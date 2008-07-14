@@ -1,0 +1,72 @@
+#! /bin/sh
+
+# $Id$
+# $URL: $
+
+DESC="Timbl Server"
+NAME=Timbl
+DAEMON=@BIN_PATH@/$NAME
+PIDFILE=@LOCALSTATE_PATH@/run/$NAME/pid
+LOGFILE=@LOCALSTATE_PATH@/log/$NAME/timbl.log
+USER=sloot
+
+# On Debian systems, configuration for init scripts is in /etc/default/
+test -f @SYSCONF_PATH@/default/@PACKAGE_TARNAME@ && . @SYSCONF_PATH@/default/@PACKAGE_TARNAME@
+# On Red Hat systems, configuration for init scripts is in /etc/sysconfig/
+test -f @SYSCONF_PATH@/sysconfig/@PACKAGE_TARNAME@ && . @SYSCONF_PATH@/sysconfig/@PACKAGE_TARNAME@
+
+if test ! -d @LOCALSTATE_PATH@/run; then mkdir -p @LOCALSTATE_PATH@/run; fi
+if test ! -d @LOCALSTATE_PATH@/log; then mkdir -p @LOCALSTATE_PATH@/log; fi
+if test ! -d @LOCALSTATE_PATH@/run/$NAME; \
+then mkdir -p @LOCALSTATE_PATH@/run/$NAME ; \
+     chown $USER:$USER @LOCALSTATE_PATH@/run/$NAME
+fi
+if test ! -d @LOCALSTATE_PATH@/log/$NAME;\
+then mkdir -p @LOCALSTATE_PATH@/log/$NAME ; \
+     chown $USER:$USER @LOCALSTATE_PATH@/log/$NAME
+fi
+
+#                        /lib/lsb/init-functions
+# Red Hat EL AS rel 2.1        No
+# Red Hat EL AS rel 3          Yes
+#
+# Debian GNU/Linux Sarge       Yes, in lsb-base package
+#
+# See /usr/share/doc/lsb-core/examples/init-skeleton.gz for sample lsb init
+# script.  If we wanna be compliant with Red Hat EL AS rel 2.1, we'd need to
+# implement our own log_success_msg, log_failure_msg and log_warning_msg.
+### FIXME . /lib/lsb/init-functions
+#
+# It seems even LSB 3.1 doesn't specify a run-as-user thing in start_daemon
+# Therefore, LSB's init-functions are not good enough for us :(
+# For now, we supply compatibility with Debian only.
+
+case "$1" in
+  start)
+        echo -n "Starting $DESC: $NAME"
+        start-stop-daemon --start --quiet --pidfile $PIDFILE --chuid $USER --exec $DAEMON -- -pidfile=$PIDFILE -logfile=$LOGFILE $TIMBLSERVER_OPTS
+        echo "."
+
+        ;;
+
+  restart)
+ 	$0 stop
+	sleep 1
+ 	$0 start
+	echo "."
+
+	;;
+
+  stop)
+        echo -n "Stopping $DESC: $NAME"
+        start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE --name $NAME
+        echo "."
+
+        ;;
+  *)
+        echo "Usage: /etc/init.d/timbl {start|stop|restart}" >&2
+        exit 3
+esac
+
+exit 0
+

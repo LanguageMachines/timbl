@@ -1,0 +1,10 @@
+structural,provide,to,CoPUNT,JJ,VB,TO,NNP,O
+parts,structural,provide,to,NNS,JJ,VB,TO,I
+for,parts,structural,provide,IN,NNS,JJ,VB,I
+Boeing,for,parts,structural,NNP,IN,NNS,JJ,O
+'s,Boeing,for,parts,POS,NNP,IN,NNS,I
+747,'s,Boeing,for,CD,POS,NNP,IN,B
+jetliners,747,'s,Boeing,NNS,CD,POS,NNP,I
+PUNT,jetliners,747,'s,PUNT,NNS,CD,POS,I
+Rockwell,PUNT,PUNT,jetliners,NNP,PUNT,PUNT,NNS,O
+said,Rockwell,PUNT,PUNT,VBD,NNP,PUNT,PUNT,I

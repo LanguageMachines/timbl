@@ -1,0 +1,10 @@
+tentative,a,signed,it,JJ,DT,VBD,PRP,I
+agreement,tentative,a,signed,NN,JJ,DT,VBD,I
+extending,agreement,tentative,a,VBG,NN,JJ,DT,I
+its,extending,agreement,tentative,PRP$,VBG,NN,JJ,O
+contract,its,extending,agreement,NN,PRP$,VBG,NN,I
+with,contract,its,extending,IN,NN,PRP$,VBG,I
+Boeing,with,contract,its,NNP,IN,NN,PRP$,O
+CoPUNT,Boeing,with,contract,NNP,NNP,IN,NN,I
+to,CoPUNT,Boeing,with,TO,NNP,NNP,IN,I
+provide,to,CoPUNT,Boeing,VB,TO,NNP,NNP,O

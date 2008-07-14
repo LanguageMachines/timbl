@@ -1,0 +1,8 @@
+for,shipsets,so-called,additional,IN,NNS,JJ,JJ,I
+the,for,shipsets,so-called,DT,IN,NNS,JJ,O
+planes,the,for,shipsets,NNS,DT,IN,NNS,I
+PUNT,planes,the,for,PUNT,NNS,DT,IN,I
+These,PUNT,PUNT,planes,DT,PUNT,PUNT,NNS,O
+include,These,PUNT,PUNT,VBP,DT,PUNT,PUNT,I
+among,KOMMA,include,These,IN,KOMMA,VBP,DT,O
+other,among,KOMMA,include,JJ,IN,KOMMA,VBP,O

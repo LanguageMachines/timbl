@@ -1,0 +1,10 @@
+the,said,Rockwell,PUNT,DT,VBD,NNP,PUNT,O
+agreement,the,said,Rockwell,NN,DT,VBD,NNP,I
+calls,agreement,the,said,VBZ,NN,DT,VBD,I
+for,calls,agreement,the,IN,VBZ,NN,DT,O
+it,for,calls,agreement,PRP,IN,VBZ,NN,O
+to,it,for,calls,TO,PRP,IN,VBZ,I
+supply,to,it,for,VB,TO,PRP,IN,O
+200,supply,to,it,CD,VB,TO,PRP,O
+additional,200,supply,to,JJ,CD,VB,TO,I
+shipsets,so-called,additional,200,NNS,JJ,JJ,CD,I

@@ -1,0 +1,10 @@
+Rockwell,PUNT,PUNT,PUNT,NNP,PUNT,PUNT,PUNT,I
+International,Rockwell,PUNT,PUNT,NNP,NNP,PUNT,PUNT,I
+CorpPUNT,International,Rockwell,PUNT,NNP,NNP,NNP,PUNT,I
+'s,CorpPUNT,International,Rockwell,POS,NNP,NNP,NNP,I
+Tulsa,'s,CorpPUNT,International,NNP,POS,NNP,NNP,B
+unit,Tulsa,'s,CorpPUNT,NN,NNP,POS,NNP,I
+said,unit,Tulsa,'s,VBD,NN,NNP,POS,I
+it,said,unit,Tulsa,PRP,VBD,NN,NNP,O
+signed,it,said,unit,VBD,PRP,VBD,NN,I
+a,signed,it,said,DT,VBD,PRP,VBD,O

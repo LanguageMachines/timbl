@@ -1,0 +1,204 @@
+/*
+  Copyright (c) 1998 - 2008
+  ILK  -  Tilburg University
+  CNTS -  University of Antwerp
+ 
+  This file is part of Timbl
+
+  Timbl is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  Timbl is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+  For questions and suggestions, see:
+      http://ilk.uvt.nl/software.html
+  or send mail to:
+      Timbl@uvt.nl
+*/
+
+
+#include <string>
+#include <map>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+#include <cassert>
+
+#include "timbl/MsgClass.h"
+#include "timbl/Common.h"
+#include "timbl/StringOps.h"
+#include "timbl/Types.h"
+#include "timbl/Options.h"
+#include "timbl/Tree.h"
+#include "timbl/Instance.h"
+#include "timbl/Statistics.h"
+#include "timbl/neighborSet.h"
+#include "timbl/BestArray.h"
+#include "timbl/IBtree.h"
+
+#ifdef USE_LOGSTREAMS
+#include "timbl/LogStream.h"
+#else
+typedef std::ostream LogStream;
+#define Log(X) (X)
+#define Dbg(X) (X)
+#endif
+
+#include "timbl/MBLClass.h"
+#include "timbl/TimblExperiment.h"
+
+namespace Timbl {
+  using namespace std;
+
+  bool CV_Experiment::Prepare( const string& f ){
+    cerr << "CV prepare " << f << endl;
+    return true;
+  }
+  
+  bool CV_Experiment::Learn( const string& f ){
+    cerr << "CV Learn " << f << endl;
+    return true;
+  }
+
+  bool CV_Experiment::checkFile( const string& FileName ){
+    if ( !IB1_Experiment::checkFile( FileName ) )
+      return false;
+    else if ( doSamples() ){
+      FatalError( "Cannot Cross validate on a file with Examplar Weighting" );
+      return false;
+    }
+    else if ( Verbosity(FEAT_W) ){
+      LearningInfo( *Log(mylog) );
+    }
+    return true;
+  }
+  
+  bool CV_Experiment::get_file_names( const string& FileName ){
+    bool result = false;
+    if ( !ExpInvalid() ){
+      NumOfFiles = 0;
+      *Dbg(mydebug) << "get_file_names: '"<< FileName << "'" << endl;
+      ifstream file_names( FileName.c_str(), ios::in );
+      string name;
+      if ( file_names.good() ) {
+	while ( getline( file_names, name ) )
+	  ++NumOfFiles;
+	file_names.close();
+	FileNames = new string[NumOfFiles];
+	ifstream file_names2( FileName.c_str(), ios::in );
+	size_t size = 0;
+	int pos = 0;
+	*Dbg(mydebug) << "get_file_names: ' step 0" << endl;
+	while ( getline( file_names2, name ) ){
+	  *Dbg(mydebug) << "examine : " << name << endl;
+	  size_t tmp = examineData( name );
+	  if ( tmp != 0 ){
+	    FileNames[pos++] = name;
+	    if ( size == 0 )
+	      size = tmp;
+	    else
+	      if ( tmp != size ) {
+		Error( "mismatching number of features in file " +
+		       name + "of CV filelist " + FileName );
+		return false;
+	      }
+	  }
+	  else
+	    return false;
+	}
+	if ( pos != NumOfFiles ){
+	  Error( "Unable to read all " + toString<int>(NumOfFiles) + 
+		 " CV filenames from " + FileName );
+	  return false;
+	}
+	else
+	  result = true;
+      }
+      else
+	Error( "Unable to read CV filenames from " + FileName );
+    }
+    return result;
+  }
+
+  static string fixPath( const string& fileName,
+			 const string& path ){
+    // if fileName contains pathinformation, it is replaced with path
+    // if filename contains NO pathinformation, path is always appended.
+    // of course we don't append if the path is empty
+
+    if ( !path.empty() ){
+      bool addSlash = path[path.length()] != '/';
+      string tmp;
+      string::size_type pos = fileName.rfind( '/' );
+      if ( pos == string::npos ){
+	tmp = path;
+	if ( addSlash )
+	  tmp += "/";
+	tmp += fileName;
+      }
+      else { 
+	tmp = path;
+	if ( addSlash )
+	tmp += "/";
+	tmp += fileName.substr( pos+1 );
+      }
+      return tmp;
+    }
+    else
+      return fileName;
+  }
+  
+
+  bool CV_Experiment::Test( const string& FileName,
+			    const string& OutFile, 
+			    const string& PercFile ){
+    if ( !ConfirmOptions() )
+      return false;
+    (void)OutFile;
+    (void)PercFile;
+    bool result = false;
+    VerbosityFlags keep = get_verbosity();
+    set_verbosity( SILENT );
+    if ( get_file_names( FileName ) ){
+      *Dbg(mydebug) << "looked in: '"<< FileName << "' " << NumOfFiles << endl;
+      *Log(mylog) << "Starting Cross validation test on files:" << endl;
+      for ( int i = 0; i < NumOfFiles; ++i )
+	*Log(mylog) << FileNames[i] << endl;
+      TimblExperiment::Prepare( FileNames[1] );
+      TimblExperiment::Learn( FileNames[1] );
+      for ( int filenum = 2; filenum < NumOfFiles; ++filenum )
+	Expand( FileNames[filenum] );
+      string outName;
+      string percName;
+      for ( int SkipFile = 0; SkipFile < NumOfFiles-1; ++SkipFile ) {
+	outName = fixPath( FileNames[SkipFile], outPath );
+	outName += ".cv";
+	percName = outName;
+	percName += ".%";
+	set_verbosity( keep );
+	result = TimblExperiment::Test( FileNames[SkipFile], outName,
+					percName );
+	set_verbosity( SILENT );
+	Expand( FileNames[SkipFile] );
+	Remove( FileNames[SkipFile+1] );
+      }
+      outName = fixPath( FileNames[NumOfFiles-1], outPath );
+      outName += ".cv";
+      percName = outName;
+      percName += ".%";
+      set_verbosity( keep );
+      result = TimblExperiment::Test( FileNames[NumOfFiles-1], outName, 
+				      percName ); 
+    }
+    return result;
+  }
+
+}
