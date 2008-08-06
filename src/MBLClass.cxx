@@ -2191,8 +2191,8 @@ namespace Timbl {
     }
   }
   
-  inline size_t MBLClass::countFeatures( const string& inBuffer,
-					 const InputFormatType IF ) const {
+  size_t MBLClass::countFeatures( const string& inBuffer,
+				  const InputFormatType IF ) const {
     size_t result = 0;
     string buffer;
     if ( chopExamples() ){
