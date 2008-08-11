@@ -679,7 +679,7 @@ namespace Timbl {
 	Order[i] = Features[i]->Weight();
 	break;
       case NoOrder:
-	Order[i] = num_of_features-i;
+	Order[i] = (double)(num_of_features-i);
 	break;
       case IGOrder:
 	Order[i] = Features[i]->InfoGain();

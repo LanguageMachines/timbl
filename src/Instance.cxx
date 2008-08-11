@@ -254,14 +254,14 @@ namespace Timbl {
   double ValueDistribution::Entropy() const {
     double Prob = 0.0;
     double entropy = 0.0;
-    double TotalVals = total_items;
+    size_t TotalVals = total_items;
     if ( TotalVals > 0 ){
       VDlist::const_iterator it = distribution.begin();
       // Loop over the classes in the distibution
       while ( it != distribution.end() ){
-	double Freq = it->second->Freq();
+	size_t Freq = it->second->Freq();
 	if ( Freq > 0 ){
-	  Prob = Freq / TotalVals;
+	  Prob = Freq / (double)TotalVals;
 	  entropy += Prob * Log2(Prob);
 	}
 	++it;
@@ -689,7 +689,7 @@ namespace Timbl {
     VCarrtype::const_iterator it = ValuesArray.begin();
     while ( it != ValuesArray.end() ){
       FeatureValue *FV = (FeatureValue*)*it;
-      double freq = FV->ValFreq();
+      size_t freq = FV->ValFreq();
       FV->ValueClassProb->Clear();
       if ( freq > 0 ){
 	// Loop over all present classes.
@@ -697,7 +697,7 @@ namespace Timbl {
 	ValueDistribution::dist_iterator It = FV->TargetDist.begin();
 	while ( It != FV->TargetDist.end() ){
 	  FV->ValueClassProb->Assign( It->second->Index(), 
-				      It->second->Freq()/freq );
+				      It->second->Freq()/(double)freq );
 	  ++It;
 	}
       }
@@ -1442,10 +1442,10 @@ namespace Timbl {
     const size_t n = source.length();
     const size_t m = target.length();
     if (n == 0) {
-      return m;
+      return (double)m;
     }
     if (m == 0) {
-      return n;
+      return (double)n;
     }    
     // Good form to declare a TYPEDEF
     typedef std::vector< std::vector<size_t> > Tmatrix;     
@@ -1497,7 +1497,7 @@ namespace Timbl {
 	matrix[i][j]=cell;
       }
     }
-    return matrix[n][m];
+    return (double)matrix[n][m];
   }
   
   double FeatureValue::VDDistance( FeatureValue *G, 

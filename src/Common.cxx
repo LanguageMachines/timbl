@@ -28,7 +28,7 @@
 #include "config.h"
 
 extern "C" {
-  int timbl_present(){ return 1; };
+  int timbl_present(){ return 1; }
 }
 
 using namespace std;
