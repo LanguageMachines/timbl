@@ -14,10 +14,21 @@ AC_DEFINE_DIR([BIN_PATH], bindir, bindir)
 AC_DEFINE_DIR([SYSCONF_PATH], sysconfdir, sysconfdir)
 AC_DEFINE_DIR([LOCALSTATE_PATH], localstatedir, localstatedir)
 
+if test x"${CXXFLAGS+set}" = xset; then
+  # the user set CXXFLAGS; don't override it.
+  cxx_flags_were_set=true
+else
+  cxx_flags_were_set=false
+fi
+
 # Checks for programs.
 # when available, we prefer the Intel Compiler
 AC_PROG_CXX( [icpc g++] )
-AC_PROG_CC
+
+if $cxx_flags_were_set; then
+  CXXFLAGS=$CXXFLAGS
+fi
+
 
 # when running tests, use CXX
 AC_LANG([C++])
@@ -108,7 +119,7 @@ AC_MSG_WARN([not building servermode] )
 else
     if test "$enable_server" != "no"; then
         LIBS="$LIBS -lpthread"
-        CPPFLAGS="$CPPFLAGS -DPTHREADS -DUSE_LOGSTREAMS"
+        CXXFLAGS="$CXXFLAGS -DPTHREADS -DUSE_LOGSTREAMS"
     fi
 fi
 dnl
@@ -116,22 +127,22 @@ dnl
 if test "$ac_cv_prog_ac_ct_CXX" == "g++"; then
   have_abi64=0
   oldLibs=$LIBS
-  oldCPPFLAGS=$CPPFLAGS
+  oldCXXFLAGS=$CXXFLAGS
   LIBS="$LIBS -mabi=64 -mips4"
-  CPPFLAGS="$CPPFLAGS -mabi=64 -mips4"
+  CXXFLAGS="$CXXFLAGS -mabi=64 -mips4"
   AC_MSG_CHECKING([-mabi=64 compiler flag] )
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[const char hw[] = "Hello World\n";]])],
                  [have_abi64=1])
   if test "$have_abi64" == "0"; then
       LIBS=$oldLibs
-      CPPFLAGS=$oldCPPFLAGS
+      CXXFLAGS=$oldCXXFLAGS
       AC_MSG_RESULT( [No] )
   else
       AC_MSG_RESULT( [Ok] )
   fi
-  CPPFLAGS="$CPPFLAGS -W -Wall"
+  CXXFLAGS="$CXXFLAGS -W -Wall"
 else
-  CPPFLAGS="$CPPFLAGS -Wcheck"
+  CXXFLAGS="$CXXFLAGS -Wcheck"
 fi
 
 AC_OUTPUT([
