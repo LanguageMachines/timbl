@@ -259,11 +259,11 @@ namespace Timbl {
   }
   
   string to_node( const FeatureValue *fv ){
-    return "<feature>" + fv->EncodedName() + "</feature>";
+    return "<feature>" + encode(fv->Name()) + "</feature>";
   }
 
   string to_node( const TargetValue *tv ){
-    return "<target>" + tv->EncodedName() + "</target>";
+    return "<target>" + encode(tv->Name()) + "</target>";
   }
 
   string to_node( const ValueDistribution *d ){

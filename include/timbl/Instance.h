@@ -106,7 +106,6 @@ namespace Timbl {
     double Entropy() const;
     ValueDistribution *to_VD_Copy( ) const;
     virtual WValueDistribution *to_WVD_Copy() const;
-    virtual bool isWeighted() const { return false; };
   protected:
     virtual void DistToEncodedString( std::string& ) const;
     virtual void DistToString( std::string&, double=0 ) const;
@@ -130,7 +129,6 @@ namespace Timbl {
     const std::string Save() const;
     void Normalize();
     void Normalize_1( double, const Target * );
-    virtual bool isWeighted() const { return true; };
     void MergeW( const ValueDistribution&, double );
   private:
     void DistToEncodedString( std::string& ) const;
@@ -152,7 +150,6 @@ namespace Timbl {
     void decr_val_freq(){ Frequency--; };
     unsigned int Index() const { return index; };
     const std::string& Name() const { return name; };
-    const std::string EncodedName() const { return encode(name); };
     friend std::ostream& operator<<( std::ostream& os, ValueClass const *vc );
   protected:
     const std::string& name;
@@ -216,7 +213,7 @@ namespace Timbl {
   public:
     BaseFeatTargClass( int, int, StringHash * );
     virtual ~BaseFeatTargClass();
-    int EffectiveValues() const;
+    size_t EffectiveValues() const;
     size_t TotalValues() const;
     VCarrtype ValuesArray;
     IVCmaptype ValuesMap;

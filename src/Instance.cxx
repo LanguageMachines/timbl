@@ -99,7 +99,7 @@ namespace Timbl {
 	++it;
 	continue;
       }
-      oss << f->Value()->EncodedName()<< " " << f->Freq();
+      oss << encode(f->Value()->Name())<< " " << f->Freq();
       ++it;
       if ( it != distribution.end() )
 	oss << ", ";
@@ -118,7 +118,7 @@ namespace Timbl {
 	++it;
 	continue;
       }
-      oss << f->value->EncodedName() << " " << f->weight;
+      oss << encode(f->value->Name()) << " " << f->weight;
       ++it;
       if ( it != distribution.end() )
 	oss << ", ";
@@ -1210,7 +1210,7 @@ namespace Timbl {
 			    unsigned int value_hash ):
     ValueClass( value, value_hash ){}
   
-  int BaseFeatTargClass::EffectiveValues() const {
+  size_t BaseFeatTargClass::EffectiveValues() const {
     int result = 0;
     VCarrtype::const_iterator it = ValuesArray.begin();
     while( it != ValuesArray.end() ){
