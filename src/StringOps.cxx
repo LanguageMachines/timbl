@@ -84,25 +84,32 @@ namespace Timbl {
     string::const_iterator it = in.begin();
     while ( it != in.end() ){
       if ( *it == '\\' ){
-	switch ( *++it ){
-	case  '_':
-	  out += ' ';
-	  break;
-	case '\\':
+	++it;
+	if ( it == in.end() ){
 	  out += '\\';
 	  break;
-	case 't':
-	  out += '\t';
-	  break;
-	default:
-	  string msg = string("Invalid value '") + *it 
-	    + "' in switch (" 
-	    + __FILE__  + "," + toString(__LINE__) + ")\n"
-	    + "Input was '"  + in + "'\n"
-	    + "ABORTING now";
-	  throw std::logic_error( msg );
 	}
-	++it;
+	else {
+	  switch ( *++it ){
+	  case  '_':
+	    out += ' ';
+	    break;
+	  case '\\':
+	    out += '\\';
+	    break;
+	  case 't':
+	    out += '\t';
+	    break;
+	  default:
+	    string msg = string("Invalid value '") + *it 
+	      + "' in switch (" 
+	      + __FILE__  + "," + toString(__LINE__) + ")\n"
+	      + "Input was '"  + in + "'\n"
+	      + "ABORTING now";
+	    throw std::logic_error( msg );
+	  }
+	  ++it;
+	}
       }
       else
 	out += *it++;
