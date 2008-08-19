@@ -101,12 +101,8 @@ namespace Timbl {
 	    out += '\t';
 	    break;
 	  default:
-	    string msg = string("Invalid value '") + *it 
-	      + "' in switch (" 
-	      + __FILE__  + "," + toString(__LINE__) + ")\n"
-	      + "Input was '"  + in + "'\n"
-	      + "ABORTING now";
-	    throw std::logic_error( msg );
+	    out += '\\';
+	    out += *it;
 	  }
 	  ++it;
 	}
