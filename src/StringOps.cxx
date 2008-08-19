@@ -90,7 +90,7 @@ namespace Timbl {
 	  break;
 	}
 	else {
-	  switch ( *++it ){
+	  switch ( *it ){
 	  case  '_':
 	    out += ' ';
 	    break;
