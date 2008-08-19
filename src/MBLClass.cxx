@@ -157,7 +157,7 @@ namespace Timbl {
     Options.Add( new SizeOption( "NEIGHBORS", 
 				 &num_of_neighbors, 1, 1, 5000 ) );
     Options.Add( new IntegerOption( "PROGRESS", 
-				    &progress, 10000, 1, 1000000 ) );
+				    &progress, 10000, 1, INT_MAX ) );
     if ( !Options.Add( new IntegerOption( "CLIP_FACTOR", 
 					  &clip_factor, 10, 0, 1000000 ) ) ){
       Error( "Too many options for OptionTable" );
