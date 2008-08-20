@@ -127,6 +127,7 @@ namespace Timbl {
 			    ):
     _size(size), features(feat), permutation(perm)
   {
+    permFeatures.reserve(_size);
     permFeatures.resize(_size,0);
     test_feature_val = new metricTester*[_size];
     for ( size_t j=0; j < _size; ++j ){
@@ -2171,13 +2172,13 @@ namespace Timbl {
   void MBLClass::initTesters() {
     delete tester;
     if ( doSamples() )
-      tester = new ExemplarTester( Features, Permutation, MaxFeatures );
+      tester = new ExemplarTester( Features, Permutation, NumOfFeatures() );
     else if ( do_cos_metric )
-      tester = new CosineTester( Features, Permutation, MaxFeatures );
+      tester = new CosineTester( Features, Permutation, NumOfFeatures() );
     else if ( do_dot_product )
-      tester = new DotProductTester( Features, Permutation, MaxFeatures );
+      tester = new DotProductTester( Features, Permutation, NumOfFeatures() );
     else
-      tester = new DefaultTester( Features, Permutation, MaxFeatures );
+      tester = new DefaultTester( Features, Permutation, NumOfFeatures() );
     tester->reset( NumOfFeatures(), GlobalMetric, mvd_threshold );
   }
 
