@@ -872,6 +872,7 @@ namespace Timbl {
       return false;
   }
     
+  static const int maxSimilarity = INT_MAX;
   void TimblExperiment::show_results( ostream& outfile, 
 				      const string& dString,
 				      const TargetValue *Best,

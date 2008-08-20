@@ -30,6 +30,7 @@ namespace Timbl {
   using namespace Common;
 
   class InstanceBase_base;
+  class TesterClass;
   class metricTester;
   class Chopper;
 
@@ -171,7 +172,6 @@ namespace Timbl {
     size_t MaxBests;
     neighborSet nSet;
     decayStruct *decay;
-    static const int maxSimilarity = INT_MAX;
     int beamSize;
     normType normalisation;
     double norm_factor;
@@ -184,7 +184,6 @@ namespace Timbl {
     bool MBL_init;
     bool do_diversify;
     bool initProbabilityArrays( bool );
-    metricTester **test_feature_val;
     void calculatePrestored();
     void initDecay();
     void initTesters();
@@ -230,78 +229,15 @@ namespace Timbl {
     double calculate_db_entropy( Target * );
     void do_numeric_statistics( );
     Chopper *ChopInput;
-    double innerProduct( FeatureValue *, FeatureValue * ) const;
-    size_t (MBLClass::*testGraph)( const std::vector<FeatureValue *>&,
-				   std::vector<FeatureValue *>&, 
-				   std::vector<double>&,
-				   size_t,
-				   size_t,
-				   size_t ) const;
+    TesterClass *tester;
     
-    size_t test_in_graph_dot( const std::vector<FeatureValue *>&,
-			      std::vector<FeatureValue *>&, 
-			      std::vector<double>&,
-			      size_t,
-			      size_t,
-			      size_t ) const;
-    
-    size_t test_in_graph_cos( const std::vector<FeatureValue *>&,
-			      std::vector<FeatureValue *>&, 
-			      std::vector<double>&,
-			      size_t,
-			      size_t,
-			      size_t ) const;
 
-
-    size_t test_in_graph( const std::vector<FeatureValue *>&, 
-			  std::vector<FeatureValue *>&, 
-			  std::vector<double>&,
-			  size_t,
-			  size_t,
-			  size_t,
-			  double ) const;
     void test_instance( const Instance& ,
 			InstanceBase_base * = NULL,
 			size_t = 0 );
     void test_instance_sim( const Instance& ,
 			    InstanceBase_base * = NULL,
 			    size_t = 0 );
-    
-    size_t (MBLClass::*testGraphEx)( const std::vector<FeatureValue *>&,
-				     std::vector<FeatureValue *>&, 
-				     std::vector<double>&,
-				     size_t,
-				     size_t,
-				     size_t,
-				     double,
-				     double& ) const;
-    
-    size_t test_in_graph_dot_ex( const std::vector<FeatureValue *>&,
-				 std::vector<FeatureValue *>&, 
-				 std::vector<double>&,
-				 size_t,
-				 size_t,
-				 size_t,
-				 double,
-				 double& ) const;
-    
-    size_t test_in_graph_cos_ex( const std::vector<FeatureValue *>&,
-				 std::vector<FeatureValue *>&, 
-				 std::vector<double>&,
-				 size_t,
-				 size_t,
-				 size_t,
-				 double,
-				 double& ) const;
-    
-    size_t test_in_graph_ex( const std::vector<FeatureValue *>&, 
-			     std::vector<FeatureValue *>&, 
-			     std::vector<double>&,
-			     size_t,
-			     size_t,
-			     size_t,
-			     double,
-			     double& ) const;
     
     void test_instance_ex( const Instance&,
 			   InstanceBase_base * = NULL,

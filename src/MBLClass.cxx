@@ -77,6 +77,335 @@ namespace Timbl {
 
   static const string DefaultSparseString = "0.0000E-17";
 
+  class TesterClass {
+  public:
+    TesterClass( const std::vector<Feature*>&, 
+		 const size_t *, 
+		 size_t );
+    virtual ~TesterClass();
+    void reset( size_t, MetricType, int );
+    virtual size_t test( const vector<FeatureValue *>& FV,
+		 vector<FeatureValue *>& G, 
+		 vector<double>& Distances,
+		 size_t CurPos,
+		 size_t Size,
+		 size_t ib_offset,
+		 double Threshold_plus ) const =0;
+    virtual size_t test_sim( const vector<FeatureValue *>& FV,
+		 vector<FeatureValue *>& G, 
+		 vector<double>& Distances,
+		 size_t CurPos,
+		 size_t Size,
+		 size_t ib_offset ) const = 0;
+    virtual size_t test_ex( const vector<FeatureValue *>& FV,
+		 vector<FeatureValue *>& G, 
+		 vector<double>& Distances,
+		 size_t CurPos,
+		 size_t Size,
+		 size_t ib_offset,
+		 double,
+		 double& ) const = 0;
+    virtual size_t test_sim_ex( const vector<FeatureValue *>& FV,
+				vector<FeatureValue *>& G, 
+				vector<double>& Distances,
+				size_t CurPos,
+				size_t Size,
+				size_t ib_offset,
+				double,
+				double& ) const = 0;
+  protected:
+    size_t _size;
+    metricTester **test_feature_val;
+    const std::vector<Feature *> &features;
+    std::vector<Feature *> permFeatures;
+    const size_t *permutation;
+  };
+  
+  TesterClass::TesterClass( const std::vector<Feature*>& feat,
+			    const size_t *perm,
+			    size_t size
+			    ):
+    _size(size), features(feat), permutation(perm)
+  {
+    permFeatures.resize(_size,0);
+    test_feature_val = new metricTester*[_size];
+    for ( size_t j=0; j < _size; ++j ){
+      permFeatures[j] = feat[perm[j]];
+      test_feature_val[j] = 0;
+    }
+  }
+  
+  void TesterClass::reset( size_t numF, 
+			   MetricType globalMetric, int threshold ){
+    for ( size_t i=0; i < numF; ++i ){
+      delete test_feature_val[i];
+      test_feature_val[i] = 0;
+      if ( features[i]->Ignore() )
+	continue;
+      if ( features[i]->Numeric() ){
+	test_feature_val[i] = new numericOverlapTester();
+      }
+      else {
+	MetricType TM =  features[i]->Metric();
+	if ( TM == DefaultMetric )
+	  TM = globalMetric;
+	switch ( TM ){
+	case Overlap:
+	  test_feature_val[i] = new overlapTester();
+	  break;
+	case Levenshtein:
+	  test_feature_val[i] = new levenshteinTester( threshold );
+	  break;
+	case ValueDiff:
+	  test_feature_val[i] = new valueDiffTester( threshold );
+	  break;
+	case JeffreyDiv:
+	  test_feature_val[i] = new jeffreyDiffTester( threshold );
+	  break;
+	default:
+	  string msg = string("Invalid value '") + toString( TM ) 
+	    + "' in switch (" 
+	    + __FILE__  + "," + toString(__LINE__) + ")\n"
+	    + "ABORTING now";
+	  throw std::logic_error( msg );
+	}
+      }
+    }
+  }
+
+  TesterClass::~TesterClass(){
+    for ( size_t i=0; i < _size; ++i ){
+      delete test_feature_val[i];
+    }
+    delete [] test_feature_val;
+  }
+
+  class DefaultTester: public TesterClass {
+  public:
+    DefaultTester( std::vector<Feature*>& pf, size_t *p, size_t s ): 
+      TesterClass( pf, p, s ){};  
+    size_t test( const vector<FeatureValue *>& FV,
+		 vector<FeatureValue *>& G, 
+		 vector<double>& Distances,
+		 size_t CurPos,
+		 size_t Size,
+		 size_t ib_offset,
+		 double Threshold_plus ) const {
+      double result;
+      size_t TrueF;
+      size_t i;
+      for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
+	result = test_feature_val[permutation[TrueF]]->test( FV[TrueF],
+							     G[i],
+							     permFeatures[TrueF] );
+	Distances[i+1] = Distances[i] + result;
+	if ( Distances[i+1] > Threshold_plus ){
+	  return i;
+	}
+      }
+      return Size;
+    }
+    size_t test_ex( const vector<FeatureValue *>&,
+		    vector<FeatureValue *>&, 
+		    vector<double>& ,
+		    size_t,
+		    size_t,
+		    size_t,
+		    double,
+		    double& ) const { abort(); };
+    size_t test_sim( const vector<FeatureValue *>&,
+		    vector<FeatureValue *>&, 
+		    vector<double>& ,
+		    size_t,
+		    size_t,
+		    size_t ) const { abort(); };
+    size_t test_sim_ex( const vector<FeatureValue *>&,
+			vector<FeatureValue *>&, 
+			vector<double>& ,
+			size_t,
+			size_t,
+			size_t,
+			double,
+			double& ) const { abort(); };
+  };
+
+  inline double WeightFun( double D, double W ){
+    return D / (W + Epsilon);
+  }
+  
+  
+  class ExemplarTester: public TesterClass {
+  public:
+    ExemplarTester( std::vector<Feature*>& pf, size_t *p, size_t s ): 
+      TesterClass( pf, p, s ){};  
+    size_t test( const vector<FeatureValue *>&,
+		 vector<FeatureValue *>&, 
+		 vector<double>&,
+		 size_t,
+		 size_t,
+		 size_t,
+		 double ) const { abort(); };
+    size_t test_sim( const vector<FeatureValue *>&,
+		    vector<FeatureValue *>&, 
+		    vector<double>& ,
+		    size_t,
+		    size_t,
+		    size_t ) const { abort(); };
+    size_t test_ex( const vector<FeatureValue *>& FV,
+		    vector<FeatureValue *>& G, 
+		    vector<double>& Distances,
+		    size_t CurPos,
+		    size_t Size,
+		    size_t ib_offset,
+		    double ExWeight,
+		    double& Distance ) const {
+      double result;
+      size_t TrueF;
+      size_t i;
+      for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
+	result = test_feature_val[permutation[TrueF]]->test( FV[TrueF],
+							     G[i],
+							     permFeatures[TrueF] );
+	Distances[i+1] = Distances[i] + result;
+      }
+      Distance = WeightFun( Distances[i], ExWeight );
+      return Size;
+    }
+    size_t test_sim_ex( const vector<FeatureValue *>&,
+			vector<FeatureValue *>&, 
+			vector<double>& ,
+			size_t,
+			size_t,
+			size_t,
+			double,
+			double& ) const { abort(); };
+  };
+
+  double innerProduct( FeatureValue *FV,
+		       FeatureValue *G ) {
+    double r1, r2, result;
+    if ( FV_to_real( FV, r1 ) &&
+	 FV_to_real( G, r2 ) ){
+      result = r1 * r2;
+    }
+    else
+      result = 0.0;
+    return result;
+  }
+
+  static const int maxSimilarity = INT_MAX;
+  
+  class CosineTester: public TesterClass {
+  public:
+    CosineTester( std::vector<Feature*>& pf, size_t *p, size_t s ): 
+      TesterClass( pf, p, s ){};  
+    size_t test( const vector<FeatureValue *>&,
+		 vector<FeatureValue *>&, 
+		 vector<double>&,
+		 size_t,
+		 size_t,
+		 size_t,
+		 double ) const { abort(); };
+    size_t test_sim( const vector<FeatureValue *>& FV,
+		     vector<FeatureValue *>& G, 
+		     vector<double>& Distances,
+		     size_t CurPos,
+		     size_t Size,
+		     size_t ib_offset ) const {
+      double denom1 = 0.0;
+      double denom2 = 0.0;
+      size_t TrueF;
+      size_t i;
+      for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
+	double d1 = innerProduct( FV[TrueF], FV[TrueF] );
+	d1 *= permFeatures[TrueF]->Weight();
+	denom1 += d1;
+	double d2 = innerProduct( G[i], G[i] );
+	d2 *= permFeatures[TrueF]->Weight();
+	denom2 += d2;
+      }
+      double denom = sqrt( denom1 * denom2 );
+      double result = 0.0;
+      for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
+	result += innerProduct( FV[TrueF], G[i] ) 
+	  * permFeatures[TrueF]->Weight();
+      }
+      Distances[Size] = result/ (denom + Epsilon);
+      return Size;
+    }
+    size_t test_ex( const vector<FeatureValue *>&,
+		    vector<FeatureValue *>&, 
+		    vector<double>&,
+		    size_t,
+		    size_t,
+		    size_t,
+		    double,
+		    double& ) const { abort(); };
+    size_t test_sim_ex( const vector<FeatureValue *>&,
+			vector<FeatureValue *>&, 
+			vector<double>& ,
+			size_t,
+			size_t,
+			size_t,
+			double,
+			double& ) const { abort(); };
+  };
+  
+  class DotProductTester: public TesterClass {
+  public:
+    DotProductTester( std::vector<Feature*>& pf, size_t *p, size_t s ): 
+      TesterClass( pf, p, s ){};  
+    size_t test( const vector<FeatureValue *>&,
+		 vector<FeatureValue *>&, 
+		 vector<double>&,
+		 size_t,
+		 size_t,
+		 size_t,
+		 double ) const { abort(); };
+    size_t test_sim( const vector<FeatureValue *>& FV,
+		     vector<FeatureValue *>& G, 
+		     vector<double>& Distances,
+		     size_t CurPos,
+		     size_t Size,
+		     size_t ib_offset ) const {
+      double result;
+      size_t TrueF;
+      size_t i;
+      for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
+	result = innerProduct( FV[TrueF], G[i] );
+	result *= permFeatures[TrueF]->Weight();
+	Distances[i+1] = Distances[i] + result;
+      }
+      return Size;
+    }
+    size_t test_ex( const vector<FeatureValue *>&,
+		    vector<FeatureValue *>&, 
+		    vector<double>&,
+		    size_t,
+		    size_t,
+		    size_t,
+		    double,
+		    double& ) const { abort(); };
+    size_t test_sim_ex( const vector<FeatureValue *>& FV,
+			vector<FeatureValue *>& G, 
+			vector<double>& Distances,
+			size_t CurPos,
+			size_t Size,
+			size_t ib_offset,
+			double ExWeight,
+			double& Distance ) const {
+      size_t TrueF;
+      size_t i;
+      for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
+	double result = innerProduct( FV[TrueF], G[i] );
+	result *= permFeatures[TrueF]->Weight();
+	Distances[i+1] = Distances[i] + result;
+      }
+      Distance = WeightFun( maxSimilarity - Distances[i], ExWeight );
+      return Size;
+    }
+  };
+  
 
   void MBLClass::fill_table(){
     Options.Add( new IntegerOption( "FLENGTH",
@@ -229,10 +558,7 @@ namespace Timbl {
       Permutation[i] = i;
     }
     UserOptions.resize(MaxFeatures+1);
-    test_feature_val = new metricTester*[MaxFeatures];
-    for ( size_t j=0; j < MaxFeatures; ++j ){
-      test_feature_val[j] = 0;
-    }
+    tester = 0;
     fill_table();
     decay = 0;
 #ifndef USE_LOGSTREAMS
@@ -296,11 +622,10 @@ namespace Timbl {
       do_silly_testing   = m.do_silly_testing;
       do_diversify       = m.do_diversify;
       Permutation = new size_t[MaxFeatures];
-      test_feature_val = new metricTester*[MaxFeatures];
       for ( size_t j=0; j < MaxFeatures; ++j ){
 	Permutation[j] = m.Permutation[j];
-	test_feature_val[j] = 0;
       }
+      tester = 0;
       decay = 0;
       Features  = m.Features;
       PermFeatures = m.PermFeatures;
@@ -350,10 +675,7 @@ namespace Timbl {
     else {
       InstanceBase->CleanPartition();
     }
-    for ( unsigned int i=0; i < MaxFeatures; ++i ){
-      delete test_feature_val[i];
-    }
-    delete [] test_feature_val;
+    delete tester;
     delete [] Permutation;
     delete decay;
     delete ChopInput;
@@ -1647,10 +1969,6 @@ namespace Timbl {
     return nSet.bestDistribution( decay, k );
   }
 
-  inline double WeightFun( double D, double W ){
-    return D / (W + Epsilon);
-  }
-  
   string MBLClass::formatInstance( const vector<FeatureValue *>& OrgFV,
 				   vector<FeatureValue *>& RedFV,
 				   size_t OffSet,
@@ -1700,29 +2018,7 @@ namespace Timbl {
     delete [] InvPerm;
     return result;
   }
-
   
-  size_t MBLClass::test_in_graph_ex( const vector<FeatureValue *>& FV,
-				     vector<FeatureValue *>& G, 
-				     vector<double>& Distances,
-				     size_t CurPos,
-				     size_t Size,
-				     size_t ib_offset,
-				     double ExWeight,
-				     double& Distance ) const {
-    double result;
-    size_t TrueF;
-    size_t i;
-    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
-      result = test_feature_val[Permutation[TrueF]]->test( FV[TrueF],
-							   G[i],
-							   PermFeatures[TrueF] );
-      Distances[i+1] = Distances[i] + result;
-    }
-    Distance = WeightFun( Distances[i], ExWeight );
-    return Size;
-  }  
-
   void MBLClass::test_instance_ex( const Instance& Inst,
 				   InstanceBase_base *IB,
 				   size_t ib_offset ){
@@ -1743,14 +2039,14 @@ namespace Timbl {
     }
     size_t CurPos = 0;
     while ( Bpnt ) {
-      size_t EndPos  = test_in_graph_ex( Inst.FV,
-					 CurrentFV,
-					 distances,
-					 CurPos,
-					 EffFeat,
-					 ib_offset,
-					 Bpnt->Weight(),
-					 Distance );
+      size_t EndPos  = tester->test_ex( Inst.FV,
+					CurrentFV,
+					distances,
+					CurPos,
+					EffFeat,
+					ib_offset,
+					Bpnt->Weight(),
+					Distance );
       if ( EndPos == EffFeat ){
 	// we finished with a certain amount of succes
 	ValueDistribution ResultDist;
@@ -1787,38 +2083,6 @@ namespace Timbl {
     }
   }
   
-  size_t MBLClass::test_in_graph_dot_ex( const vector<FeatureValue *>& FV,
-					 vector<FeatureValue *>& G, 
-					 vector<double>& Distances,
-					 size_t CurPos,
-					 size_t Size,
-					 size_t ib_offset,
-					 double ExWeight,
-					 double& Distance ) const {
-    size_t TrueF;
-    size_t i;
-    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
-      double result = innerProduct( FV[TrueF], G[i] );
-      result *= PermFeatures[TrueF]->Weight();
-      Distances[i+1] = Distances[i] + result;
-    }
-    Distance = WeightFun( maxSimilarity - Distances[i], ExWeight );
-    return Size;
-  }
-  
-  size_t MBLClass::test_in_graph_cos_ex( const vector<FeatureValue *>&,
-					 vector<FeatureValue *>&, 
-					 vector<double>&,
-					 size_t,
-					 size_t,
-					 size_t,
-					 double,
-					 double&) const {
-    Error( "test instance with cosine metric not implemented for examplar weights" );
-    FatalError( "we are dead" );
-    return 0;
-  }
-
   void MBLClass::test_instance_sim_ex( const Instance& Inst,
 				       InstanceBase_base *IB,
 				       size_t ib_offset ){
@@ -1839,14 +2103,14 @@ namespace Timbl {
     }
     size_t CurPos = 0;
     while ( Bpnt ) {
-      size_t EndPos = (this->*testGraphEx)( Inst.FV,
-					    CurrentFV,
-					    distances,
-					    CurPos,
-					    EffFeat,
-					    ib_offset,
-					    Bpnt->Weight(),
-					    Distance );
+      size_t EndPos = tester->test_sim_ex( Inst.FV,
+					   CurrentFV,
+					   distances,
+					   CurPos,
+					   EffFeat,
+					   ib_offset,
+					   Bpnt->Weight(),
+					   Distance );
       if ( EndPos == EffFeat ){
 	// we finished with a certain amount of succes
 	ValueDistribution ResultDist;
@@ -1905,53 +2169,16 @@ namespace Timbl {
   }
 
   void MBLClass::initTesters() {
-    for ( size_t i=0; i < NumOfFeatures(); ++i ){
-      delete test_feature_val[i];
-      test_feature_val[i] = 0;
-      if ( Features[i]->Ignore() )
-	continue;
-      if ( Features[i]->Numeric() ){
-	test_feature_val[i] = new numericOverlapTester();
-      }
-      else {
-	MetricType TM =  Features[i]->Metric();
-	if ( TM == DefaultMetric )
-	  TM = GlobalMetric;
-	switch ( TM ){
-	case Overlap:
-	  test_feature_val[i] = new overlapTester();
-	  break;
-	case Levenshtein:
-
-	  test_feature_val[i] = new levenshteinTester( mvd_threshold );
-	  break;
-	case ValueDiff:
-	  test_feature_val[i] = new valueDiffTester( mvd_threshold );
-	  break;
-	case JeffreyDiv:
-	  test_feature_val[i] = new jeffreyDiffTester( mvd_threshold );
-	  break;
-	default:
-	  string msg = string("Invalid value '") + toString( TM ) 
-	    + "' in switch (" 
-	    + __FILE__  + "," + toString(__LINE__) + ")\n"
-	    + "ABORTING now";
-	  throw std::logic_error( msg );
-	}
-      }
-    }
-  }
-
-  double MBLClass::innerProduct( FeatureValue *FV,
-				 FeatureValue *G ) const {
-    double r1, r2, result;
-    if ( FV_to_real( FV, r1 ) &&
-	 FV_to_real( G, r2 ) ){
-      result = r1 * r2;
-    }
+    delete tester;
+    if ( doSamples() )
+      tester = new ExemplarTester( Features, Permutation, MaxFeatures );
+    else if ( do_cos_metric )
+      tester = new CosineTester( Features, Permutation, MaxFeatures );
+    else if ( do_dot_product )
+      tester = new DotProductTester( Features, Permutation, MaxFeatures );
     else
-      result = 0.0;
-    return result;
+      tester = new DefaultTester( Features, Permutation, MaxFeatures );
+    tester->reset( NumOfFeatures(), GlobalMetric, mvd_threshold );
   }
 
   ostream&  operator<< ( ostream& os, const vector<FeatureValue*>& fv ){
@@ -1981,28 +2208,6 @@ namespace Timbl {
   }
 
   
-  size_t MBLClass::test_in_graph( const vector<FeatureValue *>& FV,
-				  vector<FeatureValue *>& G, 
-				  vector<double>& Distances,
-				  size_t CurPos,
-				  size_t Size,
-				  size_t ib_offset,
-				  double Threshold_plus ) const {
-    double result;
-    size_t TrueF;
-    size_t i;
-    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
-      result = test_feature_val[Permutation[TrueF]]->test( FV[TrueF],
-							   G[i],
-							   PermFeatures[TrueF] );
-      Distances[i+1] = Distances[i] + result;
-      if ( Distances[i+1] > Threshold_plus ){
-	return i;
-      }
-    }
-    return Size;
-  }
-
   void MBLClass::test_instance( const Instance& Inst,
 				InstanceBase_base *IB,
 				size_t ib_offset ){
@@ -2017,13 +2222,13 @@ namespace Timbl {
 							       effective_feats );
     size_t CurPos = 0;
     while ( best_distrib ){
-      size_t EndPos = test_in_graph( Inst.FV,
-				     CurrentFV,
-				     distances,
-				     CurPos,
-				     EffFeat,
-				     ib_offset,
-				     Threshold + Epsilon );
+      size_t EndPos = tester->test( Inst.FV,
+				    CurrentFV,
+				    distances,
+				    CurPos,
+				    EffFeat,
+				    ib_offset,
+				    Threshold + Epsilon );
       if ( EndPos == EffFeat ){
 	// we finished with a certain amount of succes
 	Distance = distances[EndPos];
@@ -2063,51 +2268,6 @@ namespace Timbl {
     }
   }
 
-  size_t MBLClass::test_in_graph_dot( const vector<FeatureValue *>& FV,
-				      vector<FeatureValue *>& G, 
-				      vector<double>& Distances,
-				      size_t CurPos,
-				      size_t Size,
-				      size_t ib_offset ) const {
-    double result;
-    size_t TrueF;
-    size_t i;
-    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
-      result = innerProduct( FV[TrueF], G[i] );
-      result *= PermFeatures[TrueF]->Weight();
-      Distances[i+1] = Distances[i] + result;
-    }
-    return Size;
-  }
-  
-  size_t MBLClass::test_in_graph_cos( const vector<FeatureValue *>& FV,
-				      vector<FeatureValue *>& G, 
-				      vector<double>& Distances,
-				      size_t CurPos,
-				      size_t Size,
-				      size_t ib_offset ) const {
-    double denom1 = 0.0;
-    double denom2 = 0.0;
-    size_t TrueF;
-    size_t i;
-    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
-      double d1 = innerProduct( FV[TrueF], FV[TrueF] );
-      d1 *= PermFeatures[TrueF]->Weight();
-      denom1 += d1;
-      double d2 = innerProduct( G[i], G[i] );
-      d2 *= PermFeatures[TrueF]->Weight();
-      denom2 += d2;
-    }
-    double denom = sqrt( denom1 * denom2 );
-    double result = 0.0;
-    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
-      result += innerProduct( FV[TrueF], G[i] ) 
-	* PermFeatures[TrueF]->Weight();
-    }
-    Distances[Size] = result/ (denom + Epsilon);
-    return Size;
-  }
-  
   void MBLClass::test_instance_sim( const Instance& Inst,
 				    InstanceBase_base *IB,
 				    size_t ib_offset ){
@@ -2121,12 +2281,12 @@ namespace Timbl {
 							       effective_feats );
     size_t CurPos = 0;
     while ( best_distrib ){
-      size_t EndPos = (this->*testGraph)( Inst.FV,
-					  CurrentFV,
-					  distances,
-					  CurPos,
-					  EffFeat,
-					  ib_offset );
+      size_t EndPos = tester->test_sim( Inst.FV,
+					CurrentFV,
+					distances,
+					CurPos,
+					EffFeat,
+					ib_offset );
       if ( EndPos == EffFeat ){
 	// we finished with a certain amount of succes
 	Distance = maxSimilarity - distances[EndPos];
@@ -2166,24 +2326,14 @@ namespace Timbl {
 		    Verbosity(DISTRIB) ); 
     // must be cleared for EVERY test
     if (  doSamples() ){
-      if ( do_dot_product ){
-	testGraphEx = &MBLClass::test_in_graph_dot_ex;
+      if ( do_dot_product || do_cos_metric ){
 	test_instance_sim_ex( Inst, SubTree, level );
-      }
-      else if ( do_cos_metric ){
-	testGraphEx = &MBLClass::test_in_graph_cos_ex;
-	test_instance_sim_ex( Inst, SubTree, level );	
       }
       else
 	test_instance_ex( Inst, SubTree, level );
     }
     else {
-      if ( do_dot_product ){
-	testGraph = &MBLClass::test_in_graph_dot;
-	test_instance_sim( Inst, SubTree, level );
-      }
-      else if ( do_cos_metric ){
-	testGraph = &MBLClass::test_in_graph_cos;
+      if ( do_dot_product || do_cos_metric ){
 	test_instance_sim( Inst, SubTree, level );
       }
       else
