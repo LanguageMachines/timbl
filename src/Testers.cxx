@@ -1,0 +1,383 @@
+/*
+  Copyright (c) 1998 - 2008
+  ILK  -  Tilburg University
+  CNTS -  University of Antwerp
+ 
+  This file is part of Timbl
+
+  Timbl is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  Timbl is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+  For questions and suggestions, see:
+      http://ilk.uvt.nl/software.html
+  or send mail to:
+      Timbl@uvt.nl
+*/
+#include <vector>
+#include <string>
+#include <iostream>
+#include <stdexcept>
+#include <sstream>
+#include <cstdlib>
+#include <climits>
+
+#include "timbl/Common.h"
+#include "timbl/StringOps.h"
+#include "timbl/MsgClass.h"
+#include "timbl/Tree.h"
+#include "timbl/Types.h"
+#include "timbl/Instance.h"
+#include "timbl/Testers.h"
+
+using namespace std;
+
+namespace Timbl{
+  double overlapTester::test( FeatureValue *FV,
+			      FeatureValue *G,
+			      Feature *Feat ) const {
+    double result = 0.0;
+    if ( !FV->isUnknown() && FV->ValFreq() == 0 )
+      result = 1.0;
+    else if ( FV != G ){
+      result = Feat->Weight();
+    }
+    return result;
+  }
+
+  inline bool FV_to_real( FeatureValue *FV, double &result ){
+    if ( FV ){
+      if ( stringTo<double>( FV->Name(), result ) )
+	return true;
+    }
+    return false;
+  }  
+  
+  double numericOverlapTester::test( FeatureValue *FV,
+				     FeatureValue *G,
+				     Feature *Feat ) const {
+    double r1, r2, result;
+    if ( FV_to_real( FV, r1 ) &&
+	 FV_to_real( G, r2 ) )
+      result = fabs( (r1-r2)/
+		     (Feat->Max() - Feat->Min()));
+    else
+      result = 1.0;
+    result *= Feat->Weight();
+    return result;
+  }
+  
+  double valueDiffTester::test( FeatureValue *F,
+				FeatureValue *G,
+				Feature *Feat ) const {
+    double result = Feat->ValueDistance( F, G, threshold );
+    result *= Feat->Weight();
+    return result;
+  }
+
+  
+  double jeffreyDiffTester::test( FeatureValue *F,
+				  FeatureValue *G,
+				  Feature *Feat ) const {
+    double result = Feat->JeffreyDistance( F, G, threshold );
+    result *= Feat->Weight();
+    return result;
+  }
+  
+  double levenshteinTester::test( FeatureValue *F,
+				  FeatureValue *G,
+				  Feature *Feat ) const {
+    double result = Feat->LevenshteinDistance( F, G, threshold );
+    result *= Feat->Weight();
+    return result;
+  }
+  
+  TesterClass::TesterClass( const vector<Feature*>& feat,
+			    const size_t *perm,
+			    size_t size
+			    ):
+    _size(size), features(feat), permutation(perm)
+  {
+    //    permFeatures.reserve(_size);
+    permFeatures.resize(_size,0);
+    test_feature_val = new metricTester*[_size];
+    for ( size_t j=0; j < _size; ++j ){
+      permFeatures[j] = feat[perm[j]];
+      test_feature_val[j] = 0;
+    }
+    distances.resize(_size+1, 0.0);
+  }
+  
+  void TesterClass::reset( size_t numF, 
+			   MetricType globalMetric, int threshold ){
+    distances.resize(_size+1, 0.0);
+    for ( size_t i=0; i < numF; ++i ){
+      delete test_feature_val[i];
+      test_feature_val[i] = 0;
+      if ( features[i]->Ignore() )
+	continue;
+      if ( features[i]->Numeric() ){
+	test_feature_val[i] = new numericOverlapTester();
+      }
+      else {
+	MetricType TM =  features[i]->Metric();
+	if ( TM == DefaultMetric )
+	  TM = globalMetric;
+	switch ( TM ){
+	case Overlap:
+	  test_feature_val[i] = new overlapTester();
+	  break;
+	case Levenshtein:
+	  test_feature_val[i] = new levenshteinTester( threshold );
+	  break;
+	case ValueDiff:
+	  test_feature_val[i] = new valueDiffTester( threshold );
+	  break;
+	case JeffreyDiv:
+	  test_feature_val[i] = new jeffreyDiffTester( threshold );
+	  break;
+	default:
+	  string msg = string("Invalid value '") + toString( TM ) 
+	    + "' in switch (" 
+	    + __FILE__  + "," + toString(__LINE__) + ")\n"
+	    + "ABORTING now";
+	  throw logic_error( msg );
+	}
+      }
+    }
+  }
+
+  TesterClass::~TesterClass(){
+    for ( size_t i=0; i < _size; ++i ){
+      delete test_feature_val[i];
+    }
+    delete [] test_feature_val;
+  }
+
+  size_t DefaultTester::test( const vector<FeatureValue *>& FV,
+			      vector<FeatureValue *>& G, 
+			      vector<double>& Distances,
+			      size_t CurPos,
+			      size_t Size,
+			      size_t ib_offset,
+			      double Threshold_plus ) const {
+    double result;
+    size_t TrueF;
+    size_t i;
+    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
+      result = test_feature_val[permutation[TrueF]]->test( FV[TrueF],
+							   G[i],
+							   permFeatures[TrueF] );
+      Distances[i+1] = Distances[i] + result;
+      if ( Distances[i+1] > Threshold_plus ){
+	return i;
+      }
+    }
+    return Size;
+  }
+  
+  size_t DefaultTester::test_ex( const vector<FeatureValue *>&,
+				 vector<FeatureValue *>&, 
+				 vector<double>& ,
+				 size_t,
+				 size_t,
+				 size_t,
+				 double,
+				 double& ) const { abort(); };
+
+  size_t DefaultTester::test_sim( const vector<FeatureValue *>&,
+				  vector<FeatureValue *>&, 
+				  vector<double>& ,
+				  size_t,
+				  size_t,
+				  size_t ) const { abort(); };
+
+  size_t DefaultTester::test_sim_ex( const vector<FeatureValue *>&,
+				     vector<FeatureValue *>&, 
+				     vector<double>& ,
+				     size_t,
+				     size_t,
+				     size_t,
+				     double,
+				     double& ) const { abort(); };
+  
+  inline double WeightFun( double D, double W ){
+    return D / (W + Common::Epsilon);
+  }
+  
+  
+  size_t ExemplarTester::test( const vector<FeatureValue *>&,
+			       vector<FeatureValue *>&, 
+			       vector<double>&,
+			       size_t,
+			       size_t,
+			       size_t,
+			       double ) const { abort(); };
+
+  size_t ExemplarTester::test_sim( const vector<FeatureValue *>&,
+				   vector<FeatureValue *>&, 
+				   vector<double>& ,
+				   size_t,
+				   size_t,
+				   size_t ) const { abort(); };
+
+  size_t ExemplarTester::test_ex( const vector<FeatureValue *>& FV,
+				  vector<FeatureValue *>& G, 
+				  vector<double>& Distances,
+				  size_t CurPos,
+				  size_t Size,
+				  size_t ib_offset,
+				  double ExWeight,
+				  double& Distance ) const {
+    double result;
+    size_t TrueF;
+    size_t i;
+    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
+      result = test_feature_val[permutation[TrueF]]->test( FV[TrueF],
+							   G[i],
+							   permFeatures[TrueF] );
+      Distances[i+1] = Distances[i] + result;
+    }
+    Distance = WeightFun( Distances[i], ExWeight );
+    return Size;
+  }
+ 
+  size_t ExemplarTester::test_sim_ex( const vector<FeatureValue *>&,
+				      vector<FeatureValue *>&, 
+				      vector<double>& ,
+				      size_t,
+				      size_t,
+				      size_t,
+				      double,
+				      double& ) const { abort(); };
+  
+  double innerProduct( FeatureValue *FV,
+		       FeatureValue *G ) {
+    double r1, r2, result;
+    if ( FV_to_real( FV, r1 ) &&
+	 FV_to_real( G, r2 ) ){
+      result = r1 * r2;
+    }
+    else
+      result = 0.0;
+    return result;
+  }
+
+  size_t CosineTester::test( const vector<FeatureValue *>&,
+			     vector<FeatureValue *>&, 
+			     vector<double>&,
+			     size_t,
+			     size_t,
+			     size_t,
+			     double ) const { abort(); };
+
+  size_t CosineTester::test_sim( const vector<FeatureValue *>& FV,
+				 vector<FeatureValue *>& G, 
+				 vector<double>& Distances,
+				 size_t CurPos,
+				 size_t Size,
+				 size_t ib_offset ) const {
+    double denom1 = 0.0;
+    double denom2 = 0.0;
+    size_t TrueF;
+    size_t i;
+    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
+      double d1 = innerProduct( FV[TrueF], FV[TrueF] );
+      d1 *= permFeatures[TrueF]->Weight();
+      denom1 += d1;
+      double d2 = innerProduct( G[i], G[i] );
+      d2 *= permFeatures[TrueF]->Weight();
+      denom2 += d2;
+    }
+    double denom = sqrt( denom1 * denom2 );
+    double result = 0.0;
+    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
+      result += innerProduct( FV[TrueF], G[i] ) 
+	* permFeatures[TrueF]->Weight();
+    }
+    Distances[Size] = result/ (denom + Common::Epsilon);
+    return Size;
+  }
+  
+  size_t CosineTester::test_ex( const vector<FeatureValue *>&,
+				vector<FeatureValue *>&, 
+				vector<double>&,
+				size_t,
+				size_t,
+				size_t,
+				double,
+				double& ) const { abort(); };
+
+  size_t CosineTester::test_sim_ex( const vector<FeatureValue *>&,
+				    vector<FeatureValue *>&, 
+				    vector<double>& ,
+				    size_t,
+				    size_t,
+				    size_t,
+				    double,
+				    double& ) const { abort(); };
+  
+  size_t DotProductTester::test( const vector<FeatureValue *>&,
+				 vector<FeatureValue *>&, 
+				 vector<double>&,
+				 size_t,
+				 size_t,
+				 size_t,
+				 double ) const { abort(); };
+
+  size_t DotProductTester::test_sim( const vector<FeatureValue *>& FV,
+				     vector<FeatureValue *>& G, 
+				     vector<double>& Distances,
+				     size_t CurPos,
+				     size_t Size,
+				     size_t ib_offset ) const {
+    double result;
+    size_t TrueF;
+    size_t i;
+    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
+      result = innerProduct( FV[TrueF], G[i] );
+      result *= permFeatures[TrueF]->Weight();
+      Distances[i+1] = Distances[i] + result;
+    }
+    return Size;
+  }
+  
+  size_t DotProductTester::test_ex( const vector<FeatureValue *>&,
+				    vector<FeatureValue *>&, 
+				    vector<double>&,
+				    size_t,
+				    size_t,
+				    size_t,
+				    double,
+				    double& ) const { abort(); };
+
+  size_t DotProductTester::test_sim_ex( const vector<FeatureValue *>& FV,
+					vector<FeatureValue *>& G, 
+					vector<double>& Distances,
+					size_t CurPos,
+					size_t Size,
+					size_t ib_offset,
+					double ExWeight,
+					double& Distance ) const {
+    size_t TrueF;
+    size_t i;
+    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
+      double result = innerProduct( FV[TrueF], G[i] );
+      result *= permFeatures[TrueF]->Weight();
+      Distances[i+1] = Distances[i] + result;
+    }
+    Distance = WeightFun( maxSimilarity - Distances[i], ExWeight );
+    return Size;
+  }
+  
+}  
+

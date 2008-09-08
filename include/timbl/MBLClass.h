@@ -248,10 +248,6 @@ namespace Timbl {
 
     bool allocate_arrays();
 
-    double test_value_diff_prestored( FeatureValue **, FeatureValue**,
-				      double *, int, int );
-    double test_value_diff( FeatureValue **, FeatureValue **,
-			    double *, int, int );
     double RelativeWeight( unsigned int ) const;    
     void writePermSpecial(std::ostream&) const;
     bool read_the_vals( std::istream& );

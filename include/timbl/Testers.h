@@ -2,6 +2,10 @@
 #define TESTERS_H
 
 namespace Timbl{
+
+  static const int maxSimilarity = INT_MAX;
+  
+
   class metricTester {
   public:
     virtual ~metricTester(){};
@@ -14,40 +18,14 @@ namespace Timbl{
   public:
     double test( FeatureValue *FV,
 		 FeatureValue *G,
-		 Feature *Feat ) const {
-      double result = 0.0;
-      if ( !FV->isUnknown() && FV->ValFreq() == 0 )
-	result = 1.0;
-      else if ( FV != G ){
-	result = Feat->Weight();
-      }
-      return result;
-    }
+		 Feature *Feat ) const;
   };
 
-  inline bool FV_to_real( FeatureValue *FV, double &result ){
-    if ( FV ){
-      if ( stringTo<double>( FV->Name(), result ) )
-	return true;
-    }
-    return false;
-  }  
-  
   class numericOverlapTester: public metricTester {
   public:
     double test( FeatureValue *FV,
 		 FeatureValue *G,
-		 Feature *Feat ) const {
-      double r1, r2, result;
-      if ( FV_to_real( FV, r1 ) &&
-	   FV_to_real( G, r2 ) )
-	result = fabs( (r1-r2)/
-		       (Feat->Max() - Feat->Min()));
-      else
-	result = 1.0;
-      result *= Feat->Weight();
-      return result;
-    }
+		 Feature *Feat ) const;
   };
   
 
@@ -65,11 +43,7 @@ namespace Timbl{
   valueDiffTester( int t ): valueTester( t){};
     double test( FeatureValue *F,
 		 FeatureValue *G,
-		 Feature *Feat ) const {
-      double result = Feat->ValueDistance( F, G, threshold );
-      result *= Feat->Weight();
-      return result;
-    }
+		 Feature *Feat ) const;
   };
   
   class jeffreyDiffTester: public valueTester {
@@ -77,11 +51,7 @@ namespace Timbl{
   jeffreyDiffTester( int t ): valueTester( t){};
     double test( FeatureValue *F,
 		 FeatureValue *G,
-		 Feature *Feat ) const {
-      double result = Feat->JeffreyDistance( F, G, threshold );
-      result *= Feat->Weight();
-      return result;
-    }
+		 Feature *Feat ) const;
   };
   
   class levenshteinTester: public valueTester {
@@ -89,12 +59,194 @@ namespace Timbl{
   levenshteinTester( int t ): valueTester( t){};
     double test( FeatureValue *F,
 		 FeatureValue *G,
-		 Feature *Feat ) const {
-      double result = Feat->LevenshteinDistance( F, G, threshold );
-      result *= Feat->Weight();
-      return result;
-    }
+		 Feature *Feat ) const;
+  };
+  
+  class TesterClass {
+  public:
+    TesterClass( const std::vector<Feature*>&, 
+		 const size_t *, 
+		 size_t );
+    virtual ~TesterClass();
+    void reset( size_t, MetricType, int );
+    virtual size_t test( const std::vector<FeatureValue *>& FV,
+		 std::vector<FeatureValue *>& G, 
+		 std::vector<double>& Distances,
+		 size_t CurPos,
+		 size_t Size,
+		 size_t ib_offset,
+		 double Threshold_plus ) const =0;
+    virtual size_t test_sim( const std::vector<FeatureValue *>& FV,
+		 std::vector<FeatureValue *>& G, 
+		 std::vector<double>& Distances,
+		 size_t CurPos,
+		 size_t Size,
+		 size_t ib_offset ) const = 0;
+    virtual size_t test_ex( const std::vector<FeatureValue *>& FV,
+		 std::vector<FeatureValue *>& G, 
+		 std::vector<double>& Distances,
+		 size_t CurPos,
+		 size_t Size,
+		 size_t ib_offset,
+		 double,
+		 double& ) const = 0;
+    virtual size_t test_sim_ex( const std::vector<FeatureValue *>& FV,
+				std::vector<FeatureValue *>& G, 
+				std::vector<double>& Distances,
+				size_t CurPos,
+				size_t Size,
+				size_t ib_offset,
+				double,
+				double& ) const = 0;
+  protected:
+    size_t _size;
+    metricTester **test_feature_val;
+    const std::vector<Feature *> &features;
+    std::vector<Feature *> permFeatures;
+    const size_t *permutation;
+    std::vector<double> distances;
+  };
+  
+  class DefaultTester: public TesterClass {
+  public:
+  DefaultTester( std::vector<Feature*>& pf, size_t *p, size_t s ): 
+    TesterClass( pf, p, s ){};  
+    size_t test( const std::vector<FeatureValue *>& FV,
+		 std::vector<FeatureValue *>& G, 
+		 std::vector<double>& Distances,
+		 size_t CurPos,
+		 size_t Size,
+		 size_t ib_offset,
+		 double Threshold_plus ) const; 
+    size_t test_ex( const std::vector<FeatureValue *>&,
+		    std::vector<FeatureValue *>&, 
+		    std::vector<double>& ,
+		    size_t,
+		    size_t,
+		    size_t,
+		    double,
+		    double& ) const;
+    size_t test_sim( const std::vector<FeatureValue *>&,
+		     std::vector<FeatureValue *>&, 
+		     std::vector<double>& ,
+		     size_t,
+		     size_t,
+		     size_t ) const;
+    size_t test_sim_ex( const std::vector<FeatureValue *>&,
+			std::vector<FeatureValue *>&, 
+			std::vector<double>& ,
+			size_t,
+			size_t,
+			size_t,
+			double,
+			double& ) const;
+  };
+  
+  class ExemplarTester: public TesterClass {
+  public:
+  ExemplarTester( std::vector<Feature*>& pf, size_t *p, size_t s ): 
+    TesterClass( pf, p, s ){};  
+    size_t test( const std::vector<FeatureValue *>&,
+		 std::vector<FeatureValue *>&, 
+		 std::vector<double>&,
+		 size_t,
+		 size_t,
+		 size_t,
+		 double ) const;
+    size_t test_sim( const std::vector<FeatureValue *>&,
+		     std::vector<FeatureValue *>&, 
+		     std::vector<double>& ,
+		     size_t,
+		     size_t,
+		     size_t ) const;
+    size_t test_ex( const std::vector<FeatureValue *>& FV,
+		    std::vector<FeatureValue *>& G, 
+		    std::vector<double>& Distances,
+		    size_t CurPos,
+		    size_t Size,
+		    size_t ib_offset,
+		    double ExWeight,
+		    double& Distance ) const;
+    size_t test_sim_ex( const std::vector<FeatureValue *>&,
+			std::vector<FeatureValue *>&, 
+			std::vector<double>& ,
+			size_t,
+			size_t,
+			size_t,
+			double,
+			double& ) const;
   };
 
-}
+  class CosineTester: public TesterClass {
+  public:
+  CosineTester( std::vector<Feature*>& pf, size_t *p, size_t s ): 
+    TesterClass( pf, p, s ){};  
+    size_t test( const std::vector<FeatureValue *>&,
+		 std::vector<FeatureValue *>&, 
+		 std::vector<double>&,
+		 size_t,
+		 size_t,
+		 size_t,
+		 double ) const;
+    size_t test_sim( const std::vector<FeatureValue *>& FV,
+		     std::vector<FeatureValue *>& G, 
+		     std::vector<double>& Distances,
+		     size_t CurPos,
+		     size_t Size,
+		     size_t ib_offset ) const;
+    size_t test_ex( const std::vector<FeatureValue *>&,
+		    std::vector<FeatureValue *>&, 
+		    std::vector<double>&,
+		    size_t,
+		    size_t,
+		    size_t,
+		    double,
+		    double& ) const;
+    size_t test_sim_ex( const std::vector<FeatureValue *>&,
+			std::vector<FeatureValue *>&, 
+			std::vector<double>& ,
+			size_t,
+			size_t,
+			size_t,
+			double,
+			double& ) const;
+  };
+  
+  class DotProductTester: public TesterClass {
+  public:
+  DotProductTester( std::vector<Feature*>& pf, size_t *p, size_t s ): 
+    TesterClass( pf, p, s ){};  
+    size_t test( const std::vector<FeatureValue *>&,
+		 std::vector<FeatureValue *>&, 
+		 std::vector<double>&,
+		 size_t,
+		 size_t,
+		 size_t,
+		 double ) const;
+    size_t test_sim( const std::vector<FeatureValue *>& FV,
+		     std::vector<FeatureValue *>& G, 
+		     std::vector<double>& Distances,
+		     size_t CurPos,
+		     size_t Size,
+		     size_t ib_offset ) const;
+    size_t test_ex( const std::vector<FeatureValue *>&,
+		    std::vector<FeatureValue *>&, 
+		    std::vector<double>&,
+		    size_t,
+		    size_t,
+		    size_t,
+		    double,
+		    double& ) const;
+    size_t test_sim_ex( const std::vector<FeatureValue *>& FV,
+			std::vector<FeatureValue *>& G, 
+			std::vector<double>& Distances,
+			size_t CurPos,
+			size_t Size,
+			size_t ib_offset,
+			double ExWeight,
+			double& Distance ) const;
+  };
+  
+}  
+
 #endif // TESTERS_H

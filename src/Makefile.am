@@ -17,6 +17,6 @@ libTimbl_la_SOURCES = CommandLine.cxx Common.cxx \
 	GetOptClass.cxx IBtree.cxx IBprocs.cxx Instance.cxx LogBuffer.cxx \
 	LogStream.cxx MBLClass.cxx MsgClass.cxx ServerProcs.cxx \
 	SocketBasics.cxx StringOps.cxx TimblAPI.cxx \
-	TimblExperiment.cxx IGExperiment.cxx \
+	TimblExperiment.cxx IGExperiment.cxx Testers.cxx\
 	TRIBLExperiments.cxx LOOExperiment.cxx CVExperiment.cxx \
 	Tree.cxx Types.cxx neighborSet.cxx Statistics.cxx BestArray.cxx
