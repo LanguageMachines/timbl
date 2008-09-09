@@ -231,22 +231,16 @@ namespace Timbl{
 			     double ){
     double denom1 = 0.0;
     double denom2 = 0.0;
+    double result = 0.0;
     size_t TrueF;
     size_t i;
     for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
-      double d1 = innerProduct( (*FV)[TrueF], (*FV)[TrueF] );
-      d1 *= permFeatures[TrueF]->Weight();
-      denom1 += d1;
-      double d2 = innerProduct( G[i], G[i] );
-      d2 *= permFeatures[TrueF]->Weight();
-      denom2 += d2;
+      double W = permFeatures[TrueF]->Weight();
+      denom1 +=  innerProduct( (*FV)[TrueF], (*FV)[TrueF] ) * W;
+      denom2 += innerProduct( G[i], G[i] ) * W;
+      result += innerProduct( (*FV)[TrueF], G[i] ) * W;
     }
     double denom = sqrt( denom1 * denom2 );
-    double result = 0.0;
-    for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
-      result += innerProduct( (*FV)[TrueF], G[i] ) 
-	* permFeatures[TrueF]->Weight();
-    }
     distances[effSize] = result/ (denom + Common::Epsilon);
     return effSize;
   }  
