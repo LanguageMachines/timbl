@@ -1703,6 +1703,7 @@ namespace Timbl {
 							       &Inst.FV,
 							       ib_offset,
 							       effective_feats );
+    tester->init( Inst, effective_feats, ib_offset );
     ValueDistribution::dist_iterator lastpos;
     Vfield *Bpnt = NULL;
     if ( best_distrib ){
@@ -1713,11 +1714,8 @@ namespace Timbl {
     size_t CurPos = 0;
     while ( Bpnt ) {
       double dummy = -0.0;
-      size_t EndPos  = tester->test( Inst.FV,
-				     CurrentFV,
+      size_t EndPos  = tester->test( CurrentFV,
 				     CurPos,
-				     EffFeat,
-				     ib_offset,
 				     dummy );
       if ( EndPos == EffFeat ){
 	// we finished with a certain amount of succes
@@ -1826,13 +1824,11 @@ namespace Timbl {
 							       &Inst.FV,
 							       ib_offset,
 							       effective_feats );
+    tester->init( Inst, effective_feats, ib_offset );
     size_t CurPos = 0;
     while ( best_distrib ){
-      size_t EndPos = tester->test( Inst.FV,
-				    CurrentFV,
+      size_t EndPos = tester->test( CurrentFV,
 				    CurPos,
-				    EffFeat,
-				    ib_offset,
 				    Threshold + Epsilon );
       if ( EndPos == EffFeat ){
 	// we finished with a certain amount of succes
@@ -1880,14 +1876,12 @@ namespace Timbl {
 							       &Inst.FV,
 							       ib_offset,
 							       effective_feats );
+    tester->init( Inst, effective_feats, ib_offset );
     size_t CurPos = 0;
     while ( best_distrib ){
       double dummy = -1.0;
-      size_t EndPos = tester->test( Inst.FV,
-				    CurrentFV,
+      size_t EndPos = tester->test( CurrentFV,
 				    CurPos,
-				    EffFeat,
-				    ib_offset,
 				    dummy );
       if ( EndPos == EffFeat ){
 	// we finished with a certain amount of succes

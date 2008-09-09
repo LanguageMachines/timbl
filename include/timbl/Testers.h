@@ -68,15 +68,16 @@ namespace Timbl{
 		 const size_t * );
     virtual ~TesterClass();
     void reset( MetricType, int );
-    virtual size_t test( const std::vector<FeatureValue *>&,
-			 std::vector<FeatureValue *>&, 
-			 size_t,
-			 size_t,
+    void init( const Instance&, size_t, size_t );
+    virtual size_t test( std::vector<FeatureValue *>&, 
 			 size_t,
 			 double ) = 0;
     virtual double getDistance( size_t ) const = 0;
   protected:
     size_t _size;
+    size_t effSize;
+    size_t offSet;
+    const std::vector<FeatureValue *> *FV;
     metricTester **test_feature_val;
     const std::vector<Feature *> &features;
     std::vector<Feature *> permFeatures;
@@ -89,10 +90,7 @@ namespace Timbl{
   DefaultTester( std::vector<Feature*>& pf, size_t *p ): 
     TesterClass( pf, p ){};  
     double getDistance( size_t ) const;
-    size_t test( const std::vector<FeatureValue *>&,
-		 std::vector<FeatureValue *>&, 
-		 size_t,
-		 size_t,
+    size_t test( std::vector<FeatureValue *>&, 
 		 size_t,
 		 double ); 
   };
@@ -102,10 +100,7 @@ namespace Timbl{
   ExemplarTester( std::vector<Feature*>& pf, size_t *p ): 
     TesterClass( pf, p ){};  
     double getDistance( size_t ) const;
-    size_t test( const std::vector<FeatureValue *>&,
-		 std::vector<FeatureValue *>&, 
-		 size_t,
-		 size_t,
+    size_t test( std::vector<FeatureValue *>&, 
 		 size_t,
 		 double );
   };
@@ -115,10 +110,7 @@ namespace Timbl{
   CosineTester( std::vector<Feature*>& pf, size_t *p ): 
     TesterClass( pf, p ){};  
     double getDistance( size_t ) const;
-    size_t test( const std::vector<FeatureValue *>&,
-		 std::vector<FeatureValue *>&, 
-		 size_t,
-		 size_t,
+    size_t test( std::vector<FeatureValue *>&, 
 		 size_t,
 		 double );
   };
@@ -128,10 +120,7 @@ namespace Timbl{
   DotProductTester( std::vector<Feature*>& pf, size_t *p ): 
     TesterClass( pf, p ){};  
     double getDistance( size_t ) const;
-    size_t test( const std::vector<FeatureValue *>&,
-		 std::vector<FeatureValue *>&, 
-		 size_t,
-		 size_t,
+    size_t test( std::vector<FeatureValue *>&, 
 		 size_t,
 		 double );
   };

@@ -153,6 +153,15 @@ namespace Timbl{
     }
   }
 
+  void TesterClass::init( const Instance& inst,
+			  size_t effective, 
+			  size_t offset ){
+    effSize = effective-offset;
+    offSet = offset;
+    FV = &inst.FV;
+  }
+
+
   TesterClass::~TesterClass(){
     for ( size_t i=0; i < _size; ++i ){
       delete test_feature_val[i];
@@ -164,47 +173,40 @@ namespace Timbl{
     return distances[pos];
   }
 
-  size_t DefaultTester::test( const vector<FeatureValue *>& FV,
-			      vector<FeatureValue *>& G, 
+  size_t DefaultTester::test( vector<FeatureValue *>& G, 
 			      size_t CurPos,
-			      size_t Size,
-			      size_t ib_offset,
 			      double Threshold ) {
-    double result;
-    size_t TrueF;
     size_t i;
-    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
-      result = test_feature_val[permutation[TrueF]]->test( FV[TrueF],
-							   G[i],
-							   permFeatures[TrueF] );
+    size_t TrueF;
+    for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
+      double result = test_feature_val[permutation[TrueF]]->test( (*FV)[TrueF],
+								  G[i],
+								  permFeatures[TrueF] );
       distances[i+1] = distances[i] + result;
       if ( distances[i+1] > Threshold ){
 	return i;
       }
     }
-    return Size;
+    return effSize;
   }
 
   double ExemplarTester::getDistance( size_t pos ) const{
     return distances[pos];
   }
 
-  size_t ExemplarTester::test( const vector<FeatureValue *>& FV,
-			       vector<FeatureValue *>& G, 
+  size_t ExemplarTester::test( vector<FeatureValue *>& G, 
 			       size_t CurPos,
-			       size_t Size,
-			       size_t ib_offset,
 			       double ){
     double result;
     size_t TrueF;
     size_t i;
-    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
-      result = test_feature_val[permutation[TrueF]]->test( FV[TrueF],
+    for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
+      result = test_feature_val[permutation[TrueF]]->test( (*FV)[TrueF],
 							   G[i],
 							   permFeatures[TrueF] );
       distances[i+1] = distances[i] + result;
     }
-    return Size;
+    return effSize;
   }
  
   
@@ -224,18 +226,15 @@ namespace Timbl{
     return maxSimilarity - distances[pos];
   }
 
-  size_t CosineTester::test( const vector<FeatureValue *>& FV,
-			     vector<FeatureValue *>& G, 
+  size_t CosineTester::test( vector<FeatureValue *>& G, 
 			     size_t CurPos,
-			     size_t Size,
-			     size_t ib_offset,
 			     double ){
     double denom1 = 0.0;
     double denom2 = 0.0;
     size_t TrueF;
     size_t i;
-    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
-      double d1 = innerProduct( FV[TrueF], FV[TrueF] );
+    for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
+      double d1 = innerProduct( (*FV)[TrueF], (*FV)[TrueF] );
       d1 *= permFeatures[TrueF]->Weight();
       denom1 += d1;
       double d2 = innerProduct( G[i], G[i] );
@@ -244,12 +243,12 @@ namespace Timbl{
     }
     double denom = sqrt( denom1 * denom2 );
     double result = 0.0;
-    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
-      result += innerProduct( FV[TrueF], G[i] ) 
+    for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
+      result += innerProduct( (*FV)[TrueF], G[i] ) 
 	* permFeatures[TrueF]->Weight();
     }
-    distances[Size] = result/ (denom + Common::Epsilon);
-    return Size;
+    distances[effSize] = result/ (denom + Common::Epsilon);
+    return effSize;
   }  
 
   double DotProductTester::getDistance( size_t pos ) const{
@@ -257,21 +256,18 @@ namespace Timbl{
   }
 
 
-  size_t DotProductTester::test( const vector<FeatureValue *>& FV,
-				 vector<FeatureValue *>& G, 
+  size_t DotProductTester::test( vector<FeatureValue *>& G, 
 				 size_t CurPos,
-				 size_t Size,
-				 size_t ib_offset,
 				 double ) {
     double result;
     size_t TrueF;
     size_t i;
-    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
-      result = innerProduct( FV[TrueF], G[i] );
+    for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
+      result = innerProduct( (*FV)[TrueF], G[i] );
       result *= permFeatures[TrueF]->Weight();
       distances[i+1] = distances[i] + result;
     }
-    return Size;
+    return effSize;
   }
   
 }  
