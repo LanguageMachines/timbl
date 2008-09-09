@@ -106,13 +106,10 @@ namespace Timbl {
     const ValueDistribution *ExactMatch( const Instance& I ) const {
       return InstBase->exact_match( I ); };
     virtual const ValueDistribution *InitGraphTest( std::vector<FeatureValue *>&, 
-						    const std::vector<FeatureValue *>&,
+						    const std::vector<FeatureValue *> *,
 						    size_t,
 						    size_t );
     virtual const ValueDistribution *NextGraphTest( std::vector<FeatureValue *>&, 
-					      const std::vector<FeatureValue *>&,
-					      size_t,
-					      size_t,
 					      size_t& );
     unsigned long int GetDistSize( ) const { return NumOfTails; };
     virtual const ValueDistribution *IG_test( const Instance& , int&, bool&,
@@ -192,14 +189,15 @@ namespace Timbl {
     };
     IB_InstanceBase *Clone() const;
     const ValueDistribution *InitGraphTest( std::vector<FeatureValue *>&, 
-					    const std::vector<FeatureValue *>&,
+					    const std::vector<FeatureValue *> *,
 					    size_t,
 					    size_t );
     const ValueDistribution *NextGraphTest( std::vector<FeatureValue *>&, 
-				      const std::vector<FeatureValue *>&, 
-				      size_t,
-				      size_t,
 				      size_t& );
+  private:
+    size_t offSet;
+    size_t effFeat;
+    const std::vector<FeatureValue *> *testInst;
   };
 
   class IG_InstanceBase: public InstanceBase_base {

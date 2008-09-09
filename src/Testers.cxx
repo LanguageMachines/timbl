@@ -102,10 +102,8 @@ namespace Timbl{
   }
   
   TesterClass::TesterClass( const vector<Feature*>& feat,
-			    const size_t *perm,
-			    size_t size
-			    ):
-    _size(size), features(feat), permutation(perm)
+			    const size_t *perm ):
+    _size(feat.size()), features(feat), permutation(perm)
   {
     //    permFeatures.reserve(_size);
     permFeatures.resize(_size,0);
@@ -117,10 +115,9 @@ namespace Timbl{
     distances.resize(_size+1, 0.0);
   }
   
-  void TesterClass::reset( size_t numF, 
-			   MetricType globalMetric, int threshold ){
+  void TesterClass::reset( MetricType globalMetric, int threshold ){
     distances.resize(_size+1, 0.0);
-    for ( size_t i=0; i < numF; ++i ){
+    for ( size_t i=0; i < _size; ++i ){
       delete test_feature_val[i];
       test_feature_val[i] = 0;
       if ( features[i]->Ignore() )
@@ -163,13 +160,16 @@ namespace Timbl{
     delete [] test_feature_val;
   }
 
+  double DefaultTester::getDistance( size_t pos ) const{
+    return distances[pos];
+  }
+
   size_t DefaultTester::test( const vector<FeatureValue *>& FV,
 			      vector<FeatureValue *>& G, 
-			      vector<double>& Distances,
 			      size_t CurPos,
 			      size_t Size,
 			      size_t ib_offset,
-			      double Threshold_plus ) const {
+			      double Threshold ) {
     double result;
     size_t TrueF;
     size_t i;
@@ -177,67 +177,24 @@ namespace Timbl{
       result = test_feature_val[permutation[TrueF]]->test( FV[TrueF],
 							   G[i],
 							   permFeatures[TrueF] );
-      Distances[i+1] = Distances[i] + result;
-      if ( Distances[i+1] > Threshold_plus ){
+      distances[i+1] = distances[i] + result;
+      if ( distances[i+1] > Threshold ){
 	return i;
       }
     }
     return Size;
   }
-  
-  size_t DefaultTester::test_ex( const vector<FeatureValue *>&,
-				 vector<FeatureValue *>&, 
-				 vector<double>& ,
-				 size_t,
-				 size_t,
-				 size_t,
-				 double,
-				 double& ) const { abort(); };
 
-  size_t DefaultTester::test_sim( const vector<FeatureValue *>&,
-				  vector<FeatureValue *>&, 
-				  vector<double>& ,
-				  size_t,
-				  size_t,
-				  size_t ) const { abort(); };
-
-  size_t DefaultTester::test_sim_ex( const vector<FeatureValue *>&,
-				     vector<FeatureValue *>&, 
-				     vector<double>& ,
-				     size_t,
-				     size_t,
-				     size_t,
-				     double,
-				     double& ) const { abort(); };
-  
-  inline double WeightFun( double D, double W ){
-    return D / (W + Common::Epsilon);
+  double ExemplarTester::getDistance( size_t pos ) const{
+    return distances[pos];
   }
-  
-  
-  size_t ExemplarTester::test( const vector<FeatureValue *>&,
-			       vector<FeatureValue *>&, 
-			       vector<double>&,
-			       size_t,
-			       size_t,
-			       size_t,
-			       double ) const { abort(); };
 
-  size_t ExemplarTester::test_sim( const vector<FeatureValue *>&,
-				   vector<FeatureValue *>&, 
-				   vector<double>& ,
-				   size_t,
-				   size_t,
-				   size_t ) const { abort(); };
-
-  size_t ExemplarTester::test_ex( const vector<FeatureValue *>& FV,
-				  vector<FeatureValue *>& G, 
-				  vector<double>& Distances,
-				  size_t CurPos,
-				  size_t Size,
-				  size_t ib_offset,
-				  double ExWeight,
-				  double& Distance ) const {
+  size_t ExemplarTester::test( const vector<FeatureValue *>& FV,
+			       vector<FeatureValue *>& G, 
+			       size_t CurPos,
+			       size_t Size,
+			       size_t ib_offset,
+			       double ){
     double result;
     size_t TrueF;
     size_t i;
@@ -245,20 +202,11 @@ namespace Timbl{
       result = test_feature_val[permutation[TrueF]]->test( FV[TrueF],
 							   G[i],
 							   permFeatures[TrueF] );
-      Distances[i+1] = Distances[i] + result;
+      distances[i+1] = distances[i] + result;
     }
-    Distance = WeightFun( Distances[i], ExWeight );
     return Size;
   }
  
-  size_t ExemplarTester::test_sim_ex( const vector<FeatureValue *>&,
-				      vector<FeatureValue *>&, 
-				      vector<double>& ,
-				      size_t,
-				      size_t,
-				      size_t,
-				      double,
-				      double& ) const { abort(); };
   
   double innerProduct( FeatureValue *FV,
 		       FeatureValue *G ) {
@@ -272,20 +220,16 @@ namespace Timbl{
     return result;
   }
 
-  size_t CosineTester::test( const vector<FeatureValue *>&,
-			     vector<FeatureValue *>&, 
-			     vector<double>&,
-			     size_t,
-			     size_t,
-			     size_t,
-			     double ) const { abort(); };
+  double CosineTester::getDistance( size_t pos ) const{
+    return maxSimilarity - distances[pos];
+  }
 
-  size_t CosineTester::test_sim( const vector<FeatureValue *>& FV,
-				 vector<FeatureValue *>& G, 
-				 vector<double>& Distances,
-				 size_t CurPos,
-				 size_t Size,
-				 size_t ib_offset ) const {
+  size_t CosineTester::test( const vector<FeatureValue *>& FV,
+			     vector<FeatureValue *>& G, 
+			     size_t CurPos,
+			     size_t Size,
+			     size_t ib_offset,
+			     double ){
     double denom1 = 0.0;
     double denom2 = 0.0;
     size_t TrueF;
@@ -304,78 +248,29 @@ namespace Timbl{
       result += innerProduct( FV[TrueF], G[i] ) 
 	* permFeatures[TrueF]->Weight();
     }
-    Distances[Size] = result/ (denom + Common::Epsilon);
+    distances[Size] = result/ (denom + Common::Epsilon);
     return Size;
+  }  
+
+  double DotProductTester::getDistance( size_t pos ) const{
+    return maxSimilarity - distances[pos];
   }
-  
-  size_t CosineTester::test_ex( const vector<FeatureValue *>&,
-				vector<FeatureValue *>&, 
-				vector<double>&,
-				size_t,
-				size_t,
-				size_t,
-				double,
-				double& ) const { abort(); };
 
-  size_t CosineTester::test_sim_ex( const vector<FeatureValue *>&,
-				    vector<FeatureValue *>&, 
-				    vector<double>& ,
-				    size_t,
-				    size_t,
-				    size_t,
-				    double,
-				    double& ) const { abort(); };
-  
-  size_t DotProductTester::test( const vector<FeatureValue *>&,
-				 vector<FeatureValue *>&, 
-				 vector<double>&,
-				 size_t,
-				 size_t,
-				 size_t,
-				 double ) const { abort(); };
 
-  size_t DotProductTester::test_sim( const vector<FeatureValue *>& FV,
-				     vector<FeatureValue *>& G, 
-				     vector<double>& Distances,
-				     size_t CurPos,
-				     size_t Size,
-				     size_t ib_offset ) const {
+  size_t DotProductTester::test( const vector<FeatureValue *>& FV,
+				 vector<FeatureValue *>& G, 
+				 size_t CurPos,
+				 size_t Size,
+				 size_t ib_offset,
+				 double ) {
     double result;
     size_t TrueF;
     size_t i;
     for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
       result = innerProduct( FV[TrueF], G[i] );
       result *= permFeatures[TrueF]->Weight();
-      Distances[i+1] = Distances[i] + result;
+      distances[i+1] = distances[i] + result;
     }
-    return Size;
-  }
-  
-  size_t DotProductTester::test_ex( const vector<FeatureValue *>&,
-				    vector<FeatureValue *>&, 
-				    vector<double>&,
-				    size_t,
-				    size_t,
-				    size_t,
-				    double,
-				    double& ) const { abort(); };
-
-  size_t DotProductTester::test_sim_ex( const vector<FeatureValue *>& FV,
-					vector<FeatureValue *>& G, 
-					vector<double>& Distances,
-					size_t CurPos,
-					size_t Size,
-					size_t ib_offset,
-					double ExWeight,
-					double& Distance ) const {
-    size_t TrueF;
-    size_t i;
-    for ( i=CurPos, TrueF = i + ib_offset; i < Size; ++i,++TrueF ){
-      double result = innerProduct( FV[TrueF], G[i] );
-      result *= permFeatures[TrueF]->Weight();
-      Distances[i+1] = Distances[i] + result;
-    }
-    Distance = WeightFun( maxSimilarity - Distances[i], ExWeight );
     return Size;
   }
   

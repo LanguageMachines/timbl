@@ -1688,16 +1688,19 @@ namespace Timbl {
     delete [] InvPerm;
     return result;
   }
+
+  inline double WeightFun( double D, double W ){
+    return D / (W + Common::Epsilon);
+  }
+  
   
   void MBLClass::test_instance_ex( const Instance& Inst,
 				   InstanceBase_base *IB,
 				   size_t ib_offset ){
-    double Distance;
     vector<FeatureValue *> CurrentFV(num_of_features);
-    vector<double> distances(num_of_features+1, 0.0);
     size_t EffFeat = effective_feats - ib_offset;
     const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV, 
-							       Inst.FV,
+							       &Inst.FV,
 							       ib_offset,
 							       effective_feats );
     ValueDistribution::dist_iterator lastpos;
@@ -1709,14 +1712,13 @@ namespace Timbl {
     }
     size_t CurPos = 0;
     while ( Bpnt ) {
-      size_t EndPos  = tester->test_ex( Inst.FV,
-					CurrentFV,
-					distances,
-					CurPos,
-					EffFeat,
-					ib_offset,
-					Bpnt->Weight(),
-					Distance );
+      double dummy = -0.0;
+      size_t EndPos  = tester->test( Inst.FV,
+				     CurrentFV,
+				     CurPos,
+				     EffFeat,
+				     ib_offset,
+				     dummy );
       if ( EndPos == EffFeat ){
 	// we finished with a certain amount of succes
 	ValueDistribution ResultDist;
@@ -1727,6 +1729,8 @@ namespace Timbl {
 				  ib_offset, 
 				  num_of_features );
 	}
+	double Distance = WeightFun( tester->getDistance(EndPos),
+				     Bpnt->Weight() );
 	bestArray.addResult( Distance, &ResultDist, origI );
       }
       else {
@@ -1739,8 +1743,6 @@ namespace Timbl {
       }
       else {
 	best_distrib = IB->NextGraphTest( CurrentFV, 
-					  Inst.FV, ib_offset, 
-					  effective_feats,
 					  CurPos );
 	Bpnt = NULL;
 	if ( best_distrib ){
@@ -1753,70 +1755,6 @@ namespace Timbl {
     }
   }
   
-  void MBLClass::test_instance_sim_ex( const Instance& Inst,
-				       InstanceBase_base *IB,
-				       size_t ib_offset ){
-    double Distance;
-    vector<FeatureValue *> CurrentFV(num_of_features);
-    vector<double> distances(num_of_features+1, 0.0);
-    size_t EffFeat = effective_feats - ib_offset;
-    const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV, 
-							       Inst.FV,
-							       ib_offset,
-							       effective_feats );
-    ValueDistribution::dist_iterator lastpos;
-    Vfield *Bpnt = NULL;
-    if ( best_distrib ){
-      lastpos = best_distrib->begin();
-      if ( lastpos != best_distrib->end() )
-	Bpnt = lastpos->second;
-    }
-    size_t CurPos = 0;
-    while ( Bpnt ) {
-      size_t EndPos = tester->test_sim_ex( Inst.FV,
-					   CurrentFV,
-					   distances,
-					   CurPos,
-					   EffFeat,
-					   ib_offset,
-					   Bpnt->Weight(),
-					   Distance );
-      if ( EndPos == EffFeat ){
-	// we finished with a certain amount of succes
-	ValueDistribution ResultDist;
-	ResultDist.SetFreq( Bpnt->Value(), Bpnt->Freq() );
-	string origI;
-	if ( Verbosity(NEAR_N) ){
-	  origI = formatInstance( Inst.FV, CurrentFV, 
-				  ib_offset, 
-				  num_of_features );
-	}
-	bestArray.addResult( Distance, &ResultDist, origI );
-      }
-      else {
-	EndPos++; // out of luck, compensate for roll-back
-      }
-      CurPos = EndPos-1;
-      ++lastpos;
-      if ( lastpos != best_distrib->end() ){
-	Bpnt = lastpos->second;
-      }
-      else {
-	best_distrib = IB->NextGraphTest( CurrentFV, 
-					  Inst.FV, ib_offset,
-					  effective_feats,
-					  CurPos );
-	Bpnt = NULL;
-	if ( best_distrib ){
-	  lastpos = best_distrib->begin();
-	  if ( lastpos != best_distrib->end() ){
-	    Bpnt = lastpos->second;  
-	  }
-	}
-      }
-    }
-  }
-
   void MBLClass::initDecay(){
     if ( decay ){
       delete decay;
@@ -1841,14 +1779,14 @@ namespace Timbl {
   void MBLClass::initTesters() {
     delete tester;
     if ( doSamples() )
-      tester = new ExemplarTester( Features, Permutation, NumOfFeatures() );
+      tester = new ExemplarTester( Features, Permutation );
     else if ( do_cos_metric )
-      tester = new CosineTester( Features, Permutation, NumOfFeatures() );
+      tester = new CosineTester( Features, Permutation );
     else if ( do_dot_product )
-      tester = new DotProductTester( Features, Permutation, NumOfFeatures() );
+      tester = new DotProductTester( Features, Permutation );
     else
-      tester = new DefaultTester( Features, Permutation, NumOfFeatures() );
-    tester->reset( NumOfFeatures(), GlobalMetric, mvd_threshold );
+      tester = new DefaultTester( Features, Permutation );
+    tester->reset( GlobalMetric, mvd_threshold );
   }
 
   ostream&  operator<< ( ostream& os, const vector<FeatureValue*>& fv ){
@@ -1881,27 +1819,24 @@ namespace Timbl {
   void MBLClass::test_instance( const Instance& Inst,
 				InstanceBase_base *IB,
 				size_t ib_offset ){
-    double Distance;
     vector<FeatureValue *> CurrentFV(num_of_features);
     double Threshold = DBL_MAX;
-    vector<double>distances(num_of_features+1, 0.0);
     size_t EffFeat = effective_feats - ib_offset;
     const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV, 
-							       Inst.FV,
+							       &Inst.FV,
 							       ib_offset,
 							       effective_feats );
     size_t CurPos = 0;
     while ( best_distrib ){
       size_t EndPos = tester->test( Inst.FV,
 				    CurrentFV,
-				    distances,
 				    CurPos,
 				    EffFeat,
 				    ib_offset,
 				    Threshold + Epsilon );
       if ( EndPos == EffFeat ){
 	// we finished with a certain amount of succes
-	Distance = distances[EndPos];
+	double Distance = tester->getDistance(EndPos);
 	if ( Distance >= 0.0 ){
 	  string origI;
 	  if ( Verbosity(NEAR_N) ){
@@ -1923,11 +1858,9 @@ namespace Timbl {
       }
       size_t pos=EndPos-1;
       while ( true ){
-	if ( distances[pos] <= Threshold ){
+	if ( tester->getDistance(pos) <= Threshold ){
 	  CurPos = pos;
 	  best_distrib = IB->NextGraphTest( CurrentFV, 
-					    Inst.FV, ib_offset,
-					    effective_feats,
 					    CurPos );
 	  break;
 	}
@@ -1941,25 +1874,24 @@ namespace Timbl {
   void MBLClass::test_instance_sim( const Instance& Inst,
 				    InstanceBase_base *IB,
 				    size_t ib_offset ){
-    double Distance;
     vector<FeatureValue *> CurrentFV(num_of_features);
-    vector<double>distances(num_of_features+1, 0.0);
     size_t EffFeat = effective_feats - ib_offset;
     const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV, 
-							       Inst.FV,
+							       &Inst.FV,
 							       ib_offset,
 							       effective_feats );
     size_t CurPos = 0;
     while ( best_distrib ){
-      size_t EndPos = tester->test_sim( Inst.FV,
-					CurrentFV,
-					distances,
-					CurPos,
-					EffFeat,
-					ib_offset );
+      double dummy = -1.0;
+      size_t EndPos = tester->test( Inst.FV,
+				    CurrentFV,
+				    CurPos,
+				    EffFeat,
+				    ib_offset,
+				    dummy );
       if ( EndPos == EffFeat ){
 	// we finished with a certain amount of succes
-	Distance = maxSimilarity - distances[EndPos];
+	double Distance = tester->getDistance(EndPos);
 	if ( Distance >= 0.0 ){
 	  string origI;
 	  if ( Verbosity(NEAR_N) ){
@@ -1981,8 +1913,6 @@ namespace Timbl {
       if ( EndPos > 0 ){
 	CurPos = EndPos-1;
 	best_distrib = IB->NextGraphTest( CurrentFV, 
-					  Inst.FV, ib_offset, 
-					  effective_feats,
 					  CurPos );
       }
     }
@@ -1996,11 +1926,7 @@ namespace Timbl {
 		    Verbosity(DISTRIB) ); 
     // must be cleared for EVERY test
     if (  doSamples() ){
-      if ( do_dot_product || do_cos_metric ){
-	test_instance_sim_ex( Inst, SubTree, level );
-      }
-      else
-	test_instance_ex( Inst, SubTree, level );
+      test_instance_ex( Inst, SubTree, level );
     }
     else {
       if ( do_dot_product || do_cos_metric ){

@@ -65,39 +65,16 @@ namespace Timbl{
   class TesterClass {
   public:
     TesterClass( const std::vector<Feature*>&, 
-		 const size_t *, 
-		 size_t );
+		 const size_t * );
     virtual ~TesterClass();
-    void reset( size_t, MetricType, int );
-    virtual size_t test( const std::vector<FeatureValue *>& FV,
-		 std::vector<FeatureValue *>& G, 
-		 std::vector<double>& Distances,
-		 size_t CurPos,
-		 size_t Size,
-		 size_t ib_offset,
-		 double Threshold_plus ) const =0;
-    virtual size_t test_sim( const std::vector<FeatureValue *>& FV,
-		 std::vector<FeatureValue *>& G, 
-		 std::vector<double>& Distances,
-		 size_t CurPos,
-		 size_t Size,
-		 size_t ib_offset ) const = 0;
-    virtual size_t test_ex( const std::vector<FeatureValue *>& FV,
-		 std::vector<FeatureValue *>& G, 
-		 std::vector<double>& Distances,
-		 size_t CurPos,
-		 size_t Size,
-		 size_t ib_offset,
-		 double,
-		 double& ) const = 0;
-    virtual size_t test_sim_ex( const std::vector<FeatureValue *>& FV,
-				std::vector<FeatureValue *>& G, 
-				std::vector<double>& Distances,
-				size_t CurPos,
-				size_t Size,
-				size_t ib_offset,
-				double,
-				double& ) const = 0;
+    void reset( MetricType, int );
+    virtual size_t test( const std::vector<FeatureValue *>&,
+			 std::vector<FeatureValue *>&, 
+			 size_t,
+			 size_t,
+			 size_t,
+			 double ) = 0;
+    virtual double getDistance( size_t ) const = 0;
   protected:
     size_t _size;
     metricTester **test_feature_val;
@@ -109,144 +86,55 @@ namespace Timbl{
   
   class DefaultTester: public TesterClass {
   public:
-  DefaultTester( std::vector<Feature*>& pf, size_t *p, size_t s ): 
-    TesterClass( pf, p, s ){};  
-    size_t test( const std::vector<FeatureValue *>& FV,
-		 std::vector<FeatureValue *>& G, 
-		 std::vector<double>& Distances,
-		 size_t CurPos,
-		 size_t Size,
-		 size_t ib_offset,
-		 double Threshold_plus ) const; 
-    size_t test_ex( const std::vector<FeatureValue *>&,
-		    std::vector<FeatureValue *>&, 
-		    std::vector<double>& ,
-		    size_t,
-		    size_t,
-		    size_t,
-		    double,
-		    double& ) const;
-    size_t test_sim( const std::vector<FeatureValue *>&,
-		     std::vector<FeatureValue *>&, 
-		     std::vector<double>& ,
-		     size_t,
-		     size_t,
-		     size_t ) const;
-    size_t test_sim_ex( const std::vector<FeatureValue *>&,
-			std::vector<FeatureValue *>&, 
-			std::vector<double>& ,
-			size_t,
-			size_t,
-			size_t,
-			double,
-			double& ) const;
+  DefaultTester( std::vector<Feature*>& pf, size_t *p ): 
+    TesterClass( pf, p ){};  
+    double getDistance( size_t ) const;
+    size_t test( const std::vector<FeatureValue *>&,
+		 std::vector<FeatureValue *>&, 
+		 size_t,
+		 size_t,
+		 size_t,
+		 double ); 
   };
   
   class ExemplarTester: public TesterClass {
   public:
-  ExemplarTester( std::vector<Feature*>& pf, size_t *p, size_t s ): 
-    TesterClass( pf, p, s ){};  
+  ExemplarTester( std::vector<Feature*>& pf, size_t *p ): 
+    TesterClass( pf, p ){};  
+    double getDistance( size_t ) const;
     size_t test( const std::vector<FeatureValue *>&,
 		 std::vector<FeatureValue *>&, 
-		 std::vector<double>&,
 		 size_t,
 		 size_t,
 		 size_t,
-		 double ) const;
-    size_t test_sim( const std::vector<FeatureValue *>&,
-		     std::vector<FeatureValue *>&, 
-		     std::vector<double>& ,
-		     size_t,
-		     size_t,
-		     size_t ) const;
-    size_t test_ex( const std::vector<FeatureValue *>& FV,
-		    std::vector<FeatureValue *>& G, 
-		    std::vector<double>& Distances,
-		    size_t CurPos,
-		    size_t Size,
-		    size_t ib_offset,
-		    double ExWeight,
-		    double& Distance ) const;
-    size_t test_sim_ex( const std::vector<FeatureValue *>&,
-			std::vector<FeatureValue *>&, 
-			std::vector<double>& ,
-			size_t,
-			size_t,
-			size_t,
-			double,
-			double& ) const;
+		 double );
   };
 
   class CosineTester: public TesterClass {
   public:
-  CosineTester( std::vector<Feature*>& pf, size_t *p, size_t s ): 
-    TesterClass( pf, p, s ){};  
+  CosineTester( std::vector<Feature*>& pf, size_t *p ): 
+    TesterClass( pf, p ){};  
+    double getDistance( size_t ) const;
     size_t test( const std::vector<FeatureValue *>&,
 		 std::vector<FeatureValue *>&, 
-		 std::vector<double>&,
 		 size_t,
 		 size_t,
 		 size_t,
-		 double ) const;
-    size_t test_sim( const std::vector<FeatureValue *>& FV,
-		     std::vector<FeatureValue *>& G, 
-		     std::vector<double>& Distances,
-		     size_t CurPos,
-		     size_t Size,
-		     size_t ib_offset ) const;
-    size_t test_ex( const std::vector<FeatureValue *>&,
-		    std::vector<FeatureValue *>&, 
-		    std::vector<double>&,
-		    size_t,
-		    size_t,
-		    size_t,
-		    double,
-		    double& ) const;
-    size_t test_sim_ex( const std::vector<FeatureValue *>&,
-			std::vector<FeatureValue *>&, 
-			std::vector<double>& ,
-			size_t,
-			size_t,
-			size_t,
-			double,
-			double& ) const;
+		 double );
   };
   
   class DotProductTester: public TesterClass {
   public:
-  DotProductTester( std::vector<Feature*>& pf, size_t *p, size_t s ): 
-    TesterClass( pf, p, s ){};  
+  DotProductTester( std::vector<Feature*>& pf, size_t *p ): 
+    TesterClass( pf, p ){};  
+    double getDistance( size_t ) const;
     size_t test( const std::vector<FeatureValue *>&,
 		 std::vector<FeatureValue *>&, 
-		 std::vector<double>&,
 		 size_t,
 		 size_t,
 		 size_t,
-		 double ) const;
-    size_t test_sim( const std::vector<FeatureValue *>& FV,
-		     std::vector<FeatureValue *>& G, 
-		     std::vector<double>& Distances,
-		     size_t CurPos,
-		     size_t Size,
-		     size_t ib_offset ) const;
-    size_t test_ex( const std::vector<FeatureValue *>&,
-		    std::vector<FeatureValue *>&, 
-		    std::vector<double>&,
-		    size_t,
-		    size_t,
-		    size_t,
-		    double,
-		    double& ) const;
-    size_t test_sim_ex( const std::vector<FeatureValue *>& FV,
-			std::vector<FeatureValue *>& G, 
-			std::vector<double>& Distances,
-			size_t CurPos,
-			size_t Size,
-			size_t ib_offset,
-			double ExWeight,
-			double& Distance ) const;
+		 double );
   };
-  
 }  
 
 #endif // TESTERS_H

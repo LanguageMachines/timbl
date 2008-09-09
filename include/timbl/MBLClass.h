@@ -242,9 +242,6 @@ namespace Timbl {
     void test_instance_ex( const Instance&,
 			   InstanceBase_base * = NULL,
 			   size_t = 0 );
-    void test_instance_sim_ex( const Instance& ,
-			       InstanceBase_base * = NULL,
-			       size_t = 0 );
 
     bool allocate_arrays();
 

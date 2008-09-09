@@ -1280,7 +1280,7 @@ namespace Timbl {
   }
   
   const ValueDistribution *InstanceBase_base::InitGraphTest( vector<FeatureValue *>&,
-							     const vector<FeatureValue *>&,
+							     const vector<FeatureValue *> *,
 							     size_t,
 							     size_t ){
     FatalError( "InitGraphTest" );
@@ -1313,19 +1313,22 @@ namespace Timbl {
   }
 
   const ValueDistribution *IB_InstanceBase::InitGraphTest( vector<FeatureValue *>& Path,
-							   const vector<FeatureValue *>& Templ,
+							   const vector<FeatureValue *> *inst,
 							   size_t off,
 							   size_t eff ){
     const IBtree *pnt;
     const ValueDistribution *result = NULL;
+    testInst = inst;
+    offSet = off;
+    effFeat = eff;
     pnt = InstBase;
     for ( unsigned int i = 0; i < Depth; ++i ){
       InstPath[i] = pnt;
       RestartSearch[i] = pnt;
       if ( i == 0 )
-	pnt = fast_search_node( Templ[off+i] );
+	pnt = fast_search_node( (*testInst)[offSet+i] );
       else
-	pnt = pnt->search_node( Templ[off+i] );
+	pnt = pnt->search_node( (*testInst)[offSet+i] );
       if ( pnt ){ // found an exact match, so mark restart position
 	if ( RestartSearch[i] == pnt )
 	  RestartSearch[i] = pnt->next;
@@ -1346,25 +1349,19 @@ namespace Timbl {
     }
     while ( result && result->ZeroDist() ){
       // This might happen when doing LOO or CV tests
-      size_t TmpPos = eff-1;
-      result = NextGraphTest( Path, Templ, off, eff, TmpPos );
+      size_t TmpPos = effFeat-1;
+      result = NextGraphTest( Path, TmpPos );
     }
     return result;
   }
   
   const ValueDistribution *InstanceBase_base::NextGraphTest( vector<FeatureValue *>&, 
-							     const vector<FeatureValue *>&,
-							     size_t,
-							     size_t,
 							     size_t& ){
     FatalError( "NextGraphTest" );
     return 0;
   }
   
   const ValueDistribution *IB_InstanceBase::NextGraphTest( vector<FeatureValue *>& Path, 
-							   const vector<FeatureValue *>& Templ, 
-							   size_t off,
-							   size_t eff,
 							   size_t& pos ){
     const IBtree *pnt = NULL;
     const ValueDistribution *result = NULL;
@@ -1393,7 +1390,7 @@ namespace Timbl {
       Path[pos] = pnt->FValue;
       pnt = pnt->link;
       for (  size_t j=pos+1; j < Depth; ++j ){
-	const IBtree *tmp = pnt->search_node( Templ[off+j] );
+	const IBtree *tmp = pnt->search_node( (*testInst)[offSet+j] );
 	if ( tmp ){ // we found an exact match, so mark Restart position
 	  if ( pnt == tmp )
 	    RestartSearch[j] = pnt->next;
@@ -1417,9 +1414,8 @@ namespace Timbl {
     }
     if ( result && result->ZeroDist() ){
       // This might happen when doing LOO or CV tests
-      size_t TmpPos = eff-1;
-      result = NextGraphTest( Path, Templ,
-			      off, eff, TmpPos );
+      size_t TmpPos = effFeat-1;
+      result = NextGraphTest( Path, TmpPos );
       if ( TmpPos < pos ){
 	pos = TmpPos;
       }
