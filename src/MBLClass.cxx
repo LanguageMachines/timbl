@@ -887,14 +887,12 @@ namespace Timbl {
 	  if ( force ||
 	       ( !Features[j]->ArrayRead() &&
 		 ( ( Features[j]->Metric() == ValueDiff ||
-		     (Features[j]->Metric() == DefaultMetric && 
-		      GlobalMetric == ValueDiff ) ) ||
-		   ( Features[j]->Metric() == JeffreyDiv ||
-		     (Features[j]->Metric() == DefaultMetric && 
-		      GlobalMetric == JeffreyDiv ) ) ||
-		   ( Features[j]->Metric() == Levenshtein ||
-		     (Features[j]->Metric() == DefaultMetric && 
-		      GlobalMetric == Levenshtein ) ) ) ) ){
+		     Features[j]->Metric() == JeffreyDiv ||
+		     Features[j]->Metric() == Levenshtein ||
+		     ( Features[j]->Metric() == DefaultMetric && 
+		       ( GlobalMetric == ValueDiff ||
+			 GlobalMetric == JeffreyDiv ||
+			 GlobalMetric == Levenshtein ) ) ) ) ) ){
 	    Features[j]->InitSparseArrays();
 	  } // if force
 	} //if !Ignore
