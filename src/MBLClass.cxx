@@ -311,7 +311,6 @@ namespace Timbl {
       DBEntropy = 0.0;
       ChopInput = 0;
       setInputFormat( m.input_format );
-      ChoppedInput.resize(num_of_features+2);
       //one extra to store the target!
       CurrInst.Init( num_of_features );
 #ifndef USE_LOGSTREAMS
@@ -944,15 +943,12 @@ namespace Timbl {
   const Instance *MBLClass::chopped_to_instance( PhaseValue phase ){
     CurrInst.clear();
     if ( num_of_features != target_pos ) {
-      string tmp = ChoppedInput[target_pos];
-      for ( size_t i = target_pos+1; i <= num_of_features; ++i )
-	ChoppedInput[i-1] = ChoppedInput[i];
-      ChoppedInput[num_of_features] = tmp;
+      ChopInput->swapTarget( target_pos );
     }
     switch ( phase  ){
     case LearnWords:
       // Add the target.
-      CurrInst.TV = Targets->add_value( ChoppedInput[num_of_features] );
+      CurrInst.TV = Targets->add_value( ChopInput->getField( num_of_features ));
       // Now add the Feature values.
       for ( size_t i = 0; i < num_of_features; ++i ){
 	// when learning, no need to bother about Permutation
@@ -960,7 +956,7 @@ namespace Timbl {
 	  CurrInst.FV[i] = NULL;
 	else
 	  // Add it to the Instance.
-	  CurrInst.FV[i] = Features[i]->add_value( ChoppedInput[i],
+	  CurrInst.FV[i] = Features[i]->add_value( ChopInput->getField(i),
 						   CurrInst.TV ); 
       } // i
       break;
@@ -969,20 +965,20 @@ namespace Timbl {
       // First the Features
       for ( size_t k = 0; k < effective_feats; ++k ){
 	size_t j = Permutation[k];
-	CurrInst.FV[k] = Features[j]->Lookup( ChoppedInput[j] );
+	CurrInst.FV[k] = Features[j]->Lookup( ChopInput->getField(j) );
       } // k
       // and the Target
-      CurrInst.TV = Targets->Lookup( ChoppedInput[num_of_features] );
+      CurrInst.TV = Targets->Lookup( ChopInput->getField( num_of_features ) );
       break;
     case TrainLearnWords:
       // Lookup for Incremental TreeBuilding
       // Assumes that somehow Permutation and effective_feats are known
       // First the Target
-      CurrInst.TV = Targets->add_value( ChoppedInput[num_of_features] );
+      CurrInst.TV = Targets->add_value( ChopInput->getField(num_of_features ) );
       // Then the Features
       for ( size_t l = 0; l < effective_feats; ++l ){
 	size_t j = Permutation[l];
-	CurrInst.FV[l] = Features[j]->add_value( ChoppedInput[j],
+	CurrInst.FV[l] = Features[j]->add_value( ChopInput->getField(j),
 						 CurrInst.TV ); 
       } // k
       break;
@@ -991,14 +987,16 @@ namespace Timbl {
       // This might fail for unknown values, then we create a dummy value
       for ( size_t m = 0; m < effective_feats; ++m ){
 	size_t j = Permutation[m];
-	CurrInst.FV[m] = Features[j]->Lookup( ChoppedInput[j] );
+	const string& fld =  ChopInput->getField(j);
+	CurrInst.FV[m] = Features[j]->Lookup( fld );
 	if ( !CurrInst.FV[m] ){
 	  // for "unknown" values have to add a dummy value
-	  CurrInst.FV[m] = new FeatureValue( ChoppedInput[j] );
+	  CurrInst.FV[m] = new FeatureValue( fld );
 	}
+
       } // i
       // the last string is the target
-      CurrInst.TV = Targets->Lookup( ChoppedInput[num_of_features] );
+      CurrInst.TV = Targets->Lookup( ChopInput->getField(num_of_features) );
       break;
     default:
       FatalError( "Wrong value in Switch: " 
@@ -1006,7 +1004,7 @@ namespace Timbl {
     }
     if ( ( phase != TestWords ) && doSamples() ){
       double tmp;
-      if ( stringTo<double>( ChoppedInput[num_of_features+1], tmp ) )
+      if ( stringTo<double>( ChopInput->getField(num_of_features+1), tmp ) )
 	CurrInst.ExemplarWeight( tmp );
       else 
 	CurrInst.ExemplarWeight( 1.0 );
@@ -1024,32 +1022,7 @@ namespace Timbl {
   }
   
   void MBLClass::show_org_input( ostream& out ) const {
-    for ( size_t i = 0; i <= num_of_features; ++i ) {
-      switch ( input_format) {
-      case C4_5:
-      case ARFF:
-	out << CodeToStr(ChoppedInput[i]) << ",";
-      break;
-      case Columns:
-	out << ChoppedInput[i] << " ";
-	break;
-      case SparseBin:
-	if ( i == num_of_features )
-	  out << ChoppedInput[i] << ",";
-	else if ( ChoppedInput[i][0] == '1' )
-	  out << i+1 << ",";
-	break;
-      case Sparse:
-	if ( i == num_of_features )
-	  out << ChoppedInput[i] << ",";
-	else if ( ChoppedInput[i] != DefaultSparseString )
-	  out << "(" << i+1 << "," << CodeToStr(ChoppedInput[i]) << ")";
-	break;
-      default:
-	out << ChoppedInput[i];
-	break;
-      }
-    }
+    ChopInput->print( out );
   }
   
   void MBLClass::LearningInfo( ostream& os ) {
@@ -1566,7 +1539,7 @@ namespace Timbl {
 	  return false;
 	}
 	else {
-	  ChoppedInput[num_of_features+1] = wght;
+	  ChopInput->setField(num_of_features+1, wght);
 	}
       }
     }
@@ -1580,7 +1553,8 @@ namespace Timbl {
     while ( it != OriginalInput.begin() && 
 	    isspace(*it) ) --it;
     OriginalInput.erase( ++it , OriginalInput.end() );
-    return ChopInput->chop( OriginalInput, ChoppedInput, num_of_features );
+    bool result = ChopInput->chop( OriginalInput, num_of_features );
+    return result;
   }
   
   bool MBLClass::setInputFormat( const InputFormatType IF ){
@@ -1609,7 +1583,7 @@ namespace Timbl {
       ChopInput = new Columns_Chopper();
       break;
     case Compact:
-      ChopInput = new Compact_Chopper( F_length );
+      ChopInput = new Compact_Chopper(F_length );
       break;
     default:
       return false;
@@ -2180,9 +2154,9 @@ namespace Timbl {
 				 FeatureStrings );
       PermFeatures[i] = NULL; //Features[i];
     }
-    ChoppedInput.resize(num_of_features+2);
-    //one extra to store the target and one for sample-weighting
     CurrInst.Init( num_of_features );
+    if ( ChopInput )
+      ChopInput->init( num_of_features );
     // the user thinks about features running from 1 to Num
     // we know better, so shift one down.
     effective_feats = num_of_features;

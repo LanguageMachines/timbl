@@ -5,17 +5,32 @@ namespace Timbl{
 
   class Chopper {
   public:
+    void init( size_t len ) { choppedInput.resize(len+2); };
     virtual ~Chopper() {};
     virtual bool chop( const std::string&,
-		       std::vector<std::string>&,
-		       size_t ) const = 0;
+		       size_t ) = 0;
+    const std::string& getField( size_t i ) const { return choppedInput[i]; };
+    void setField( size_t i, std::string s ){ choppedInput[i] = s; };
+    const std::string& getExW() const { return exW; };
+    void setExW( std::string& s){ exW = s; };
+    virtual void print( std::ostream& ) = 0;
+    void swapTarget( size_t target_pos ){
+      std::string tmp = choppedInput[target_pos];
+      for ( size_t i = target_pos+1; i <= size; ++i )
+	choppedInput[i-1] = choppedInput[i];
+      choppedInput[size] = tmp;
+    }
+  protected:
+    std::vector<std::string> choppedInput;
+    std::string exW;
+    size_t size;
   };
   
   class C45_Chopper : public Chopper {
   public:
     bool chop( const std::string& InBuf, 
-	       std::vector<std::string>& OutBuf, 
-	       size_t Len ) const {
+	       size_t Len ) {
+      size = Len;
       // Function that takes a line InBuf, and chops it up into substrings,
       // which represent the feature-values and the target-value.
       std::vector<std::string> splits;
@@ -23,36 +38,42 @@ namespace Timbl{
       if ( res != Len + 1 )
 	return false;
       for ( size_t i=0; i <= Len ; ++i ){
-	OutBuf[i] = StrToCode( compress(splits[i]) );
+	choppedInput[i] = StrToCode( compress(splits[i]) );
       }
       return true;
     }
+    void print( std::ostream& os ){ 
+      for ( size_t i = 0; i <= size; ++i ) {
+	os << CodeToStr( choppedInput[i] ) << ",";
+      }
+      if ( !exW.empty() )
+	os << " " << exW;
+    };
   };
 
 
   class ARFF_Chopper : public C45_Chopper {
   public:
     bool chop( const std::string&InBuf,
-	       std::vector<std::string>& OutBuf, 
-	       size_t Len ) const {
+	       size_t Len ) {
       // Lines look like this:
       // one, two,   three , bla.
       // the termination dot is optional
       // WhiteSpace is skipped!
-      return C45_Chopper::chop( compress( InBuf ), OutBuf, Len );
+      return C45_Chopper::chop( compress( InBuf ), Len );
     }
   };
   
   class Bin_Chopper : public Chopper {
   public:
-    bool chop( const std::string&InBuf,
-	       std::vector<std::string>& OutBuf,
-	       size_t Len ) const {
+    bool chop( const std::string& InBuf,
+	       size_t Len ) {
       // Lines look like this:
       // 12, 25, 333, bla.
       // the termination dot is optional
+      size = Len;
       for ( size_t m = 0; m < Len; ++m )
-	OutBuf[m] = "0";
+	choppedInput[m] = "0";
       std::string::size_type s_pos = 0;
       std::string::size_type e_pos = InBuf.find( ',' );
       while ( e_pos != std::string::npos ){
@@ -61,22 +82,31 @@ namespace Timbl{
 	if ( !stringTo<size_t>( tmp, k, 1, Len ) )
 	  return false;
 	else
-	  OutBuf[k-1] = "1";
+	  choppedInput[k-1] = "1";
 	s_pos = e_pos + 1;
 	e_pos = InBuf.find( ',', s_pos );
       }
-      OutBuf[Len] = std::string( InBuf, s_pos );
+      choppedInput[Len] = std::string( InBuf, s_pos );
       return true;
+    }
+    void print( std::ostream& os ){ 
+      for ( size_t i = 0; i < size; ++i ) {
+	if ( choppedInput[i][0] == '1' )
+	  os << i+1 << ",";
+      }
+      os << choppedInput[size] << ",";
+      if ( !exW.empty() )
+	os  << " " << exW;
     }
   };
   
   class Compact_Chopper : public Chopper {
   public:
-  Compact_Chopper( int L ): Chopper(), fLen(L){};
+  Compact_Chopper( int L ): fLen(L){};
     
     bool chop( const std::string& InBuf, 
-	       std::vector<std::string>& OutBuf, 
-	       size_t Len ) const {
+	       size_t Len ) {
+      size = Len;
       size_t i;
       // Lines look like this:
       // ====AKBVAK
@@ -91,13 +121,21 @@ namespace Timbl{
 	size_t index = i * fLen; 
 	// Scan the value.
 	//
-	OutBuf[i] = "";
+	choppedInput[i] = "";
 	for ( int j = 0; j < fLen; ++j ) {
-	  OutBuf[i] += InBuf[index++];
+	  choppedInput[i] += InBuf[index++];
 	}
       }
       return ( i == Len+1 ); // Enough?
     }
+    void print( std::ostream& os ){ 
+      for ( size_t i = 0; i <= size; ++i ) {
+	os << CodeToStr( choppedInput[i] );
+      }
+      if ( !exW.empty() )
+	os << " " << exW;
+    };
+
   private:
     int fLen;
   };
@@ -105,24 +143,32 @@ namespace Timbl{
   class Columns_Chopper : public Chopper {
   public:
     bool chop( const std::string& InBuf,
-	       std::vector<std::string>& OutBuf,
-	       size_t Len ) const {
+	       size_t Len ) {
       // Lines look like this:
       // one  two three bla
+      size = Len;
       unsigned int i = 0;
       std::string::size_type s_pos = 0;
       std::string::size_type e_pos = InBuf.find_first_of( " \t" );
       while ( e_pos != s_pos && e_pos != std::string::npos && i <= Len+1 ){
 	// stop if a zero length string is found or if too many entries show up
-	OutBuf[i++] = std::string( InBuf, s_pos, e_pos - s_pos );
+	choppedInput[i++] = std::string( InBuf, s_pos, e_pos - s_pos );
 	s_pos = InBuf.find_first_not_of( " \t", e_pos );
 	e_pos = InBuf.find_first_of( " \t", s_pos );
       }
       if ( s_pos != std::string::npos && i <= Len+1 ){
-	OutBuf[i++] = std::string( InBuf, s_pos );
+	choppedInput[i++] = std::string( InBuf, s_pos );
       }
       return ( i == Len+1 ); // Enough?
     }
+    void print( std::ostream& os ){ 
+      for ( size_t i = 0; i <= size; ++i ) {
+	os << choppedInput[i] << " ";
+      }
+      if ( !exW.empty() )
+	os << " " << exW;
+    };
+
   };
 
   static const std::string ThisDefaultSparseString = "0.0000E-17";
@@ -130,18 +176,18 @@ namespace Timbl{
   class Sparse_Chopper : public Chopper {
   public:
     bool chop( const std::string& InBuf, 
-	       std::vector<std::string>& OutBuf,
-	       size_t Len ) const {
+	       size_t Len ) {
       // Lines look like this:
       // (12,value1) (25,value2) (333,value3) bla.
       // the termination dot is optional
       
+      size = Len;
       for ( size_t m = 0; m < Len; ++m )
-	OutBuf[m] = ThisDefaultSparseString;
-      OutBuf[Len] = "";
+	choppedInput[m] = ThisDefaultSparseString;
+      choppedInput[Len] = "";
       std::string::size_type s_pos = InBuf.find( "(" );
       if ( s_pos == std::string::npos )
-	OutBuf[Len] = compress(InBuf);
+	choppedInput[Len] = compress(InBuf);
       else {
 	std::string::size_type m_pos, e_pos = InBuf.find( ")" );
 	while ( s_pos < e_pos &&
@@ -152,22 +198,31 @@ namespace Timbl{
 	  if ( !stringTo<size_t>( temp, k, 1, Len ) )
 	    return false;
 	  else {
-	    OutBuf[k-1] = std::string( InBuf, m_pos + 1, e_pos - m_pos -1 );
-	    OutBuf[k-1] = StrToCode( compress(OutBuf[k-1]) );
+	    choppedInput[k-1] = std::string( InBuf, m_pos + 1, e_pos - m_pos -1 );
+	    choppedInput[k-1] = StrToCode( compress(choppedInput[k-1]) );
 	  }
 	  s_pos = InBuf.find( '(', e_pos );
 	  if ( s_pos == std::string::npos ){
 	    e_pos = InBuf.find_first_not_of( ") \t", e_pos );
 	    if ( e_pos != std::string::npos ){
-	      OutBuf[Len] = std::string( InBuf, e_pos );
-	      OutBuf[Len] = compress( OutBuf[Len] );
+	      choppedInput[Len] = std::string( InBuf, e_pos );
+	      choppedInput[Len] = compress( choppedInput[Len] );
 	    }
 	  }
 	  else
 	    e_pos = InBuf.find( ')', s_pos );
 	}
       }
-      return !OutBuf[Len].empty();
+      return !choppedInput[Len].empty();
+    }
+    void print( std::ostream& os ){ 
+      for ( size_t i = 0; i < size; ++i ) {
+	if ( choppedInput[i] != ThisDefaultSparseString )
+	  os << "(" << i+1 << "," << CodeToStr(choppedInput[i]) << ")";
+      }
+      os << choppedInput[size] << ",";
+      if ( !exW.empty() )
+	os << " " << exW;
     }
   };
   

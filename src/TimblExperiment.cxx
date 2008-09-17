@@ -52,6 +52,7 @@
 #include "timbl/Options.h"
 #include "timbl/Tree.h"
 #include "timbl/Instance.h"
+#include "timbl/Choppers.h"
 #include "timbl/Statistics.h"
 #include "timbl/neighborSet.h"
 #include "timbl/BestArray.h"
@@ -1056,6 +1057,7 @@ namespace Timbl {
       }
       else {
 	initExperiment();
+	ChopInput->init( NumOfFeatures() );
 	result = true;
       }
     }

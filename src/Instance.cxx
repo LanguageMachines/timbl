@@ -1184,8 +1184,9 @@ namespace Timbl {
   
    
   ostream& operator<<( std::ostream& os, ValueClass const *vc ){
-    if ( vc )
+    if ( vc ){
       os << vc->Name();
+    }
     else
       os << "*FV-NF*";
     return os;
@@ -1952,6 +1953,8 @@ namespace Timbl {
       }
       FV[i] = 0;
     }
+    TV = 0;
+    sample_weight = 0.0;
   }
   
   void Instance::Init( size_t len ){

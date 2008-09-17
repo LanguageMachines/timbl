@@ -187,6 +187,7 @@ namespace Timbl {
     void calculatePrestored();
     void initDecay();
     void initTesters();
+    Chopper *ChopInput;
   private:
     size_t MaxFeatures;
     std::vector<MetricType> UserOptions;
@@ -223,12 +224,11 @@ namespace Timbl {
 	!( runningPhase == TestWords && no_samples_test ); }
     bool keep_distributions;
     double DBEntropy;
-    std::vector<std::string>ChoppedInput;
+    //    std::vector<std::string>ChoppedInput;
     void fill_table();
     void InvalidMessage() const ;
     double calculate_db_entropy( Target * );
     void do_numeric_statistics( );
-    Chopper *ChopInput;
     TesterClass *tester;
     
 
