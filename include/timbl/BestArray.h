@@ -32,7 +32,7 @@ namespace Timbl {
   public:
     BestRec();
     ~BestRec();
-    size_t totalBests() { return aggregateDist.size(); };
+    size_t totalBests() { return aggregateDist.totalSize(); };
     double bestDistance;
     ValueDistribution aggregateDist;
     std::vector<ValueDistribution*> bestDistributions;

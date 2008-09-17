@@ -83,7 +83,8 @@ namespace Timbl {
     ValueDistribution( ): total_items(0) {};
     ValueDistribution( const ValueDistribution& );
     virtual ~ValueDistribution(){ clear(); };
-    size_t size() const{ return total_items; };
+    size_t totalSize() const{ return total_items; };
+    size_t size() const{ return distribution.size(); };
     bool empty() const{ return distribution.empty(); };
     void clear();
     dist_iterator begin() const { return distribution.begin(); };
@@ -187,7 +188,7 @@ namespace Timbl {
     ~FeatureValue();
     void ReconstructDistribution( const ValueDistribution& vd ) { 
       TargetDist.Merge( vd );
-      Frequency = TargetDist.size();
+      Frequency = TargetDist.totalSize();
     };
     double VDDistance( FeatureValue *, 
 		       size_t = 1, 

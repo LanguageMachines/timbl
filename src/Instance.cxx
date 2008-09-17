@@ -757,7 +757,7 @@ namespace Timbl {
     }
     for ( int k=0; k < BinSize; k++ ){
       FeatureValue *pnt = FVBin[k];
-      size_t Freq = pnt->TargetDist.size();
+      size_t Freq = pnt->TargetDist.totalSize();
       pnt->ValFreq( Freq );
       if ( Freq > 0 ){
 	// Entropy for this FV pair.
