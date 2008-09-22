@@ -313,6 +313,7 @@ namespace Timbl {
       setInputFormat( m.input_format );
       //one extra to store the target!
       CurrInst.Init( num_of_features );
+      ChopInput->init( num_of_features );
 #ifndef USE_LOGSTREAMS
       myerr = m.myerr;
       mylog = m.mylog;
