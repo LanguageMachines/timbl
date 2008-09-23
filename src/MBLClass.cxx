@@ -313,7 +313,6 @@ namespace Timbl {
       setInputFormat( m.input_format );
       //one extra to store the target!
       CurrInst.Init( num_of_features );
-      ChopInput->init( num_of_features );
 #ifndef USE_LOGSTREAMS
       myerr = m.myerr;
       mylog = m.mylog;
@@ -1519,6 +1518,7 @@ namespace Timbl {
   }
 
   bool MBLClass::Chop( const string& line ) {
+    ChopInput->init( num_of_features );
     string OriginalInput = line;
     string::iterator it = OriginalInput.end();
     --it;
@@ -2156,8 +2156,6 @@ namespace Timbl {
       PermFeatures[i] = NULL; //Features[i];
     }
     CurrInst.Init( num_of_features );
-    if ( ChopInput )
-      ChopInput->init( num_of_features );
     // the user thinks about features running from 1 to Num
     // we know better, so shift one down.
     effective_feats = num_of_features;

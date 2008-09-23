@@ -392,7 +392,6 @@ namespace Timbl {
 	    if ( NumOfFeatures() == 0 ){
 	      Initialize( Num );
 	    }
-	    ChopInput->init( NumOfFeatures() );
 	    CurrentDataFile = FileName;
 	    if ( Verbosity(OPTIONS) ){
 	      ShowSettings( *Log(mylog) );
@@ -1058,7 +1057,6 @@ namespace Timbl {
       }
       else {
 	initExperiment();
-	ChopInput->init( NumOfFeatures() );
 	result = true;
       }
     }
@@ -1115,7 +1113,6 @@ namespace Timbl {
 	    Do_Exact( false );
 	  }
 	  initExperiment();
-	  ChopInput->init( NumOfFeatures() );
 	  Initialized = true;
 	  result = true;
 	}
