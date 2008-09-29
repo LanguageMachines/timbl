@@ -72,10 +72,7 @@ namespace Timbl {
   const int DefaultTargetNumber  = 20;
   const int DefaultFeatureNumber = 50;
   const int TargetIncrement      = 50;
-  const int FeatureIncrement     = 100;
-  
-
-  static const string DefaultSparseString = "0.0000E-17";
+  const int FeatureIncrement     = 100;  
 
   void MBLClass::fill_table(){
     Options.Add( new IntegerOption( "FLENGTH",
@@ -1003,11 +1000,10 @@ namespace Timbl {
 		  + toString<PhaseValue>(phase) );
     }
     if ( ( phase != TestWords ) && doSamples() ){
-      double tmp;
-      if ( stringTo<double>( ChopInput->getField(num_of_features+1), tmp ) )
-	CurrInst.ExemplarWeight( tmp );
-      else 
-	CurrInst.ExemplarWeight( 1.0 );
+      double exW = ChopInput->getExW();
+      if ( exW < 0 )
+	exW = 1.0;
+      CurrInst.ExemplarWeight( exW );
     }
     return &CurrInst;
   }
@@ -1518,7 +1514,7 @@ namespace Timbl {
   }
 
   bool MBLClass::Chop( const string& line ) {
-    ChopInput->init( num_of_features );
+    ChopInput->init( line, num_of_features );
     string OriginalInput = line;
     string::iterator it = OriginalInput.end();
     --it;
@@ -1540,7 +1536,7 @@ namespace Timbl {
 	  return false;
 	}
 	else {
-	  ChopInput->setField(num_of_features+1, wght);
+	  ChopInput->setExW( tmp );
 	}
       }
     }
@@ -1554,7 +1550,7 @@ namespace Timbl {
     while ( it != OriginalInput.begin() && 
 	    isspace(*it) ) --it;
     OriginalInput.erase( ++it , OriginalInput.end() );
-    bool result = ChopInput->chop( OriginalInput, num_of_features );
+    bool result = ChopInput->chop( OriginalInput );
     return result;
   }
   

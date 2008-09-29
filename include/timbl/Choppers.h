@@ -28,51 +28,52 @@
 
 namespace Timbl{
 
+  static const std::string DefaultSparseString = "0.0000E-17";
+
   class Chopper {
   public:
-    void init( size_t len ) { choppedInput.resize(len+2); };
+    void init( const std::string&, size_t );
     virtual ~Chopper() {};
-    virtual bool chop( const std::string&,
-		       size_t ) = 0;
+    virtual bool chop( const std::string& ) = 0;
     const std::string& getField( size_t i ) const { return choppedInput[i]; };
-    void setField( size_t i, std::string s ){ choppedInput[i] = s; };
-    const std::string& getExW() const { return exW; };
-    void setExW( std::string& s){ exW = s; };
+    double getExW() const { return exW; };
+    void setExW( double e ){ exW = e; };
     virtual void print( std::ostream& ) = 0;
     void swapTarget( size_t target_pos ){
       std::string tmp = choppedInput[target_pos];
-      for ( size_t i = target_pos+1; i <= size; ++i )
+      for ( size_t i = target_pos+1; i < vSize; ++i )
 	choppedInput[i-1] = choppedInput[i];
-      choppedInput[size] = tmp;
+      choppedInput[vSize-1] = tmp;
     }
   protected:
+    double exW;
+    size_t vSize;
+    std::string originalInput;
     std::vector<std::string> choppedInput;
-    std::string exW;
-    size_t size;
   };
   
   class C45_Chopper : public Chopper {
   public:
-    bool chop( const std::string&, size_t );
+    bool chop( const std::string& );
     void print( std::ostream& );
   };
 
 
   class ARFF_Chopper : public C45_Chopper {
   public:
-    bool chop( const std::string&, size_t );
+    bool chop( const std::string& );
   };
   
   class Bin_Chopper : public Chopper {
   public:
-    bool chop( const std::string&, size_t );
+    bool chop( const std::string& );
     void print( std::ostream& os );
   };
   
   class Compact_Chopper : public Chopper {
   public:
   Compact_Chopper( int L ): fLen(L){};
-    bool chop( const std::string&, size_t );
+    bool chop( const std::string& );
     void print( std::ostream& );
   private:
     int fLen;
@@ -80,13 +81,13 @@ namespace Timbl{
   
   class Columns_Chopper : public Chopper {
   public:
-    bool chop( const std::string&, size_t );
+    bool chop( const std::string& );
     void print( std::ostream& );
   };
 
   class Sparse_Chopper : public Chopper {
   public:
-    bool chop( const std::string&, size_t );
+    bool chop( const std::string& );
     void print( std::ostream& );
   };  
 
