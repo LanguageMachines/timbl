@@ -1493,65 +1493,14 @@ namespace Timbl {
     return result;
   }
 
-  string stripExemplarWeight( const string& Buffer,
-			      string& wght ) {
-    string::size_type t_pos, e_pos = Buffer.length();
-    // first remove trailing whitespace and dot
-    e_pos = Buffer.find_last_not_of( ". \t", e_pos );
-    // now some non-space
-    t_pos = Buffer.find_last_of( " \t", e_pos );
-    if ( t_pos != string::npos ){
-      // found white space
-      wght = string( Buffer, t_pos+1, e_pos - t_pos );
-    }
-    else {
-      //      Warning( "missing Exemplar weight in line " + Buffer );
-      wght = "";
-    }
-    // and some more space...
-    e_pos = Buffer.find_last_not_of( " \t", t_pos );
-    return string( Buffer, 0, e_pos+1 );
-  }
-
   bool MBLClass::Chop( const string& line ) {
-    ChopInput->init( line, num_of_features );
-    string OriginalInput = line;
-    string::iterator it = OriginalInput.end();
-    --it;
-    // first trim trailing spaces 
-    while ( it != OriginalInput.begin() && 
-	    isspace(*it) ) --it;
-    OriginalInput.erase( ++it , OriginalInput.end() );
-    if ( chopExamples() ){
-      string wght;
-      OriginalInput = stripExemplarWeight( OriginalInput, wght );
-      if ( wght.empty() ){
-	Warning( "Missing sample weight: " );
-	return false;
-      }
-      else {
-	double tmp;
-	if ( !stringTo<double>( wght, tmp ) ){
-	  Warning( "Wrong sample weight: '" + wght + "'" );
-	  return false;
-	}
-	else {
-	  ChopInput->setExW( tmp );
-	}
-      }
+    try {
+      return ChopInput->chop( line, num_of_features, chopExamples() );
     }
-    // now trim trailing dot
-    it = OriginalInput.end();
-    --it;
-    if ( it !=  OriginalInput.begin() &&  *it == '.' &&
-	 input_format != Compact && input_format != Columns )
-      --it;
-    // and trailing spaces
-    while ( it != OriginalInput.begin() && 
-	    isspace(*it) ) --it;
-    OriginalInput.erase( ++it , OriginalInput.end() );
-    bool result = ChopInput->chop( OriginalInput );
-    return result;
+    catch ( const exception& e ){
+      Warning( e.what() );
+      return false;
+    }
   }
   
   bool MBLClass::setInputFormat( const InputFormatType IF ){
@@ -1906,7 +1855,7 @@ namespace Timbl {
     string buffer;
     if ( chopExamples() ){
       string dummy;
-      buffer = stripExemplarWeight( inBuffer, dummy );
+      buffer = Chopper::stripExemplarWeight( inBuffer, dummy );
     }
     else
       buffer = inBuffer;
@@ -1950,7 +1899,7 @@ namespace Timbl {
     string buffer;
     if ( chopExamples() ){
       string dummy;
-      buffer = stripExemplarWeight( inBuffer, dummy );
+      buffer = Chopper::stripExemplarWeight( inBuffer, dummy );
     }
     else
       buffer = inBuffer;

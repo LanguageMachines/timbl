@@ -32,9 +32,8 @@ namespace Timbl{
 
   class Chopper {
   public:
-    void init( const std::string&, size_t );
     virtual ~Chopper() {};
-    virtual bool chop( const std::string& ) = 0;
+    virtual bool chop( const std::string&, size_t, bool ) = 0;
     const std::string& getField( size_t i ) const { return choppedInput[i]; };
     double getExW() const { return exW; };
     void setExW( double e ){ exW = e; };
@@ -45,7 +44,10 @@ namespace Timbl{
 	choppedInput[i-1] = choppedInput[i];
       choppedInput[vSize-1] = tmp;
     }
+    static std::string stripExemplarWeight( const std::string&, std::string& );
   protected:
+    void init( const std::string&, size_t, bool, bool );
+    bool doEx;
     double exW;
     size_t vSize;
     std::string originalInput;
@@ -54,26 +56,26 @@ namespace Timbl{
   
   class C45_Chopper : public Chopper {
   public:
-    bool chop( const std::string& );
+    bool chop( const std::string&, size_t, bool );
     void print( std::ostream& );
   };
 
 
   class ARFF_Chopper : public C45_Chopper {
   public:
-    bool chop( const std::string& );
+    bool chop( const std::string&, size_t, bool );
   };
   
   class Bin_Chopper : public Chopper {
   public:
-    bool chop( const std::string& );
+    bool chop( const std::string&, size_t, bool );
     void print( std::ostream& os );
   };
   
   class Compact_Chopper : public Chopper {
   public:
   Compact_Chopper( int L ): fLen(L){};
-    bool chop( const std::string& );
+    bool chop( const std::string&, size_t, bool );
     void print( std::ostream& );
   private:
     int fLen;
@@ -81,13 +83,13 @@ namespace Timbl{
   
   class Columns_Chopper : public Chopper {
   public:
-    bool chop( const std::string& );
+    bool chop( const std::string&, size_t, bool );
     void print( std::ostream& );
   };
 
   class Sparse_Chopper : public Chopper {
   public:
-    bool chop( const std::string& );
+    bool chop( const std::string&, size_t, bool );
     void print( std::ostream& );
   };  
 
