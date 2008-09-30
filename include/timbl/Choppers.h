@@ -36,7 +36,6 @@ namespace Timbl{
     virtual bool chop( const std::string&, size_t, bool ) = 0;
     const std::string& getField( size_t i ) const { return choppedInput[i]; };
     double getExW() const { return exW; };
-    void setExW( double e ){ exW = e; };
     virtual void print( std::ostream& ) = 0;
     void swapTarget( size_t target_pos ){
       std::string tmp = choppedInput[target_pos];
@@ -78,6 +77,7 @@ namespace Timbl{
     void print( std::ostream& );
   private:
     int fLen;
+    Compact_Chopper();
   };
   
   class Columns_Chopper : public Chopper {
