@@ -57,21 +57,20 @@ namespace Timbl{
   }
 
 
-  void Chopper::init( const string& s, size_t len, bool ex, bool stripDot ) {
-    doEx = ex;
+  void Chopper::init( const string& s, size_t len, bool doEx, bool stripDot ) {
     exW = -1.0;
-    originalInput = s;
+    strippedInput = s;
     vSize = len+1;
     choppedInput.resize(vSize);
-    string::iterator it = originalInput.end();
+    string::iterator it = strippedInput.end();
     --it;
     // first trim trailing spaces 
-    while ( it != originalInput.begin() && 
+    while ( it != strippedInput.begin() && 
 	    isspace(*it) ) --it;
-    originalInput.erase( ++it , originalInput.end() );
+    strippedInput.erase( ++it , strippedInput.end() );
     if ( doEx ){
       string wght;
-      originalInput = stripExemplarWeight( originalInput, wght );
+      strippedInput = stripExemplarWeight( strippedInput, wght );
       if ( wght.empty() ){
 	throw logic_error( "Missing sample weight" );
       }
@@ -85,17 +84,17 @@ namespace Timbl{
 	}
       }
     }
-    it = originalInput.end();
+    it = strippedInput.end();
     --it;
     if ( stripDot ){
       // first trim trailing dot
-      if ( it != originalInput.begin() && *it == '.' )
+      if ( it != strippedInput.begin() && *it == '.' )
 	--it;
     }
     // strip remaining trailing spaces
-    while ( it != originalInput.begin() && 
+    while ( it != strippedInput.begin() && 
 	    isspace(*it) ) --it;
-    originalInput.erase( ++it , originalInput.end() );
+    strippedInput.erase( ++it , strippedInput.end() );
   };
 
   bool C45_Chopper::chop( const string& InBuf, size_t len, bool doE ){
@@ -103,7 +102,7 @@ namespace Timbl{
     // which represent the feature-values and the target-value.
     init( InBuf, len, doE, true );
     vector<string> splits;
-    size_t res = split_at( originalInput, splits, "," );
+    size_t res = split_at( strippedInput, splits, "," );
     if ( res != vSize )
       return false;
     for ( size_t i=0; i < res ; ++i ){
@@ -124,7 +123,7 @@ namespace Timbl{
     // one, two,   three , bla.
     // the termination dot is optional
     // WhiteSpace is skipped!
-    return C45_Chopper::chop( compress( InBuf ), len, doE );
+    return C45_Chopper::chop( InBuf, len, doE );
   }
   
   bool Bin_Chopper::chop( const string& InBuf, size_t len, bool doE ) {
@@ -136,18 +135,18 @@ namespace Timbl{
     for ( size_t m = 0; m < vSize-1; ++m )
       choppedInput[m] = "0";
     string::size_type s_pos = 0;
-    string::size_type e_pos = originalInput.find( ',' );
+    string::size_type e_pos = strippedInput.find( ',' );
     while ( e_pos != string::npos ){
-      string tmp = string( originalInput, s_pos, e_pos - s_pos );
+      string tmp = string( strippedInput, s_pos, e_pos - s_pos );
       size_t k;
       if ( !stringTo<size_t>( tmp, k, 1, vSize-1 ) )
 	return false;
       else
 	choppedInput[k-1] = "1";
       s_pos = e_pos + 1;
-      e_pos = originalInput.find( ',', s_pos );
+      e_pos = strippedInput.find( ',', s_pos );
     }
-    choppedInput[vSize-1] = string( originalInput, s_pos );
+    choppedInput[vSize-1] = string( strippedInput, s_pos );
     return true;
   }
   
@@ -167,7 +166,7 @@ namespace Timbl{
     // v1v2v3v4tt
     // Get & add the target.
     //
-    size_t len = originalInput.length();
+    size_t len = strippedInput.length();
     if ( len != vSize * fLen ){
       return false;
     }
@@ -177,7 +176,7 @@ namespace Timbl{
       //
       choppedInput[i] = "";
       for ( int j = 0; j < fLen; ++j ) {
-	choppedInput[i] += originalInput[index++];
+	choppedInput[i] += strippedInput[index++];
       }
     }
     return ( i == vSize ); // Enough?
@@ -195,17 +194,17 @@ namespace Timbl{
     init( InBuf, len, doE, false );
     unsigned int i = 0;
     string::size_type s_pos = 0;
-    string::size_type e_pos = originalInput.find_first_of( " \t" );
+    string::size_type e_pos = strippedInput.find_first_of( " \t" );
     while ( e_pos != s_pos && e_pos != string::npos && i < vSize ){
       // stop if a zero length string is found or if too many entries show up
-      choppedInput[i++] = string( originalInput, s_pos, e_pos - s_pos );
-      s_pos = originalInput.find_first_not_of( " \t", e_pos );
-      e_pos = originalInput.find_first_of( " \t", s_pos );
+      choppedInput[i++] = string( strippedInput, s_pos, e_pos - s_pos );
+      s_pos = strippedInput.find_first_not_of( " \t", e_pos );
+      e_pos = strippedInput.find_first_of( " \t", s_pos );
     }
     if ( e_pos != string::npos )
       return false;
     if ( s_pos != string::npos && i < vSize ){
-      choppedInput[i++] = string( originalInput, s_pos );
+      choppedInput[i++] = string( strippedInput, s_pos );
     }
     return ( i == vSize ); // Enough?
   }
@@ -224,32 +223,32 @@ namespace Timbl{
     for ( size_t m = 0; m < vSize-1; ++m )
       choppedInput[m] = DefaultSparseString;
     choppedInput[vSize-1] = "";
-    string::size_type s_pos = originalInput.find( "(" );
+    string::size_type s_pos = strippedInput.find( "(" );
     if ( s_pos == string::npos )
-      choppedInput[vSize-1] = compress(originalInput);
+      choppedInput[vSize-1] = compress(strippedInput);
     else {
-      string::size_type m_pos, e_pos = originalInput.find( ")" );
+      string::size_type m_pos, e_pos = strippedInput.find( ")" );
       while ( s_pos < e_pos &&
 	      s_pos != string::npos  && e_pos != string::npos ){
-	m_pos = originalInput.find( ',', s_pos );
-	string temp = string( originalInput, s_pos + 1, m_pos - s_pos - 1 );
+	m_pos = strippedInput.find( ',', s_pos );
+	string temp = string( strippedInput, s_pos + 1, m_pos - s_pos - 1 );
 	size_t k = 0;
 	if ( !stringTo<size_t>( temp, k, 1, vSize-1 ) )
 	  return false;
 	else {
-	  choppedInput[k-1] = string( originalInput, m_pos + 1, e_pos - m_pos -1 );
+	  choppedInput[k-1] = string( strippedInput, m_pos + 1, e_pos - m_pos -1 );
 	  choppedInput[k-1] = StrToCode( compress(choppedInput[k-1]) );
 	}
-	s_pos = originalInput.find( '(', e_pos );
+	s_pos = strippedInput.find( '(', e_pos );
 	if ( s_pos == string::npos ){
-	  e_pos = originalInput.find_first_not_of( ") \t", e_pos );
+	  e_pos = strippedInput.find_first_not_of( ") \t", e_pos );
 	  if ( e_pos != string::npos ){
-	    choppedInput[vSize-1] = string( originalInput, e_pos );
+	    choppedInput[vSize-1] = string( strippedInput, e_pos );
 	    choppedInput[vSize-1] = compress( choppedInput[vSize-1] );
 	  }
 	}
 	else
-	  e_pos = originalInput.find( ')', s_pos );
+	  e_pos = strippedInput.find( ')', s_pos );
       }
     }
     return !choppedInput[vSize-1].empty();

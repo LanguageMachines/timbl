@@ -47,10 +47,9 @@ namespace Timbl{
     static std::string stripExemplarWeight( const std::string&, std::string& );
   protected:
     void init( const std::string&, size_t, bool, bool );
-    bool doEx;
     double exW;
     size_t vSize;
-    std::string originalInput;
+    std::string strippedInput;
     std::vector<std::string> choppedInput;
   };
   
