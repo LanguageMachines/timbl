@@ -267,9 +267,8 @@ namespace Timbl {
       do_dot_product     = m.do_dot_product;
       do_cos_metric          = m.do_cos_metric;
       GlobalMetric       = m.GlobalMetric;
-      for ( size_t i=0; i < MaxFeatures+1; ++i )
-	UserOptions[i]  = m.UserOptions[i];
-      mvd_threshold       = m.mvd_threshold;
+      UserOptions        = m.UserOptions;
+      mvd_threshold      = m.mvd_threshold;
       mvdDefaultMetric   = m.mvdDefaultMetric;
       num_of_neighbors   = m.num_of_neighbors;
       dynamic_neighbors  = m.dynamic_neighbors;
@@ -507,10 +506,8 @@ namespace Timbl {
     return true;
   }
   
-  void MBLClass::calc_perm( double *W ){
-    double *WR = new double[num_of_features];
-    for ( size_t i=0; i< num_of_features; ++i ) 
-      WR[i] = W[i];
+  void MBLClass::calculatePermutation( const vector<double>& W ){
+    vector<double> WR = W;
     size_t IgnoredFeatures = 0;
     permutation.resize(num_of_features);
     for ( size_t j=0; j < num_of_features; ++j ){
@@ -535,7 +532,6 @@ namespace Timbl {
 	permutation[k] = Max;
       }
     }
-    delete [] WR;
   }
   
   void MBLClass::writePermutation( ostream& os ) const {
@@ -653,7 +649,7 @@ namespace Timbl {
   
   void MBLClass::set_order(){
     calculate_fv_entropy(false);
-    double *Order = new double[num_of_features];
+    vector<double> Order(num_of_features);
     for ( size_t i=0; i < num_of_features; ++i )
       switch( TreeOrder ){
       case DataFile:
@@ -704,8 +700,7 @@ namespace Timbl {
 		    toString( TreeOrder ) );
 	break;
       }
-    calc_perm( Order );
-    delete [] Order;
+    calculatePermutation( Order );
     if ( !Verbosity(SILENT) )
       writePermutation( *Log(mylog) );
     for ( size_t j=0; j < num_of_features; ++j ){

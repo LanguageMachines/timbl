@@ -154,7 +154,7 @@ namespace Timbl {
     bool IsClone() const { return is_copy; };
     void default_order();
     void set_order(void);
-    void calc_perm( double * );
+    void calculatePermutation( const std::vector<double>& );
     void  calculate_fv_entropy( bool );
     OptionTableClass Options;
     PhaseValue runningPhase;
