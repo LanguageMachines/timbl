@@ -358,6 +358,7 @@ void show_connection( ostream& os, struct hostent *host, int sock ){
 	Mother->my_log().associate( *tmp );
 	Mother->my_err().associate( *tmp );
 	*Log(Mother->my_log())  << "Started logging " << endl;	
+	*Log(Mother->my_log())  << "Server verbosity " << toString<VerbosityFlags>( Mother->ServerVerbosity()) << endl;	
       }
       else {
 	*Log(Mother->my_err()) << "unable to create logfile: " << logFile << endl;
@@ -517,6 +518,7 @@ void show_connection( ostream& os, struct hostent *host, int sock ){
 	Mother->my_log().associate( *tmp );
 	Mother->my_err().associate( *tmp );
 	*Log(Mother->my_log())  << "Started logging " << endl;	
+	*Log(Mother->my_log())  << "Server verbosity " << toString<VerbosityFlags>( Mother->ServerVerbosity()) << endl;	
       }
       else {
 	*Log(Mother->my_err()) << "unable to create logfile: " << logFile << endl;
