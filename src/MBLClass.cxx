@@ -1313,7 +1313,7 @@ namespace Timbl {
     // Loop over the Features, see if the numerics are non-singular
     // and do the statistics for those features where the metric is changed.
     MetricType TmpMetric;
-    FeatVal_Stat *feat_status = new FeatVal_Stat[MaxFeatures];
+    FeatVal_Stat *feat_status = new FeatVal_Stat[num_of_features];
     for ( size_t g = 0; g < num_of_features; ++g ) {
       feat_status[g] = Unknown;
       if ( Features[g]->Ignore() )
