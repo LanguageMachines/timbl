@@ -319,10 +319,10 @@ namespace Timbl {
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	  Features[i]->SetWeight( 1.0 );
-	  if ( Features[Permutation[i]]->Ignore() )
+	  if ( Features[permutation[i]]->Ignore() )
 	    PermFeatures[i] = NULL;
 	  else 
-	    PermFeatures[pos++] = Features[Permutation[i]];
+	    PermFeatures[pos++] = Features[permutation[i]];
 	}
 	if ( Hashed )
 	  result = InstanceBase->ReadIB( is, PermFeatures,
@@ -366,10 +366,10 @@ namespace Timbl {
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	  Features[i]->SetWeight( 1.0 );
-	  if ( Features[Permutation[i]]->Ignore() )
+	  if ( Features[permutation[i]]->Ignore() )
 	    PermFeatures[i] = NULL;
 	  else 
-	    PermFeatures[pos++] = Features[Permutation[i]];
+	    PermFeatures[pos++] = Features[permutation[i]];
 	}
 	if ( Hashed )
 	  result = InstanceBase->ReadIB( is, PermFeatures,

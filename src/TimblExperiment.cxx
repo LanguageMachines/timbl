@@ -1320,7 +1320,7 @@ namespace Timbl {
     int cnt = 0;
     size_t *InvPerm = new size_t[NumOfFeatures()];
     for ( size_t i = 0; i < NumOfFeatures(); ++i )
-      InvPerm[Permutation[i]] = i;
+      InvPerm[permutation[i]] = i;
     for ( size_t i = 0; i < NumOfFeatures(); ++i ){
       if ( !Features[i]->Ignore() &&
 	   InvPerm[i]+1 > TRIBL_offset() ){
@@ -1766,10 +1766,10 @@ namespace Timbl {
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	  Features[i]->SetWeight( 1.0 );
-	  if ( Features[Permutation[i]]->Ignore() )
+	  if ( Features[permutation[i]]->Ignore() )
 	    PermFeatures[i] = NULL;
 	  else 
-	    PermFeatures[pos++] = Features[Permutation[i]];
+	    PermFeatures[pos++] = Features[permutation[i]];
 	}
 	if ( Hashed )
 	  result = InstanceBase->ReadIB( is, PermFeatures,

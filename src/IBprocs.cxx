@@ -131,7 +131,7 @@ namespace Timbl {
 	  nodes = *(nIt-1) + *(tIt-1);
 	  if ( nodes == 0 )
 	    break;
-	  os << setw(8) << i << " |"<< setw(8) << Permutation[i-1] + 1 << " |"
+	  os << setw(8) << i << " |"<< setw(8) << permutation[i-1] + 1 << " |"
 	     << setw(10) << nodes << " |"
 	     << setw(10) << *(nIt-1) << " |" << setw(10) << *(tIt-1) << " |"
 	     << setw(10) << (*nIt + *tIt)/double(nodes) << " |"
@@ -214,19 +214,18 @@ namespace Timbl {
 	      perms = perms + splits[i]; // Maybe we could use splits directly?
 	    }
 	    bool excl = false;
-	    for ( size_t j=0; j < MaxFeatures; ++j )
-	      Permutation[j] = j;
 	    effective_feats = 0;
 	    size_t i = 0;
 	    size_t index;
 	    string::size_type pos = 0; // skip <
 	    while ( info_ok && pos != string::npos &&
 		    i < MaxFeatures ){
+	      i++;
 	      if ( !excl )
 		effective_feats++;
 	      string tmp = string_tok( perms, pos, ", !" );
 	      index = stringTo<size_t>( tmp );
-	      Permutation[i++] = --index;
+	      permutation.push_back( --index );
 	      if ( index >= MaxFeatures ){
 		Error ( "illegal value " + toString<size_t>(index) + 
 			" in permutation, not between 1 and " +
@@ -371,14 +370,14 @@ namespace Timbl {
     bool excl = false;
     os << "< ";
     for ( size_t j=0; j < num_of_features-1; ++j ){
-      if ( !excl && Features[Permutation[j+1]]->Ignore() ){
+      if ( !excl && Features[permutation[j+1]]->Ignore() ){
 	excl = true;
-	os << Permutation[j]+1 << "! ";
+	os << permutation[j]+1 << "! ";
       }
       else
-	os << Permutation[j]+1 << ", ";
+	os << permutation[j]+1 << ", ";
     }
-    os << Permutation[num_of_features-1]+1 << " >" << endl;
+    os << permutation[num_of_features-1]+1 << " >" << endl;
   }  
 
   bool MBLClass::PutInstanceBase( ostream& os ) const {

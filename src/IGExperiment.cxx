@@ -320,7 +320,7 @@ namespace Timbl {
 	//
 	ifstream datafile( CurrentDataFile.c_str(), ios::in);
 	//
-	Feature *Feat =  Features[Permutation[0]];
+	Feature *Feat =  Features[permutation[0]];
 	IVCmaptype::const_iterator it = Feat->ValuesMap.begin();
 	//
 	// don't ask why. but we need to iterate the Map here, not the Array
@@ -333,14 +333,14 @@ namespace Timbl {
 	  }
 	  if ( igOffset() > 0 && fmIt->second.size() > igOffset() ){
 	    IVCmaptype::const_iterator it2
-	      = Features[Permutation[1]]->ValuesMap.begin();
+	      = Features[permutation[1]]->ValuesMap.begin();
 	    IG_InstanceBase *TmpInstanceBase = 0;
 	    TmpInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
 						   ibCount,
 						   (RandomSeed()>=0), 
 						   false, 
 						   true );
-	    while ( it2 != Features[Permutation[1]]->ValuesMap.end() ){
+	    while ( it2 != Features[permutation[1]]->ValuesMap.end() ){
 	      FeatureValue *the2fv = (FeatureValue*)(it2->second);
 	      typedef MultiIndex::const_iterator mit;
 	      pair<mit,mit> b = fmIt->second.equal_range( the2fv );
@@ -567,10 +567,10 @@ namespace Timbl {
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	  Features[i]->SetWeight( 1.0 );
-	  if ( Features[Permutation[i]]->Ignore() )
+	  if ( Features[permutation[i]]->Ignore() )
 	    PermFeatures[i] = NULL;
 	  else 
-	    PermFeatures[pos++] = Features[Permutation[i]];
+	    PermFeatures[pos++] = Features[permutation[i]];
 	}
 	if ( Hashed )
 	  result = InstanceBase->ReadIB( is, PermFeatures,

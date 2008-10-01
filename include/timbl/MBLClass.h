@@ -126,7 +126,7 @@ namespace Timbl {
     Target   *Targets;
     std::vector<Feature *> Features;
     std::vector<Feature *> PermFeatures;
-    size_t *Permutation;
+    std::vector<size_t> permutation;
     InstanceBase_base *InstanceBase;
     LogStream *mylog;
     LogStream *myerr;

@@ -102,7 +102,7 @@ namespace Timbl{
   }
   
   TesterClass::TesterClass( const vector<Feature*>& feat,
-			    const size_t *perm ):
+			    const vector<size_t>& perm ):
     _size(feat.size()), features(feat), permutation(perm)
   {
     //    permFeatures.reserve(_size);

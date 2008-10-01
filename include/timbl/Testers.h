@@ -65,7 +65,7 @@ namespace Timbl{
   class TesterClass {
   public:
     TesterClass( const std::vector<Feature*>&, 
-		 const size_t * );
+		 const std::vector<size_t> & );
     virtual ~TesterClass();
     void reset( MetricType, int );
     void init( const Instance&, size_t, size_t );
@@ -81,13 +81,14 @@ namespace Timbl{
     metricTester **test_feature_val;
     const std::vector<Feature *> &features;
     std::vector<Feature *> permFeatures;
-    const size_t *permutation;
+    const std::vector<size_t> &permutation;
     std::vector<double> distances;
   };
   
   class DefaultTester: public TesterClass {
   public:
-  DefaultTester( std::vector<Feature*>& pf, size_t *p ): 
+  DefaultTester( const std::vector<Feature*>& pf, 
+		 const std::vector<size_t>& p ): 
     TesterClass( pf, p ){};  
     double getDistance( size_t ) const;
     size_t test( std::vector<FeatureValue *>&, 
@@ -97,7 +98,8 @@ namespace Timbl{
   
   class ExemplarTester: public TesterClass {
   public:
-  ExemplarTester( std::vector<Feature*>& pf, size_t *p ): 
+  ExemplarTester( const std::vector<Feature*>& pf,
+		  const std::vector<size_t>& p ): 
     TesterClass( pf, p ){};  
     double getDistance( size_t ) const;
     size_t test( std::vector<FeatureValue *>&, 
@@ -107,7 +109,8 @@ namespace Timbl{
 
   class CosineTester: public TesterClass {
   public:
-  CosineTester( std::vector<Feature*>& pf, size_t *p ): 
+  CosineTester( const std::vector<Feature*>& pf,
+		const std::vector<size_t>& p ): 
     TesterClass( pf, p ){};  
     double getDistance( size_t ) const;
     size_t test( std::vector<FeatureValue *>&, 
@@ -117,7 +120,8 @@ namespace Timbl{
   
   class DotProductTester: public TesterClass {
   public:
-  DotProductTester( std::vector<Feature*>& pf, size_t *p ): 
+  DotProductTester( const std::vector<Feature*>& pf,
+		    const std::vector<size_t>& p ): 
     TesterClass( pf, p ){};  
     double getDistance( size_t ) const;
     size_t test( std::vector<FeatureValue *>&, 

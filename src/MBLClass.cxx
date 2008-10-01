@@ -220,10 +220,6 @@ namespace Timbl {
     do_silly_testing = false;
     do_diversify = false;
     keep_distributions = false;
-    Permutation = new size_t[MaxFeatures];
-    for ( size_t i=0; i< MaxFeatures; ++i ){
-      Permutation[i] = i;
-    }
     UserOptions.resize(MaxFeatures+1);
     tester = 0;
     fill_table();
@@ -288,10 +284,7 @@ namespace Timbl {
       do_sloppy_loo      = m.do_sloppy_loo;
       do_silly_testing   = m.do_silly_testing;
       do_diversify       = m.do_diversify;
-      Permutation = new size_t[MaxFeatures];
-      for ( size_t j=0; j < MaxFeatures; ++j ){
-	Permutation[j] = m.Permutation[j];
-      }
+      permutation = m.permutation;
       tester = 0;
       decay = 0;
       Features  = m.Features;
@@ -342,7 +335,6 @@ namespace Timbl {
       InstanceBase->CleanPartition();
     }
     delete tester;
-    delete [] Permutation;
     delete decay;
     delete ChopInput;
 #ifndef USE_LOGSTREAMS
@@ -520,8 +512,9 @@ namespace Timbl {
     for ( size_t i=0; i< num_of_features; ++i ) 
       WR[i] = W[i];
     size_t IgnoredFeatures = 0;
+    permutation.resize(num_of_features);
     for ( size_t j=0; j < num_of_features; ++j ){
-      Permutation[j] = j;
+      permutation[j] = j;
       if ( Features[j]->Ignore() ){
 	WR[j] = -0.1;         // To be shure that they are placed AFTER
 	// those which are realy Zero
@@ -539,7 +532,7 @@ namespace Timbl {
 	    Max = m;
 	}
 	WR[Max] = -1;
-	Permutation[k] = Max;
+	permutation[k] = Max;
       }
     }
     delete [] WR;
@@ -550,9 +543,9 @@ namespace Timbl {
        << ( Weighting==UserDefined_w?"weightfile":toString(TreeOrder, true))
        << " :" << endl << "< ";
     for ( size_t j=0; j < num_of_features-1; ++j ){
-      os << Permutation[j]+1 << ", ";
+      os << permutation[j]+1 << ", ";
     }
-    os << Permutation[num_of_features-1]+1 << " >" << endl;
+    os << permutation[num_of_features-1]+1 << " >" << endl;
   }
   
   inline char *CurTime(){
@@ -717,7 +710,7 @@ namespace Timbl {
       writePermutation( *Log(mylog) );
     for ( size_t j=0; j < num_of_features; ++j ){
       if ( j < effective_feats )
-	PermFeatures[j] = Features[Permutation[j]];
+	PermFeatures[j] = Features[permutation[j]];
       else 
 	PermFeatures[j] = NULL;
     }
@@ -961,7 +954,7 @@ namespace Timbl {
       // Lookup for TreeBuilding
       // First the Features
       for ( size_t k = 0; k < effective_feats; ++k ){
-	size_t j = Permutation[k];
+	size_t j = permutation[k];
 	CurrInst.FV[k] = Features[j]->Lookup( ChopInput->getField(j) );
       } // k
       // and the Target
@@ -974,7 +967,7 @@ namespace Timbl {
       CurrInst.TV = Targets->add_value( ChopInput->getField(num_of_features ) );
       // Then the Features
       for ( size_t l = 0; l < effective_feats; ++l ){
-	size_t j = Permutation[l];
+	size_t j = permutation[l];
 	CurrInst.FV[l] = Features[j]->add_value( ChopInput->getField(j),
 						 CurrInst.TV ); 
       } // k
@@ -983,7 +976,7 @@ namespace Timbl {
       // Lookup for Testing
       // This might fail for unknown values, then we create a dummy value
       for ( size_t m = 0; m < effective_feats; ++m ){
-	size_t j = Permutation[m];
+	size_t j = permutation[m];
 	const string& fld =  ChopInput->getField(j);
 	CurrInst.FV[m] = Features[j]->Lookup( fld );
 	if ( !CurrInst.FV[m] ){
@@ -1569,7 +1562,7 @@ namespace Timbl {
       inst.FV[j] = RedFV[j-OffSet];
     size_t *InvPerm = new size_t[num_of_features];
     for ( size_t i=0; i< num_of_features; ++i )
-      InvPerm[Permutation[i]] = i;
+      InvPerm[permutation[i]] = i;
     for ( size_t j=0; j< num_of_features; ++j ){
       switch ( input_format ) {
       case C4_5:
@@ -1695,13 +1688,13 @@ namespace Timbl {
   void MBLClass::initTesters() {
     delete tester;
     if ( doSamples() )
-      tester = new ExemplarTester( Features, Permutation );
+      tester = new ExemplarTester( Features, permutation );
     else if ( do_cos_metric )
-      tester = new CosineTester( Features, Permutation );
+      tester = new CosineTester( Features, permutation );
     else if ( do_dot_product )
-      tester = new DotProductTester( Features, Permutation );
+      tester = new DotProductTester( Features, permutation );
     else
-      tester = new DefaultTester( Features, Permutation );
+      tester = new DefaultTester( Features, permutation );
     tester->reset( GlobalMetric, mvd_threshold );
   }
 
