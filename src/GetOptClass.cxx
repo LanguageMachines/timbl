@@ -95,15 +95,13 @@ namespace Timbl {
     do_diversify = false;
     if ( MaxFeats == -1 ){
       MaxFeats = Max;
-      MaxFeatsSet = true;
       LocalInputFormat = UnknownInputFormat; // InputFormat and verbosity
       MyVerbosity = NO_VERB;   // are not reset!
     }
     target_pos = -1;
-    if ( !MetricsArray )
-      MetricsArray = new MetricType[MaxFeats+1];
+    metricsArray.resize(MaxFeats+1);
     for ( int i=0; i < MaxFeats+1; ++i ){
-      MetricsArray[i] = DefaultMetric;
+      metricsArray[i] = DefaultMetric;
     }
     outPath = "";
     logFile = "";
@@ -118,11 +116,9 @@ namespace Timbl {
     threshold( -1 ),
     igThreshold( -1 ),
     MyVerbosity( NO_VERB ),
-    MaxFeatsSet( false ),
     opt_init( false ),
     opt_changed( false ),
     N_present( false ),
-    MetricsArray( NULL ),
     parent_socket( 0 ) {
     int MaxF = DEFAULT_MAX_FEATS;
     bool the_mood;
@@ -135,8 +131,6 @@ namespace Timbl {
   }
   
   GetOptClass::~GetOptClass( ){
-    if ( MetricsArray )
-      delete [] MetricsArray;
   }
   
   GetOptClass::GetOptClass( const GetOptClass& in ):
@@ -167,7 +161,6 @@ namespace Timbl {
     threshold( in.threshold ),
     igThreshold( in.igThreshold ),
     MyVerbosity( in.MyVerbosity ),
-    MaxFeatsSet( in.MaxFeatsSet ),
     opt_init( in.opt_init ),
     opt_changed( in.opt_changed ),
     do_exact( in.do_exact ), 
@@ -184,16 +177,12 @@ namespace Timbl {
     do_silly( in.do_silly ),
     do_server( in.do_server ),
     do_diversify( in.do_diversify ),
-    MetricsArray(NULL),
+    metricsArray( in.metricsArray ),
     parent_socket( in.parent_socket ),
     outPath( in.outPath ),
     logFile( in.logFile ),
     pidFile( in.pidFile )
   {
-    MetricsArray = new MetricType[MaxFeats+1];
-    for ( int i=0; i < MaxFeats+1; ++i ){
-      MetricsArray[i] = in.MetricsArray[i];
-    }
   }
   
   GetOptClass *GetOptClass::Clone( int tcp_id ) const{
@@ -435,19 +424,19 @@ namespace Timbl {
 		    optline = "VERBOSITY: " + 
 		      toString(MyVerbosity);
 		    if ( Exp->SetOption( optline ) ){
-		      for ( int i=0; i < MaxFeats+1; ++i ){
+		      for ( size_t i=0; i < metricsArray.size(); ++i ){
 			if ( !first ){
-			  if ( MetricsArray[i] == Ignore ){
+			  if ( metricsArray[i] == Ignore ){
 			    Error( "-m:I is not possible now" );
 			    return false;
 			  }
-			  else if ( MetricsArray[i] == Numeric ){
+			  else if ( metricsArray[i] == Numeric ){
 			    Error( "-m:N is not possible now" );
 			    return false;
 			  }
 			}
 			optline = "METRICS: " + toString<int>( i ) + "=" +
-			  toString(MetricsArray[i]);
+			  toString(metricsArray[i]);
 			if (!Exp->SetOption( optline ) )
 			  return false;
 		      }
@@ -471,22 +460,21 @@ namespace Timbl {
   
   inline bool GetOptClass::parse_range( string& line, 
 					string::iterator& it,
-					MetricType Value, 
-					MetricType *info ){
-    int m;
+					MetricType Value ){
+    size_t m;
     string::iterator eit;
     while( it != line.end() && *it != ':' ){
       eit = it;
       while( eit != line.end() && isdigit( *eit ) ) ++eit;
       string tmp = string( it, eit ); 
-      int k;
-      if ( stringTo<int>( tmp, k, 1, MaxFeats ) ){
-	if ( info[k] != DefaultMetric && info[k] != Value ){
+      size_t k;
+      if ( stringTo<size_t>( tmp, k, 1, metricsArray.size() ) ){
+	if ( metricsArray[k] != DefaultMetric && metricsArray[k] != Value ){
 	  Error( "metric of feature " + tmp +
 		 " is multiply changed!" );
 	  return false;
 	}
-	info[k] = Value;
+	metricsArray[k] = Value;
       }
       else {
 	Error( "illegal value in metric description: -m " + line );
@@ -504,7 +492,7 @@ namespace Timbl {
 	while( eit != line.end() && isdigit( *eit ) ) ++eit;
 	tmp = string( it, eit ); 
 	m = stringTo<int>(tmp);
-	if ( m <= 0 || m > MaxFeats ){
+	if ( m <= 0 || m > metricsArray.size() ){
 	  Error( "illegal value in metric description: -m " + line );
 	  return false;
 	}
@@ -518,13 +506,14 @@ namespace Timbl {
 	  return false;
 	}
 	else {
-	  for ( int j=k+1; j <= m && j <= MaxFeats; ++j ){
-	    if ( info[j] != DefaultMetric && info[j] != Value ){
+	  for ( size_t j=k+1; j <= m && j <= metricsArray.size(); ++j ){
+	    if ( metricsArray[j] != DefaultMetric 
+		 && metricsArray[j] != Value ){
 	      Error( "metric of feature " + toString<int>(j) + 
 		     " is multiply changed!" );
 	      return false;
 	    }
-	    info[j] = Value;
+	    metricsArray[j] = Value;
 	  }
 	}
 	if ( it != line.end() && *it == ',' ) ++it;
@@ -534,8 +523,7 @@ namespace Timbl {
   }
   
   inline bool GetOptClass::parse_metrics( const string& Mline,
-					  MetricType& Def,
-					  MetricType *info ){
+					  MetricType& Def ){
     string line = Mline;
     uppercase( line );
     string::iterator p = line.begin();
@@ -614,7 +602,7 @@ namespace Timbl {
 	    return false;
 	  }
 	  ++p;
-	  if ( !parse_range( line, p, TmpMT, info ) )
+	  if ( !parse_range( line, p, TmpMT ) )
 	    return false;
 	  if ( p == line.end() ){
 	    break;
@@ -632,9 +620,12 @@ namespace Timbl {
 	}
 	else {
 	  if ( Def == Ignore ){
-	    for ( int k=0; k <= MaxFeats; ++k )
-	      if ( info[k] == DefaultMetric )
-		info[k] = Ignore;
+	    for ( vector<MetricType>::iterator it=metricsArray.begin();
+		  it != metricsArray.end();
+		  ++it ){
+	      if ( *it == DefaultMetric )
+		*it = Ignore;
+	    }
 	  }
 	}
       }
@@ -916,8 +907,7 @@ namespace Timbl {
 	break;
       }
       case 'm': 
-	if ( !parse_metrics( myoptarg, local_metric, 
-			     MetricsArray) )
+	if ( !parse_metrics( myoptarg, local_metric ) )
 	  return false;
 	break;
       

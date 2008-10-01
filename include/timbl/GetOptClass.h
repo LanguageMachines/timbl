@@ -73,7 +73,6 @@ namespace Timbl {
     int threshold;
     int igThreshold;
     VerbosityFlags MyVerbosity;
-    bool MaxFeatsSet;
     bool opt_init;
     bool opt_changed;
     bool do_exact;
@@ -90,7 +89,7 @@ namespace Timbl {
     bool do_silly;
     bool do_server;
     bool do_diversify;
-    MetricType *MetricsArray;
+    std::vector<MetricType>metricsArray;
     int parent_socket;
     std::string inPath;
     std::string outPath;
@@ -99,10 +98,9 @@ namespace Timbl {
     void Error( const std::string& ) const;
     inline bool parse_range( std::string&, 
 			     std::string::iterator&,
-			     MetricType, 
-			     MetricType * );
+			     MetricType );
     inline bool parse_metrics( const std::string&,
-			       MetricType&, MetricType * );
+			       MetricType& );
     GetOptClass( const GetOptClass& );
     GetOptClass& operator=( const GetOptClass& );
   };
