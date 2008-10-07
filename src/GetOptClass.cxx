@@ -804,7 +804,8 @@ namespace Timbl {
 	  Error( "unknown Option " + long_option );
 	  return false;
 	}
-	keep_distributions = mood;
+	else
+	  keep_distributions = mood;
 	break;
 	
       case 'e':
