@@ -126,7 +126,8 @@ namespace Timbl {
     void Save( std::ostream &, bool=false );
     void Save( std::ostream &, StringHash *, StringHash *, bool=false );
     void IBtoXML( std::ostream& );
-    virtual bool ReadIB( std::istream &, std::vector<Feature *>&, 
+    void printStatsTree( std::ostream&, unsigned int startLevel );
+    virtual bool ReadIB( std::istream&, std::vector<Feature *>&, 
 			 Target *, int );
     virtual bool ReadIB( std::istream &, std::vector<Feature *>&, Target *,
 			 StringHash *, StringHash *, int );

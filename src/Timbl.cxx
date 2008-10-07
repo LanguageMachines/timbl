@@ -63,6 +63,8 @@ string OutputFile = "";
 string PercFile = "";
 string TreeInFile = "";
 string TreeOutFile = "";
+string levelTreeOutFile = "";
+int levelTreeLevel = 0;
 string XOutFile = "";
 string WgtInFile = "";
 Weighting WgtType = UNKNOWN_W;
@@ -419,6 +421,8 @@ bool get_file_names( TimblOpts& Opts ){
   PercFile = "";
   TreeInFile = "";
   TreeOutFile = "";
+  levelTreeOutFile = "";
+  levelTreeLevel = 0;
   XOutFile = "";
   WgtInFile = "";
   WgtType = UNKNOWN_W;
@@ -458,6 +462,17 @@ bool get_file_names( TimblOpts& Opts ){
   if ( Opts.Find( 'o', value, mood ) ){
     OutputFile = correct_path( value, O_Path, true );
     Opts.Delete( 'o' );
+  }
+  if ( Opts.Find( "IL", value, mood ) ){
+    vector<string> vec;
+    int num = split_at( value, vec, ":" );
+    if ( num > 1 ){
+      levelTreeOutFile = correct_path( vec[0], O_Path, true );
+      levelTreeLevel = stringTo<int>( vec[1] );
+    }
+    else
+      levelTreeOutFile = correct_path( value, O_Path, true );
+    Opts.Delete( "IL" );
   }
   if ( Opts.Find( 'I', value, mood ) ){
     TreeOutFile = correct_path( value, O_Path, true );
@@ -697,6 +712,7 @@ int main(int argc, char *argv[]){
       return 1;
     }
     TimblOpts Opts( argc, argv );
+    cerr << Opts << endl;
     Preset_Values( Opts );
     Adjust_Default_Values( Opts );
     if ( !get_file_names( Opts ) )
@@ -752,6 +768,7 @@ int main(int argc, char *argv[]){
 	   !checkInputFile( WgtInFile ) ||
 	   !checkInputFile( ProbInFile ) ||
 	   !checkOutputFile( TreeOutFile ) ||
+	   !checkOutputFile( levelTreeOutFile ) ||
 	   !checkOutputFile( XOutFile ) ||
 	   !checkOutputFile( NamesFile ) ||
 	   !checkOutputFile( WgtOutFile ) ||
@@ -779,6 +796,7 @@ int main(int argc, char *argv[]){
 	  do_test = TestFile != "" || Do_Indirect;
 	  if ( do_test ||     // something to test ?
 	       TreeOutFile != "" || // or at least to produce
+	       levelTreeOutFile != "" || // or at least to produce
 	       XOutFile != "" ){ // or at least to produce
 	    if ( WgtInFile != "" ){
 	      if ( Run->GetWeights( WgtInFile, WgtType ) ){
@@ -793,6 +811,9 @@ int main(int argc, char *argv[]){
 	    if ( Run->Learn( dataFile ) ){
 	      if ( TreeOutFile != "" )
 		Run->WriteInstanceBase( TreeOutFile );
+	      if ( levelTreeOutFile != "" )
+		Run->WriteInstanceBaseLevels( levelTreeOutFile, 
+					      levelTreeLevel );
 	      if ( XOutFile != "" )
 		Run->WriteInstanceBaseXml( XOutFile );
 	    }

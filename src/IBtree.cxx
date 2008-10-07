@@ -326,6 +326,39 @@ namespace Timbl {
     os << "</root>" << endl;
   }  
   
+  void InstanceBase_base::printStatsTree( ostream &os, 
+					  unsigned int startLevel )  {
+    os << "statistics from level " << startLevel << " upwards" << endl;
+    if ( !PersistentDistributions ){
+      os << "no statsTree written, use IG tree and +D while training" << endl;
+    }
+    else {
+      unsigned int level = startLevel;
+      while ( level < Depth ){
+	IBtree *branch = InstBase;
+	while ( branch ){
+	  unsigned int l = level;
+	  IBtree *pnt = branch;
+	  while ( pnt && l-- > 0 )
+	    pnt = pnt->link;
+	  if ( pnt ){
+	    os << level << " " << pnt->TDistribution << " <";
+	    pnt = pnt->link;
+	    while ( pnt ){
+	      os << pnt->FValue;
+	      pnt = pnt->next;
+	      if ( pnt )
+		os << ",";
+	    }
+	    os << ">" << endl;
+	  }
+	  branch = branch->next;
+	}
+	++level;
+      }
+    }
+  }
+  
   void save_hash( ostream &os, StringHash *cats, StringHash *feats ){
     int Size = cats->NumOfEntries();
     os << "Classes" << endl;

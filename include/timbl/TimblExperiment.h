@@ -85,6 +85,7 @@ namespace Timbl {
     virtual bool WriteInstanceBase( const std::string& );
     bool chopLine( const std::string& );
     bool WriteInstanceBaseXml( const std::string& );
+    bool WriteInstanceBaseLevels( const std::string&, unsigned int );
     bool WriteNamesFile( const std::string& ) const;
     bool StartServer( const int, const int );
     bool SetSingleThreaded();

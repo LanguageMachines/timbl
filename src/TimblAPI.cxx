@@ -548,6 +548,14 @@ bool TimblAPI::WriteInstanceBaseXml( const string& f ){
     return false;
 }
 
+  bool TimblAPI::WriteInstanceBaseLevels( const string& f, unsigned int l ){
+  if ( Valid() ){
+    return pimpl->WriteInstanceBaseLevels( f, l );
+  }
+  else
+    return false;
+}
+
 bool TimblAPI::GetInstanceBase( const string& f ){
   if ( Valid() ){
     if ( !pimpl->ReadInstanceBase( f ) )

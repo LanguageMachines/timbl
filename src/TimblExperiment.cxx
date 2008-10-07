@@ -1715,7 +1715,7 @@ namespace Timbl {
     return result;
   }
   
-  bool TimblExperiment::WriteInstanceBaseXml( const std::string& FileName ){
+  bool TimblExperiment::WriteInstanceBaseXml( const std::string& FileName ) {
     bool result = false;
     if ( ConfirmOptions() ){
       ofstream os( FileName.c_str(), ios::out | ios::trunc );
@@ -1733,6 +1733,31 @@ namespace Timbl {
 	}
 	else {
 	  InstanceBase->IBtoXML( os );
+	}
+      }
+    }
+    return result;
+  }
+
+  bool TimblExperiment::WriteInstanceBaseLevels( const std::string& FileName,
+						 unsigned int levels ) {
+    bool result = false;
+    if ( ConfirmOptions() ){
+      ofstream os( FileName.c_str(), ios::out | ios::trunc );
+      if (!os) {
+	Warning( "can't open outputfile: " + FileName );
+      }
+      else {
+	if ( !Verbosity(SILENT) )
+	  Info( "Writing Instance-Base in: " + FileName );
+	if ( ExpInvalid() ){
+	  result = false;
+	}
+	else if ( InstanceBase == NULL ){
+	  Warning( "unable to write an Instance Base, nothing learned yet" );
+	}
+	else {
+	  InstanceBase->printStatsTree( os, levels );
 	}
       }
     }

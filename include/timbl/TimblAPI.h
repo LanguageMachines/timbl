@@ -107,6 +107,7 @@ namespace Timbl{
     Weighting GetCurrentWeights( std::vector<double>& ) const;
     bool WriteInstanceBase( const std::string& = "" );
     bool WriteInstanceBaseXml( const std::string& = "" );
+    bool WriteInstanceBaseLevels( const std::string& = "", unsigned int=0 );
     bool GetInstanceBase( const std::string& = "" );
     bool WriteArrays( const std::string& = "" );
     bool GetArrays( const std::string& = "" );
