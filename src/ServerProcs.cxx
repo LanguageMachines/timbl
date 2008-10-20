@@ -366,9 +366,13 @@ void show_connection( ostream& os, struct hostent *host, int sock ){
 	exit(1);
       }
     }
+#if defined( __sgi__ )
+    int start = _daemonize( 0, -1, -1, -1 );
+#else
     int start = daemon( 0, 0 );
+#endif
     if ( start < 0 ){
-      cerr << "failed to daemonise error= " << strerror(errno) << endl;
+      cerr << "failed to daemonize error= " << strerror(errno) << endl;
       exit(1);
     };
 
@@ -526,9 +530,13 @@ void show_connection( ostream& os, struct hostent *host, int sock ){
 	exit(1);
       }
     }
+#if defined( __sgi__ )
+    int start = _daemonize( 0, -1, -1, -1 );
+#else
     int start = daemon( 0, 0 );
+#endif
     if ( start < 0 ){
-      cerr << "failed to daemonise error= " << strerror(errno) << endl;
+      cerr << "failed to daemonize error= " << strerror(errno) << endl;
       exit(1);
     };
     if ( !pidFile.empty() ){

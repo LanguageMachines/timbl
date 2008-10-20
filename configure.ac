@@ -33,6 +33,27 @@ fi
 # when running tests, use CXX
 AC_LANG([C++])
 
+if test "$ac_cv_prog_ac_ct_CXX" == "g++"; then
+  have_abi64=0
+  oldLibs=$LIBS
+  oldCXXFLAGS=$CXXFLAGS
+  LIBS="-mabi=64 -mips4 $LIBS"
+  CXXFLAGS="$CXXFLAGS -mabi=64 -mips4"
+  AC_MSG_CHECKING([-mabi=64 compiler flag] )
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[const char hw[] = "Hello World\n";]])],
+                 [have_abi64=1])
+  if test "$have_abi64" == "0"; then
+      LIBS=$oldLibs
+      CXXFLAGS=$oldCXXFLAGS
+      AC_MSG_RESULT( [No] )
+  else
+      AC_MSG_RESULT( [Ok] )
+  fi
+  CXXFLAGS="$CXXFLAGS -W -Wall"
+else
+  CXXFLAGS="$CXXFLAGS -Wcheck"
+fi
+
 # libtool stuff
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
@@ -123,27 +144,6 @@ else
     fi
 fi
 dnl
-
-if test "$ac_cv_prog_ac_ct_CXX" == "g++"; then
-  have_abi64=0
-  oldLibs=$LIBS
-  oldCXXFLAGS=$CXXFLAGS
-  LIBS="$LIBS -mabi=64 -mips4"
-  CXXFLAGS="$CXXFLAGS -mabi=64 -mips4"
-  AC_MSG_CHECKING([-mabi=64 compiler flag] )
-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[const char hw[] = "Hello World\n";]])],
-                 [have_abi64=1])
-  if test "$have_abi64" == "0"; then
-      LIBS=$oldLibs
-      CXXFLAGS=$oldCXXFLAGS
-      AC_MSG_RESULT( [No] )
-  else
-      AC_MSG_RESULT( [Ok] )
-  fi
-  CXXFLAGS="$CXXFLAGS -W -Wall"
-else
-  CXXFLAGS="$CXXFLAGS -Wcheck"
-fi
 
 AC_OUTPUT([
   Makefile
