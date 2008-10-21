@@ -328,11 +328,11 @@ namespace Timbl {
   
   void InstanceBase_base::printStatsTree( ostream &os, 
 					  unsigned int startLevel )  {
-    os << "statistics from level " << startLevel << " upwards" << endl;
     if ( !PersistentDistributions ){
       os << "no statsTree written, use IG tree and +D while training" << endl;
     }
     else {
+      os << "statistics from level " << startLevel << " upwards" << endl;
       unsigned int level = startLevel;
       while ( level < Depth ){
 	IBtree *branch = InstBase;
@@ -342,7 +342,7 @@ namespace Timbl {
 	  while ( pnt && l-- > 0 )
 	    pnt = pnt->link;
 	  if ( pnt ){
-	    os << level << " " << pnt->TDistribution << " <";
+	    os << level << " " << pnt->FValue << " " << pnt->TDistribution << " <";
 	    pnt = pnt->link;
 	    while ( pnt ){
 	      os << pnt->FValue;
