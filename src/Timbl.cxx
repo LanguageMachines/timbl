@@ -712,7 +712,6 @@ int main(int argc, char *argv[]){
       return 1;
     }
     TimblOpts Opts( argc, argv );
-    cerr << Opts << endl;
     Preset_Values( Opts );
     Adjust_Default_Values( Opts );
     if ( !get_file_names( Opts ) )
