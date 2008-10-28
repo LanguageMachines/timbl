@@ -1830,81 +1830,22 @@ namespace Timbl {
   size_t MBLClass::countFeatures( const string& inBuffer,
 				  const InputFormatType IF ) const {
     size_t result = 0;
-    string buffer;
-    if ( chopExamples() ){
-      string dummy;
-      buffer = Chopper::stripExemplarWeight( inBuffer, dummy );
+    try {
+      result = Chopper::countFeatures( inBuffer, IF, F_length, chopExamples() );
     }
-    else
-      buffer = inBuffer;
-    size_t len = buffer.length();
-    switch ( IF ){
-    case ARFF:
-    case C4_5:
-      for ( size_t i = 0; i < len; ++i ) {
-	if (buffer[i] == ',')
-	  result++;
-      };
-      break;
-    case Compact:
-      if ( F_length == 0 ){
-	Error( "-F Compact specified, but Feature Length not set."
-	       " (-l option)" );
-	return result;
-      }
-      else
-	result = (len / F_length) - 1;
-      break;
-    case Columns:
-      for ( size_t j = 0; j < len; ++j ) {
-	if ( isspace(buffer[j]) ){
-	  result++;
-	  while ( isspace( buffer[++j] ) ){};
-	  if ( buffer[j] == '\0' )
-	    result--; // we had some trailing spaces
-	}
-      };
-      break;
-    default:
-      FatalError( "CountFeatures: Illegal value in switch:" +
-		  toString(IF) );
-    };
+    catch( const runtime_error& e ){
+      Error( e.what() );
+    }
+    catch( const exception& e ){
+      FatalError( e.what() );
+    }
     return result;
   }
-  
+
   InputFormatType MBLClass::getInputFormat( const string& inBuffer ) const {
-    InputFormatType IF = UnknownInputFormat;
-    string buffer;
-    if ( chopExamples() ){
-      string dummy;
-      buffer = Chopper::stripExemplarWeight( inBuffer, dummy );
-    }
-    else
-      buffer = inBuffer;
-    size_t len = buffer.length();
-    int c45Cnt = 0;
-    int columnCnt = 0;
-    for ( unsigned int i = 0; i < len; ++i ) {
-      if ( buffer[i] == ',' ) {
-	++c45Cnt;
-      }
-      else if ( isspace( buffer[i] ) ){
-	++columnCnt;
-	while ( i < len && isspace( buffer[i+1] ) ) ++i;
-	if ( i >= len-1 ){ // just trailing spaces!
-	  --columnCnt;
-	}
-      }
-    }
-    if ( columnCnt == 0 && c45Cnt == 0 )
-      IF = Compact;
-    else if ( c45Cnt >= columnCnt )
-      IF = C4_5;
-    else
-      IF = Columns;
-    return IF;
+    return Chopper::getInputFormat( inBuffer, chopExamples() );
   }
-  
+
   inline void show_input_format( ostream& os,
 				 InputFormatType IF,
 				 int F_length ) {
