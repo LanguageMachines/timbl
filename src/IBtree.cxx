@@ -326,6 +326,16 @@ namespace Timbl {
     os << "</root>" << endl;
   }  
   
+  string toString( const vector<FeatureValue*> vec ){
+    string result;
+    vector<FeatureValue*>::const_iterator it = vec.begin();
+    while ( it != vec.end() ){
+      result += " " + (*it)->Name();
+      ++it;
+    }
+    return result;
+  }
+
   void InstanceBase_base::printStatsTree( ostream &os, 
 					  unsigned int startLevel )  {
     if ( !PersistentDistributions ){
@@ -339,18 +349,22 @@ namespace Timbl {
 	while ( branch ){
 	  unsigned int l = level;
 	  IBtree *pnt = branch;
-	  while ( pnt && l-- > 0 )
+	  vector<FeatureValue*> pad;
+	  while ( pnt && l-- > 0 ){
+	    pad.push_back( pnt->FValue );
 	    pnt = pnt->link;
+	  }
 	  if ( pnt ){
-	    os << level << " " << pnt->FValue << " " << pnt->TDistribution << " <";
+	    os << level << " [" << toString(pad) << " " << pnt->FValue << " ] " 
+	       << pnt->TDistribution << " < ";
 	    pnt = pnt->link;
 	    while ( pnt ){
 	      os << pnt->FValue;
 	      pnt = pnt->next;
 	      if ( pnt )
-		os << ",";
+		os << " ";
 	    }
-	    os << ">" << endl;
+	    os << " >" << endl;
 	  }
 	  branch = branch->next;
 	}
