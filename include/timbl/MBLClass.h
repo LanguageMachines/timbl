@@ -208,7 +208,6 @@ namespace Timbl {
     unsigned igThreshold;
     int mvd_threshold;
     MetricType mvdDefaultMetric;
-    bool do_sparse;
     bool do_sloppy_loo;
     bool do_dot_product;
     bool do_cos_metric;

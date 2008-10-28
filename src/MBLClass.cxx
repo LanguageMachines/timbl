@@ -215,7 +215,6 @@ namespace Timbl {
     ChopInput = 0;
     MaxFeatures = Size;
     runningPhase = LearnWords;
-    do_sparse = false;
     do_sloppy_loo = false;
     do_silly_testing = false;
     do_diversify = false;
@@ -279,7 +278,6 @@ namespace Timbl {
       ib2_offset         = m.ib2_offset;
       runningPhase       = m.runningPhase;
       Weighting          = m.Weighting;
-      do_sparse          = m.do_sparse;
       do_sloppy_loo      = m.do_sloppy_loo;
       do_silly_testing   = m.do_silly_testing;
       do_diversify       = m.do_diversify;
@@ -1468,52 +1466,12 @@ namespace Timbl {
       delete ChopInput;
       ChopInput = 0;
     }
-    if ( do_sparse && ( IF != SparseBin && IF != Sparse ) )
-      return false;
-    switch ( IF ){
-    case C4_5:
-      if ( chopExamples() )
-	ChopInput = new C45_ExChopper();
-      else
-	ChopInput = new C45_Chopper();
-      break;
-    case ARFF:
-      if ( chopExamples() )
-	ChopInput = new ARFF_ExChopper();
-      else
-	ChopInput = new ARFF_Chopper();
-      break;
-    case SparseBin:
-      if ( chopExamples() )
-	ChopInput = new Bin_ExChopper();
-      else
-	ChopInput = new Bin_Chopper();
-      do_sparse = true;
-      break;
-    case Sparse:
-      if ( chopExamples() )
-	ChopInput = new Sparse_ExChopper();
-      else
-	ChopInput = new Sparse_Chopper();
-      do_sparse = true;
-      break;
-    case Columns:
-      if ( chopExamples() )
-	ChopInput = new Columns_ExChopper();
-      else
-	ChopInput = new Columns_Chopper();
-      break;
-    case Compact:
-      if ( chopExamples() )
-	ChopInput = new Compact_ExChopper(F_length );
-      else
-	ChopInput = new Compact_Chopper(F_length );
-      break;
-    default:
-      return false;
+    ChopInput = Chopper::create( IF, chopExamples(), F_length );
+    if ( ChopInput ){
+      input_format = IF;
+      return true;
     }
-    input_format = IF;
-    return true;
+    return false;
   }
   
   const ValueDistribution *MBLClass::ExactMatch( const Instance& inst ) const {
@@ -1898,7 +1856,7 @@ namespace Timbl {
       }
       else if ( input_format != UnknownInputFormat ){
 	// The format is somehow already known, so use that
-	if ( do_sparse || input_format == SparseBin || input_format == Sparse )
+	if ( input_format == SparseBin || input_format == Sparse )
 	  NumF = MaxFeatures;
 	else {
 	  if ( !getline( datafile, Buffer ) ) {

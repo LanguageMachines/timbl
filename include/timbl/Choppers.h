@@ -43,8 +43,7 @@ namespace Timbl{
 	choppedInput[i-1] = choppedInput[i];
       choppedInput[vSize-1] = tmp;
     }
-    static std::string stripExemplarWeight( const std::string&, 
-					    std::string& );
+    static Chopper *create( InputFormatType , bool, int );
     static InputFormatType getInputFormat( const std::string&,
 					   bool=false );
     static size_t countFeatures( const std::string&, 

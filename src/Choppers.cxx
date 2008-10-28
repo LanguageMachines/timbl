@@ -37,6 +37,53 @@ using namespace std;
 
 namespace Timbl{
 
+  Chopper *Chopper::create( InputFormatType IF, bool doEx, int fLen ){
+    Chopper *result = 0;
+    switch ( IF ){
+    case C4_5:
+      if ( doEx )
+	result = new C45_ExChopper();
+      else
+	result = new C45_Chopper();
+      break;
+    case ARFF:
+      if ( doEx )
+	result = new ARFF_ExChopper();
+      else
+	result = new ARFF_Chopper();
+      break;
+    case SparseBin:
+      if ( doEx )
+	result = new Bin_ExChopper();
+      else
+	result = new Bin_Chopper();
+      //      do_sparse = true;
+      break;
+    case Sparse:
+      if ( doEx )
+	result = new Sparse_ExChopper();
+      else
+	result = new Sparse_Chopper();
+      //      do_sparse = true;
+      break;
+    case Columns:
+      if ( doEx )
+	result = new Columns_ExChopper();
+      else
+	result = new Columns_Chopper();
+      break;
+    case Compact:
+      if ( doEx )
+	result = new Compact_ExChopper( fLen );
+      else
+	result = new Compact_Chopper( fLen );
+      break;
+    default:
+      break;
+    }
+    return result;
+  }
+
   void Chopper::init( const string& s, size_t len, bool stripDot ) {
     strippedInput = s;
     vSize = len+1;
@@ -60,8 +107,8 @@ namespace Timbl{
     strippedInput.erase( ++it , strippedInput.end() );
   };
 
-  string Chopper::stripExemplarWeight( const string& Buffer,
-				       string& wght ) {
+  static string stripExemplarWeight( const string& Buffer,
+				     string& wght ) {
     string::size_type t_pos, e_pos = Buffer.length();
     // first remove trailing whitespace and dot
     e_pos = Buffer.find_last_not_of( ". \t", e_pos );
