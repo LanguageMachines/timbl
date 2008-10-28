@@ -1455,7 +1455,7 @@ namespace Timbl {
 
   bool MBLClass::Chop( const string& line ) {
     try {
-      return ChopInput->chop( line, num_of_features, chopExamples() );
+      return ChopInput->chop( line, num_of_features );
     }
     catch ( const exception& e ){
       Warning( e.what() );
@@ -1472,24 +1472,42 @@ namespace Timbl {
       return false;
     switch ( IF ){
     case C4_5:
-      ChopInput = new C45_Chopper();
+      if ( chopExamples() )
+	ChopInput = new C45_ExChopper();
+      else
+	ChopInput = new C45_Chopper();
       break;
     case ARFF:
-      ChopInput = new ARFF_Chopper();
+      if ( chopExamples() )
+	ChopInput = new ARFF_ExChopper();
+      else
+	ChopInput = new ARFF_Chopper();
       break;
     case SparseBin:
-      ChopInput = new Bin_Chopper();
+      if ( chopExamples() )
+	ChopInput = new Bin_ExChopper();
+      else
+	ChopInput = new Bin_Chopper();
       do_sparse = true;
       break;
     case Sparse:
-      ChopInput = new Sparse_Chopper();
+      if ( chopExamples() )
+	ChopInput = new Sparse_ExChopper();
+      else
+	ChopInput = new Sparse_Chopper();
       do_sparse = true;
       break;
     case Columns:
-      ChopInput = new Columns_Chopper();
+      if ( chopExamples() )
+	ChopInput = new Columns_ExChopper();
+      else
+	ChopInput = new Columns_Chopper();
       break;
     case Compact:
-      ChopInput = new Compact_Chopper(F_length );
+      if ( chopExamples() )
+	ChopInput = new Compact_ExChopper(F_length );
+      else
+	ChopInput = new Compact_Chopper(F_length );
       break;
     default:
       return false;

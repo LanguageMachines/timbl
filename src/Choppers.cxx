@@ -37,6 +37,29 @@ using namespace std;
 
 namespace Timbl{
 
+  void Chopper::init( const string& s, size_t len, bool stripDot ) {
+    strippedInput = s;
+    vSize = len+1;
+    choppedInput.resize(vSize);
+    string::iterator it = strippedInput.end();
+    --it;
+    // first trim trailing spaces 
+    while ( it != strippedInput.begin() && 
+	    isspace(*it) ) --it;
+    strippedInput.erase( ++it , strippedInput.end() );
+    it = strippedInput.end();
+    --it;
+    if ( stripDot ){
+      // first trim trailing dot
+      if ( it != strippedInput.begin() && *it == '.' )
+	--it;
+    }
+    // strip remaining trailing spaces
+    while ( it != strippedInput.begin() && 
+	    isspace(*it) ) --it;
+    strippedInput.erase( ++it , strippedInput.end() );
+  };
+
   string Chopper::stripExemplarWeight( const string& Buffer,
 				       string& wght ) {
     string::size_type t_pos, e_pos = Buffer.length();
@@ -57,7 +80,7 @@ namespace Timbl{
   }
 
 
-  void Chopper::init( const string& s, size_t len, bool doEx, bool stripDot ) {
+  void ExChopper::init( const string& s, size_t len, bool stripDot ) {
     exW = -1.0;
     strippedInput = s;
     vSize = len+1;
@@ -68,20 +91,18 @@ namespace Timbl{
     while ( it != strippedInput.begin() && 
 	    isspace(*it) ) --it;
     strippedInput.erase( ++it , strippedInput.end() );
-    if ( doEx ){
-      string wght;
-      strippedInput = stripExemplarWeight( strippedInput, wght );
-      if ( wght.empty() ){
-	throw logic_error( "Missing sample weight" );
+    string wght;
+    strippedInput = stripExemplarWeight( strippedInput, wght );
+    if ( wght.empty() ){
+      throw logic_error( "Missing sample weight" );
+    }
+    else {
+      double tmp;
+      if ( !stringTo<double>( wght, tmp ) ){
+	throw runtime_error( "Wrong sample weight: '" + wght + "'" );
       }
       else {
-	double tmp;
-	if ( !stringTo<double>( wght, tmp ) ){
-	  throw runtime_error( "Wrong sample weight: '" + wght + "'" );
-	}
-	else {
-	  exW = tmp;
-	}
+	exW = tmp;
       }
     }
     it = strippedInput.end();
@@ -97,10 +118,10 @@ namespace Timbl{
     strippedInput.erase( ++it , strippedInput.end() );
   };
 
-  bool C45_Chopper::chop( const string& InBuf, size_t len, bool doE ){
+  bool C45_Chopper::chop( const string& InBuf, size_t len ){
     // Function that takes a line, and chops it up into substrings,
     // which represent the feature-values and the target-value.
-    init( InBuf, len, doE, true );
+    init( InBuf, len, true );
     vector<string> splits;
     size_t res = split_at( strippedInput, splits, "," );
     if ( res != vSize )
@@ -117,21 +138,19 @@ namespace Timbl{
     }
   }
 
-
-  bool ARFF_Chopper::chop( const string& InBuf, size_t len, bool doE ){
+  bool ARFF_Chopper::chop( const string& InBuf, size_t len ){
     // Lines look like this:
     // one, two,   three , bla.
     // the termination dot is optional
     // WhiteSpace is skipped!
-    return C45_Chopper::chop( InBuf, len, doE );
+    return C45_Chopper::chop( InBuf, len );
   }
   
-  bool Bin_Chopper::chop( const string& InBuf, size_t len, bool doE ) {
+  bool Bin_Chopper::chop( const string& InBuf, size_t len ) {
     // Lines look like this:
     // 12, 25, 333, bla.
     // the termination dot is optional
-    init( InBuf, len, doE, true );
-    vector<string> splits;
+    init( InBuf, len, true );
     for ( size_t m = 0; m < vSize-1; ++m )
       choppedInput[m] = "0";
     string::size_type s_pos = 0;
@@ -158,8 +177,8 @@ namespace Timbl{
     os << choppedInput[vSize-1] << ",";
   }
   
-  bool Compact_Chopper::chop( const string& InBuf, size_t leng, bool doE ){
-    init( InBuf, leng, doE, false );
+  bool Compact_Chopper::chop( const string& InBuf, size_t leng ){
+    init( InBuf, leng, false );
     size_t i;
     // Lines look like this:
     // ====AKBVAK
@@ -188,10 +207,10 @@ namespace Timbl{
     }
   };
   
-  bool Columns_Chopper::chop( const string& InBuf, size_t len, bool doE ){
+  bool Columns_Chopper::chop( const string& InBuf, size_t len ){
     // Lines look like this:
     // one  two three bla
-    init( InBuf, len, doE, false );
+    init( InBuf, len, false );
     unsigned int i = 0;
     string::size_type s_pos = 0;
     string::size_type e_pos = strippedInput.find_first_of( " \t" );
@@ -215,11 +234,11 @@ namespace Timbl{
     }
   };
   
-  bool Sparse_Chopper::chop( const string& InBuf, size_t len, bool doE ){
+  bool Sparse_Chopper::chop( const string& InBuf, size_t len ){
     // Lines look like this:
     // (12,value1) (25,value2) (333,value3) bla.
     // the termination dot is optional
-    init( InBuf, len, doE, true );
+    init( InBuf, len, true );
     for ( size_t m = 0; m < vSize-1; ++m )
       choppedInput[m] = DefaultSparseString;
     choppedInput[vSize-1] = "";

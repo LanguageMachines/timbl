@@ -33,9 +33,9 @@ namespace Timbl{
   class Chopper {
   public:
     virtual ~Chopper() {};
-    virtual bool chop( const std::string&, size_t, bool ) = 0;
+    virtual bool chop( const std::string&, size_t ) = 0;
     const std::string& getField( size_t i ) const { return choppedInput[i]; };
-    double getExW() const { return exW; };
+    virtual double getExW() const { return -1; };
     virtual void print( std::ostream& ) = 0;
     void swapTarget( size_t target_pos ){
       std::string tmp = choppedInput[target_pos];
@@ -45,51 +45,79 @@ namespace Timbl{
     }
     static std::string stripExemplarWeight( const std::string&, std::string& );
   protected:
-    void init( const std::string&, size_t, bool, bool );
-    double exW;
+    virtual void init( const std::string&, size_t, bool );
     size_t vSize;
     std::string strippedInput;
     std::vector<std::string> choppedInput;
   };
   
-  class C45_Chopper : public Chopper {
+  class ExChopper: public virtual Chopper {
   public:
-    bool chop( const std::string&, size_t, bool );
+    double getExW() const { return exW; };
+  protected:
+    void init( const std::string&, size_t, bool );
+    double exW;
+  };
+  
+  class C45_Chopper : public virtual Chopper {
+  public:
+    bool chop( const std::string&, size_t );
     void print( std::ostream& );
   };
 
+  class C45_ExChopper : public C45_Chopper, public ExChopper {
+  };
 
   class ARFF_Chopper : public C45_Chopper {
   public:
-    bool chop( const std::string&, size_t, bool );
+    bool chop( const std::string&, size_t );
   };
   
-  class Bin_Chopper : public Chopper {
+  class ARFF_ExChopper : public C45_ExChopper {
+  };
+  
+  class Bin_Chopper : public virtual Chopper {
   public:
-    bool chop( const std::string&, size_t, bool );
+    bool chop( const std::string&, size_t );
     void print( std::ostream& os );
   };
   
-  class Compact_Chopper : public Chopper {
+  class Bin_ExChopper : public Bin_Chopper, public ExChopper {
+  };
+  
+  class Compact_Chopper : public virtual Chopper {
   public:
   Compact_Chopper( int L ): fLen(L){};
-    bool chop( const std::string&, size_t, bool );
+    bool chop( const std::string&, size_t );
     void print( std::ostream& );
   private:
     int fLen;
     Compact_Chopper();
   };
   
-  class Columns_Chopper : public Chopper {
+  class Compact_ExChopper : public Compact_Chopper, public ExChopper {
   public:
-    bool chop( const std::string&, size_t, bool );
+  Compact_ExChopper( int L ): Compact_Chopper( L ){};
+  private:
+    Compact_ExChopper();
+  };
+  
+  class Columns_Chopper : public virtual Chopper {
+  public:
+    bool chop( const std::string&, size_t );
     void print( std::ostream& );
   };
 
-  class Sparse_Chopper : public Chopper {
+  class Columns_ExChopper : public Columns_Chopper, public ExChopper {
+  };
+
+  class Sparse_Chopper : public virtual Chopper {
   public:
-    bool chop( const std::string&, size_t, bool );
+    bool chop( const std::string&, size_t );
     void print( std::ostream& );
+  };  
+
+  class Sparse_ExChopper : public Sparse_Chopper, public ExChopper {
   };  
 
 }
