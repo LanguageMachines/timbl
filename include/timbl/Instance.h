@@ -249,6 +249,7 @@ namespace Timbl {
     bool Numeric() const { return numeric; };
     void Numeric( const bool val ){ numeric = val; };
     MetricType Metric() const { return metric; };
+    bool storableMetric( MetricType globalMetric );
     void Metric( const MetricType M ){ metric = M; };
     double Weight() const { return weight; };
     void SetWeight( const double w ) { weight = w; };

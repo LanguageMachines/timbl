@@ -1346,6 +1346,16 @@ namespace Timbl {
     }
   }
 
+  bool Feature::storableMetric( MetricType globalMetric ){
+    return metric == ValueDiff ||
+      metric == JeffreyDiv ||
+      metric == Levenshtein ||
+      ( metric == DefaultMetric && 
+	( globalMetric == ValueDiff ||
+	  globalMetric == JeffreyDiv ||
+	  globalMetric == Levenshtein ) );
+  }  
+
   bool Feature::matrix_present() const {
     return metric_matrix != 0 && PrestoreStatus == ps_ok;
   }
@@ -1635,13 +1645,17 @@ namespace Timbl {
     PrestoreStatus = ps_undef;
   }
   
-  bool Feature::store_matrix( MetricType mt, int limit, MetricType df ){
+  bool Feature::store_matrix( MetricType gmt, int limit, MetricType df ){
     //
     // Store a complete distance matrix.
     //
     if ( !metric_matrix )
       metric_matrix = new SparseSymetricMatrix<FeatureValue*>();
 
+    MetricType mt = metric;
+    if ( mt == DefaultMetric )
+      mt = gmt;
+    
     if ( PrestoreStatus != ps_failed && 
 	 ( ( mt == ValueDiff || mt == JeffreyDiv || mt == Levenshtein ) ) ){
       try {

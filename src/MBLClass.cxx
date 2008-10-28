@@ -716,15 +716,7 @@ namespace Timbl {
     for ( size_t f = 0; f < num_of_features; ++f ){
       if ( !Features[f]->Ignore() &&
 	   Features[f]->matrix_present() &&
-	   ( ( Features[f]->Metric() == ValueDiff ||
-	       ( Features[f]->Metric() == DefaultMetric && 
-		 GlobalMetric == ValueDiff ) ) ||
-	     ( Features[f]->Metric() == JeffreyDiv ||
-	       ( Features[f]->Metric() == DefaultMetric && 
-		 GlobalMetric == JeffreyDiv ) ) ||
-	     ( Features[f]->Metric() == Levenshtein ||
-	       ( Features[f]->Metric() == DefaultMetric && 
-		 GlobalMetric == Levenshtein ) ) ) ){
+	   Features[f]->storableMetric( GlobalMetric ) ){
 	unsigned int Count = Features[f]->matrix_byte_size();
 	os << "Size of value-matrix[" << f+1 << "] = " 
 	   << Count << " Bytes " << endl;
@@ -858,7 +850,7 @@ namespace Timbl {
     } // j
     return true;
   }
-  
+
   bool MBLClass::initProbabilityArrays( bool force ){
     bool result = true;
     result = allocate_arrays();
@@ -870,13 +862,7 @@ namespace Timbl {
 					   log((double)Features[j]->EffectiveValues())));
 	  if ( force ||
 	       ( !Features[j]->ArrayRead() &&
-		 ( ( Features[j]->Metric() == ValueDiff ||
-		     Features[j]->Metric() == JeffreyDiv ||
-		     Features[j]->Metric() == Levenshtein ||
-		     ( Features[j]->Metric() == DefaultMetric && 
-		       ( GlobalMetric == ValueDiff ||
-			 GlobalMetric == JeffreyDiv ||
-			 GlobalMetric == Levenshtein ) ) ) ) ) ){
+		 Features[j]->storableMetric( GlobalMetric ) ) ){
 	    Features[j]->InitSparseArrays();
 	  } // if force
 	} //if !Ignore
@@ -890,23 +876,9 @@ namespace Timbl {
   */
   void MBLClass::calculatePrestored(){
     for ( size_t j = tribl_offset; j < effective_feats; ++j ) {
-      if ( PermFeatures[j]->Metric() == ValueDiff ||
-	   (PermFeatures[j]->Metric() == DefaultMetric && 
-	    GlobalMetric == ValueDiff) ){
-	PermFeatures[j]->store_matrix( ValueDiff,
+      if ( PermFeatures[j]->storableMetric( GlobalMetric ) ){
+	PermFeatures[j]->store_matrix( GlobalMetric,
 				       mvd_threshold, mvdDefaultMetric );
-      }
-      else if ( PermFeatures[j]->Metric() == JeffreyDiv ||
-		(PermFeatures[j]->Metric() == DefaultMetric && 
-		 GlobalMetric == JeffreyDiv) ){
-	PermFeatures[j]->store_matrix( JeffreyDiv, mvd_threshold,
-				       mvdDefaultMetric );
-      }
-      else if ( PermFeatures[j]->Metric() == Levenshtein ||
-		(PermFeatures[j]->Metric() == DefaultMetric && 
-		 GlobalMetric == Levenshtein ) ){
-	PermFeatures[j]->store_matrix( Levenshtein, mvd_threshold,
-				       mvdDefaultMetric );
       }
     } // j
     if ( Verbosity(VD_MATRIX) ) 
