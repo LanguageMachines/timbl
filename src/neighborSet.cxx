@@ -143,12 +143,12 @@ namespace Timbl {
     if ( !d )
       return result;
     switch ( d->type() ){
-    case decayStruct::Zero_d:
+    case Zero:
       break;
-    case decayStruct::InvDist_d:
+    case InvDist:
       result = 1.0/(distances[k] + Epsilon);
       break;
-    case decayStruct::InvLin_d:
+    case InvLinear:
       if ( k > 0 && size() != 1 ){
 	double nearest_dist, furthest_dist;
 	nearest_dist = distances[0];
@@ -157,7 +157,7 @@ namespace Timbl {
 	  (furthest_dist-nearest_dist);
       }
       break;
-    case decayStruct::Exp_d:
+    case ExpDecay:
       result = exp(-d->alpha*pow(distances[k], d->beta));
       break;
     default:
@@ -213,6 +213,36 @@ namespace Timbl {
 
   ostream& operator<<( ostream& os, const neighborSet *Set ){
     os << *Set;
+    return os;
+  }
+
+  ostream& operator<<( ostream& os, const decayStruct& dc ){
+    return dc.put( os );
+  }
+
+  ostream& zeroDecay::put( ostream& os ) const {
+    return os;
+  }
+
+  ostream& invLinDecay::put( ostream& os ) const {
+    os << "Decay         : " << toString( type(), true);
+    return os;
+  }
+
+  ostream& invDistDecay::put( ostream& os ) const {
+    os << "Decay         : " << toString( type(), true);
+    return os;
+  }
+  
+  ostream& expDecay::put( ostream& os ) const {
+    os << "Decay         : " << toString( type(), true);
+    os << " a=" << alpha << " b= " << beta;
+    return os;
+  }
+  
+  ostream& operator<<( ostream& os, const decayStruct *dc ){
+    if ( dc )
+      os << *dc;
     return os;
   }
 

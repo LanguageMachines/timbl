@@ -146,9 +146,6 @@ namespace Timbl {
 
     WeightType CurrentWeighting() const { return Weighting; };
     MetricType CurrentMetric() const { return GlobalMetric; };
-    DecayType CurrentDecay( double &a, double &b ) const {
-      a = decay_alfa; b = decay_beta; return decay_flag; };
-    
     bool IsClone() const { return is_copy; };
     void default_order();
     void set_order(void);

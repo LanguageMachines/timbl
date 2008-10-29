@@ -29,12 +29,14 @@
 namespace Timbl{
 
   class decayStruct {
+    friend std::ostream& operator<<( std::ostream&, const decayStruct& );
+    friend std::ostream& operator<<( std::ostream&, const decayStruct * );
   public:
     decayStruct():alpha(0),beta(0){};
     decayStruct(double a, double b ):alpha(a),beta(b){};
     virtual ~decayStruct(){};
-    enum decay_t { Zero_d, InvLin_d, InvDist_d, Exp_d };
-    virtual decay_t type() const = 0;
+    virtual std::ostream& put( std::ostream& ) const = 0;
+    virtual DecayType type() const = 0;
     double alpha;
     double beta;
   };
@@ -42,26 +44,30 @@ namespace Timbl{
   class zeroDecay: public decayStruct {
   public:
     zeroDecay():decayStruct(){};
-    decay_t type() const { return Zero_d;};
+    std::ostream& put( std::ostream& ) const;
+    DecayType type() const { return Zero;};
   };
   
   class invLinDecay: public decayStruct {
   public:
     invLinDecay():decayStruct(){};
-    decay_t type() const { return InvLin_d;};
+    std::ostream& put( std::ostream& ) const;
+    DecayType type() const { return InvLinear;};
   };
   
   class invDistDecay: public decayStruct {
   public:
     invDistDecay():decayStruct(){};
-    decay_t type() const { return InvDist_d;};
+    std::ostream& put( std::ostream& ) const;
+    DecayType type() const { return InvDist;};
   };
   
   class expDecay: public decayStruct {
   public:
     expDecay( double alp ): decayStruct(alp,1.0){};
     expDecay( double alp, double bet ): decayStruct(alp,bet){};
-    decay_t type() const { return Exp_d;};
+    std::ostream& put( std::ostream& ) const;
+    DecayType type() const { return ExpDecay;};
   };
   
   class neighborSet {

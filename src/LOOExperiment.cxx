@@ -117,8 +117,7 @@ namespace Timbl {
 	 << "Algorithm     : LOO" << endl;
     show_metric_info( os );
     show_weight_info( os );
-    show_decay_info( os );
-    os << endl;
+    os << decay << endl;
   }
 
   bool LOO_Experiment::Test( const string& FileName,

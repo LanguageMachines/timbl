@@ -287,8 +287,7 @@ namespace Timbl {
        << "Algorithm     : TRIBL, q = " << TRIBL_offset() << endl;
     show_metric_info( os );
     show_weight_info( os );
-    show_decay_info( os );
-    os << endl;
+    os << decay << endl;
   }
 
   bool TRIBL_Experiment::GetInstanceBase( istream& is ){

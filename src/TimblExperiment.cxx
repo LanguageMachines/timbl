@@ -1372,17 +1372,6 @@ namespace Timbl {
       ShowWeights( os );
   }
 
-  void TimblExperiment::show_decay_info( ostream& os ) const {
-    double par_a, par_b;
-    DecayType dc = CurrentDecay( par_a, par_b );
-    if ( dc != Zero ){
-      os << "Decay         : " << toString(dc, true);
-      if ( dc == ExpDecay )
-	os << " a=" << par_a << " b= " << par_b;
-      os << endl;
-    }
-  }
-
   void TimblExperiment::show_ignore_info( ostream& os ) const{
     bool first = true;
     for ( size_t i=0; i< NumOfFeatures(); ++i ){
@@ -1410,8 +1399,7 @@ namespace Timbl {
        << "Algorithm     : " << toString( Algorithm() ) << endl;
     show_metric_info( os );
     show_weight_info( os );
-    show_decay_info( os );
-    os << endl;
+    os << decay << endl;
   }
 
   bool TimblExperiment::Test( const string& FileName,

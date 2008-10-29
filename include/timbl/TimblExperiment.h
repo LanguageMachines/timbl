@@ -190,7 +190,6 @@ namespace Timbl {
     
     void show_ignore_info( std::ostream& os ) const;
     void show_weight_info( std::ostream& os ) const;
-    void show_decay_info( std::ostream& os ) const;
     void show_metric_info( std::ostream& os ) const;
     double sum_remaining_weights( size_t ) const;
     
