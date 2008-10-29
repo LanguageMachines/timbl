@@ -131,6 +131,8 @@ namespace Timbl{
 	  TM = globalMetric;
 	switch ( TM ){
 	case Overlap:
+	case Cosine:
+	case DotProduct:
 	  test_feature_val[i] = new overlapTester();
 	  break;
 	case Levenshtein:
@@ -143,7 +145,7 @@ namespace Timbl{
 	  test_feature_val[i] = new jeffreyDiffTester( threshold );
 	  break;
 	default:
-	  string msg = string("Invalid value '") + toString( TM ) 
+	  string msg = string("Invalid value '") + toString( TM, true ) 
 	    + "' in switch (" 
 	    + __FILE__  + "," + toString(__LINE__) + ")\n"
 	    + "ABORTING now";

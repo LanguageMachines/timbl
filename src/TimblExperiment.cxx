@@ -53,6 +53,7 @@
 #include "timbl/Tree.h"
 #include "timbl/Instance.h"
 #include "timbl/Choppers.h"
+#include "timbl/Testers.h"
 #include "timbl/Statistics.h"
 #include "timbl/neighborSet.h"
 #include "timbl/BestArray.h"
@@ -873,7 +874,6 @@ namespace Timbl {
       return false;
   }
     
-  static const int maxSimilarity = INT_MAX;
   void TimblExperiment::show_results( ostream& outfile, 
 				      const string& dString,
 				      const TargetValue *Best,
@@ -887,7 +887,7 @@ namespace Timbl {
       int OldPrec = outfile.precision(DBL_DIG-1);
       outfile.setf(ios::showpoint);
       outfile.width(8);
-      if ( similarityMetric() )
+      if ( isSimilarityMetric( CurrentMetric() ) )
 	outfile << " " << maxSimilarity-Distance;
       else
 	outfile << " " << Distance;
@@ -1302,9 +1302,6 @@ namespace Timbl {
   
   void TimblExperiment::show_metric_info( ostream& os ) const {
     switch ( CurrentMetric() ){
-    case Overlap:
-      os << "Global metric : " << toString(CurrentMetric(), true);
-      break;
     case ValueDiff:
     case JeffreyDiv:
       os << "Global metric : " << toString(CurrentMetric(), true);
@@ -1325,7 +1322,7 @@ namespace Timbl {
       if ( !Features[i]->Ignore() &&
 	   InvPerm[i]+1 > TRIBL_offset() ){
 	if ( Features[i]->Numeric() ){
-	  if ( CurrentMetric() != Numeric ){
+	  if ( !isNumericalMetric( CurrentMetric() ) ){
 	    cnt++;
 	    os << endl << "   Feature[" << i+1 << "] : "
 	       << toString( Numeric, true );

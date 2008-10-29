@@ -135,10 +135,6 @@ namespace Timbl {
 				      &verbosity, NO_VERB ) );
     Options.Add( new BoolOption( "EXACT_MATCH", 
 				 &do_exact_match, false ) );
-    Options.Add( new BoolOption( "DO_DOT_PRODUCT", 
-				 &do_dot_product, false ) );
-    Options.Add( new BoolOption( "DO_COSINE", 
-				 &do_cos_metric, false ) );
     Options.Add( new BoolOption( "HASHED_TREE", 
 				 &hashed_trees, true ) );
     Options.Add( new MetricOption( "GLOBAL_METRIC", 
@@ -263,8 +259,6 @@ namespace Timbl {
       keep_distributions = m.keep_distributions;
       verbosity          = m.verbosity;
       do_exact_match     = m.do_exact_match;
-      do_dot_product     = m.do_dot_product;
-      do_cos_metric          = m.do_cos_metric;
       GlobalMetric       = m.GlobalMetric;
       UserOptions        = m.UserOptions;
       mvd_threshold      = m.mvd_threshold;
@@ -1281,14 +1275,14 @@ namespace Timbl {
 	feat_status[g] = Features[g]->prepare_numeric_stats();
 	if ( feat_status[g] == SingletonNumeric &&
 	     ( input_format == SparseBin 
-	       && ( do_dot_product || do_cos_metric ) ) ){
+	       && ( isSimilarityMetric( GlobalMetric ) ) ) ){
 	  // ok
 	}
 	else {
 	  if ( feat_status[g] != NumericValue ){
 	    Features[g]->Numeric( false );
 	    nothing_changed = false;
-	    if ( GlobalMetric == Numeric )
+	    if ( isNumericalMetric( GlobalMetric ) )
 	      TmpMetric = Overlap;
 	    else
 	      TmpMetric = DefaultMetric;
@@ -1312,14 +1306,15 @@ namespace Timbl {
 	  }
 	}
 	if ( TmpMetric != Numeric && 
-	     !( TmpMetric == DefaultMetric && GlobalMetric == Numeric ) &&
+	     !( TmpMetric == DefaultMetric &&
+		( isNumericalMetric( GlobalMetric ) ) ) &&
 	     TmpMetric !=  Features[g]->Metric() ){
 	  nothing_changed = false;
 	  Features[g]->Metric(TmpMetric);
 	}
       }
     } // end g
-    if ( (do_dot_product || do_cos_metric ) && !nothing_changed ){
+    if ( isSimilarityMetric( GlobalMetric ) && !nothing_changed ){
       // check to see if ALL features are still Numeric.
       // otherwise we can't do Inner product!
       bool first = true;
@@ -1476,7 +1471,7 @@ namespace Timbl {
   
   const ValueDistribution *MBLClass::ExactMatch( const Instance& inst ) const {
     const ValueDistribution *result = NULL;
-    if ( !(do_dot_product || do_cos_metric) &&
+    if ( !isSimilarityMetric(GlobalMetric) &&
 	 ( do_exact_match || 
 	   ( num_of_neighbors == 1 &&
 	     !( Verbosity( NEAR_N | ALL_K) ) ) ) ){
@@ -1632,9 +1627,9 @@ namespace Timbl {
     delete tester;
     if ( doSamples() )
       tester = new ExemplarTester( Features, permutation );
-    else if ( do_cos_metric )
+    else if ( GlobalMetric == Cosine )
       tester = new CosineTester( Features, permutation );
-    else if ( do_dot_product )
+    else if ( GlobalMetric == DotProduct )
       tester = new DotProductTester( Features, permutation );
     else
       tester = new DefaultTester( Features, permutation );
@@ -1777,9 +1772,8 @@ namespace Timbl {
       test_instance_ex( Inst, SubTree, level );
     }
     else {
-      if ( do_dot_product || do_cos_metric ){
+      if ( isSimilarityMetric( GlobalMetric ) )
 	test_instance_sim( Inst, SubTree, level );
-      }
       else
 	test_instance( Inst, SubTree, level );
     }
@@ -1993,7 +1987,7 @@ namespace Timbl {
 	num_of_num_features++;
 	break;
       case DefaultMetric:
-	if ( GlobalMetric == Numeric ){
+	if ( isNumericalMetric( GlobalMetric) ){
 	  Features[j]->Numeric( true );
 	  num_of_num_features++;
 	}

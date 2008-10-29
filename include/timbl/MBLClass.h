@@ -85,8 +85,6 @@ namespace Timbl {
 		       InstanceBase_base * = NULL,
 		       size_t = 0 );
     void show_org_input( std::ostream & ) const;
-    bool similarityMetric() const 
-      { return (do_dot_product || do_cos_metric); };
     const ValueDistribution *ExactMatch( const Instance& ) const;
     bool ExpInvalid() const { 
       if ( err_count > 0 ){
@@ -209,8 +207,6 @@ namespace Timbl {
     int mvd_threshold;
     MetricType mvdDefaultMetric;
     bool do_sloppy_loo;
-    bool do_dot_product;
-    bool do_cos_metric;
     bool do_exact_match;
     bool do_silly_testing;
     bool hashed_trees;

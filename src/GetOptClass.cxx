@@ -366,22 +366,8 @@ namespace Timbl {
       else
 	Exp->SetOption(  "EXEMPLAR_WEIGHTS: false" );
       if ( local_metric != UnknownMetric ){
-	if ( local_metric == DotProduct ){
-	  optline = "GLOBAL_METRIC: " +  toString(Numeric);
-	  Exp->SetOption( optline );
-	  optline = "DO_DOT_PRODUCT: true";
-	  Exp->SetOption( optline );
-	}
-	else if ( local_metric == Cosine ){
-	  optline = "GLOBAL_METRIC: " +  toString(Numeric);
-	  Exp->SetOption( optline );
-	  optline = "DO_COSINE: true";
-	  Exp->SetOption( optline );
-	}
-	else {
-	  optline = "GLOBAL_METRIC: " + toString(local_metric);
-	  Exp->SetOption( optline );
-	}
+	optline = "GLOBAL_METRIC: " + toString(local_metric);
+	Exp->SetOption( optline );
       }
       if ( local_weight != Unknown_w ){
 	optline = "WEIGHTING: " + toString(local_weight);

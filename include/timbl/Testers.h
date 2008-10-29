@@ -5,6 +5,14 @@ namespace Timbl{
 
   static const int maxSimilarity = INT_MAX;
   
+  inline bool isSimilarityMetric( MetricType m ){
+    return m == Cosine || m == DotProduct;
+  }
+  
+  inline bool isNumericalMetric( MetricType m ){
+    return m == Numeric || m == Cosine || m == DotProduct;
+  }
+
 
   class metricTester {
   public:
