@@ -145,7 +145,6 @@ namespace Timbl {
     void KeepDistributions( bool f ){ keep_distributions = f; };
 
     WeightType CurrentWeighting() const { return Weighting; };
-    MetricType CurrentMetric() const { return GlobalMetric; };
     bool IsClone() const { return is_copy; };
     void default_order();
     void set_order(void);

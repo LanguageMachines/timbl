@@ -887,7 +887,7 @@ namespace Timbl {
       int OldPrec = outfile.precision(DBL_DIG-1);
       outfile.setf(ios::showpoint);
       outfile.width(8);
-      if ( isSimilarityMetric( CurrentMetric() ) )
+      if ( isSimilarityMetric( GlobalMetric ) )
 	outfile << " " << maxSimilarity-Distance;
       else
 	outfile << " " << Distance;
@@ -1301,14 +1301,9 @@ namespace Timbl {
   }
   
   void TimblExperiment::show_metric_info( ostream& os ) const {
-    switch ( CurrentMetric() ){
-    case ValueDiff:
-    case JeffreyDiv:
-      os << "Global metric : " << toString(CurrentMetric(), true);
+    os << "Global metric : " << toString( GlobalMetric, true);
+    if ( isStorable( GlobalMetric ) ){
       os << ", Prestored matrix";
-      break;
-    default:
-      os << "Global metric : " << toString(CurrentMetric(), true);
     }
     if ( Do_Exact() )
       os << ", prefering exact matches";
@@ -1322,30 +1317,28 @@ namespace Timbl {
       if ( !Features[i]->Ignore() &&
 	   InvPerm[i]+1 > TRIBL_offset() ){
 	if ( Features[i]->Numeric() ){
-	  if ( !isNumericalMetric( CurrentMetric() ) ){
+	  if ( !isNumericalMetric( GlobalMetric ) ){
 	    cnt++;
 	    os << endl << "   Feature[" << i+1 << "] : "
 	       << toString( Numeric, true );
 	  }
 	}
-	else if ( Features[i]->Metric() != CurrentMetric() &&
+	else if ( Features[i]->Metric() != GlobalMetric &&
 		  Features[i]->Metric() != DefaultMetric ){
 	  ++cnt;
 	  os << endl << "   Feature[" << i+1 << "] : "
 	     << toString( Features[i]->Metric(), true );
-	  if ( ( Features[i]->Metric() == ValueDiff ||
-		 Features[i]->Metric() == JeffreyDiv ) &&
+	  if ( Features[i]->storableMetric( GlobalMetric ) &&
 	       Features[i]->matrix_present() )
 	    os << " (Prestored)";
 	}
-	else if ( ( Features[i]->Metric() == CurrentMetric() ||
+	else if ( ( Features[i]->Metric() == GlobalMetric ||
 		    Features[i]->Metric() == DefaultMetric ) &&
-		  ( ( CurrentMetric() == ValueDiff ||
-		      CurrentMetric() == JeffreyDiv ) && 
-		    !Features[i]->matrix_present( ) ) ){
+		  ( isStorable( GlobalMetric ) && 
+		    !Features[i]->matrix_present() ) ){
 	  ++cnt;
 	  os << endl << "   Feature[" << i+1 
-	     << "] : " << toString( CurrentMetric(), true )
+	     << "] : " << toString( GlobalMetric, true )
 	     << " (Not Prestored)";
 	}
       }

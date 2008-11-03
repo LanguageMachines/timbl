@@ -103,9 +103,7 @@ namespace Timbl{
   
   TesterClass::TesterClass( const vector<Feature*>& feat,
 			    const vector<size_t>& perm ):
-    _size(feat.size()), features(feat), permutation(perm)
-  {
-    //    permFeatures.reserve(_size);
+    _size(feat.size()), features(feat), permutation(perm) {
     permFeatures.resize(_size,0);
     test_feature_val = new metricTester*[_size];
     for ( size_t j=0; j < _size; ++j ){
@@ -126,7 +124,7 @@ namespace Timbl{
 	test_feature_val[i] = new numericOverlapTester();
       }
       else {
-	MetricType TM =  features[i]->Metric();
+	MetricType TM = features[i]->Metric();
 	if ( TM == DefaultMetric )
 	  TM = globalMetric;
 	switch ( TM ){

@@ -1346,14 +1346,13 @@ namespace Timbl {
     }
   }
 
-  bool Feature::storableMetric( MetricType globalMetric ){
-    return metric == ValueDiff ||
-      metric == JeffreyDiv ||
-      metric == Levenshtein ||
-      ( metric == DefaultMetric && 
-	( globalMetric == ValueDiff ||
-	  globalMetric == JeffreyDiv ||
-	  globalMetric == Levenshtein ) );
+  bool isStorable( MetricType m ){
+    return m == ValueDiff || m == JeffreyDiv || m == Levenshtein;
+  }
+  
+  bool Feature::storableMetric( MetricType gm ){
+    return isStorable( metric) ||
+      ( metric == DefaultMetric && isStorable( gm ) );
   }  
 
   bool Feature::matrix_present() const {
@@ -1656,8 +1655,7 @@ namespace Timbl {
     if ( mt == DefaultMetric )
       mt = gmt;
     
-    if ( PrestoreStatus != ps_failed && 
-	 ( ( mt == ValueDiff || mt == JeffreyDiv || mt == Levenshtein ) ) ){
+    if ( PrestoreStatus != ps_failed && isStorable( mt ) ) {
       try {
 	for ( unsigned int ii=0; ii < ValuesArray.size(); ++ii ){
 	  FeatureValue *FV_i = (FeatureValue *)ValuesArray[ii];
@@ -1667,18 +1665,21 @@ namespace Timbl {
 		 FV_j->ValFreq() >= matrix_clip_freq &&
 		 ( Prestored_metric != mt ||
 		   fabs(metric_matrix->Extract(FV_i,FV_j)) < Epsilon ) ){
-	      if ( mt == ValueDiff ){
-		metric_matrix->Assign( FV_i, FV_j, 
-				      FV_i->VDDistance( FV_j, limit, df ) );
+	      double dist;
+	      switch ( mt ){
+	      case ValueDiff:
+		dist = FV_i->VDDistance( FV_j, limit, df );
+		break;
+	      case JeffreyDiv:
+		dist = FV_i->JDDistance( FV_j, limit, df );
+		break;
+	      case Levenshtein:
+		dist = FV_i->LDDistance( FV_j, limit, df );
+		break;
+	      default:
+		FatalError( "invalid value " + toString( mt ) + "in switch" );
 	      }
-	      else if ( mt == JeffreyDiv ){	
-		metric_matrix->Assign( FV_i, FV_j, 
-				      FV_i->JDDistance( FV_j, limit, df ) );
-	      }
-	      else if ( mt == Levenshtein ){	
-		metric_matrix->Assign( FV_i, FV_j, 
-				      FV_i->LDDistance( FV_j, limit, df ) );
-	      }
+	      metric_matrix->Assign( FV_i, FV_j, dist );
 	    }
 	  }
 	}

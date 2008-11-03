@@ -240,6 +240,8 @@ namespace Timbl {
     bool increment_value( TargetValue * );
     TargetValue *MajorityClass() const;
   };
+
+  bool isStorable( MetricType mt );
   
   class Feature: public BaseFeatTargClass {
   public:
