@@ -27,6 +27,14 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <string>
+#include <vector>
+#include <exception>
+#include <stdexcept>
+#include <sstream>
+
+#include "StringOps.h"
+
 namespace Timbl {
 
   template< typename T >
