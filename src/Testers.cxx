@@ -133,6 +133,9 @@ namespace Timbl{
 	case DotProduct:
 	  test_feature_val[i] = new overlapTester();
 	  break;
+	case Numeric:
+	  test_feature_val[i] = new numericOverlapTester();
+	  break;
 	case Levenshtein:
 	  test_feature_val[i] = new levenshteinTester( threshold );
 	  break;

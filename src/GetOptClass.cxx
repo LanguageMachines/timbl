@@ -48,6 +48,7 @@ typedef std::ostream LogStream;
 #include "timbl/Instance.h"
 #include "timbl/neighborSet.h"
 #include "timbl/Statistics.h"
+#include "timbl/Testers.h"
 #include "timbl/CommandLine.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/BestArray.h"
@@ -579,12 +580,9 @@ namespace Timbl {
 	    Error( "illegal value in metric description: -m " + Mline );
 	    return false;
 	  }
-	  if ( Def == DotProduct && TmpMT != Ignore ){
-	    Error( "DotProduct only accepts -I specifications: -m " + Mline );
-	    return false;
-	  }
-	  if ( Def == Cosine && TmpMT != Ignore ){
-	    Error( "Cosine Metric only accepts -I specifications: -m " + Mline );
+	  if ( TmpMT != Ignore && isSimilarityMetric( Def ) ){
+	    Error( "Similarity metric " + toString( Def ) 
+		   + " only accepts -I specifications: -m " + Mline );
 	    return false;
 	  }
 	  ++p;

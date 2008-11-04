@@ -1244,7 +1244,6 @@ namespace Timbl {
   
   void MBLClass::calculate_fv_entropy( bool always ){
     bool realy_first =  DBEntropy < Epsilon;
-    bool nothing_changed = true;
     if ( always || realy_first ){
       // if it's the first time (DBEntropy == 0 ) or
       // if always, we have to (re)calculate everything
@@ -1266,6 +1265,7 @@ namespace Timbl {
     // and do the statistics for those features where the metric is changed.
     MetricType TmpMetric;
     FeatVal_Stat *feat_status = new FeatVal_Stat[num_of_features];
+    bool nothing_changed = true;
     for ( size_t g = 0; g < num_of_features; ++g ) {
       feat_status[g] = Unknown;
       if ( Features[g]->Ignore() )
@@ -1977,28 +1977,20 @@ namespace Timbl {
     effective_feats = num_of_features;
     num_of_num_features = 0;
     for ( size_t j = 0; j < num_of_features; ++j ){
-      switch (UserOptions[j+1] ){
-      case Ignore:
+      MetricType m = UserOptions[j+1];
+      if ( m == Ignore ){
 	Features[j]->Ignore( true );
 	effective_feats--;
-	break;
-      case Numeric:
-	Features[j]->Numeric( true );
-	num_of_num_features++;
-	break;
-      case DefaultMetric:
+      }
+      else if ( m == DefaultMetric ){
 	if ( isNumericalMetric( GlobalMetric) ){
 	  Features[j]->Numeric( true );
 	  num_of_num_features++;
 	}
-	break;
-      case Overlap:
-      case ValueDiff:
-      case JeffreyDiv:
-	break;
-      default:
-	FatalError( "Initialize: Illegal value in switch " +
-		    toString( UserOptions[j+1] ) );
+      }
+      else if ( isNumericalMetric( m ) ){
+	Features[j]->Numeric( true );
+	num_of_num_features++;
       }
     }
     Options.FreezeTable();

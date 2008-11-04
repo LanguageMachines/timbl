@@ -1665,7 +1665,7 @@ namespace Timbl {
 		 FV_j->ValFreq() >= matrix_clip_freq &&
 		 ( Prestored_metric != mt ||
 		   fabs(metric_matrix->Extract(FV_i,FV_j)) < Epsilon ) ){
-	      double dist;
+	      double dist = -1.0;
 	      switch ( mt ){
 	      case ValueDiff:
 		dist = FV_i->VDDistance( FV_j, limit, df );
