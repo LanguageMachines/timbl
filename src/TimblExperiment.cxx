@@ -1425,7 +1425,8 @@ namespace Timbl {
       else {
 	string Buffer;
 	stats.clear();
-	testing_info( *Log(mylog), FileName, OutFile );
+	if ( !Verbosity(SILENT) )
+	  testing_info( *Log(mylog), FileName, OutFile );
       
 	// Start time.
 	//
@@ -1451,15 +1452,18 @@ namespace Timbl {
 		*Log(mylog) << endl;
 	      }
 	    }
-	    // Display progress counter.
-	    show_progress( *Log(mylog), lStartTime );
+	    if ( !Verbosity(SILENT) )
+	      // Display progress counter.
+	      show_progress( *Log(mylog), lStartTime );
 	  }
 	}// end while.
 	if ( OutFile != "-" )
 	  out_file.close();
-	time_stamp( "Ready:  ", stats.dataLines() );
-	show_speed_summary( *Log(mylog), startTime );
-	showStatistics( *Log(mylog) );
+	if ( !Verbosity(SILENT) ){
+	  time_stamp( "Ready:  ", stats.dataLines() );
+	  show_speed_summary( *Log(mylog), startTime );
+	  showStatistics( *Log(mylog) );
+	}
 	createPercFile( PercFile );
 	result = true;
       }
@@ -1502,7 +1506,8 @@ namespace Timbl {
       else {
 	string Buffer;
 	stats.clear();
-	testing_info( *Log(mylog), FileName, OutFile );
+	if ( !Verbosity(SILENT) )
+	  testing_info( *Log(mylog), FileName, OutFile );
       
 	// Start time.
 	//
@@ -1523,14 +1528,17 @@ namespace Timbl {
 	    const neighborSet *res = LocalClassify( CurrInst );
 	    show_org_input( *outfile );
 	    *outfile << endl << *res;
-	    // Display progress counter.
-	    show_progress( *Log(mylog), lStartTime );
+	    if ( !Verbosity(SILENT) )
+	      // Display progress counter.
+	      show_progress( *Log(mylog), lStartTime );
 	  }
 	}// end while.
 	if ( OutFile != "-" )
 	  out_file.close();
-	time_stamp( "Ready:  ", stats.dataLines() );
-	show_speed_summary( *Log(mylog), startTime );
+	if ( !Verbosity(SILENT) ){
+	  time_stamp( "Ready:  ", stats.dataLines() );
+	  show_speed_summary( *Log(mylog), startTime );
+	}
 	result = true;
       }
     }
