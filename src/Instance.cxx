@@ -297,7 +297,6 @@ namespace Timbl {
       else {
 	distribution[id] = new Vfield( val, 1, factor );
       }
-      ++it;
     }
     total_items += targ->ValuesArray.size();
     Normalize();
