@@ -1,7 +1,7 @@
 #ifndef CHOPPERS_H
 #define CHOPPERS_H
 /*
-  Copyright (c) 1998 - 2008
+  Copyright (c) 1998 - 2009
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  

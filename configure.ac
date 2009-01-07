@@ -51,7 +51,7 @@ if test "$ac_cv_prog_ac_ct_CXX" == "g++"; then
   fi
   CXXFLAGS="$CXXFLAGS -W -Wall"
 else
-  CXXFLAGS="$CXXFLAGS -Wcheck"
+  CXXFLAGS="$CXXFLAGS -W"
 fi
 
 # libtool stuff

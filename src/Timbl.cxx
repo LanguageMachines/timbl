@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2008
+  Copyright (c) 1998 - 2009
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -700,7 +700,7 @@ int main(int argc, char *argv[]){
     // Start.
     //
     cerr << "TiMBL " << TimblAPI::VersionInfo()
-	 << " (c) ILK 1998 - 2008.\n" 
+	 << " (c) ILK 1998 - 2009.\n" 
 	 << "Tilburg Memory Based Learner\n"
 	 << "Induction of Linguistic Knowledge Research Group\n"
 	 << "Tilburg University / University of Antwerp" << endl;
