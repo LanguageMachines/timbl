@@ -1,6 +1,8 @@
 # $Id$
 # $URL: $
 
+ACLOCAL_AMFLAGS =-I m4
+
 SUBDIRS = src include demos docs init
 
 EXTRA_DIST = bootstrap AUTHORS TODO NEWS timbl.pc
