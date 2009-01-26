@@ -5,7 +5,7 @@ ACLOCAL_AMFLAGS =-I m4
 
 SUBDIRS = src include demos docs init
 
-EXTRA_DIST = bootstrap AUTHORS TODO NEWS timbl.pc
+EXTRA_DIST = bootstrap AUTHORS TODO NEWS timbl.pc m4
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = timbl.pc
