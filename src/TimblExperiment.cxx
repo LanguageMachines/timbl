@@ -765,12 +765,12 @@ namespace Timbl {
 	// check if we are slow, if so, change progress value
 	if ( Time - start > 120 ) // more then two minutes
 	  // very slow !
-	  local_progress = 1000;
+	  Progress( 1000 );
       }
       else if ( line == 10000 ){
 	if ( Time - start > 600 ) // more then ten minutes
 	  // quit slow !
-	  local_progress = 10000;
+	  Progress( 10000 );
       }
       curtime = localtime(&Time);
       os << "Tested: ";
@@ -1011,6 +1011,8 @@ namespace Timbl {
 	    //
 	    if ((stats.dataLines() % Progress() ) == 0) 
 	      time_stamp( "Learning:  ", stats.dataLines() );
+	    if ( Added > 0 && ( Added % Progress() ) == 0) 
+	      time_stamp( "Added:  ", Added );
 	    found = false;
 	    while ( !found &&
 		    nextLine( datafile, Buffer ) ){

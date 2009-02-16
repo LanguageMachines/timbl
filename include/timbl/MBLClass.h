@@ -119,6 +119,7 @@ namespace Timbl {
     void Socket( int so ){ tcp_socket = so ; };
     int Socket() const { return tcp_socket; };
     int Progress() const { return progress; };
+    void Progress( int p ){ progress =  p; };
     bool MBLInit() const { return MBL_init; };
     void MBLInit( bool b ) { MBL_init = b; };
     Target   *Targets;
