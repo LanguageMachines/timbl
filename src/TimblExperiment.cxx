@@ -992,9 +992,11 @@ namespace Timbl {
 	    chopped_to_instance( TestWords );
 	    double final_distance;
 	    bool dummy = false;
+	    StatisticsClass stats_keep = stats;
 	    const TargetValue *ResultTarget = LocalClassify( CurrInst, 
 							     final_distance,
 							     dummy );
+	    stats = stats_keep;
 	    if ( ResultTarget != CurrInst.TV ) {
 	      chopped_to_instance( TrainLearnWords );
 	      if ( !IBAdd( CurrInst ) ){
