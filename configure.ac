@@ -4,7 +4,7 @@
 # $URL: $
 
 AC_PREREQ(2.59)
-AC_INIT([Timbl], [6.1.5], [timbl@uvt.nl])
+AC_INIT([Timbl], [6.1.6-beta], [timbl@uvt.nl])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_MACRO_DIR([m4])

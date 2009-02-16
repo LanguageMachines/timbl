@@ -583,12 +583,14 @@ namespace Timbl {
 					 Version ); 
 	if ( result ){
 	  if ( !InstanceBase->HasDistributions() ){
-	    if ( Verbosity(DISTRIB) ){
+	    if ( KeepDistributions() )
+	      Error( "Instance base doesn't contain Distributions, "
+		     "+D option impossible" );
+	    else if ( Verbosity(DISTRIB) ){
 	      Info( "Instance base doesn't contain Distributions, "
 		    "+vDB option disabled ...."  );
 	      ResetVerbosityFlag(DISTRIB);
 	    }
-	    KeepDistributions( false );
 	  }
 	}
       }
