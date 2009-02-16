@@ -389,6 +389,10 @@ const TargetValue *TimblAPI::Classify( const string& s,
   if ( Valid() ){
     return pimpl->Classify( s, db, di );
   }
+  else {
+    db = NULL;
+    di = DBL_MAX;
+  }
   return NULL;
 }
 
@@ -404,6 +408,8 @@ const TargetValue *TimblAPI::Classify( const string& s,
   if ( Valid() ){
     return pimpl->Classify( s, db  );
   }
+  else
+    db = NULL;
   return NULL;
 }
 
@@ -412,6 +418,8 @@ const TargetValue *TimblAPI::Classify( const string& s,
   if ( Valid() ){
     return pimpl->Classify( s, di );
   }
+  else 
+    di = DBL_MAX;
   return NULL;
 }
 
