@@ -798,7 +798,7 @@ namespace Timbl {
     }
   }
   
-  void IB2_Experiment::show_learn_progress( ostream& os,
+  bool IB2_Experiment::show_learn_progress( ostream& os,
 					    time_t start,
 					    size_t added ){
     char time_string[26];
@@ -846,7 +846,10 @@ namespace Timbl {
 	} 
       }
       os << endl;
+      return true;
     }
+    else
+      return false;
   }
   
   void TimblExperiment::show_speed_summary( ostream& os,
@@ -986,6 +989,7 @@ namespace Timbl {
   bool IB2_Experiment::Expand_N( const string& FileName ){
     bool result = true;
     size_t Added = 0;
+    size_t TotalAdded = 0;
     if ( ExpInvalid() ){
       result = false;
     }
@@ -1062,7 +1066,10 @@ namespace Timbl {
 	    }
 	    // Progress update.
 	    //
-	    show_learn_progress( *Log(mylog), lStartTime, Added );
+	    if ( show_learn_progress( *Log(mylog), lStartTime, Added ) ){
+	      TotalAdded += Added;
+	      Added = 0;
+	    }
 	    found = false;
 	    while ( !found &&
 		    nextLine( datafile, Buffer ) ){
@@ -1076,7 +1083,7 @@ namespace Timbl {
 	  } while( found );
 	  if ( result ){
 	    time_stamp( "Finished:  ", stats.dataLines() );
-	    *Log(mylog) << "added " << Added << " new entries" << endl;
+	    *Log(mylog) << "added " << TotalAdded << " new entries" << endl;
 	    if ( !Verbosity(SILENT) ){
 	      IBInfo( *Log(mylog) );
 	      LearningInfo( *Log(mylog) );
