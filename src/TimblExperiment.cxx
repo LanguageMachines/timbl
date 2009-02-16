@@ -808,28 +808,35 @@ namespace Timbl {
     time_t EstimatedTime;
     double Estimated;
     int local_progress = Progress();
-    unsigned int line = stats.dataLines();
+    unsigned int lines = stats.dataLines();
+    unsigned int line = lines - IB2_offset() ;
     if ( ( (line % local_progress ) == 0) || ( line <= 10 ) ||
 	 ( line == 100 || line == 1000 || line == 10000 ) ){
       time(&Time);
-      if ( line == 1000 ){
+      if ( line == 100 ){
 	// check if we are slow, if so, change progress value
-	if ( Time - start > 120 ) // more then two minutes
+	if ( Time - start > 120 && local_progress > 100 )
+	  // very slow !
+	  Progress( 100 );
+      }
+      else if ( line == 1000 ){
+	// check if we are slow, if so, change progress value
+	if ( Time - start > 120 && local_progress > 1000 )
 	  // very slow !
 	  Progress( 1000 );
       }
       else if ( line == 10000 ){
-	if ( Time - start > 600 ) // more then ten minutes
+	if ( Time - start > 120 && local_progress > 10000)
 	  // quit slow !
 	  Progress( 10000 );
       }
       curtime = localtime(&Time);
-      os << "Learning: ";
+      os << "Learning:  ";
       os.width(6);
       os.setf(ios::right, ios::adjustfield);
       strcpy( time_string, asctime(curtime));
       time_string[24] = '\0';
-      os << line << " @ " << time_string;
+      os << lines << " @ " << time_string;
       os << "\t added:" << added;
       // Estime time until Estimate.
       //
@@ -837,9 +844,9 @@ namespace Timbl {
 	SecsUsed = Time - start;
 	if ( SecsUsed > 0 ) {
 	  Estimated = (SecsUsed / (float)line) * 
-	    (float)Estimate();
+	    ( (float)Estimate() - IB2_offset() );
 	  EstimatedTime = (long)Estimated + start;
-	  os << ", ";
+	  os << "\t, ";
 	  strcpy(time_string, ctime(&EstimatedTime));
 	  time_string[24] = '\0';
 	  os << Estimate() << ": " << time_string;
