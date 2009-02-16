@@ -254,6 +254,7 @@ class IB2_Experiment: public IB1_Experiment {
   bool checkFile( const std::string& );
   TimblExperiment *clone() const { return new IB2_Experiment( MaxFeats() ); };
   bool Expand_N( const std::string& );
+  void show_learn_progress( std::ostream& os, time_t, size_t );
 };
 
 class LOO_Experiment: public IB1_Experiment {

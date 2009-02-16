@@ -798,6 +798,57 @@ namespace Timbl {
     }
   }
   
+  void IB2_Experiment::show_learn_progress( ostream& os,
+					    time_t start,
+					    size_t added ){
+    char time_string[26];
+    struct tm *curtime;
+    time_t Time;
+    time_t SecsUsed;
+    time_t EstimatedTime;
+    double Estimated;
+    int local_progress = Progress();
+    unsigned int line = stats.dataLines();
+    if ( ( (line % local_progress ) == 0) || ( line <= 10 ) ||
+	 ( line == 100 || line == 1000 || line == 10000 ) ){
+      time(&Time);
+      if ( line == 1000 ){
+	// check if we are slow, if so, change progress value
+	if ( Time - start > 120 ) // more then two minutes
+	  // very slow !
+	  Progress( 1000 );
+      }
+      else if ( line == 10000 ){
+	if ( Time - start > 600 ) // more then ten minutes
+	  // quit slow !
+	  Progress( 10000 );
+      }
+      curtime = localtime(&Time);
+      os << "Learning: ";
+      os.width(6);
+      os.setf(ios::right, ios::adjustfield);
+      strcpy( time_string, asctime(curtime));
+      time_string[24] = '\0';
+      os << line << " @ " << time_string;
+      os << "\t added:" << added;
+      // Estime time until Estimate.
+      //
+      if ( Estimate() > 0 ) {
+	SecsUsed = Time - start;
+	if ( SecsUsed > 0 ) {
+	  Estimated = (SecsUsed / (float)line) * 
+	    (float)Estimate();
+	  EstimatedTime = (long)Estimated + start;
+	  os << ", ";
+	  strcpy(time_string, ctime(&EstimatedTime));
+	  time_string[24] = '\0';
+	  os << Estimate() << ": " << time_string;
+	} 
+      }
+      os << endl;
+    }
+  }
+  
   void TimblExperiment::show_speed_summary( ostream& os,
 					    const timeval& Start ) const {
     timeval Time;
@@ -934,7 +985,7 @@ namespace Timbl {
   
   bool IB2_Experiment::Expand_N( const string& FileName ){
     bool result = true;
-    int Added = 0;
+    size_t Added = 0;
     if ( ExpInvalid() ){
       result = false;
     }
@@ -981,6 +1032,8 @@ namespace Timbl {
 	  }
 	}
 	if ( result ){
+	  time_t lStartTime;
+	  time(&lStartTime);
 	  if ( !Verbosity(SILENT) ) {
 	    Info( "Phase 2: Appending from Datafile: " + FileName + 
 		  " (starting at line " + toString<int>( stats.dataLines() ) + ")" );
@@ -1009,10 +1062,7 @@ namespace Timbl {
 	    }
 	    // Progress update.
 	    //
-	    if ((stats.dataLines() % Progress() ) == 0) 
-	      time_stamp( "Learning:  ", stats.dataLines() );
-	    if ( Added > 0 && ( Added % Progress() ) == 0) 
-	      time_stamp( "Added:  ", Added );
+	    show_learn_progress( *Log(mylog), lStartTime, Added );
 	    found = false;
 	    while ( !found &&
 		    nextLine( datafile, Buffer ) ){
