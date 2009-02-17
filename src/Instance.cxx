@@ -1531,7 +1531,10 @@ namespace Timbl {
 	}
       }
       else {
-	result = ValueClassProb->vd_distance( G->ValueClassProb );
+	if ( ValueClassProb && G->ValueClassProb )
+	  result = ValueClassProb->vd_distance( G->ValueClassProb );
+	else
+	  result = 1.0;
       }
     }
     return result;
