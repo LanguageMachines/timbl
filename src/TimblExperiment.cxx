@@ -1061,8 +1061,8 @@ namespace Timbl {
 							     final_distance,
 							     dummy );
 	    stats = stats_keep;
-	    //	    size_t treshold = IB2_offset() / 10;
-	    size_t treshold = 10;
+	    size_t treshold = IB2_offset() / 10 + 1;
+	    //	    size_t treshold = 10;
 	    if ( ResultTarget != CurrInst.TV ) {
 	      chopped_to_instance( TrainLearnWords );
 	      if ( !IBAdd( CurrInst ) ){
