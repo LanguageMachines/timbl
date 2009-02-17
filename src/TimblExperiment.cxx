@@ -1068,7 +1068,7 @@ namespace Timbl {
 			 toString<int>(stats.totalLines() ) + ":\n" +
 			 Buffer + "\nIgnoring the new weight" );
 	      }
-	      *Dbg(mydebug) <<"adding " << &CurrInst << endl;
+	      *Dbg(mydebug) << "adding " << &CurrInst << endl;
 	      ++Added;
 	    }
 	    // Progress update.
@@ -1089,8 +1089,9 @@ namespace Timbl {
 	    }
 	  } while( found );
 	  if ( result ){
+	    TotalAdded += Added;
 	    time_stamp( "Finished:  ", stats.dataLines() );
-	    *Log(mylog) << "added " << TotalAdded << " new entries" << endl;
+	    *Log(mylog) << "in total added " << TotalAdded << " new entries" << endl;
 	    if ( !Verbosity(SILENT) ){
 	      IBInfo( *Log(mylog) );
 	      LearningInfo( *Log(mylog) );
