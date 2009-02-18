@@ -23,6 +23,7 @@
   or send mail to:
       Timbl@uvt.nl
 */
+
 #define IB2_HACK 1
 
 
@@ -792,7 +793,7 @@ namespace Timbl {
       
       // Estime time until Estimate.
       //
-      if ( Estimate() > 0 ) {
+      if ( Estimate() > 0 &&  (unsigned int)Estimate() < line ) {
 	SecsUsed = Time - start;
 	if ( SecsUsed > 0 ) {
 	  Estimated = (SecsUsed / (float)line) * 
@@ -850,7 +851,7 @@ namespace Timbl {
       os << "\t added:" << added;
       // Estime time until Estimate.
       //
-      if ( Estimate() > 0 ) {
+      if ( Estimate() > 0 && (unsigned int)Estimate() < lines ) {
 	SecsUsed = Time - start;
 	if ( SecsUsed > 0 ) {
 	  Estimated = (SecsUsed / (float)line) * 
