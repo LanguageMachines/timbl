@@ -1061,8 +1061,6 @@ namespace Timbl {
 							     final_distance,
 							     dummy );
 	    stats = stats_keep;
-	    size_t treshold = IB2_offset() / 10 + 1;
-	    //	    size_t treshold = 10;
 	    if ( ResultTarget != CurrInst.TV ) {
 	      chopped_to_instance( TrainLearnWords );
 	      if ( !IBAdd( CurrInst ) ){
@@ -1073,12 +1071,6 @@ namespace Timbl {
 	      *Dbg(mydebug) << "adding " << &CurrInst << endl;
 	      ++Added;
 	      ++TotalAdded;
-	      if ( TotalAdded % treshold == 0 ){
-		//		cerr << "reset " << TotalAdded << endl; 
-	      }
-	      else {
-		MBL_init = true;
-	      }
 	    }
 	    // Progress update.
 	    //
@@ -1097,7 +1089,6 @@ namespace Timbl {
 	    }
 	  } while( found );
 	  if ( result ){
-	    TotalAdded += Added;
 	    time_stamp( "Finished:  ", stats.dataLines() );
 	    *Log(mylog) << "in total added " << TotalAdded << " new entries" << endl;
 	    if ( !Verbosity(SILENT) ){
