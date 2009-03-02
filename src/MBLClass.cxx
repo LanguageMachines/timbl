@@ -852,8 +852,8 @@ namespace Timbl {
 	     !Features[j]->Numeric() ){
 	  Features[j]->ClipFreq( (int)rint(clip_factor * 
 					   log((double)Features[j]->EffectiveValues())));
-	  if ( force ||
-	       ( !Features[j]->ArrayRead() &&
+	  if ( !Features[j]->ArrayRead() &&
+	       ( force ||
 		 Features[j]->storableMetric( GlobalMetric ) ) ){
 	    Features[j]->InitSparseArrays();
 	  } // if force
