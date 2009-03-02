@@ -293,135 +293,161 @@ bool string_to( const string& s, Weighting& w ){
   return false;
 }
 
-Algorithm TimblAPI::Algo() const {
-  Algorithm result = UNKNOWN_ALG;
-  if ( pimpl ){
-    switch ( pimpl->Algorithm() ){
-    case IB1_a:
-      result = IB1;
-      break;
-    case IB2_a:
-      result = IB2;
-      break;
-    case IGTREE_a:
-      result = IGTREE;
-      break;
-    case TRIBL_a:
-      result = TRIBL;
-      break;
-    case TRIBL2_a:
-      result = TRIBL2;
-      break;
-    case LOO_a:
-      result = LOO;
-      break;
-    case CV_a:
-      result = CV;
-      break;
-    default:
-      cerr << "invalid algorithm in switch " << endl;
-      break;
+  Algorithm TimblAPI::Algo() const {
+    Algorithm result = UNKNOWN_ALG;
+    if ( pimpl ){
+      switch ( pimpl->Algorithm() ){
+      case IB1_a:
+	result = IB1;
+	break;
+      case IB2_a:
+	result = IB2;
+	break;
+      case IGTREE_a:
+	result = IGTREE;
+	break;
+      case TRIBL_a:
+	result = TRIBL;
+	break;
+      case TRIBL2_a:
+	result = TRIBL2;
+	break;
+      case LOO_a:
+	result = LOO;
+	break;
+      case CV_a:
+	result = CV;
+	break;
+      default:
+	cerr << "invalid algorithm in switch " << endl;
+	break;
+      }
+    }
+    return result;
+  }
+  
+  bool TimblAPI::Learn( const string& s ){
+    if ( Valid() )
+      return pimpl->Learn( s );
+    else 
+      return false;
+  }
+  
+  bool TimblAPI::Prepare( const string& s ){
+    if ( Valid() )
+      return pimpl->Prepare( s );
+    else
+      return false;
+  }
+  
+  bool TimblAPI::CVprepare( const string& wf, Weighting w, const string& pf ){
+    if ( Valid() ){
+      WeightType tmp;
+      switch ( w ){
+      case UNKNOWN_W: tmp = Unknown_w;
+	break;
+      case NW: tmp = No_w;
+	break;
+      case GR: tmp = GR_w;
+	break;
+      case IG: tmp = IG_w;
+	break;
+      case X2: tmp = X2_w;
+	break;
+      case SV: tmp = SV_w;
+	break;
+      default:
+	return false;
+      }
+      return pimpl->CVprepare( wf, tmp, pf );
+    }
+    else
+      return false;
+  }
+  
+
+  bool TimblAPI::Increment( const string& s ){
+    return Valid() && pimpl->Increment( s );
+  }
+  
+  bool TimblAPI::Decrement( const string& s ){
+    return Valid() && pimpl->Decrement( s );
+  }
+  
+  bool TimblAPI::Expand( const string& s ){
+    return Valid() && pimpl->Expand( s );
+  }
+  
+  bool TimblAPI::Remove( const string& s ){
+    return Valid() && pimpl->Remove( s );
+  }
+  
+  bool TimblAPI::Test( const string& in,
+		       const string& out,
+		       const string& p ){
+    if ( !Valid() )
+      return false;
+    else {
+      if ( in.empty() )
+	return false;
+      if ( out.empty() && Algo() != CV )
+	return false;
+      return pimpl->Test( in, out, p );
     }
   }
-  return result;
-}
-
-  bool TimblAPI::Learn( const string& s ){
-  if ( Valid() )
-    return pimpl->Learn( s );
-  else 
-    return false;
-}
-
-bool TimblAPI::Prepare( const string& s ){
-  if ( Valid() )
-    return pimpl->Prepare( s );
-  else
-    return false;
-}
-
-bool TimblAPI::Increment( const string& s ){
-  return Valid() && pimpl->Increment( s );
-}
-
-bool TimblAPI::Decrement( const string& s ){
-  return Valid() && pimpl->Decrement( s );
-}
-
-bool TimblAPI::Expand( const string& s ){
-  return Valid() && pimpl->Expand( s );
-}
-
-bool TimblAPI::Remove( const string& s ){
-  return Valid() && pimpl->Remove( s );
-}
-
-bool TimblAPI::Test( const string& in,
-		     const string& out,
-		     const string& p ){
-  if ( !Valid() )
-    return false;
-  else {
-    if ( in.empty() )
+  
+  bool TimblAPI::NS_Test( const string& in,
+			  const string& out ){
+    if ( !Valid() )
       return false;
-    if ( out.empty() && Algo() != CV )
-      return false;
-    return pimpl->Test( in, out, p );
+    else {
+      if ( in.empty() )
+	return false;
+      if ( out.empty() && Algo() != CV )
+	return false;
+      return pimpl->NS_Test( in, out );
+    }
   }
-}
+  
+  const TargetValue *TimblAPI::Classify( const string& s,
+					 const ValueDistribution *& db,
+					 double& di ){
+    if ( Valid() ){
+      return pimpl->Classify( s, db, di );
+    }
+    else {
+      db = NULL;
+      di = DBL_MAX;
+    }
+    return NULL;
+  }
+  
+  const TargetValue *TimblAPI::Classify( const string& s ){
+    if ( Valid() ){
+      return pimpl->Classify( s );
+    }
+    return NULL;
+  }
+  
+  const TargetValue *TimblAPI::Classify( const string& s,
+					 const ValueDistribution *& db ){
+    if ( Valid() ){
+      return pimpl->Classify( s, db  );
+    }
+    else
+      db = NULL;
+    return NULL;
+  }
 
-bool TimblAPI::NS_Test( const string& in,
-			const string& out ){
-  if ( !Valid() )
-    return false;
-  else {
-    if ( in.empty() )
-      return false;
-    if ( out.empty() && Algo() != CV )
-      return false;
-    return pimpl->NS_Test( in, out );
+  const TargetValue *TimblAPI::Classify( const string& s,
+					 double& di ){
+    if ( Valid() ){
+      return pimpl->Classify( s, di );
+    }
+    else 
+      di = DBL_MAX;
+    return NULL;
   }
-}
-
-const TargetValue *TimblAPI::Classify( const string& s,
-				       const ValueDistribution *& db,
-				       double& di ){
-  if ( Valid() ){
-    return pimpl->Classify( s, db, di );
-  }
-  else {
-    db = NULL;
-    di = DBL_MAX;
-  }
-  return NULL;
-}
-
-const TargetValue *TimblAPI::Classify( const string& s ){
-  if ( Valid() ){
-    return pimpl->Classify( s );
-  }
-  return NULL;
-}
-
-const TargetValue *TimblAPI::Classify( const string& s,
-				       const ValueDistribution *& db ){
-  if ( Valid() ){
-    return pimpl->Classify( s, db  );
-  }
-  else
-    db = NULL;
-  return NULL;
-}
-
-const TargetValue *TimblAPI::Classify( const string& s,
-				       double& di ){
-  if ( Valid() ){
-    return pimpl->Classify( s, di );
-  }
-  else 
-    di = DBL_MAX;
-  return NULL;
-}
 
   const neighborSet *TimblAPI::classifyNS( const string& s ){
     const neighborSet *ns = 0;

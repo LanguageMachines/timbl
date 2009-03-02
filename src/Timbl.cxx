@@ -460,6 +460,10 @@ bool get_file_names( TimblOpts& Opts ){
     Opts.Delete( 'n' );
   }
   if ( Opts.Find( 'o', value, mood ) ){
+    if ( Do_CV ){
+      cerr << "-o option not possible for Cross Validation testing" << endl;
+      return false;
+    }
     OutputFile = correct_path( value, O_Path, true );
     Opts.Delete( 'o' );
   }
@@ -728,6 +732,7 @@ int main(int argc, char *argv[]){
     if ( Do_CV ){
       if ( !checkInputFile( TestFile ) )
 	exit(0);
+      Run->CVprepare( WgtInFile, WgtType, ProbInFile );
       Run->Test( TestFile, "" );
       delete Run;
     }

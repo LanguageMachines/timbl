@@ -75,6 +75,9 @@ namespace Timbl{
     bool Valid() const;
     bool StartServer( const int, const int=10 );
     bool Prepare( const std::string& = "" );
+    bool CVprepare( const std::string& = "",
+		    Weighting = GR,
+		    const std::string& = "" );
     bool Learn( const std::string& = "" );
     bool Increment( const std::string& );
     bool Decrement( const std::string& );

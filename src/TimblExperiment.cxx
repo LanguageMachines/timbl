@@ -478,6 +478,13 @@ namespace Timbl {
     return result;
   }
   
+  bool TimblExperiment::CVprepare( const string&,
+				   WeightType,
+				   const string& ){
+    Error( "CVprepare called for NON CV experiment" );
+    return false;
+  }
+
   bool TimblExperiment::Learn( const string& FileName ){
     bool result = true;
     if ( ExpInvalid() ||
@@ -1740,7 +1747,6 @@ namespace Timbl {
 
   bool TimblExperiment::GetWeights( const std::string& FileName, WeightType w ){
     if ( ConfirmOptions() ){
-      WFileName = FileName;
       // Open the file.
       //
       ifstream weightsfile( FileName.c_str(), ios::in);
@@ -1758,6 +1764,7 @@ namespace Timbl {
 	  //	  Info( "Reading " + toString(w) + " weights from " + FileName );
 	  Info( "Reading weights from " + FileName );
 	if ( readWeights( weightsfile, w ) ){
+	  WFileName = FileName;
 	  return true;
 	}
 	else {

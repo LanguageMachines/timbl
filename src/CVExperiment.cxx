@@ -63,6 +63,15 @@ namespace Timbl {
     return true;
   }
   
+  bool CV_Experiment::CVprepare( const string& wgtFile,
+				 WeightType w,
+				 const string& probFile ){
+    CV_WfileName = wgtFile;
+    CV_fileW = w;
+    CV_PfileName = probFile;
+    return true;
+  }
+
   bool CV_Experiment::Learn( const string& f ){
     cerr << "CV Learn " << f << endl;
     return true;
@@ -184,6 +193,10 @@ namespace Timbl {
 	percName = outName;
 	percName += ".%";
 	set_verbosity( keep );
+	if ( CV_WfileName != "" )
+	  GetWeights( CV_WfileName, CV_fileW );
+	if ( !CV_PfileName.empty() )
+	  GetArrays( CV_PfileName );
 	result = TimblExperiment::Test( FileNames[SkipFile], outName,
 					percName );
 	set_verbosity( SILENT );
@@ -195,6 +208,10 @@ namespace Timbl {
       percName = outName;
       percName += ".%";
       set_verbosity( keep );
+      if ( CV_WfileName != "" )
+	GetWeights( CV_WfileName, CV_fileW );
+      if ( !CV_PfileName.empty() )
+	GetArrays( CV_PfileName );
       result = TimblExperiment::Test( FileNames[NumOfFiles-1], outName, 
 				      percName ); 
     }

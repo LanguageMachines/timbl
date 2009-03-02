@@ -67,6 +67,9 @@ namespace Timbl {
     virtual ~TimblExperiment();
     virtual bool Learn( const std::string& = "" );
     virtual bool Prepare( const std::string& = "" );
+    virtual bool CVprepare( const std::string& = "",
+			    WeightType = GR_w,
+			    const std::string& = "" );
     virtual bool Increment( const std::string& )
     { FatalError( "Increment" ); return false; };
     virtual bool Decrement( const std::string& )
@@ -284,6 +287,9 @@ class CV_Experiment: public IB1_Experiment {
   bool Test( const std::string&,
 	     const std::string&,
 	     const std::string& = "" );
+  bool CVprepare( const std::string& = "",
+		  WeightType = GR_w,
+		  const std::string& = "" );
   AlgorithmType Algorithm() const { return CV_a; };
  protected:
   bool checkFile( const std::string& );
@@ -293,6 +299,9 @@ class CV_Experiment: public IB1_Experiment {
   CV_Experiment& operator=( const CV_Experiment& );
   int NumOfFiles;
   std::string *FileNames;
+  std::string CV_WfileName;
+  std::string CV_PfileName;
+  WeightType CV_fileW;
 };
 
 class TRIBL_Experiment: public TimblExperiment {
