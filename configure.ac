@@ -1,10 +1,10 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 # $Id$
-# $URL: $
+# $URL $
 
 AC_PREREQ(2.59)
-AC_INIT([Timbl], [6.1.6-beta], [timbl@uvt.nl])
+AC_INIT([Timbl], [6.2.0-beta], [timbl@uvt.nl])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_MACRO_DIR([m4])
