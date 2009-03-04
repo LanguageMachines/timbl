@@ -273,7 +273,7 @@ namespace Timbl {
     }
     result->WFileName = WFileName;
     result->CurrentDataFile = "";
-    result->InstanceBase->CleanPartition();
+    result->InstanceBase->CleanPartition( false );
     result->InstanceBase = 0;
     result->is_synced = true;
     return result;

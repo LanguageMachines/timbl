@@ -323,7 +323,7 @@ namespace Timbl {
       delete InstanceBase;
     }
     else {
-      InstanceBase->CleanPartition();
+      InstanceBase->CleanPartition( false );
     }
     delete tester;
     delete decay;

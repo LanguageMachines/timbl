@@ -133,7 +133,7 @@ namespace Timbl {
 			 StringHash *, StringHash *, int );
     virtual void Prune( const TargetValue *, long = 0 );
     virtual bool IsPruned() const { return false; };
-    void CleanPartition();
+    void CleanPartition(  bool );
     unsigned long int GetSizeInfo( unsigned long int&, double & ) const;
     const ValueDistribution *TopDist() const { return TopDistribution; };
     bool HasDistributions() const;

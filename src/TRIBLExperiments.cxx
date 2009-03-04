@@ -165,7 +165,7 @@ namespace Timbl {
 	else {
 	  bestResult.addDisposable( ResultDist );
 	}
-	SubTree->CleanPartition();
+	SubTree->CleanPartition( true );
 	Distance = getBestDistance();
       }
     }
@@ -251,7 +251,7 @@ namespace Timbl {
 	else {
 	  bestResult.addDisposable( ResultDist1 );
 	}
-	SubTree->CleanPartition();
+	SubTree->CleanPartition( true );
 	Distance = getBestDistance();
       }
       else {

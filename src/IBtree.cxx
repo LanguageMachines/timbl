@@ -990,7 +990,16 @@ namespace Timbl {
     if ( RestartSearch ){
       delete [] RestartSearch;
     }
-    delete InstBase;
+    // the Instance can become very large, with even millions of 'next' pointers
+    // so recursive deletion will use a lot of stack
+    // therefore we choose to iterate the first level.
+    IBtree *pnt = InstBase;
+    while ( pnt ){
+      IBtree *toDel = pnt;
+      pnt = pnt->next;
+      toDel->next = 0;
+      delete toDel;
+    }
     delete TopDistribution;
     delete WTop;
   }
@@ -1116,9 +1125,10 @@ namespace Timbl {
     return result;
   }
 
-  void InstanceBase_base::CleanPartition(){
+  void InstanceBase_base::CleanPartition( bool distToo ){
     InstBase = 0; // prevent deletion of InstBase in next step!
-    TopDistribution = 0;// same for TopDistribution
+    if ( !distToo )
+      TopDistribution = 0; // save TopDistribution for deletion
     delete this;
   }
   
