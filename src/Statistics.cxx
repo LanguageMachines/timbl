@@ -135,6 +135,10 @@ namespace Timbl {
     double mia = 0.0;
     ios_base::fmtflags flags = os.flags(ios::fixed);
     int oldPrec =  os.precision(5);
+    size_t effF = 0;
+    size_t totF = 0;
+    size_t effA = 0;
+    size_t totA = 0;
     if ( cs_too ){
       os << "Scores per Value Class:" << endl;
       os << "class  |\tTP\tFP\tTN\tFN\tprecision\trecall(TPR)\tFPR\t\tF-score\t\tAUC" << endl;
@@ -145,6 +149,7 @@ namespace Timbl {
       size_t FN = 0;
       size_t TN = 0;
       ValueClass *tv = tg->ValuesArray[i];
+      size_t valFreq = tv->ValFreq();
       for ( unsigned int j=0; j < size; ++j ){
 	if ( i == j ){
 	  TP = mat[i][j];
@@ -185,8 +190,10 @@ namespace Timbl {
       }
       else {
 	FScore = ( 2 * precision * TPR ) / (precision + TPR );
+	++effF;
 	maf += FScore;
-	mif += (FScore * tv->ValFreq());
+	totF += valFreq;
+	mif += (FScore * valFreq);
       }
       double AUC;
       if ( TPR < 0 || FPR < 0 ){
@@ -195,8 +202,10 @@ namespace Timbl {
       else {
 	AUC = ( 0.5 * TPR * FPR ) + ( TPR * ( 1.0 - FPR ) ) + 
 	  ( 0.5 * ( ( 1.0 - TPR ) * ( 1.0 - FPR ) ) );
+	++effA;
 	maa += AUC;
-	mia += (AUC * tv->ValFreq());
+	totA += valFreq;
+	mia += (AUC * valFreq);
       }
       if ( cs_too ){
 	os.width( 6 );
@@ -214,10 +223,10 @@ namespace Timbl {
 	os << endl;
       }
     }
-    maf = maf / tg->EffectiveValues();
-    mif = mif / tg->TotalValues();
-    maa = maa / tg->EffectiveValues();
-    mia = mia / tg->TotalValues();
+    maf = maf / effF;
+    mif = mif / totF;
+    maa = maa / effA;
+    mia = mia / totA;
     os.precision( oldPrec );
     os.flags( flags );
     os << "F-Score beta=1, microav: " << mif << endl;
