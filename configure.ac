@@ -31,6 +31,11 @@ if $cxx_flags_were_set; then
 fi
 
 
+# libtool stuff
+LT_INIT
+AC_SUBST([LIBTOOL_DEPS])
+LT_PREREQ([1.5.20])
+
 # when running tests, use CXX
 AC_LANG([C++])
 
@@ -55,9 +60,6 @@ else
   CXXFLAGS="$CXXFLAGS -W"
 fi
 
-# libtool stuff
-AC_PROG_LIBTOOL
-AC_SUBST([LIBTOOL_DEPS])
 
 # Checks for header files.
 AC_CHECK_HEADERS([unistd.h sys/types.h])
