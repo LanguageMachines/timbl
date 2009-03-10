@@ -32,9 +32,13 @@ fi
 
 
 # libtool stuff
-LT_INIT
+# unfortunately, a lot of old libtools hang around.
+# so LT_INIT and LT_PREREQ cannot be used for now
+#LT_PREREQ([2.2.0])
+#LT_INIT
+AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
-LT_PREREQ([1.5.20])
+
 
 # when running tests, use CXX
 AC_LANG([C++])
