@@ -30,16 +30,17 @@
 #include <iosfwd>
 
 namespace Timbl {
-
+  
   class CL_item {
     friend std::ostream& operator<<( std::ostream&, CL_item& );
   public:
-    CL_item( const std::string& s, const std::string& o, bool m=false ): 
-      opt_word(s), option( o ), mood( m ){};
-    CL_item( char c, const std::string& o, bool m=false ): 
-      option( o ), mood( m ){ opt_word = c; };
-    CL_item( const CL_item& in ):
-      opt_word( in.opt_word ), option(in.option), mood(in.mood){
+  CL_item( const std::string& s, const std::string& o, bool m=false ): 
+    opt_word(s), option( o ), mood( m ), longOpt(true) {};
+  CL_item( char c, const std::string& o, bool m=false ): 
+    option( o ), mood( m ), longOpt(false){ opt_word = c; };
+  CL_item( const CL_item& in ):
+    opt_word( in.opt_word ), option(in.option),
+      mood(in.mood), longOpt(in.longOpt){
     };
     CL_item& operator=( const CL_item& );
     bool Mood() const { return mood; };
@@ -50,12 +51,8 @@ namespace Timbl {
     std::string opt_word;
     std::string option;
     bool mood;
+    bool longOpt;
   };
-
-  inline std::ostream& operator<<( std::ostream& os, CL_item& it ){
-    os << (it.mood ? " +": "-" ) << it.OptChar() << it.option;
-    return os;
-  }
 
   typedef std::list<CL_item> CommandLine;
 

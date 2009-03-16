@@ -49,6 +49,14 @@ namespace Timbl {
     delete Opts;
   }
   
+  ostream& operator<<( ostream& os, CL_item& it ){
+    if ( it.longOpt )
+      os << (it.mood ? " +": "-" ) << it.opt_word << "=" << it.option;
+    else
+      os << (it.mood ? " +": "-" ) << it.opt_word << it.option;
+    return os;
+  }
+
   ostream& operator<<( ostream& os, const CL_Options& cl ){
     list<CL_item>::iterator pos;
     for ( pos = cl.Opts->begin(); pos != cl.Opts->end(); ++pos ){
@@ -184,6 +192,7 @@ namespace Timbl {
       }
     }
     for ( int arg_ind=0; arg_ind < local_argc; ++arg_ind ){
+      bool longOpt = false;
       Option = local_argv[arg_ind];
       if ( !p_or_m(Option[0]) ){
 	Optchar = '?';
@@ -200,6 +209,7 @@ namespace Timbl {
 	  if ( pos == string::npos )
 	    Option = Option.erase(0,2);
 	  else {
+	    longOpt = true;
 	    Option = Optword.substr( pos+1 );
 	    Optword = Optword.substr( 0, pos );
 	  }
@@ -221,8 +231,14 @@ namespace Timbl {
 	  }
 	}
       }
-      CL_item cl( Optword, Option, Mood );
-      result->push_front( cl );
+      if ( longOpt ){
+	CL_item cl( Optword, Option, Mood );
+	result->push_front( cl );
+      }
+      else {
+	CL_item cl( Optchar, Option, Mood );
+	result->push_front( cl );
+      }
     }
     return result;
   }    
