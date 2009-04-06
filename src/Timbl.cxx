@@ -326,7 +326,7 @@ void Preset_Values( TimblOpts& Opts ){
     }
     if ( Do_LOO || Do_CV )
       if ( algorithm != IB1 ){
-	cerr << "Invalid Algorithm: Only IB1 possible for LOO, CV or NS" << endl;
+	cerr << "Invalid Algorithm: Only IB1 possible for LOO and CV " << endl;
 	exit(1);
       }
   }
