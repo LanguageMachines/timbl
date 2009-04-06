@@ -189,6 +189,10 @@ inline void usage_full(void){
   cerr << "+% or -%  : do or don't save test result (%) to file" << endl;
   cerr << "-o s      : use s as output filename" << endl;
   cerr << "-O d      : save output using path 'd'" << endl;
+  cerr << "Server options" << endl;
+  cerr << "-S <port> : run as a server on <port>" << endl;
+  cerr << "-pidfile=<f> store pid in file <f>" << endl; 
+  cerr << "-logfile=<f> log server activity in file <f>" << endl; 
   cerr << "Internal representation options:" << endl;
   cerr << "-B n      : number of bins used for discretization of numeric " 
        << "feature values" << endl;
