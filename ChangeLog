@@ -1,408 +1,820 @@
+2009-04-06 09:05  
+
+	* [r2572] src/Timbl.cxx: removed confusing NS warning for
+	  undocumented -Z option
+
+2009-04-06 09:02  
+
+	* [r2571] src/Timbl.cxx: added Server stuff to usage
+
+2009-03-16 14:01  
+
+	* [r2542] include/timbl/CommandLine.h, src/CommandLine.cxx: fixed
+	  output off CommandLine (used for debugging mainly)
+
+2009-03-10 16:00  
+
+	* [r2531] configure.ac: hmm. that didn't work out. To many old
+	  libtools around.
+
+2009-03-10 15:48  
+
+	* [r2530] configure.ac: attempt to improve libtool usage
+
+2009-03-10 11:56  
+
+	* [r2525] src/Statistics.cxx: fixed FScore and AUC calculations
+
+2009-03-04 13:50  
+
+	* [r2523] include/timbl/IBtree.h, src/IBtree.cxx, src/MBLClass.cxx,
+	  src/TRIBLExperiments.cxx, src/TimblExperiment.cxx: - at last
+	  fixed a wll known memory leak
+	  - deleting an instancebase is done non-recursive at the top
+	  level, in an attempt to fix exhaustive cache usage
+
+2009-03-02 16:07  
+
+	* [r2521] src/MBLClass.cxx: attempt to fix bug 21
+
+2009-03-02 14:51  
+
+	* [r2518] include/timbl/TimblAPI.h,
+	  include/timbl/TimblExperiment.h, src/CVExperiment.cxx,
+	  src/Timbl.cxx, src/TimblAPI.cxx, src/TimblExperiment.cxx: fixed
+	  the problem that -w <filename> and -u <filename> were ignored for
+	  CV testing
+
+2009-03-02 14:49  
+
+	* [r2517] configure.ac: bumped version, because we add stuff to the
+	  API
+
+2009-02-18 16:31  
+
+	* [r2496] src/TimblExperiment.cxx: don't show estimate if we passed
+	  that line
+
+2009-02-18 14:47  
+
+	* [r2495] src/TimblExperiment.cxx: made 'configurable' IB2 hack
+
+2009-02-18 12:25  
+
+	* [r2494] src/TimblExperiment.cxx: reverted IB2 attempt to be
+	  smart. Keeping fixes counting, though
+
+2009-02-17 14:23  
+
+	* [r2493] src/TimblExperiment.cxx: train with a threshold
+
+2009-02-17 13:37  
+
+	* [r2492] src/Instance.cxx, src/TimblExperiment.cxx: try to speed
+	  up IB2
+
+2009-02-17 11:30  
+
+	* [r2491] src/TimblExperiment.cxx: fixed problem with counting of
+	  IB2 additions
+
+2009-02-16 16:07  
+
+	* [r2490] src/TimblExperiment.cxx: this is it, i hope
+
+2009-02-16 14:23  
+
+	* [r2489] include/timbl/TimblExperiment.h, src/TimblExperiment.cxx:
+	  and again improved
+
+2009-02-16 14:18  
+
+	* [r2488] include/timbl/TimblExperiment.h, src/TimblExperiment.cxx:
+	  next attempt for better IB2 logging
+
+2009-02-16 14:01  
+
+	* [r2487] include/timbl/MBLClass.h, src/TimblExperiment.cxx: More
+	  fixes for IB2 progress logging
+
+2009-02-16 12:11  
+
+	* [r2484] src/TimblExperiment.cxx: clumsy attemp to fic IB2
+
+2009-02-16 10:38  
+
+	* [r2483] src/TimblAPI.cxx: return something useless when failing.
+
+2009-02-16 09:54  
+
+	* [r2482] configure.ac, src/IGExperiment.cxx: fixed bug 17
+	  (enhancement)
+	  bumped to 6.1.6-beta
+
+2009-02-09 15:10  
+
+	* [r2474] configure.ac: bumoed version
+
+2009-01-26 09:58  
+
+	* [r2465] Makefile.am, bootstrap, m4: attempt to fix m4 stuff
+
+2009-01-21 15:01  
+
+	* [r2458] Makefile.am, configure.ac: Moderner
+
+2009-01-07 15:40  
+
+	* [r2431] configure.ac, demos/api_test1.cxx, demos/api_test2.cxx,
+	  demos/api_test3.cxx, demos/api_test4.cxx, demos/api_test5.cxx,
+	  demos/api_test6.cxx, demos/classify.cxx, demos/tse.cxx,
+	  include/timbl/BestArray.h, include/timbl/Choppers.h,
+	  include/timbl/CommandLine.h, include/timbl/Common.h,
+	  include/timbl/GetOptClass.h, include/timbl/IBtree.h,
+	  include/timbl/Instance.h, include/timbl/LogBuffer.h,
+	  include/timbl/LogStream.h, include/timbl/MBLClass.h,
+	  include/timbl/Matrices.h, include/timbl/MsgClass.h,
+	  include/timbl/Options.h, include/timbl/ServerProcs.h,
+	  include/timbl/SocketBasics.h, include/timbl/Statistics.h,
+	  include/timbl/StringOps.h, include/timbl/Testers.h,
+	  include/timbl/TimblAPI.h, include/timbl/TimblExperiment.h,
+	  include/timbl/Tree.h, include/timbl/Trie.h,
+	  include/timbl/Types.h, include/timbl/neighborSet.h,
+	  src/BestArray.cxx, src/CVExperiment.cxx, src/Choppers.cxx,
+	  src/CommandLine.cxx, src/Common.cxx, src/GetOptClass.cxx,
+	  src/IBprocs.cxx, src/IBtree.cxx, src/IGExperiment.cxx,
+	  src/Instance.cxx, src/LOOExperiment.cxx, src/LogBuffer.cxx,
+	  src/LogStream.cxx, src/MBLClass.cxx, src/MsgClass.cxx,
+	  src/ServerProcs.cxx, src/SocketBasics.cxx, src/Statistics.cxx,
+	  src/StringOps.cxx, src/TRIBLExperiments.cxx, src/Testers.cxx,
+	  src/Timbl.cxx, src/TimblAPI.cxx, src/TimblClient.cxx,
+	  src/TimblExperiment.cxx, src/Tree.cxx, src/Types.cxx,
+	  src/neighborSet.cxx: Bumped year
+
+2008-12-02 14:20  sloot
+
+	* [r2398] src/Instance.cxx: removed deadly line
+
+2008-11-26 14:00  sloot
+
+	* [r2388] src/TimblExperiment.cxx: the -vS option is used for
+	  Test() also
+
+2008-11-18 10:32  sloot
+
+	* [r2366] src/Makefile.am: oesp
+
+2008-11-12 15:19  sloot
+
+	* [r2361] include/timbl/Metrics.h, src/Makefile.am,
+	  src/Metrics.cxx: removed dead end
+
+2008-11-04 16:56  sloot
+
+	* [r2360] src/GetOptClass.cxx, src/Instance.cxx, src/MBLClass.cxx,
+	  src/Testers.cxx: small changed to make life easier, I hope
+
+2008-11-04 16:55  sloot
+
+	* [r2359] include/timbl/Testers.h: aded GPL stuff
+
+2008-11-04 16:55  sloot
+
+	* [r2358] include/timbl/Types.h: added GPL stuff
+
+2008-11-04 16:54  sloot
+
+	* [r2357] src/Makefile.am: compile new Metrics class
+
+2008-11-04 16:54  sloot
+
+	* [r2356] include/timbl/Metrics.h, src/Metrics.cxx: start to
+	  seperate Metrics also (no used yet)
+
+2008-11-03 14:26  sloot
+
+	* [r2354] include/timbl/Instance.h, include/timbl/MBLClass.h,
+	  src/Instance.cxx, src/Testers.cxx, src/TimblExperiment.cxx: more
+	  cleanup in metric handling
+
+2008-10-29 16:32  sloot
+
+	* [r2351] include/timbl/MBLClass.h,
+	  include/timbl/TimblExperiment.h, include/timbl/neighborSet.h,
+	  src/LOOExperiment.cxx, src/TRIBLExperiments.cxx,
+	  src/TimblExperiment.cxx, src/neighborSet.cxx: cleanup in decay
+	  stuff
+
+2008-10-29 15:22  sloot
+
+	* [r2350] include/timbl/MBLClass.h, include/timbl/Testers.h,
+	  src/GetOptClass.cxx, src/MBLClass.cxx, src/Testers.cxx,
+	  src/TimblExperiment.cxx: cleaned up metric stuff a bit
+
+2008-10-28 16:25  sloot
+
+	* [r2338] src/IBtree.cxx: changed statsTree output
+
+2008-10-28 16:02  sloot
+
+	* [r2337] include/timbl/Choppers.h, include/timbl/MBLClass.h,
+	  src/Choppers.cxx, src/MBLClass.cxx: more cleanup
+
+2008-10-28 14:24  sloot
+
+	* [r2336] include/timbl/Choppers.h, src/Choppers.cxx,
+	  src/MBLClass.cxx: more cleanup
+
+2008-10-28 10:49  sloot
+
+	* [r2335] include/timbl/Choppers.h, src/Choppers.cxx,
+	  src/MBLClass.cxx: changed Choppers
+
+2008-10-28 08:39  sloot
+
+	* [r2334] include/timbl/Instance.h, src/Instance.cxx,
+	  src/MBLClass.cxx: cleanup
+
+2008-10-27 11:41  sloot
+
+	* [r2333] src/Timbl.cxx: removed debug lien
+
+2008-10-21 14:42  sloot
+
+	* [r2324] AUTHORS: an extra contrubutor
+
+2008-10-21 14:07  sloot
+
+	* [r2323] src/IBtree.cxx: changed output of -IL option
+
+2008-10-20 14:52  sloot
+
+	* [r2322] configure.ac, src/ServerProcs.cxx: try to fix daemon()
+	  stuff on IRIX.
+
+2008-10-07 15:21  sloot
+
+	* [r2320] include/timbl/IBtree.h, include/timbl/TimblAPI.h,
+	  include/timbl/TimblExperiment.h, src/IBtree.cxx, src/Timbl.cxx,
+	  src/TimblAPI.cxx, src/TimblExperiment.cxx: added experimental
+	  code for a different tree output
+
+2008-10-07 15:20  sloot
+
+	* [r2319] src/GetOptClass.cxx: bug?
+
+2008-10-01 16:17  sloot
+
+	* [r2318] include/timbl/MBLClass.h, src/MBLClass.cxx: more banning
+	  of C-style arrays
+
+2008-10-01 16:01  sloot
+
+	* [r2317] include/timbl/MBLClass.h, include/timbl/Testers.h,
+	  src/IBprocs.cxx, src/IGExperiment.cxx, src/MBLClass.cxx,
+	  src/TRIBLExperiments.cxx, src/Testers.cxx,
+	  src/TimblExperiment.cxx: again eliminated a C array
+
+2008-10-01 15:15  sloot
+
+	* [r2315] src/MBLClass.cxx: numb change
+
+2008-10-01 15:01  sloot
+
+	* [r2314] include/timbl/GetOptClass.h, src/GetOptClass.cxx: more
+	  refactoring
+
+2008-10-01 08:29  sloot
+
+	* [r2312] src/ServerProcs.cxx: added informational message
+
+2008-09-30 15:50  sloot
+
+	* [r2311] include/timbl/Choppers.h: small improvement again
+
+2008-09-30 15:43  sloot
+
+	* [r2310] include/timbl/Choppers.h, src/Choppers.cxx: small
+	  refactoring
+
+2008-09-30 13:28  sloot
+
+	* [r2309] include/timbl/Choppers.h, src/Choppers.cxx,
+	  src/MBLClass.cxx: cleaned Chopper class
+
+2008-09-29 16:15  sloot
+
+	* [r2308] include/timbl/Choppers.h, src/Choppers.cxx,
+	  src/MBLClass.cxx: cleaned up Choppers
+
+2008-09-23 14:44  sloot
+
+	* [r2304] src/MBLClass.cxx, src/TimblExperiment.cxx: cleaner
+
+2008-09-22 15:33  sloot
+
+	* [r2299] src/MBLClass.cxx, src/TimblExperiment.cxx: fixed pronblem
+	  with Chopppers, but not very neat. PLEASE reconsider!
+
+2008-09-22 12:58  sloot
+
+	* [r2298] include/timbl/Choppers.h, src/Choppers.cxx,
+	  src/Makefile.am: moved Chopper code to separate .cxx file
+
+2008-09-17 15:54  sloot
+
+	* [r2297] include/timbl/BestArray.h, include/timbl/Instance.h,
+	  src/Instance.cxx: ValueDistribution::size() renamed to
+	  totalSize()
+	  Added new size() function to return the size.
+
+2008-09-17 14:18  sloot
+
+	* [r2296] include/timbl/Choppers.h, include/timbl/MBLClass.h,
+	  src/Instance.cxx, src/MBLClass.cxx, src/TimblExperiment.cxx:
+	  attempt to make the choppers smarter.
+	  not done yest
+
+2008-09-15 15:46  sloot
+
+	* [r2294] src/MBLClass.cxx: small clarification
+
+2008-09-09 16:31  sloot
+
+	* [r2289] src/Testers.cxx: small change
+
+2008-09-09 16:13  sloot
+
+	* [r2288] include/timbl/Testers.h, src/MBLClass.cxx,
+	  src/Testers.cxx: more cleanup
+
+2008-09-09 15:02  sloot
+
+	* [r2287] include/timbl/IBtree.h, include/timbl/MBLClass.h,
+	  include/timbl/Testers.h, src/IBtree.cxx, src/MBLClass.cxx,
+	  src/Testers.cxx: code reshuffling and simplification
+
+2008-09-08 14:51  sloot
+
+	* [r2286] include/timbl/MBLClass.h, include/timbl/Testers.h,
+	  src/MBLClass.cxx, src/Makefile.am, src/Testers.cxx: made separate
+	  Testers.cxx ans started to demangle testing stuff
+
+2008-08-20 17:03  sloot
+
+	* [r2282] src/MBLClass.cxx: fixed a problem
+
+2008-08-20 16:37  sloot
+
+	* [r2281] include/timbl/MBLClass.h, src/MBLClass.cxx,
+	  src/TimblExperiment.cxx: major code reshuffling. Not ready yet.
+
+2008-08-19 15:06  sloot
+
+	* [r2280] src/MBLClass.cxx: incremented maximum value for PROGRESS
+
+2008-08-19 14:14  sloot
+
+	* [r2276] src/StringOps.cxx: hmm. CodeToStr should accept free '\'
+	  as well
+
+2008-08-19 12:56  sloot
+
+	* [r2275] src/StringOps.cxx: fixed last fix
+
+2008-08-19 12:39  sloot
+
+	* [r2273] src/StringOps.cxx: fixed problem with iterator running of
+	  at end
+
+2008-08-18 14:03  sloot
+
+	* [r2271] include/timbl/Instance.h, src/IBtree.cxx,
+	  src/Instance.cxx: small code inprovements
+
+2008-08-12 13:56  sloot
+
+	* [r2265] configure.ac: fixed configuration.
+	  Now you can set CXXFLAGS at configuretime to override the
+	  defaults
+
+2008-08-11 13:38  sloot
+
+	* [r2261] configure.ac, src/Common.cxx, src/Instance.cxx,
+	  src/MBLClass.cxx: satisfy icpc's -Wcheck compiler option. (-Wall
+	  is unwise)
+
+2008-08-06 13:27  sloot
+
+	* [r2258] src/MBLClass.cxx: countFeatures may not be declared
+	  inline!
+
+2008-07-14 13:42  sloot
+
+	* [r2247] ChangeLog: modified after reinstall
+
 2008-07-14 12:08  sloot
 
 	* [r2229] .: moved
 
 2008-07-14 09:43  sloot
 
-	* [r2224] : - cleaned up old chop code
+	* [r2224] - cleaned up old chop code
 	  - removed max_prod parameter in test*ex() functions, it was a
 	  constant
 
 2008-07-09 14:37  sloot
 
-	* [r2222] : oesp
+	* [r2222] oesp
 
 2008-07-09 14:03  sloot
 
-	* [r2221] : added Chopper class
+	* [r2221] added Chopper class
 
 2008-07-08 13:21  sloot
 
-	* [r2218] : fixed leak
+	* [r2218] fixed leak
 
 2008-07-08 13:03  sloot
 
-	* [r2217] : replaced functionpointers for testing features by a
+	* [r2217] replaced functionpointers for testing features by a
 	  testclass.
 
 2008-07-07 15:47  sloot
 
-	* [r2214] : made ExactMatch() function simpler
+	* [r2214] made ExactMatch() function simpler
 
 2008-07-07 12:24  sloot
 
-	* [r2213] : removed unused code
+	* [r2213] removed unused code
 
 2008-07-01 09:51  sloot
 
-	* [r2205] : removed unused function declarartion
+	* [r2205] removed unused function declarartion
 
 2008-06-24 15:57  sloot
 
-	* [r2203] : some cleanup.
+	* [r2203] some cleanup.
 	  made SparseSymetricMatrix a template.
 
 2008-06-23 14:43  sloot
 
-	* [r2198] : made gcc 4.3 shut up:
+	* [r2198] made gcc 4.3 shut up:
 	  - fixed missing includes
 	  - added explanatory brackets
 
 2008-06-11 12:26  sloot
 
-	* [r2175] : fixed unitialized variable that made servermode crash
+	* [r2175] fixed unitialized variable that made servermode crash
 
 2008-05-28 10:34  sloot
 
-	* [r2158] : - bumped version
+	* [r2158] - bumped version
 	  - replaced cvs2cl by svn2cl
 
 2008-05-28 09:05  sloot
 
-	* [r2157] : added code to be able to split an experiment. fixes
+	* [r2157] added code to be able to split an experiment. fixes
 	  trouble with Dimbl.
 
 2008-04-22 13:10  sloot
 
-	* [r2094] : removed evil exit()'s
+	* [r2094] removed evil exit()'s
 
 2008-04-16 14:42  sloot
 
-	* [r2088] : changed behaviour (but didn't break any of out
-	  tests...)
+	* [r2088] changed behaviour (but didn't break any of out tests...)
 	  improved implemenation
 
 2008-04-15 14:05  sloot
 
-	* [r2082] : README2 was gone
+	* [r2082] README2 was gone
 
 2008-04-15 12:54  sloot
 
-	* [r2079] : back to one README
+	* [r2079] back to one README
 
 2008-04-15 12:53  sloot
 
-	* [r2078] : extended API
+	* [r2078] extended API
 
 2008-04-15 12:53  sloot
 
-	* [r2077] : added some morer usefull functions
+	* [r2077] added some morer usefull functions
 
 2008-04-15 12:50  sloot
 
-	* [r2076] : don't install demos
+	* [r2076] don't install demos
 
 2008-04-15 12:49  sloot
 
-	* [r2075] : name was changed!
+	* [r2075] name was changed!
 
 2008-04-14 12:03  sloot
 
-	* [r2070] : to ignore
+	* [r2070] to ignore
 
 2008-04-14 12:03  sloot
 
-	* [r2069] : renamed timblserver.in to timbl.in
+	* [r2069] renamed timblserver.in to timbl.in
 
 2008-04-10 18:29  joostvb
 
-	* [r2063] : do not install demos in /usr/local/bin, but in
+	* [r2063] do not install demos in /usr/local/bin, but in
 	  /usr/local/libexec/timbl : do not clutter the namespace of
 	  binaries
 
 2008-04-10 11:05  joostvb
 
-	* [r2056] : add sh-bang, in order to make this sciript executable
-	  on unix-like OSes
+	* [r2056] add sh-bang, in order to make this sciript executable on
+	  unix-like OSes
 
 2008-04-08 14:56  sloot
 
-	* [r2045] : make sure that directories exist and are writable for
+	* [r2045] make sure that directories exist and are writable for
 	  $USER
 
 2008-04-08 14:38  sloot
 
-	* [r2044] : code also works again for non GETADDRINFO case
+	* [r2044] code also works again for non GETADDRINFO case
 
 2008-04-08 14:37  sloot
 
-	* [r2043] : oeps, debug lines!
+	* [r2043] oeps, debug lines!
 
 2008-04-08 14:13  sloot
 
-	* [r2042] : to ignore
+	* [r2042] to ignore
 
 2008-04-08 13:09  sloot
 
-	* [r2041] : implemented restart
+	* [r2041] implemented restart
 
 2008-04-08 12:21  sloot
 
-	* [r2040] : works now
+	* [r2040] works now
 
 2008-04-08 12:21  sloot
 
-	* [r2039] : added options to set logfile and pidfile for server
-	  mode
+	* [r2039] added options to set logfile and pidfile for server mode
 
 2008-04-08 08:22  sloot
 
-	* [r2038] : starting to implement start-stop scripts for init.d
+	* [r2038] starting to implement start-stop scripts for init.d
 
 2008-04-07 14:53  sloot
 
-	* [r2035] : removed signal handlers.
+	* [r2035] removed signal handlers.
 	  We want to be able to SIGHUP the server.
 
 2008-04-02 15:53  sloot
 
-	* [r2028] : fixed neighborSet stuff.
+	* [r2028] fixed neighborSet stuff.
 	  Adpated api_test5 to changed behaviour of neigborSet
 
 2008-04-02 15:04  sloot
 
-	* [r2026] : added outputstate flags to neighbor sets
+	* [r2026] added outputstate flags to neighbor sets
 
 2008-04-02 08:22  sloot
 
-	* [r2023] : fixed memory leak
+	* [r2023] fixed memory leak
 
 2008-04-01 14:19  sloot
 
-	* [r2022] : changed API to make it possible for several
+	* [r2022] changed API to make it possible for several
 	  TimblExperiments to share MVDM matrices
 
 2008-03-25 17:18  sloot
 
-	* [r2011] : and reverted again
+	* [r2011] and reverted again
 
 2008-03-25 09:48  sloot
 
-	* [r2010] : new attempt
+	* [r2010] new attempt
 
 2008-03-19 15:36  sloot
 
-	* [r2002] : reverted previous update, because it was not helpfull
-	  (to say the least)
+	* [r2002] reverted previous update, because it was not helpfull (to
+	  say the least)
 
 2008-03-19 14:34  sloot
 
-	* [r2001] : attempt to make IG traing faster. To no avail is seems
+	* [r2001] attempt to make IG traing faster. To no avail is seems
 
 2008-03-18 10:47  sloot
 
-	* [r1998] : added ignores
+	* [r1998] added ignores
 
 2008-03-18 10:32  sloot
 
-	* [r1996] : demos should use libtool also
+	* [r1996] demos should use libtool also
 
 2008-03-18 09:21  sloot
 
-	* [r1993] : added Libtool stuff
+	* [r1993] added Libtool stuff
 	  bumped version
 
 2008-03-17 13:31  sloot
 
-	* [r1991] : oops, too much babling
+	* [r1991] oops, too much babling
 
 2008-03-17 13:05  sloot
 
-	* [r1990] : - fixed compiler warning
+	* [r1990] - fixed compiler warning
 	  - added code to 'compress' idexes for IG tree testing. doesn't
 	  help much?
 	  needed adaptation to Merge() also
 
 2008-03-05 10:43  sloot
 
-	* [r1980] : Bumped version for release
+	* [r1980] Bumped version for release
 
 2008-03-04 15:12  sloot
 
-	* [r1978] : changed error message
+	* [r1978] changed error message
 
 2008-03-04 15:11  sloot
 
-	* [r1977] : al lot of problems shouldn't a priori invalidate the
+	* [r1977] al lot of problems shouldn't a priori invalidate the
 	  experiment
 
 2008-03-04 15:10  sloot
 
-	* [r1976] : changed logic
+	* [r1976] changed logic
 
 2008-03-04 15:09  sloot
 
-	* [r1975] : problems with reading Weights now lead to termination
+	* [r1975] problems with reading Weights now lead to termination
 
 2008-03-03 09:02  sloot
 
-	* [r1971] : prefer small memory leak over crash :{
+	* [r1971] prefer small memory leak over crash :{
 
 2008-02-20 15:41  sloot
 
-	* [r1958] : fixed memory leak.
+	* [r1958] fixed memory leak.
 	  cleanup
 
 2008-02-20 15:41  sloot
 
-	* [r1957] : cleanup
+	* [r1957] cleanup
 
 2008-02-20 15:37  sloot
 
-	* [r1956] : fixed memory leak for CV testing
+	* [r1956] fixed memory leak for CV testing
 
 2008-02-20 14:36  sloot
 
-	* [r1955] : oeps. parameters reversed
+	* [r1955] oeps. parameters reversed
 
 2008-02-20 12:44  sloot
 
-	* [r1952] : igTreshold can now be set with -Treshold=<n>
+	* [r1952] igTreshold can now be set with -Treshold=<n>
 
 2008-02-19 16:33  sloot
 
-	* [r1946] : quick fix for confusion info in LOO. needs checking!
+	* [r1946] quick fix for confusion info in LOO. needs checking!
 
 2008-02-19 15:57  sloot
 
-	* [r1945] : cleanup.
+	* [r1945] cleanup.
 
 2008-02-19 14:44  sloot
 
-	* [r1944] : fixed progress output
+	* [r1944] fixed progress output
 
 2008-02-19 14:27  sloot
 
-	* [r1943] : added attempt for extra level in IG training
+	* [r1943] added attempt for extra level in IG training
 
 2008-02-06 14:44  sloot
 
-	* [r1931] : attempt to clear up more code
+	* [r1931] attempt to clear up more code
 
 2008-02-05 15:46  sloot
 
-	* [r1930] : to ignore ;)
+	* [r1930] to ignore ;)
 
 2008-02-05 15:12  sloot
 
-	* [r1929] : new entries!
+	* [r1929] new entries!
 
 2008-02-05 15:08  sloot
 
-	* [r1928] : moved functionality from MBLclass to a separate
-	  BestArray class.
+	* [r1928] moved functionality from MBLclass to a separate BestArray
+	  class.
 
 2008-01-29 15:53  sloot
 
-	* [r1924] : MBLclass split up (a little bit)
+	* [r1924] MBLclass split up (a little bit)
 	  try to clean up all that test_instance* mess
 	  did some function renaming also.
 
 2008-01-29 10:39  sloot
 
-	* [r1922] : moved common code into Init/Next GraphTest
+	* [r1922] moved common code into Init/Next GraphTest
 
 2008-01-29 10:38  sloot
 
-	* [r1921] : added classify options to tse
+	* [r1921] added classify options to tse
 
 2008-01-28 10:34  sloot
 
-	* [r1918] : removed unused function
+	* [r1918] removed unused function
 
 2008-01-23 16:09  sloot
 
-	* [r1915] : more refactoring
+	* [r1915] more refactoring
 	  also added new files
 
 2008-01-23 15:48  sloot
 
-	* [r1914] : bumped year
+	* [r1914] bumped year
 
 2008-01-23 15:37  sloot
 
-	* [r1913] : started refactoring of TimblExperiment to reduce module
+	* [r1913] started refactoring of TimblExperiment to reduce module
 	  size.
 
 2008-01-22 15:21  sloot
 
-	* [r1909] : timbl.pc must be distributed also
+	* [r1909] timbl.pc must be distributed also
 
 2008-01-22 11:07  sloot
 
-	* [r1906] : attempt to add pkg-config support
+	* [r1906] attempt to add pkg-config support
 
 2008-01-21 14:51  sloot
 
-	* [r1901] : fixed -O output path handling for CrossValidation test
+	* [r1901] fixed -O output path handling for CrossValidation test
 
 2008-01-21 14:50  sloot
 
-	* [r1900] : changed output formatting
+	* [r1900] changed output formatting
 
 2008-01-21 10:17  sloot
 
-	* [r1898] : fixed initializing in the API
+	* [r1898] fixed initializing in the API
 
 2008-01-14 14:33  sloot
 
-	* [r1896] : more code reshuffling. still trying to make things less
+	* [r1896] more code reshuffling. still trying to make things less
 	  convoluted
 
 2008-01-09 15:54  sloot
 
-	* [r1891] : Bumped minor version.
+	* [r1891] Bumped minor version.
 	  changed logic porblem in *options_ok() functions
 
 2008-01-09 14:20  sloot
 
-	* [r1889] : added a StatisticsClass to collect our statistics
+	* [r1889] added a StatisticsClass to collect our statistics
 
 2008-01-09 10:18  sloot
 
-	* [r1888] : confusion is a TimblExperiment member
+	* [r1888] confusion is a TimblExperiment member
 
 2008-01-08 16:45  sloot
 
-	* [r1887] : hmmm, is this improvement?
+	* [r1887] hmmm, is this improvement?
 
 2008-01-08 12:50  sloot
 
-	* [r1885] : next cleanup step
+	* [r1885] next cleanup step
 
 2008-01-08 11:14  sloot
 
-	* [r1884] : and more cleanup
+	* [r1884] and more cleanup
 
 2008-01-08 09:56  sloot
 
-	* [r1883] : small cleanup
+	* [r1883] small cleanup
 
 2008-01-07 16:03  sloot
 
-	* [r1882] : next small step
+	* [r1882] next small step
 
 2008-01-07 13:27  sloot
 
-	* [r1881] : next step: some code reshuffling to get things more
-	  clear
+	* [r1881] next step: some code reshuffling to get things more clear
 
 2007-12-31 08:55  antalb
 
-	* [r1875] : updated AUTHORS file
+	* [r1875] updated AUTHORS file
 
 2007-12-30 21:50  antalb
 
-	* [r1874] : moved Walter to authors
+	* [r1874] moved Walter to authors
 
 2007-12-20 08:33  sloot
 
-	* [r1872] : New files
+	* [r1872] New files
 
 2007-12-18 15:36  sloot
 
-	* [r1871] : started code reshuffling to make Advanced Statistics
-	  and Confusion Matrix
+	* [r1871] started code reshuffling to make Advanced Statistics and
+	  Confusion Matrix
 	  a "first class citizen" of MBLClass. so, that these statistics
 	  can be extracted
 	  using the API.
@@ -410,675 +822,675 @@
 
 2007-12-18 15:20  sloot
 
-	* [r1870] : rollback of unicode stuff
+	* [r1870] rollback of unicode stuff
 
 2007-12-18 13:52  sloot
 
-	* [r1869] : now it's working again, i think
+	* [r1869] now it's working again, i think
 
 2007-12-18 13:42  sloot
 
-	* [r1868] : oesp
+	* [r1868] oesp
 
 2007-12-18 12:49  sloot
 
-	* [r1867] : replace string array by list<string>
+	* [r1867] replace string array by list<string>
 
 2007-12-18 11:26  sloot
 
-	* [r1866] : added tests to check all input and output files asap,
-	  to avoid waiting 5
+	* [r1866] added tests to check all input and output files asap, to
+	  avoid waiting 5
 	  minutes to read a tree, and then bail out because of a missing
 	  weight file
 
 2007-12-18 09:12  sloot
 
-	* [r1864] : no ICU check needed in configure.ac
+	* [r1864] no ICU check needed in configure.ac
 
 2007-12-18 09:09  sloot
 
-	* [r1863] : rolled back unicode stuf. Timbl is already quite good
-	  at it!
+	* [r1863] rolled back unicode stuf. Timbl is already quite good at
+	  it!
 
 2007-12-17 15:54  sloot
 
-	* [r1861] : added LATIN1 --> UTF8 conversion
+	* [r1861] added LATIN1 --> UTF8 conversion
 
 2007-12-17 14:06  sloot
 
-	* [r1860] : new code
+	* [r1860] new code
 
 2007-12-17 14:02  sloot
 
-	* [r1859] : added encoding option. Not functional yet
+	* [r1859] added encoding option. Not functional yet
 
 2007-12-11 15:32  sloot
 
-	* [r1849] : last minute fix. missing include in SocketBasics.cxx
+	* [r1849] last minute fix. missing include in SocketBasics.cxx
 	  makes TimblClient fail!
 
 2007-12-10 13:46  sloot
 
-	* [r1843] : getting ready for release!
+	* [r1843] getting ready for release!
 
 2007-12-10 11:42  sloot
 
-	* [r1839] : New manuals
+	* [r1839] New manuals
 
 2007-12-04 09:48  sloot
 
-	* [r1821] : configure seems desperate in need for this.
+	* [r1821] configure seems desperate in need for this.
 
 2007-12-03 11:18  sloot
 
-	* [r1804] : oeps. distcheck failed
+	* [r1804] oeps. distcheck failed
 
 2007-12-03 11:05  sloot
 
-	* [r1803] : minor additions
+	* [r1803] minor additions
 
 2007-12-03 11:05  sloot
 
-	* [r1802] : is autogenerated now
+	* [r1802] is autogenerated now
 
 2007-12-03 11:04  sloot
 
-	* [r1801] : added conditional cvs2cl call to generate ChangeLog
+	* [r1801] added conditional cvs2cl call to generate ChangeLog
 
 2007-12-03 10:21  sloot
 
-	* [r1800] : small updates
+	* [r1800] small updates
 
 2007-12-03 10:05  sloot
 
-	* [r1799] : data files are correctly installed now
+	* [r1799] data files are correctly installed now
 
 2007-11-28 10:10  sloot
 
-	* [r1790] : added a "C" symbol timbl_present to satisfy autotools
-	  for non gnu compilers
+	* [r1790] added a "C" symbol timbl_present to satisfy autotools for
+	  non gnu compilers
 
 2007-11-28 09:22  sloot
 
-	* [r1788] : moved line
+	* [r1788] moved line
 
 2007-11-28 09:22  sloot
 
-	* [r1787] : mabi=64 test only fot g++
+	* [r1787] mabi=64 test only fot g++
 
 2007-11-26 16:18  sloot
 
-	* [r1786] : made it work for IBM C++
+	* [r1786] made it work for IBM C++
 
 2007-11-26 16:05  sloot
 
-	* [r1785] : oeps. only look in our own dirs please
+	* [r1785] oeps. only look in our own dirs please
 
 2007-11-26 13:45  sloot
 
-	* [r1780] : cleaned up build system
+	* [r1780] cleaned up build system
 
 2007-11-26 12:38  sloot
 
-	* [r1779] : fixed dependency on libTimbl and -mabi=64 build
+	* [r1779] fixed dependency on libTimbl and -mabi=64 build
 
 2007-11-20 11:39  sloot
 
-	* [r1773] : added test for working -mabi=64 compiler flag
+	* [r1773] added test for working -mabi=64 compiler flag
 
 2007-11-13 15:11  sloot
 
-	* [r1772] : fixed small int vs. unsigned int problems
+	* [r1772] fixed small int vs. unsigned int problems
 
 2007-11-13 15:10  sloot
 
-	* [r1771] : added beta to version
+	* [r1771] added beta to version
 
 2007-11-06 14:09  sloot
 
-	* [r1762] : to ignore more
+	* [r1762] to ignore more
 
 2007-11-06 14:07  sloot
 
-	* [r1761] : hmm. quite a mess with README's
+	* [r1761] hmm. quite a mess with README's
 
 2007-11-06 11:55  sloot
 
-	* [r1757] : not needed in CVS
+	* [r1757] not needed in CVS
 
 2007-11-06 11:50  sloot
 
-	* [r1756] : added docs dir to install and dist
+	* [r1756] added docs dir to install and dist
 
 2007-10-18 07:53  sloot
 
-	* [r1723] : quick fix. TopDistribution should always be there, I
+	* [r1723] quick fix. TopDistribution should always be there, I
 	  think. Fixes bug in serverMode
 
 2007-10-15 10:12  sloot
 
-	* [r1708] : typo
+	* [r1708] typo
 
 2007-10-15 10:12  sloot
 
-	* [r1707] : now we use Version info from config.h (aka auto tools)
+	* [r1707] now we use Version info from config.h (aka auto tools)
 
 2007-10-10 07:23  sloot
 
-	* [r1706] : first attempt to make a good list
+	* [r1706] first attempt to make a good list
 
 2007-10-10 07:04  sloot
 
-	* [r1705] : typos changed
+	* [r1705] typos changed
 
 2007-10-09 08:59  sloot
 
-	* [r1689] : When an intel compiler is there, we prefer that
+	* [r1689] When an intel compiler is there, we prefer that
 
 2007-10-09 08:58  sloot
 
-	* [r1688] : fixed terrible mistake
+	* [r1688] fixed terrible mistake
 
 2007-10-08 12:03  sloot
 
-	* [r1683] : autotools 1.8 seems ok
+	* [r1683] autotools 1.8 seems ok
 
 2007-10-03 10:09  sloot
 
-	* [r1663] : default is now to build a server
+	* [r1663] default is now to build a server
 
 2007-10-03 07:55  sloot
 
-	* [r1657] : more to ignore
+	* [r1657] more to ignore
 
 2007-10-03 07:54  sloot
 
-	* [r1656] : removed Makefile
+	* [r1656] removed Makefile
 	  changed bootstrap to test for automake and aclocal versions
 
 2007-10-02 14:39  sloot
 
-	* [r1655] : tsja
+	* [r1655] tsja
 
 2007-10-02 14:30  sloot
 
-	* [r1654] : oesp
+	* [r1654] oesp
 
 2007-10-02 14:24  sloot
 
-	* [r1653] : fixed up .cvsignore's
+	* [r1653] fixed up .cvsignore's
 
 2007-10-02 14:22  sloot
 
-	* [r1652] : and more
+	* [r1652] and more
 
 2007-10-02 14:18  sloot
 
-	* [r1651] : changed
+	* [r1651] changed
 
 2007-10-02 14:15  sloot
 
-	* [r1650] : major reshuffle for packaging
+	* [r1650] major reshuffle for packaging
 
 2007-09-25 14:57  sloot
 
-	* [r1637] : fixed topCache usage, i hope
+	* [r1637] fixed topCache usage, i hope
 
 2007-09-25 13:58  sloot
 
-	* [r1636] : added result Class that can normalize and beam and
-	  caches topDistribution results
+	* [r1636] added result Class that can normalize and beam and caches
+	  topDistribution results
 
 2007-09-19 15:58  sloot
 
-	* [r1633] : small improvement, i think
+	* [r1633] small improvement, i think
 
 2007-09-19 15:41  sloot
 
-	* [r1632] : next attempt
+	* [r1632] next attempt
 
 2007-09-19 15:26  sloot
 
-	* [r1631] : hmm, attempt to fix Beam output for ValueDistributions
+	* [r1631] hmm, attempt to fix Beam output for ValueDistributions
 
 2007-09-19 15:05  sloot
 
-	* [r1630] : attempt to avoid needless copies. NOT realy debunked!
+	* [r1630] attempt to avoid needless copies. NOT realy debunked!
 
 2007-09-10 07:50  sloot
 
-	* [r1625] : updated usage().
+	* [r1625] updated usage().
 	  added try{} block tot GetOptClass
 
 2007-09-03 13:07  sloot
 
-	* [r1611] : removed strange parameter from time_stamp()
+	* [r1611] removed strange parameter from time_stamp()
 
 2007-08-27 13:30  sloot
 
-	* [r1606] : replaced abort() by throw() generally
+	* [r1606] replaced abort() by throw() generally
 
 2007-08-08 20:29  antalb
 
-	* [r1591] : Turned it into 6.0(Release) - note the capital R
+	* [r1591] Turned it into 6.0(Release) - note the capital R
 
 2007-08-08 13:54  sloot
 
-	* [r1589] : fixed a big hole. (only when -silly and +vn was active)
+	* [r1589] fixed a big hole. (only when -silly and +vn was active)
 
 2007-08-08 13:53  sloot
 
-	* [r1588] : fixed small leak
+	* [r1588] fixed small leak
 
 2007-08-08 12:04  sloot
 
-	* [r1587] : bumped version
+	* [r1587] bumped version
 
 2007-08-08 12:04  sloot
 
-	* [r1586] : fixed memory leak
+	* [r1586] fixed memory leak
 
 2007-08-08 12:03  sloot
 
-	* [r1585] : fixed a memory leak.
+	* [r1585] fixed a memory leak.
 	  also better react on exception in read_distribution()
 
 2007-08-08 11:57  sloot
 
-	* [r1584] : eeek
+	* [r1584] eeek
 
 2007-07-11 19:13  antalb
 
-	* [r1522] : replaced Timbl manual; added API guide; removed the two
+	* [r1522] replaced Timbl manual; added API guide; removed the two
 	  pdfs that should go
 	  with Mbt3 instead
 
 2007-07-11 15:03  sloot
 
-	* [r1519] : last fix ...
+	* [r1519] last fix ...
 
 2007-07-11 13:36  sloot
 
-	* [r1517] : match the docs ;)
+	* [r1517] match the docs ;)
 
 2007-07-11 09:17  sloot
 
-	* [r1515] : smaal improvement. i hope
+	* [r1515] smaal improvement. i hope
 
 2007-07-11 09:09  sloot
 
-	* [r1514] : removed 1 line
+	* [r1514] removed 1 line
 
 2007-07-10 15:46  sloot
 
-	* [r1513] : added api_test6 and modified test5
+	* [r1513] added api_test6 and modified test5
 
 2007-07-10 15:44  sloot
 
-	* [r1512] : made output of Vfield global. Uses Vfield.put() which
-	  now prints al
+	* [r1512] made output of Vfield global. Uses Vfield.put() which now
+	  prints al
 	  entries using the weight.
 
 2007-07-10 14:05  sloot
 
-	* [r1511] : more docs
+	* [r1511] more docs
 
 2007-07-10 13:48  sloot
 
-	* [r1509] : numb change
+	* [r1509] numb change
 
 2007-07-10 11:40  sloot
 
-	* [r1504] : API cleanup
+	* [r1504] API cleanup
 
 2007-07-10 09:55  sloot
 
-	* [r1503] : added tests for neigborSets
+	* [r1503] added tests for neigborSets
 
 2007-07-09 13:18  sloot
 
-	* [r1493] : added docs
+	* [r1493] added docs
 
 2007-07-09 10:47  sloot
 
-	* [r1491] : seems to have cleared dot-product and cosine hassle
+	* [r1491] seems to have cleared dot-product and cosine hassle
 
 2007-07-09 09:10  sloot
 
-	* [r1488] : more GPL 3.0 changes
+	* [r1488] more GPL 3.0 changes
 
 2007-07-09 08:34  sloot
 
-	* [r1486] : GPL 3.0
+	* [r1486] GPL 3.0
 
 2007-07-09 08:17  sloot
 
-	* [r1485] : GPL 3.0 licence
+	* [r1485] GPL 3.0 licence
 
 2007-07-03 14:34  sloot
 
-	* [r1478] : fixed innerproduct and cosine metric. I hope
+	* [r1478] fixed innerproduct and cosine metric. I hope
 
 2007-07-03 10:47  sloot
 
-	* [r1476] : solved linker problems
+	* [r1476] solved linker problems
 
 2007-07-03 10:06  sloot
 
-	* [r1475] : attempt to circumvent linker errors
+	* [r1475] attempt to circumvent linker errors
 
 2007-07-03 07:59  sloot
 
-	* [r1473] : reshuffled
+	* [r1473] reshuffled
 
 2007-07-02 14:37  sloot
 
-	* [r1472] : ULONG max is NOT a reliable maximum for size_t. Replace
+	* [r1472] ULONG max is NOT a reliable maximum for size_t. Replace
 	  by
 	  std::numeric_limits<size_t>::max()
 
 2007-07-02 12:50  sloot
 
-	* [r1471] : changed indexing of ValueClass. start with 1, 0 ==
+	* [r1471] changed indexing of ValueClass. start with 1, 0 ==
 	  'unknown'
 
 2007-06-27 21:10  sloot
 
-	* [r1470] : removed debug lines
+	* [r1470] removed debug lines
 
 2007-06-27 21:06  sloot
 
-	* [r1469] : last try
+	* [r1469] last try
 
 2007-06-27 20:51  sloot
 
-	* [r1468] : hmm, try to fix
+	* [r1468] hmm, try to fix
 
 2007-06-27 20:34  sloot
 
-	* [r1467] : desperate
+	* [r1467] desperate
 
 2007-06-27 19:40  sloot
 
-	* [r1466] : fixed trailing dot problem i hope
+	* [r1466] fixed trailing dot problem i hope
 
 2007-06-27 17:23  sloot
 
-	* [r1464] : fiddled a lot with templates
+	* [r1464] fiddled a lot with templates
 
 2007-06-26 10:31  sloot
 
-	* [r1463] : small 64 bit fix
+	* [r1463] small 64 bit fix
 
 2007-06-26 10:31  sloot
 
-	* [r1462] : lots off template stuff added
+	* [r1462] lots off template stuff added
 
 2007-06-19 15:00  sloot
 
-	* [r1460] : more generic
+	* [r1460] more generic
 
 2007-06-19 14:47  sloot
 
-	* [r1459] : next step
+	* [r1459] next step
 
 2007-06-19 14:05  sloot
 
-	* [r1458] : use more templates!
+	* [r1458] use more templates!
 
 2007-06-19 11:13  sloot
 
-	* [r1457] : fix 64 bits
+	* [r1457] fix 64 bits
 
 2007-06-19 10:44  sloot
 
-	* [r1456] : cleanup
+	* [r1456] cleanup
 
 2007-06-19 10:40  sloot
 
-	* [r1455] : add hack
+	* [r1455] add hack
 
 2007-06-19 10:38  sloot
 
-	* [r1454] : almost there, i hope
+	* [r1454] almost there, i hope
 
 2007-06-19 10:17  sloot
 
-	* [r1453] : and?
+	* [r1453] and?
 
 2007-06-19 10:03  sloot
 
-	* [r1452] : the story continues
+	* [r1452] the story continues
 
 2007-06-19 09:54  sloot
 
-	* [r1451] : changed signatures
+	* [r1451] changed signatures
 
 2007-06-19 09:54  sloot
 
-	* [r1450] : changed signature
+	* [r1450] changed signature
 
 2007-06-19 09:53  sloot
 
-	* [r1449] : forgotten one
+	* [r1449] forgotten one
 
 2007-06-19 09:53  sloot
 
-	* [r1448] : more
+	* [r1448] more
 
 2007-06-19 09:52  sloot
 
-	* [r1447] : damn
+	* [r1447] damn
 
 2007-06-19 09:39  sloot
 
-	* [r1446] : hack
+	* [r1446] hack
 
 2007-06-19 09:33  sloot
 
-	* [r1445] : next attempt
+	* [r1445] next attempt
 
 2007-06-19 08:45  sloot
 
-	* [r1444] : try to fix more
+	* [r1444] try to fix more
 
 2007-06-19 08:31  sloot
 
-	* [r1443] : oesp
+	* [r1443] oesp
 
 2007-06-19 08:15  sloot
 
-	* [r1442] : and one more
+	* [r1442] and one more
 
 2007-06-19 08:11  sloot
 
-	* [r1441] : one more
+	* [r1441] one more
 
 2007-06-18 16:17  sloot
 
-	* [r1435] : and more
+	* [r1435] and more
 
 2007-06-18 16:05  sloot
 
-	* [r1434] : ...
+	* [r1434] ...
 
 2007-06-18 15:41  sloot
 
-	* [r1433] : still more
+	* [r1433] still more
 
 2007-06-18 15:22  sloot
 
-	* [r1432] : it's hard
+	* [r1432] it's hard
 
 2007-06-18 14:47  sloot
 
-	* [r1431] : and more...
+	* [r1431] and more...
 
 2007-06-18 14:12  sloot
 
-	* [r1430] : and more
+	* [r1430] and more
 
 2007-06-18 14:01  sloot
 
-	* [r1429] : sigh
+	* [r1429] sigh
 
 2007-06-18 13:26  sloot
 
-	* [r1428] : more to do
+	* [r1428] more to do
 
 2007-06-18 13:06  sloot
 
-	* [r1427] : and more...
+	* [r1427] and more...
 
 2007-06-18 12:55  sloot
 
-	* [r1426] : lots of 64 bit stuff
+	* [r1426] lots of 64 bit stuff
 
 2007-06-18 10:57  sloot
 
-	* [r1425] : try this
+	* [r1425] try this
 
 2007-06-18 10:53  sloot
 
-	* [r1424] : small fixes
+	* [r1424] small fixes
 
 2007-06-18 10:32  sloot
 
-	* [r1423] : oesp
+	* [r1423] oesp
 
 2007-06-18 10:29  sloot
 
-	* [r1422] : new attempt for precision et. al.
+	* [r1422] new attempt for precision et. al.
 
 2007-06-18 09:50  sloot
 
-	* [r1421] : and more 64 bits stuff
+	* [r1421] and more 64 bits stuff
 
 2007-06-18 09:32  sloot
 
-	* [r1420] : and more 64-bit hassle
+	* [r1420] and more 64-bit hassle
 
 2007-06-18 09:04  sloot
 
-	* [r1419] : 64 bit fix
+	* [r1419] 64 bit fix
 
 2007-06-18 08:38  sloot
 
-	* [r1418] : and more
+	* [r1418] and more
 
 2007-06-18 08:32  sloot
 
-	* [r1417] : more 64-bit enhancements
+	* [r1417] more 64-bit enhancements
 
 2007-06-13 15:21  sloot
 
-	* [r1415] : changed signature to satisfy Intel compiler
+	* [r1415] changed signature to satisfy Intel compiler
 
 2007-06-13 15:17  sloot
 
-	* [r1414] : help teh Intel compiler shut up
+	* [r1414] help teh Intel compiler shut up
 
 2007-06-13 15:11  sloot
 
-	* [r1412] : small type problem
+	* [r1412] small type problem
 
 2007-06-13 15:07  sloot
 
-	* [r1411] : improved error handling
+	* [r1411] improved error handling
 
 2007-06-13 14:18  sloot
 
-	* [r1410] : oesp
+	* [r1410] oesp
 
 2007-06-13 14:15  sloot
 
-	* [r1409] : getting closer
+	* [r1409] getting closer
 
 2007-06-13 14:09  sloot
 
-	* [r1408] : and more...
+	* [r1408] and more...
 
 2007-06-13 14:02  sloot
 
-	* [r1407] : more 64 bit stuff
+	* [r1407] more 64 bit stuff
 
 2007-06-13 13:52  sloot
 
-	* [r1405] : fixed
+	* [r1405] fixed
 
 2007-06-13 13:44  sloot
 
-	* [r1404] : fixed problem with look_ahead()
+	* [r1404] fixed problem with look_ahead()
 
 2007-06-13 12:29  sloot
 
-	* [r1403] : fixed visability
+	* [r1403] fixed visability
 
 2007-06-13 12:28  sloot
 
-	* [r1402] : changed type
+	* [r1402] changed type
 
 2007-06-13 12:22  sloot
 
-	* [r1401] : gcc wants this
+	* [r1401] gcc wants this
 
 2007-06-13 12:22  sloot
 
-	* [r1400] : oesp
+	* [r1400] oesp
 
 2007-06-13 12:08  sloot
 
-	* [r1399] : some fixes to satisfy Intel compiler. Nor ready yet
+	* [r1399] some fixes to satisfy Intel compiler. Nor ready yet
 
 2007-06-13 12:07  sloot
 
-	* [r1398] : make Intel compiler happy
+	* [r1398] make Intel compiler happy
 
 2007-06-13 09:28  sloot
 
-	* [r1397] : more generic
+	* [r1397] more generic
 
 2007-06-13 08:58  sloot
 
-	* [r1396] : g++ is de default of course
+	* [r1396] g++ is de default of course
 
 2007-06-13 08:51  sloot
 
-	* [r1395] : cleaned up Makefiles
+	* [r1395] cleaned up Makefiles
 
 2007-06-12 09:39  sloot
 
-	* [r1393] : cleanup
+	* [r1393] cleanup
 
 2007-06-12 09:32  sloot
 
-	* [r1392] : to ignore
+	* [r1392] to ignore
 
 2007-06-12 09:17  sloot
 
-	* [r1391] : cleanup finished
+	* [r1391] cleanup finished
 
 2007-06-12 09:10  sloot
 
-	* [r1390] : cleanup
+	* [r1390] cleanup
 
 2007-06-12 09:06  sloot
 
-	* [r1389] : testfiles
+	* [r1389] testfiles
 
 2007-06-12 09:02  sloot
 
-	* [r1388] : ignore some stuff
+	* [r1388] ignore some stuff
 
 2007-06-12 08:59  sloot
 
-	* [r1387] : demos
+	* [r1387] demos
 
 2007-06-12 08:24  sloot
 
-	* [r1385] : improved branching info layout
+	* [r1385] improved branching info layout
 
 2007-06-11 14:57  sloot
 
-	* [r1379] : Initial revision
+	* [r1379] Initial revision
 

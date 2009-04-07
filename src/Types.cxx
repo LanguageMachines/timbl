@@ -57,6 +57,7 @@ namespace Timbl {
 				  { "C", "Cosine metric" },
 				  { "O", "Overlap" }, 
 				  { "L", "Levenshtein" },
+				  { "DC", "Dice coefficient" },
 				  { "M", "Value Difference" },
 				  { "J", "Jeffrey Divergence" } };
   

@@ -1346,7 +1346,8 @@ namespace Timbl {
   }
 
   bool isStorable( MetricType m ){
-    return m == ValueDiff || m == JeffreyDiv || m == Levenshtein;
+    return m == ValueDiff || m == JeffreyDiv 
+      || m == Levenshtein || m == Dice;
   }
   
   bool Feature::storableMetric( MetricType gm ){
@@ -1509,6 +1510,32 @@ namespace Timbl {
     return (double)matrix[n][m];
   }
   
+  double dc_distance( const string& string1, const string& string2 ){
+    // code taken from:
+    // http://en.wikibooks.org/wiki/Algorithm_implementation/Strings/Dice's_coefficient
+    multiset<string> string1_bigrams;
+    multiset<string> string2_bigrams;
+    
+    for(unsigned int i = 0; i < (string1.length() - 1); i++) {      // extract character bigrams from string1
+      string1_bigrams.insert(string1.substr(i, 2));
+    }
+    for(unsigned int i = 0; i < (string2.length() - 1); i++) {      // extract character bigrams from string2
+      string2_bigrams.insert(string2.substr(i, 2));
+    }
+    
+    int overlap = 0;
+    
+    for(unsigned int j = 0; j < (string2.length() - 1); j++) {      // extract character bigrams from string2 and overlap
+      overlap += string1_bigrams.count(string2.substr(j, 2));
+    }
+    
+    // calculate 1 - dice coefficient
+    int total = string1_bigrams.size() + string2_bigrams.size();
+    float dice = (float)(overlap * 2) / (float)total;
+    dice = 1.0 - dice;
+    return dice;
+  }  
+
   double FeatureValue::VDDistance( FeatureValue *G, 
 				   size_t limit, MetricType mt ) const {
     double result = 0.0;
@@ -1521,6 +1548,9 @@ namespace Timbl {
 	  break;
 	case Levenshtein:
 	  result = lv_distance( Name(), G->Name() );
+	  break;
+	case Dice:
+	  result = dc_distance( Name(), G->Name() );
 	  break;
 	default:
 	  string msg = string("Invalid value '") + toString(mt) 
@@ -1593,6 +1623,9 @@ namespace Timbl {
 	case Levenshtein:
 	  result = lv_distance( Name(), G->Name() );
 	  break;
+	case Dice:
+	  result = dc_distance( Name(), G->Name() );
+	  break;
 	default:
 	  string msg = string("Invalid value '") + toString(mt) 
 	    + "' in switch (" 
@@ -1623,6 +1656,9 @@ namespace Timbl {
 	case Levenshtein:
 	  result = lv_distance( Name(), G->Name() );
 	  break;
+	case Dice:
+	  result = dc_distance( Name(), G->Name() );
+	  break;
 	default:
 	  string msg = string("Invalid value '") + toString(mt) 
 	    + "' in switch (" 
@@ -1634,6 +1670,35 @@ namespace Timbl {
       else
 	result = lv_distance( Name(), G->Name() );
     }
+    return result;
+  }
+  
+  double FeatureValue::DcDistance( FeatureValue *G, 
+				   size_t limit,
+				   MetricType mt ) const {
+    double result = 0.0;
+    if ( ValFreq() < limit ||
+	 G->ValFreq() < limit ){
+      switch ( mt ){
+      case Overlap:
+	result = 1.0;
+	break;
+      case Levenshtein:
+	result = lv_distance( Name(), G->Name() );
+	break;
+      case Dice:
+	result = dc_distance( Name(), G->Name() );
+	break;
+      default:
+	string msg = string("Invalid value '") + toString(mt) 
+	  + "' in switch (" 
+	  + __FILE__  + "," + toString(__LINE__) + ")\n"
+	  + "ABORTING now";
+	throw std::logic_error( msg );
+      }
+    }
+    else
+      result = dc_distance( Name(), G->Name() );
     return result;
   }
   
@@ -1677,6 +1742,9 @@ namespace Timbl {
 		break;
 	      case Levenshtein:
 		dist = FV_i->LDDistance( FV_j, limit, df );
+		break;
+	      case Dice:
+		dist = FV_i->DcDistance( FV_j, limit, df );
 		break;
 	      default:
 		FatalError( "invalid value " + toString( mt ) + "in switch" );
@@ -1736,6 +1804,18 @@ namespace Timbl {
       result = metric_matrix->Extract( F, G );
     else
       result = F->LDDistance( G, th );
+    return result;
+  }  
+
+  double Feature::DiceDistance( FeatureValue *F, FeatureValue *G,
+				int th ) const {
+    double result = 1.0;
+    if ( matrix_present() &&
+	 F->ValFreq() >= matrix_clip_freq &&
+	 G->ValFreq() >= matrix_clip_freq )
+      result = metric_matrix->Extract( F, G );
+    else
+      result = F->DcDistance( G, th );
     return result;
   }  
 

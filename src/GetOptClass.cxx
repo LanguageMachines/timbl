@@ -511,10 +511,9 @@ namespace Timbl {
   
   inline bool GetOptClass::parse_metrics( const string& Mline,
 					  MetricType& Def ){
-    string line = Mline;
+    string line = compress( Mline );
     uppercase( line );
     string::iterator p = line.begin();
-    while ( p != line.end() && isspace( *p ) ) p++;
     if ( p != line.end() ){
       switch ( *p++ ){
       case 'O' : 
@@ -530,7 +529,13 @@ namespace Timbl {
 	Def = Numeric;
 	break;
       case 'D' :
-	Def = DotProduct;
+	if ( p == line.end() || *p == ':' )
+	  Def = DotProduct;
+	else
+	  if ( *p == 'C' ){
+	    Def = Dice;
+	    ++p;
+	  }
 	break;
       case 'C' :
 	Def = Cosine;
@@ -865,6 +870,7 @@ namespace Timbl {
 	    if ( !stringTo<MetricType>( string( myoptarg, 0, pos1 ), 
 					mvdDefaultMetric ) ||
 		 !( mvdDefaultMetric == Levenshtein ||
+		    mvdDefaultMetric == Dice ||
 		    mvdDefaultMetric == Overlap ) ){
 	      Error( "illegal value for -L option: " + myoptarg );
 	      return false;
@@ -884,6 +890,7 @@ namespace Timbl {
 	       !stringTo<MetricType>( string( myoptarg, 0, pos1 ),
 				      mvdDefaultMetric ) ||
 	       !( mvdDefaultMetric == Levenshtein ||
+		  mvdDefaultMetric == Dice ||
 		  mvdDefaultMetric == Overlap ) ){
 	    Error( "illegal value for -L option: " + myoptarg );
 	    return false;

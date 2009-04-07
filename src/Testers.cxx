@@ -101,6 +101,14 @@ namespace Timbl{
     return result;
   }
   
+  double diceTester::test( FeatureValue *F,
+			   FeatureValue *G,
+			   Feature *Feat ) const {
+    double result = Feat->DiceDistance( F, G, threshold );
+    result *= Feat->Weight();
+    return result;
+  }
+  
   TesterClass::TesterClass( const vector<Feature*>& feat,
 			    const vector<size_t>& perm ):
     _size(feat.size()), features(feat), permutation(perm) {
@@ -138,6 +146,9 @@ namespace Timbl{
 	  break;
 	case Levenshtein:
 	  test_feature_val[i] = new levenshteinTester( threshold );
+	  break;
+	case Dice:
+	  test_feature_val[i] = new diceTester( threshold );
 	  break;
 	case ValueDiff:
 	  test_feature_val[i] = new valueDiffTester( threshold );
@@ -210,8 +221,7 @@ namespace Timbl{
       distances[i+1] = distances[i] + result;
     }
     return effSize;
-  }
- 
+  } 
   
   double innerProduct( FeatureValue *FV,
 		       FeatureValue *G ) {

@@ -96,6 +96,14 @@ namespace Timbl{
 		 Feature *Feat ) const;
   };
   
+  class diceTester: public valueTester {
+  public:
+  diceTester( int t ): valueTester( t){};
+    double test( FeatureValue *F,
+		 FeatureValue *G,
+		 Feature *Feat ) const;
+  };
+  
   class TesterClass {
   public:
     TesterClass( const std::vector<Feature*>&, 
@@ -162,6 +170,7 @@ namespace Timbl{
 		 size_t,
 		 double );
   };
+
 }  
 
 #endif // TESTERS_H

@@ -114,8 +114,8 @@ namespace Timbl {
   
   
   enum MetricType { UnknownMetric, DefaultMetric, Ignore, 
-		    Numeric, DotProduct, Cosine, Overlap, Levenshtein,
-		    ValueDiff, JeffreyDiv, MaxMetric };
+		    Numeric, DotProduct, Cosine, Overlap, Levenshtein, 
+		    Dice, ValueDiff, JeffreyDiv, MaxMetric };
   
   inline MetricType& operator++( MetricType &W ){
     return W = ( MaxMetric == W ) ? UnknownMetric : MetricType(W+1);

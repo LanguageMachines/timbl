@@ -199,6 +199,9 @@ namespace Timbl {
     double LDDistance( FeatureValue *,
 		       size_t = 1,
 		       MetricType = Overlap ) const;
+    double DcDistance( FeatureValue *,
+		       size_t = 1,
+		       MetricType = Overlap ) const;
     bool isUnknown() const { return index == 0; };
   private:
     SparseValueProbClass *ValueClassProb;
@@ -283,6 +286,7 @@ namespace Timbl {
     double ValueDistance( FeatureValue *, FeatureValue *, int ) const;
     double JeffreyDistance( FeatureValue *, FeatureValue *, int ) const;
     double LevenshteinDistance( FeatureValue *, FeatureValue *, int ) const;
+    double DiceDistance( FeatureValue *, FeatureValue *, int ) const;
     bool store_matrix( MetricType, int = 1, MetricType = Overlap );
     void delete_matrix();
     void print_matrix( bool s = false ) const;
