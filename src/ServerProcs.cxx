@@ -36,7 +36,7 @@
 
 #include <sys/time.h>
 
-#include "config.h" // for TIMBL_SOCKLEN_T
+#include "config.h" // for TIMBL_SOCKLEN_T and HAVE_GETADDRINFO
 #include "timbl/Common.h"
 #include "timbl/StringOps.h"
 #include "timbl/MsgClass.h"
@@ -336,7 +336,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
   }
   
 #ifndef HAVE_GETADDRINFO
-void show_connection( ostream& os, struct hostent *host, int sock ){
+  void show_connection( ostream& os, struct hostent *host, int sock ){
     os << "Accepting Connection #" << sock
        << " from remote host: " << host->h_name;
     char **p;
@@ -347,10 +347,25 @@ void show_connection( ostream& os, struct hostent *host, int sock ){
     }
     os << endl;
   }
+
   void RunServer( TimblExperiment *Mother, int TCP_PORT ){
     string pidFile = Mother->pidFile;
     string logFile = Mother->logFile;
+    if ( !pidFile.empty() ){
+      // check validity of pidfile
+      if ( pidFile[0] != '/' ) // make sure the path is absolute
+	pidFile = '/' + pidFile;
+      unlink( pidFile.c_str() );
+      ofstream pid_file( pidFile.c_str() ) ;
+      if ( !pid_file ){
+	*Log(Mother->my_err())<< "unable to create pidfile:"<< pidFile << endl;
+	*Log(Mother->my_err())<< "TimblServer NOT Started" << endl;
+	exit(1);
+      }
+    }
     if ( !logFile.empty() ){
+      if ( logFile[0] != '/' ) // make sure the path is absolute
+	logFile = '/' + logFile;
       ostream *tmp = new ofstream( logFile.c_str() );
       if ( tmp && tmp->good() ){
 	*Log(Mother->my_err()) << "switching logging to file " 
@@ -379,7 +394,6 @@ void show_connection( ostream& os, struct hostent *host, int sock ){
     if ( !pidFile.empty() ){
       // we have a liftoff!
       // signal it to the world
-      unlink( pidFile.c_str() ) ;
       ofstream pid_file( pidFile.c_str() ) ;
       if ( !pid_file ){
 	*Log(Mother->my_err()) << "unable to create pidfile:"<< pidFile << endl;
@@ -514,7 +528,21 @@ void show_connection( ostream& os, struct hostent *host, int sock ){
   void RunServer( TimblExperiment *Mother, int TCP_PORT ){
     string logFile =  Mother->logFile;
     string pidFile =  Mother->pidFile;
+    if ( !pidFile.empty() ){
+      // check validity of pidfile
+      if ( pidFile[0] != '/' ) // make sure the path is absolute
+	pidFile = '/' + pidFile;
+      unlink( pidFile.c_str() ) ;
+      ofstream pid_file( pidFile.c_str() ) ;
+      if ( !pid_file ){
+	*Log(Mother->my_err())<< "unable to create pidfile:"<< pidFile << endl;
+	*Log(Mother->my_err())<< "TimblServer NOT Started" << endl;
+	exit(1);
+      }
+    }
     if ( !logFile.empty() ){
+      if ( logFile[0] != '/' ) // make sure the path is absolute
+	logFile = '/' + logFile;
       ostream *tmp = new ofstream( logFile.c_str() );
       if ( tmp && tmp->good() ){
 	*Log(Mother->my_err()) << "switching logging to file " 
@@ -542,7 +570,6 @@ void show_connection( ostream& os, struct hostent *host, int sock ){
     if ( !pidFile.empty() ){
       // we have a liftoff!
       // signal it to the world
-      unlink( pidFile.c_str() ) ;
       ofstream pid_file( pidFile.c_str() ) ;
       if ( !pid_file ){
 	*Log(Mother->my_err())<< "unable to create pidfile:"<< pidFile << endl;
