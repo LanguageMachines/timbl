@@ -138,7 +138,7 @@ namespace Timbl {
     Options.Add( new BoolOption( "HASHED_TREE", 
 				 &hashed_trees, true ) );
     Options.Add( new MetricOption( "GLOBAL_METRIC", 
-				   &GlobalMetric, Overlap ) );
+				   &metricOption, Overlap ) );
     Options.Add( new MetricArrayOption( "METRICS", 
 					UserOptions, DefaultMetric, 
 					MaxFeatures+1 ) );
@@ -191,6 +191,7 @@ namespace Timbl {
   }
   
   void MBLClass::InitClass( const size_t Size ){
+    GlobalMetric = 0;
     is_copy = false;
     is_synced = false;
     tcp_socket = 0;
@@ -259,7 +260,8 @@ namespace Timbl {
       keep_distributions = m.keep_distributions;
       verbosity          = m.verbosity;
       do_exact_match     = m.do_exact_match;
-      GlobalMetric       = m.GlobalMetric;
+      if ( m.GlobalMetric )
+	GlobalMetric     = getMetricClass( m.GlobalMetric->type() );
       UserOptions        = m.UserOptions;
       mvd_threshold      = m.mvd_threshold;
       mvdDefaultMetric   = m.mvdDefaultMetric;
@@ -318,6 +320,7 @@ namespace Timbl {
       delete Targets;
       delete TargetStrings;
       delete FeatureStrings;
+      delete GlobalMetric;
     }
     else if ( is_synced ){
       delete InstanceBase;
@@ -706,9 +709,15 @@ namespace Timbl {
   void MBLClass::MatrixInfo( ostream& os ) const {
     unsigned int TotalCount = 0;
     for ( size_t f = 0; f < num_of_features; ++f ){
+      assert ( Features[f]->Metric() == 0 ||
+	       Features[f]->Metric()->type() != DefaultMetric );
       if ( !Features[f]->Ignore() &&
 	   Features[f]->matrix_present() &&
-	   Features[f]->storableMetric( GlobalMetric ) ){
+	   ( (  Features[f]->Metric() != 0 &&
+		Features[f]->Metric()->isStorable() ) ||
+	     ( ( Features[f]->Metric() == 0 || 
+		 Features[f]->Metric()->type() == DefaultMetric ) &&
+	       GlobalMetric->isStorable()))){
 	unsigned int Count = Features[f]->matrix_byte_size();
 	os << "Size of value-matrix[" << f+1 << "] = " 
 	   << Count << " Bytes " << endl;
@@ -852,9 +861,14 @@ namespace Timbl {
 	     !Features[j]->Numeric() ){
 	  Features[j]->ClipFreq( (int)rint(clip_factor * 
 					   log((double)Features[j]->EffectiveValues())));
+	  assert ( Features[j]->Metric() == 0 ||
+		   Features[j]->Metric()->type() != DefaultMetric );
 	  if ( !Features[j]->ArrayRead() &&
 	       ( force ||
-		 Features[j]->storableMetric( GlobalMetric ) ) ){
+		 ( ( Features[j]->Metric() != 0 && 
+		     Features[j]->Metric()->isStorable() ) ||
+		   ( Features[j]->Metric() == 0 &&
+		     GlobalMetric->isStorable() ) ) ) ){
 	    Features[j]->InitSparseArrays();
 	  } // if force
 	} //if !Ignore
@@ -868,9 +882,16 @@ namespace Timbl {
   */
   void MBLClass::calculatePrestored(){
     for ( size_t j = tribl_offset; j < effective_feats; ++j ) {
-      if ( PermFeatures[j]->storableMetric( GlobalMetric ) ){
-	PermFeatures[j]->store_matrix( GlobalMetric,
-				       mvd_threshold, mvdDefaultMetric );
+      if ( !PermFeatures[j]->Numeric() ){
+	assert ( PermFeatures[j]->Metric() == 0 ||
+		 PermFeatures[j]->Metric()->type() != DefaultMetric );
+	if ( ( PermFeatures[j]->Metric() != 0 &&
+	       PermFeatures[j]->Metric()->isStorable() ) ||
+	     ( PermFeatures[j]->Metric() == 0 &&
+	       GlobalMetric->isStorable())) {
+	  PermFeatures[j]->store_matrix( GlobalMetric,
+					 mvd_threshold, mvdDefaultMetric );
+	}
       }
     } // j
     if ( Verbosity(VD_MATRIX) ) 
@@ -1271,22 +1292,25 @@ namespace Timbl {
       if ( Features[g]->Ignore() )
 	continue;
       TmpMetric = UserOptions[g+1];
+      //      cerr << "user option[" << g+1 << "]=" << toString(TmpMetric) << endl;
       if ( Features[g]->Numeric() ){
+	//	cerr << "Feature is numeric" << endl;
 	feat_status[g] = Features[g]->prepare_numeric_stats();
 	if ( feat_status[g] == SingletonNumeric &&
 	     ( input_format == SparseBin 
-	       && ( isSimilarityMetric( GlobalMetric ) ) ) ){
+	       && ( GlobalMetric->isSimilarityMetric( ) ) ) ){
 	  // ok
 	}
 	else {
 	  if ( feat_status[g] != NumericValue ){
 	    Features[g]->Numeric( false );
 	    nothing_changed = false;
-	    if ( isNumericalMetric( GlobalMetric ) )
+	    if ( GlobalMetric->isNumericalMetric() )
 	      TmpMetric = Overlap;
 	    else
 	      TmpMetric = DefaultMetric;
-	    Features[g]->Metric(TmpMetric);
+	    //	    cerr << "set 1 metric[" << g << "]=" << toString(TmpMetric) << endl;
+	    Features[g]->setMetric(TmpMetric);
 	  }
 	  else
 	    TmpMetric = Numeric;
@@ -1305,16 +1329,23 @@ namespace Timbl {
 				     need_all_weights );
 	  }
 	}
+	//	cerr << "got here with metric " << toString(TmpMetric) << endl;
+//  	if ( Features[g]->Metric() )
+//  	  cerr << "metric[" << g << "]=" << toString(Features[g]->Metric()->type() ) << endl;
+//  	else
+//  	  cerr << "metric is nog niet gezet" << endl;
 	if ( TmpMetric != Numeric && 
 	     !( TmpMetric == DefaultMetric &&
-		( isNumericalMetric( GlobalMetric ) ) ) &&
-	     TmpMetric !=  Features[g]->Metric() ){
+		( GlobalMetric->isNumericalMetric( ) ) ) &&
+	     ( Features[g]->Metric() == 0 ||
+	       TmpMetric != Features[g]->Metric()->type() ) ){
 	  nothing_changed = false;
-	  Features[g]->Metric(TmpMetric);
+	  //	  cerr << "set 2 metric[" << g << "]=" << toString(TmpMetric) << endl;
+	  Features[g]->setMetric(TmpMetric);
 	}
       }
     } // end g
-    if ( isSimilarityMetric( GlobalMetric ) && !nothing_changed ){
+    if ( GlobalMetric->isSimilarityMetric( ) && !nothing_changed ){
       // check to see if ALL features are still Numeric.
       // otherwise we can't do Inner product!
       bool first = true;
@@ -1471,7 +1502,7 @@ namespace Timbl {
   
   const ValueDistribution *MBLClass::ExactMatch( const Instance& inst ) const {
     const ValueDistribution *result = NULL;
-    if ( !isSimilarityMetric(GlobalMetric) &&
+    if ( !GlobalMetric->isSimilarityMetric() &&
 	 ( do_exact_match || 
 	   ( num_of_neighbors == 1 &&
 	     !( Verbosity( NEAR_N | ALL_K) ) ) ) ){
@@ -1627,13 +1658,13 @@ namespace Timbl {
     delete tester;
     if ( doSamples() )
       tester = new ExemplarTester( Features, permutation );
-    else if ( GlobalMetric == Cosine )
+    else if ( GlobalMetric->type() == Cosine )
       tester = new CosineTester( Features, permutation );
-    else if ( GlobalMetric == DotProduct )
+    else if ( GlobalMetric->type() == DotProduct )
       tester = new DotProductTester( Features, permutation );
     else
       tester = new DefaultTester( Features, permutation );
-    tester->reset( GlobalMetric, mvd_threshold );
+    tester->reset( GlobalMetric->type(), mvd_threshold );
   }
 
   ostream&  operator<< ( ostream& os, const vector<FeatureValue*>& fv ){
@@ -1772,7 +1803,7 @@ namespace Timbl {
       test_instance_ex( Inst, SubTree, level );
     }
     else {
-      if ( isSimilarityMetric( GlobalMetric ) )
+      if ( GlobalMetric->isSimilarityMetric( ) )
 	test_instance_sim( Inst, SubTree, level );
       else
 	test_instance( Inst, SubTree, level );
@@ -1976,6 +2007,8 @@ namespace Timbl {
     // we know better, so shift one down.
     effective_feats = num_of_features;
     num_of_num_features = 0;
+    delete GlobalMetric;
+    GlobalMetric = getMetricClass( metricOption );
     for ( size_t j = 0; j < num_of_features; ++j ){
       MetricType m = UserOptions[j+1];
       if ( m == Ignore ){
@@ -1983,14 +2016,18 @@ namespace Timbl {
 	effective_feats--;
       }
       else if ( m == DefaultMetric ){
-	if ( isNumericalMetric( GlobalMetric) ){
+	if ( GlobalMetric->isNumericalMetric() ){
 	  Features[j]->Numeric( true );
 	  num_of_num_features++;
 	}
       }
-      else if ( isNumericalMetric( m ) ){
-	Features[j]->Numeric( true );
-	num_of_num_features++;
+      else {
+	metricClass *mc = getMetricClass( m );
+	if ( mc->isNumericalMetric() ){
+	  Features[j]->Numeric( true );
+	  num_of_num_features++;
+	}
+	delete mc;
       }
     }
     Options.FreezeTable();

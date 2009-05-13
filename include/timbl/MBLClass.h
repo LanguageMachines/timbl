@@ -154,7 +154,7 @@ namespace Timbl {
     OptionTableClass Options;
     PhaseValue runningPhase;
     WeightType Weighting;
-    MetricType GlobalMetric;
+    metricClass *GlobalMetric;
     OrdeningType TreeOrder;
     size_t num_of_neighbors;
     bool dynamic_neighbors;
@@ -177,6 +177,7 @@ namespace Timbl {
     double decay_alfa;
     double decay_beta;
     bool MBL_init;
+    MetricType metricOption;
     bool do_diversify;
     bool initProbabilityArrays( bool );
     void calculatePrestored();

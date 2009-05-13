@@ -41,6 +41,7 @@
 #include "timbl/Tree.h"
 #include "timbl/Instance.h"
 #include "timbl/Statistics.h"
+#include "timbl/Testers.h"
 #include "timbl/neighborSet.h"
 #include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
@@ -129,10 +130,13 @@ namespace Timbl {
 	Warning( "Decay impossible for IGTree test, (k=1)" );
 	decay_flag = Zero;
       }
-      if ( GlobalMetric != Overlap ){
+      if ( GlobalMetric && GlobalMetric->type() != Overlap ){
 	Warning( "Metric set to Overlap for IGTree test." );
-	GlobalMetric = Overlap;
+	delete GlobalMetric;
+	GlobalMetric = 0;
       }
+      if ( !GlobalMetric )
+	GlobalMetric = getMetricClass( Overlap );
     }
     return true;
   }
@@ -452,10 +456,13 @@ namespace Timbl {
 	Warning( "Decay impossible for IGTree test, (k=1)" );
 	decay_flag = Zero;
       }
-      if ( GlobalMetric != Overlap ){
+      if ( GlobalMetric && GlobalMetric->type() != Overlap ){
 	Warning( "Metric set to Overlap for IGTree test." );
-	GlobalMetric = Overlap;
+	delete GlobalMetric;
+	GlobalMetric = 0;
       }
+      if ( !GlobalMetric )
+	GlobalMetric = getMetricClass( Overlap );
     }
     return true;
   }      

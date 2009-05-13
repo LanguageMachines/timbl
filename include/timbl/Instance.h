@@ -203,6 +203,7 @@ namespace Timbl {
 		       size_t = 1,
 		       MetricType = Overlap ) const;
     bool isUnknown() const { return index == 0; };
+    SparseValueProbClass *valueClassProb() const { return ValueClassProb; };
   private:
     SparseValueProbClass *ValueClassProb;
     ValueDistribution TargetDist;
@@ -244,8 +245,8 @@ namespace Timbl {
     TargetValue *MajorityClass() const;
   };
 
-  bool isStorable( MetricType mt );
-  
+  class metricClass;
+
   class Feature: public BaseFeatTargClass {
   public:
     Feature( int a, int b, StringHash *T );
@@ -253,9 +254,8 @@ namespace Timbl {
     void Ignore( const bool val ){ ignore = val; };
     bool Numeric() const { return numeric; };
     void Numeric( const bool val ){ numeric = val; };
-    MetricType Metric() const { return metric; };
-    bool storableMetric( MetricType globalMetric );
-    void Metric( const MetricType M ){ metric = M; };
+    metricClass *Metric() const { return metric; };
+    void setMetric( const MetricType );
     double Weight() const { return weight; };
     void SetWeight( const double w ) { weight = w; };
     double InfoGain() const { return info_gain; };
@@ -283,11 +283,7 @@ namespace Timbl {
     bool ArrayRead(){ return vcpb_read; };
     bool matrix_present( ) const;
     unsigned int matrix_byte_size() const;
-    double ValueDistance( FeatureValue *, FeatureValue *, int ) const;
-    double JeffreyDistance( FeatureValue *, FeatureValue *, int ) const;
-    double LevenshteinDistance( FeatureValue *, FeatureValue *, int ) const;
-    double DiceDistance( FeatureValue *, FeatureValue *, int ) const;
-    bool store_matrix( MetricType, int = 1, MetricType = Overlap );
+    bool store_matrix( metricClass *, int = 1, MetricType = Overlap );
     void delete_matrix();
     void print_matrix( bool s = false ) const;
     void print_vc_pb_array( std::ostream& ) const;
@@ -299,7 +295,7 @@ namespace Timbl {
     size_t ClipFreq() const { return matrix_clip_freq; };
     SparseSymetricMatrix<FeatureValue *> *metric_matrix;
  private:
-    MetricType metric;
+    metricClass *metric;
     bool ignore;
     bool numeric;
     bool vcpb_read;

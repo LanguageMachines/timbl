@@ -282,6 +282,8 @@ namespace Timbl {
   void TimblExperiment::initExperiment( bool all_vd ){ 
     if ( !ExpInvalid() ){
       if ( !MBL_init ){  // do this only when necessary
+	delete GlobalMetric;
+	GlobalMetric = getMetricClass( metricOption );
 	stats.clear();
 	delete confusionInfo;
 	confusionInfo = 0;
@@ -966,7 +968,7 @@ namespace Timbl {
       int OldPrec = outfile.precision(DBL_DIG-1);
       outfile.setf(ios::showpoint);
       outfile.width(8);
-      if ( isSimilarityMetric( GlobalMetric ) )
+      if ( GlobalMetric->isSimilarityMetric() )
 	outfile << " " << maxSimilarity-Distance;
       else
 	outfile << " " << Distance;
@@ -1394,8 +1396,8 @@ namespace Timbl {
   }
   
   void TimblExperiment::show_metric_info( ostream& os ) const {
-    os << "Global metric : " << toString( GlobalMetric, true);
-    if ( isStorable( GlobalMetric ) ){
+    os << "Global metric : " << toString( GlobalMetric->type(), true);
+    if ( GlobalMetric->isStorable() ){
       os << ", Prestored matrix";
     }
     if ( Do_Exact() )
@@ -1410,28 +1412,32 @@ namespace Timbl {
       if ( !Features[i]->Ignore() &&
 	   InvPerm[i]+1 > TRIBL_offset() ){
 	if ( Features[i]->Numeric() ){
-	  if ( !isNumericalMetric( GlobalMetric ) ){
+	  if ( !GlobalMetric->isNumericalMetric() ){
 	    cnt++;
 	    os << endl << "   Feature[" << i+1 << "] : "
 	       << toString( Numeric, true );
 	  }
 	}
-	else if ( Features[i]->Metric() != GlobalMetric &&
-		  Features[i]->Metric() != DefaultMetric ){
+	else if ( Features[i]->Metric() != 0 &&
+		  Features[i]->Metric()->type() != GlobalMetric->type() &&
+		  Features[i]->Metric()->type() != DefaultMetric ){
 	  ++cnt;
 	  os << endl << "   Feature[" << i+1 << "] : "
-	     << toString( Features[i]->Metric(), true );
-	  if ( Features[i]->storableMetric( GlobalMetric ) &&
-	       Features[i]->matrix_present() )
+	     << toString( Features[i]->Metric()->type(), true );
+	  if ( Features[i]->Metric()->isStorable() ||
+	       ( Features[i]->Metric()->type() == DefaultMetric && 
+		 GlobalMetric->isStorable() ) )
 	    os << " (Prestored)";
 	}
-	else if ( ( Features[i]->Metric() == GlobalMetric ||
-		    Features[i]->Metric() == DefaultMetric ) &&
-		  ( isStorable( GlobalMetric ) && 
+	else if ( ( ( Features[i]->Metric() != 0 &&
+		      Features[i]->Metric()->type() == GlobalMetric->type() ) ||
+		    ( Features[i]->Metric() == 0 ||
+		      Features[i]->Metric()->type() == DefaultMetric ) ) &&
+		  ( GlobalMetric->isStorable() && 
 		    !Features[i]->matrix_present() ) ){
 	  ++cnt;
 	  os << endl << "   Feature[" << i+1 
-	     << "] : " << toString( GlobalMetric, true )
+	     << "] : " << toString( GlobalMetric->type(), true )
 	     << " (Not Prestored)";
 	}
       }

@@ -46,6 +46,7 @@
 #include "timbl/Tree.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
+#include "timbl/Testers.h"
 
 #ifdef PTHREADS
 #include <pthread.h>
@@ -660,7 +661,7 @@ namespace Timbl {
   Feature::Feature( int a, int b, StringHash *T ): 
     BaseFeatTargClass(a,b,T),
     metric_matrix( 0 ),
-    metric( UnknownMetric ),
+    metric( 0 ),
     ignore( false ),
     numeric( false ),
     vcpb_read( false ),
@@ -1343,17 +1344,8 @@ namespace Timbl {
       delete [] n_dot_j;
       delete [] n_i_dot;
     }
+    delete metric; 
   }
-
-  bool isStorable( MetricType m ){
-    return m == ValueDiff || m == JeffreyDiv 
-      || m == Levenshtein || m == Dice;
-  }
-  
-  bool Feature::storableMetric( MetricType gm ){
-    return isStorable( metric) ||
-      ( metric == DefaultMetric && isStorable( gm ) );
-  }  
 
   bool Feature::matrix_present() const {
     return metric_matrix != 0 && PrestoreStatus == ps_ok;
@@ -1444,132 +1436,6 @@ namespace Timbl {
     return result;
   }
   
-  double lv_distance( const string& source, const string& target ){
-    // code taken from: http://www.merriampark.com/ldcpp.htm
-    //    Levenshtein Distance Algorithm: C++ Implementation
-    //                  by Anders Sewerin Johansen
-    // Step 1
-    const size_t n = source.length();
-    const size_t m = target.length();
-    if (n == 0) {
-      return (double)m;
-    }
-    if (m == 0) {
-      return (double)n;
-    }    
-    // Good form to declare a TYPEDEF
-    typedef std::vector< std::vector<size_t> > Tmatrix;     
-    Tmatrix matrix(n+1);
-    
-    // Size the vectors in the 2.nd dimension. Unfortunately C++ doesn't
-    // allow for allocation on declaration of 2.nd dimension of vec of vec
-    
-    for ( size_t i = 0; i <= n; ++i ) {
-      matrix[i].resize(m+1);
-    }
-    // Step 2
-    for ( size_t i = 0; i <= n; ++i ) {
-      matrix[i][0]=i;
-    }
-    for ( size_t i = 0; i <= m; ++i ) {
-      matrix[0][i]=i;
-    }
-    // Step 3
-    for ( size_t i = 1; i <= n; ++i ) {
-      const char s_i = source[i-1];
-      // Step 4
-      for ( size_t j = 1; j <= m; ++j ) {
-	const char t_j = target[j-1];
-	// Step 5
-	int cost;
-	if (s_i == t_j) {
-	  cost = 0;
-	}
-	else {
-	  cost = 1;
-	}
-	// Step 6
-	const size_t above = matrix[i-1][j];
-	const size_t left = matrix[i][j-1];
-	const size_t diag = matrix[i-1][j-1];
-	size_t cell = min( above + 1, min(left + 1, diag + cost));
-	// Step 6A: Cover transposition, in addition to deletion,
-	// insertion and substitution. This step is taken from:
-	// Berghel, Hal ; Roach, David : "An Extension of Ukkonen's 
-	// Enhanced Dynamic Programming ASM Algorithm"
-	// (http://www.acm.org/~hlb/publications/asm/asm.html)
-	if (i>2 && j>2) {
-	  size_t trans=matrix[i-2][j-2]+1;
-	  if (source[i-2]!=t_j) trans++;
-	  if (s_i!=target[j-2]) trans++;
-	  if (cell>trans) cell=trans;
-	}
-	matrix[i][j]=cell;
-      }
-    }
-    return (double)matrix[n][m];
-  }
-  
-  double dc_distance( const string& string1, const string& string2 ){
-    // code taken from:
-    // http://en.wikibooks.org/wiki/Algorithm_implementation/Strings/Dice's_coefficient
-    multiset<string> string1_bigrams;
-    multiset<string> string2_bigrams;
-    
-    for(unsigned int i = 0; i < (string1.length() - 1); i++) {      // extract character bigrams from string1
-      string1_bigrams.insert(string1.substr(i, 2));
-    }
-    for(unsigned int i = 0; i < (string2.length() - 1); i++) {      // extract character bigrams from string2
-      string2_bigrams.insert(string2.substr(i, 2));
-    }
-    
-    int overlap = 0;
-    
-    for(unsigned int j = 0; j < (string2.length() - 1); j++) {      // extract character bigrams from string2 and overlap
-      overlap += string1_bigrams.count(string2.substr(j, 2));
-    }
-    
-    // calculate 1 - dice coefficient
-    int total = string1_bigrams.size() + string2_bigrams.size();
-    float dice = (float)(overlap * 2) / (float)total;
-    dice = 1.0 - dice;
-    return dice;
-  }  
-
-  double FeatureValue::VDDistance( FeatureValue *G, 
-				   size_t limit, MetricType mt ) const {
-    double result = 0.0;
-    if ( G != this ){
-      if ( ValFreq() < limit ||
-	   G->ValFreq() < limit ){
-	switch ( mt ){
-	case Overlap:
-	  result = 1.0;
-	  break;
-	case Levenshtein:
-	  result = lv_distance( Name(), G->Name() );
-	  break;
-	case Dice:
-	  result = dc_distance( Name(), G->Name() );
-	  break;
-	default:
-	  string msg = string("Invalid value '") + toString(mt) 
-	    + "' in switch (" 
-	    + __FILE__  + "," + toString(__LINE__) + ")\n"
-	    + "ABORTING now";
-	  throw std::logic_error( msg );
-	}
-      }
-      else {
-	if ( ValueClassProb && G->ValueClassProb )
-	  result = ValueClassProb->vd_distance( G->ValueClassProb );
-	else
-	  result = 1.0;
-      }
-    }
-    return result;
-  }
-
   double k_log_k_div_m( double k, double l ) {
     if ( abs(k+l) < Epsilon )
       return 0;
@@ -1609,99 +1475,6 @@ namespace Timbl {
     return result;
   }
   
-  double FeatureValue::JDDistance( FeatureValue *G, 
-				   size_t limit,
-				   MetricType mt ) const {
-    double result = 0.0;
-    if ( G != this ){
-      if ( ValFreq() < limit ||
-	   G->ValFreq() < limit ){
-	switch ( mt ){
-	case Overlap:
-	  result = 1.0;
-	  break;
-	case Levenshtein:
-	  result = lv_distance( Name(), G->Name() );
-	  break;
-	case Dice:
-	  result = dc_distance( Name(), G->Name() );
-	  break;
-	default:
-	  string msg = string("Invalid value '") + toString(mt) 
-	    + "' in switch (" 
-	    + __FILE__  + "," + toString(__LINE__) + ")\n"
-	    + "ABORTING now";
-	  throw std::logic_error( msg );
-	}
-      }
-      else {
-	result = ValueClassProb->jd_distance( G->ValueClassProb );
-      }
-    }
-    return result;
-  }
-  
-  double FeatureValue::LDDistance( FeatureValue *G, 
-				   size_t limit,
-				   MetricType mt ) const {
-    // LD is ALWAYS calculated!
-    double result = 0.0;
-    if ( G != this ){
-      if ( ValFreq() < limit ||
-	   G->ValFreq() < limit ){
-	switch ( mt ){
-	case Overlap:
-	  result = 1.0;
-	  break;
-	case Levenshtein:
-	  result = lv_distance( Name(), G->Name() );
-	  break;
-	case Dice:
-	  result = dc_distance( Name(), G->Name() );
-	  break;
-	default:
-	  string msg = string("Invalid value '") + toString(mt) 
-	    + "' in switch (" 
-	    + __FILE__  + "," + toString(__LINE__) + ")\n"
-	    + "ABORTING now";
-	  throw std::logic_error( msg );
-	}
-      }
-      else
-	result = lv_distance( Name(), G->Name() );
-    }
-    return result;
-  }
-  
-  double FeatureValue::DcDistance( FeatureValue *G, 
-				   size_t limit,
-				   MetricType mt ) const {
-    double result = 0.0;
-    if ( ValFreq() < limit ||
-	 G->ValFreq() < limit ){
-      switch ( mt ){
-      case Overlap:
-	result = 1.0;
-	break;
-      case Levenshtein:
-	result = lv_distance( Name(), G->Name() );
-	break;
-      case Dice:
-	result = dc_distance( Name(), G->Name() );
-	break;
-      default:
-	string msg = string("Invalid value '") + toString(mt) 
-	  + "' in switch (" 
-	  + __FILE__  + "," + toString(__LINE__) + ")\n"
-	  + "ABORTING now";
-	throw std::logic_error( msg );
-      }
-    }
-    else
-      result = dc_distance( Name(), G->Name() );
-    return result;
-  }
-  
   void Feature::delete_matrix(){
     if ( metric_matrix ){
       metric_matrix->Clear();
@@ -1711,18 +1484,22 @@ namespace Timbl {
     PrestoreStatus = ps_undef;
   }
   
-  bool Feature::store_matrix( MetricType gmt, int limit, MetricType df ){
+  void Feature::setMetric( const MetricType M ){ 
+    delete metric; 
+    metric = getMetricClass(M); 
+  };
+  
+  bool Feature::store_matrix( metricClass *gmt, int limit, MetricType df ){
     //
     // Store a complete distance matrix.
     //
     if ( !metric_matrix )
       metric_matrix = new SparseSymetricMatrix<FeatureValue*>();
-
-    MetricType mt = metric;
-    if ( mt == DefaultMetric )
-      mt = gmt;
-    
-    if ( PrestoreStatus != ps_failed && isStorable( mt ) ) {
+    if ( metric == 0 || metric->type() == DefaultMetric ){
+      delete metric;
+      metric = gmt->clone();
+    }
+    if ( PrestoreStatus != ps_failed && metric->isStorable( ) ) {
       try {
 	for ( unsigned int ii=0; ii < ValuesArray.size(); ++ii ){
 	  FeatureValue *FV_i = (FeatureValue *)ValuesArray[ii];
@@ -1730,25 +1507,9 @@ namespace Timbl {
 	    FeatureValue *FV_j = (FeatureValue *)ValuesArray[jj];
 	    if ( FV_i->ValFreq() >= matrix_clip_freq &&
 		 FV_j->ValFreq() >= matrix_clip_freq &&
-		 ( Prestored_metric != mt ||
+		 ( Prestored_metric != metric->type() ||
 		   fabs(metric_matrix->Extract(FV_i,FV_j)) < Epsilon ) ){
-	      double dist = -1.0;
-	      switch ( mt ){
-	      case ValueDiff:
-		dist = FV_i->VDDistance( FV_j, limit, df );
-		break;
-	      case JeffreyDiv:
-		dist = FV_i->JDDistance( FV_j, limit, df );
-		break;
-	      case Levenshtein:
-		dist = FV_i->LDDistance( FV_j, limit, df );
-		break;
-	      case Dice:
-		dist = FV_i->DcDistance( FV_j, limit, df );
-		break;
-	      default:
-		FatalError( "invalid value " + toString( mt ) + "in switch" );
-	      }
+	      double dist = metric->distance( FV_i, FV_j, limit, df );
 	      metric_matrix->Assign( FV_i, FV_j, dist );
 	    }
 	  }
@@ -1762,62 +1523,10 @@ namespace Timbl {
       PrestoreStatus = ps_ok;
     }
     if ( PrestoreStatus == ps_ok ){
-      Prestored_metric = mt;
+      Prestored_metric = metric->type();
     }
     return true;
   }
-
-  double Feature::ValueDistance( FeatureValue *F, FeatureValue *G, 
-				 int th ) const {
-    double result = 1.0;
-    if ( F ){
-      if ( matrix_present() &&
-	   F->ValFreq() >= matrix_clip_freq &&
-	   G->ValFreq() >= matrix_clip_freq )
-	result = metric_matrix->Extract( F, G );
-      else
-	result = F->VDDistance( G, th );
-    }
-    return result;
-  }
-  
-  double Feature::JeffreyDistance( FeatureValue *F, FeatureValue *G,
-				   int th ) const {
-    double result = 1.0;
-    if ( F ){
-      if ( matrix_present() &&
-	   F->ValFreq() >= matrix_clip_freq &&
-	   G->ValFreq() >= matrix_clip_freq )
-	result = metric_matrix->Extract( F, G );
-      else
-	result = F->JDDistance( G, th );
-    }
-    return result;
-  }
-  
-  double Feature::LevenshteinDistance( FeatureValue *F, FeatureValue *G,
-				       int th ) const {
-    double result = 1.0;
-    if ( matrix_present() &&
-	 F->ValFreq() >= matrix_clip_freq &&
-	 G->ValFreq() >= matrix_clip_freq )
-      result = metric_matrix->Extract( F, G );
-    else
-      result = F->LDDistance( G, th );
-    return result;
-  }  
-
-  double Feature::DiceDistance( FeatureValue *F, FeatureValue *G,
-				int th ) const {
-    double result = 1.0;
-    if ( matrix_present() &&
-	 F->ValFreq() >= matrix_clip_freq &&
-	 G->ValFreq() >= matrix_clip_freq )
-      result = metric_matrix->Extract( F, G );
-    else
-      result = F->DcDistance( G, th );
-    return result;
-  }  
 
   ostream& operator<< (std::ostream& os, SparseValueProbClass *VPC ){
     if ( VPC ) {

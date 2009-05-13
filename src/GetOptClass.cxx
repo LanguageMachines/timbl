@@ -585,11 +585,14 @@ namespace Timbl {
 	    Error( "illegal value in metric description: -m " + Mline );
 	    return false;
 	  }
-	  if ( TmpMT != Ignore && isSimilarityMetric( Def ) ){
+	  metricClass *tmpMC = getMetricClass(Def);
+	  if ( TmpMT != Ignore && tmpMC->isSimilarityMetric() ){
 	    Error( "Similarity metric " + toString( Def ) 
 		   + " only accepts -I specifications: -m " + Mline );
+	    delete tmpMC;
 	    return false;
 	  }
+	  delete tmpMC;
 	  ++p;
 	  if ( !parse_range( line, p, TmpMT ) )
 	    return false;
