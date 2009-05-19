@@ -425,8 +425,6 @@ namespace Timbl{
 	MetricType TM;
 	if ( features[i]->Metric() ){
 	  TM = features[i]->Metric()->type();
-	  if ( TM == DefaultMetric )
-	    TM = globalMetric;
 	}
 	else 
 	  TM = globalMetric;

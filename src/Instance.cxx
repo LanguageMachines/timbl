@@ -1414,8 +1414,10 @@ namespace Timbl {
   }
   
   void Feature::setMetric( const MetricType M ){ 
-    delete metric; 
-    metric = getMetricClass(M); 
+    if ( !metric || ( metric && M != metric->type() ) ){
+      delete metric; 
+      metric = getMetricClass(M); 
+    }
   };
   
   bool Feature::store_matrix( metricClass *gmt, int limit){
