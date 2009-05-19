@@ -1424,7 +1424,6 @@ namespace Timbl {
     //
     if ( !metric_matrix )
       metric_matrix = new SparseSymetricMatrix<FeatureValue*>();
-    assert ( metric == 0 || metric->type() != DefaultMetric );
     if ( metric == 0 ){
       metric = gmt->clone();
     }
