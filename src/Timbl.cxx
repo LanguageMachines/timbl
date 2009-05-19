@@ -499,6 +499,10 @@ bool get_file_names( TimblOpts& Opts ){
     Opts.Delete( 'U' );
   }
   if ( Opts.Find( 'u', value, mood ) ){
+    if ( algorithm == IGTREE ){
+      cerr << "-u option is useless for IGtree" << endl;
+      return false;
+    }
     ProbInFile = correct_path( value, I_Path, true );
     Opts.Delete( 'u' );
   }
