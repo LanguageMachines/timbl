@@ -72,7 +72,6 @@ namespace Timbl {
     local_norm_factor = 1;
     no_neigh = 1;
     mvd_limit = 1;
-    mvdDefaultMetric = Overlap;
     estimate = 0;
     maxbests = 500;
     BinSize = 0;
@@ -149,7 +148,6 @@ namespace Timbl {
     MaxFeats( in.MaxFeats ),
     no_neigh( in.no_neigh ),
     mvd_limit( in.mvd_limit ),
-    mvdDefaultMetric( in.mvdDefaultMetric ),
     estimate( in.estimate ),
     maxbests( in.maxbests ),
     clip_freq( in.clip_freq ),
@@ -391,8 +389,6 @@ namespace Timbl {
 	}
       }
       optline = "MVD_LIMIT: " + toString<int>(mvd_limit);
-      Exp->SetOption( optline );
-      optline = "MVD_DEFAULT_METRIC: " + toString(mvdDefaultMetric);
       Exp->SetOption( optline );
       optline = "NEIGHBORS: " + toString<int>(no_neigh);
       if ( Exp->SetOption( optline ) ){
@@ -869,17 +865,7 @@ namespace Timbl {
 	string::size_type pos1 = myoptarg.find( ":" );
 	if ( pos1 == string::npos ){
 	  pos1 = myoptarg.find_first_of( "0123456789" );
-	  if ( pos1 == string::npos ){
-	    if ( !stringTo<MetricType>( string( myoptarg, 0, pos1 ), 
-					mvdDefaultMetric ) ||
-		 !( mvdDefaultMetric == Levenshtein ||
-		    mvdDefaultMetric == Dice ||
-		    mvdDefaultMetric == Overlap ) ){
-	      Error( "illegal value for -L option: " + myoptarg );
-	      return false;
-	    }
-	  }
-	  else {
+	  if ( pos1 != string::npos ){
 	    mvd_limit = stringTo<int>( myoptarg );
 	    if ( mvd_limit <= 0 ){
 	      Error( "illegal value for -L option: " + myoptarg );
@@ -889,12 +875,7 @@ namespace Timbl {
 	}
 	else {
 	  mvd_limit = stringTo<int>( string( myoptarg, pos1+1 ) );
-	  if ( mvd_limit <= 0 ||
-	       !stringTo<MetricType>( string( myoptarg, 0, pos1 ),
-				      mvdDefaultMetric ) ||
-	       !( mvdDefaultMetric == Levenshtein ||
-		  mvdDefaultMetric == Dice ||
-		  mvdDefaultMetric == Overlap ) ){
+	  if ( mvd_limit <= 0 ){
 	    Error( "illegal value for -L option: " + myoptarg );
 	    return false;
 	  }

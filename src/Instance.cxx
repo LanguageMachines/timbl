@@ -1404,77 +1404,6 @@ namespace Timbl {
       shared_variance = chi_square / (double)( NumInst * k );
   }
   
-  double SparseValueProbClass::vd_distance( SparseValueProbClass *s ) const {
-    double result = 0.0;
-    IDmaptype::const_iterator p1 = vc_map.begin();
-    IDmaptype::const_iterator p2 = s->vc_map.begin();
-    while( p1 != vc_map.end() &&
-	   p2 != s->vc_map.end() ){
-      if ( p2->first < p1->first ){
-	result += p2->second;
-	++p2;
-      }
-      else if ( p2->first == p1->first ){
-	result += fabs( p1->second - p2->second );
-	++p1;
-	++p2;
-      }
-      else {
-	result += p1->second;
-	++p1;
-      }	  
-    }
-    while ( p1 != vc_map.end() ){
-      result += p1->second;
-      ++p1;
-    }
-    while ( p2 != s->vc_map.end() ){
-      result += p2->second;
-      ++p2;
-    }
-    result = result / 2.0;
-    return result;
-  }
-  
-  double k_log_k_div_m( double k, double l ) {
-    if ( abs(k+l) < Epsilon )
-      return 0;
-    return k * Log2( (2.0 * k)/( k + l ) );
-  }
-  
-  double SparseValueProbClass::jd_distance( SparseValueProbClass *s ) const {
-    double result = 0.0;
-    IDmaptype::const_iterator p1 = vc_map.begin();
-    IDmaptype::const_iterator p2 = s->vc_map.begin();
-    while( p1 != vc_map.end() &&
-	   p2 != s->vc_map.end() ){
-      if ( p2->first < p1->first ){
-	result += p2->second;
-	++p2;
-      }
-      else if ( p2->first == p1->first ){
-	result += k_log_k_div_m( p1->second, p2->second );
-	result += k_log_k_div_m( p2->second, p1->second );
-	++p1;
-	++p2;
-      }
-      else {
-	result += p1->second;
-	++p1;
-      }	  
-    }
-    while ( p1 != vc_map.end() ){
-      result += p1->second;
-      ++p1;
-    }
-    while ( p2 != s->vc_map.end() ){
-      result += p2->second;
-      ++p2;
-    }
-    result = result / 2.0;
-    return result;
-  }
-  
   void Feature::delete_matrix(){
     if ( metric_matrix ){
       metric_matrix->Clear();
@@ -1489,15 +1418,15 @@ namespace Timbl {
     metric = getMetricClass(M); 
   };
   
-  bool Feature::store_matrix( metricClass *gmt, int limit, MetricType df ){
+  bool Feature::store_matrix( metricClass *globalMetric, int limit){
     //
     // Store a complete distance matrix.
     //
     if ( !metric_matrix )
       metric_matrix = new SparseSymetricMatrix<FeatureValue*>();
-    if ( metric == 0 || metric->type() == DefaultMetric ){
+    if ( metric != 0 && metric->type() != globalMetric->type() ){
       delete metric;
-      metric = gmt->clone();
+      metric = globalMetric->clone();
     }
     if ( PrestoreStatus != ps_failed && metric->isStorable( ) ) {
       try {
@@ -1509,7 +1438,7 @@ namespace Timbl {
 		 FV_j->ValFreq() >= matrix_clip_freq &&
 		 ( Prestored_metric != metric->type() ||
 		   fabs(metric_matrix->Extract(FV_i,FV_j)) < Epsilon ) ){
-	      double dist = metric->distance( FV_i, FV_j, limit, df );
+	      double dist = metric->distance( FV_i, FV_j, limit );
 	      metric_matrix->Assign( FV_i, FV_j, dist );
 	    }
 	  }

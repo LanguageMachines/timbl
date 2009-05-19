@@ -76,7 +76,7 @@ namespace Timbl {
 			std::vector<unsigned int>& );
     const ValueDistribution *exact_match( const Instance&  ) const;
   protected:
-    const IBtree * search_node( FeatureValue * ) const;
+    const IBtree *search_node( FeatureValue * ) const;
     IBtree( const IBtree& );
     IBtree& operator=( const IBtree& );
   };

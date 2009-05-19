@@ -203,7 +203,6 @@ namespace Timbl {
     size_t tribl_offset;
     unsigned igThreshold;
     int mvd_threshold;
-    MetricType mvdDefaultMetric;
     bool do_sloppy_loo;
     bool do_exact_match;
     bool do_silly_testing;

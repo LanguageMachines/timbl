@@ -44,8 +44,7 @@ namespace Timbl{
     virtual bool isSimilarityMetric() const = 0;
     virtual bool isNumericalMetric() const = 0;
     virtual bool isStorable() const = 0;
-    virtual double distance( FeatureValue *, FeatureValue *, 
-			     size_t=1, MetricType=Overlap) const = 0;
+    virtual double distance( FeatureValue *, FeatureValue *, size_t=1 ) const = 0;
     metricClass *clone() const{ return getMetricClass(_type); };
   private:
     MetricType _type;
@@ -57,8 +56,7 @@ namespace Timbl{
     bool isSimilarityMetric() const { return false; };
     bool isNumericalMetric() const { return false; };
     bool isStorable() const { return false; };
-    double distance( FeatureValue *, FeatureValue *, 
-		     size_t, MetricType ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
   
   class ValueDiffMetric: public metricClass {
@@ -67,8 +65,7 @@ namespace Timbl{
     bool isSimilarityMetric() const { return false; };
     bool isNumericalMetric() const { return false; };
     bool isStorable() const { return true; };
-    double distance( FeatureValue *, FeatureValue *, 
-		     size_t, MetricType ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
   
   class NumericMetric: public metricClass {
@@ -77,8 +74,7 @@ namespace Timbl{
     bool isSimilarityMetric() const { return false; };
     bool isNumericalMetric() const { return true; };
     bool isStorable() const { return false; };
-    double distance( FeatureValue *, FeatureValue *, 
-			     size_t, MetricType ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
 
   class CosineMetric: public metricClass {
@@ -87,8 +83,7 @@ namespace Timbl{
     bool isSimilarityMetric() const { return true; };
     bool isNumericalMetric() const { return true; };
     bool isStorable() const { return false; };
-    double distance( FeatureValue *, FeatureValue *, 
-			     size_t, MetricType ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
 
   class DotProductMetric: public metricClass {
@@ -97,8 +92,7 @@ namespace Timbl{
     bool isSimilarityMetric() const { return true; };
     bool isNumericalMetric() const { return true; };
     bool isStorable() const { return false; };
-    double distance( FeatureValue *, FeatureValue *, 
-			     size_t, MetricType ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
 
   class DiceMetric: public metricClass {
@@ -107,8 +101,7 @@ namespace Timbl{
     bool isSimilarityMetric() const { return false; };
     bool isNumericalMetric() const { return false; };
     bool isStorable() const { return true; };
-    double distance( FeatureValue *, FeatureValue *, 
-			     size_t, MetricType ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
 
   class JeffreyMetric: public metricClass {
@@ -117,8 +110,7 @@ namespace Timbl{
     bool isSimilarityMetric() const { return false; };
     bool isNumericalMetric() const { return false; };
     bool isStorable() const { return true; };
-    double distance( FeatureValue *, FeatureValue *, 
-		    size_t, MetricType ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
 
   class LevenshteinMetric: public metricClass {
@@ -127,8 +119,7 @@ namespace Timbl{
     bool isSimilarityMetric() const { return false; };
     bool isNumericalMetric() const { return false; };
     bool isStorable() const { return true; };
-    double distance( FeatureValue *, FeatureValue *, 
-			     size_t, MetricType ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
 
   class metricTester {

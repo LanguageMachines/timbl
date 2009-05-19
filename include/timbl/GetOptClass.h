@@ -60,7 +60,6 @@ namespace Timbl {
     int target_pos;
     int no_neigh;
     int mvd_limit;
-    MetricType mvdDefaultMetric;
     int estimate;
     int maxbests;
     int clip_freq;

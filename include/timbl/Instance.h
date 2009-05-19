@@ -166,14 +166,15 @@ namespace Timbl {
   };
   
   class SparseValueProbClass {
-    typedef std::map< size_t, double > IDmaptype;
     friend std::ostream& operator<< ( std::ostream&, SparseValueProbClass * );
   public:
+    typedef std::map< size_t, double > IDmaptype;
+    typedef IDmaptype::const_iterator IDiterator;
     SparseValueProbClass( size_t d ): dimension(d) {};
     void Assign( const size_t i, const double d ) { vc_map[i] = d; };
     void Clear() { vc_map.clear(); };
-    double vd_distance( SparseValueProbClass * ) const;
-    double jd_distance( SparseValueProbClass * ) const;
+    IDiterator begin() const { return vc_map.begin(); };
+    IDiterator end() const { return vc_map.end(); };    
   private:
     IDmaptype vc_map;
     size_t dimension;
@@ -190,18 +191,6 @@ namespace Timbl {
       TargetDist.Merge( vd );
       Frequency = TargetDist.totalSize();
     };
-    double VDDistance( FeatureValue *, 
-		       size_t = 1, 
-		       MetricType = Overlap ) const;
-    double JDDistance( FeatureValue *,
-		       size_t = 1,
-		       MetricType = Overlap ) const;
-    double LDDistance( FeatureValue *,
-		       size_t = 1,
-		       MetricType = Overlap ) const;
-    double DcDistance( FeatureValue *,
-		       size_t = 1,
-		       MetricType = Overlap ) const;
     bool isUnknown() const { return index == 0; };
     SparseValueProbClass *valueClassProb() const { return ValueClassProb; };
   private:
@@ -255,6 +244,7 @@ namespace Timbl {
     bool Numeric() const { return numeric; };
     void Numeric( const bool val ){ numeric = val; };
     metricClass *Metric() const { return metric; };
+    void Metric( metricClass * m ){ metric = m; };
     void setMetric( const MetricType );
     double Weight() const { return weight; };
     void SetWeight( const double w ) { weight = w; };
@@ -283,7 +273,7 @@ namespace Timbl {
     bool ArrayRead(){ return vcpb_read; };
     bool matrix_present( ) const;
     unsigned int matrix_byte_size() const;
-    bool store_matrix( metricClass *, int = 1, MetricType = Overlap );
+    bool store_matrix( metricClass *, int = 1 );
     void delete_matrix();
     void print_matrix( bool s = false ) const;
     void print_vc_pb_array( std::ostream& ) const;

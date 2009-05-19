@@ -144,8 +144,6 @@ namespace Timbl {
 					MaxFeatures+1 ) );
     Options.Add( new IntegerOption( "MVD_LIMIT", 
 				    &mvd_threshold, 1, 1, 100000 ) );
-    Options.Add( new MetricOption( "MVD_DEFAULT_METRIC", 
-				   &mvdDefaultMetric, Overlap ) );
     Options.Add( new SizeOption( "NEIGHBORS", 
 				 &num_of_neighbors, 1, 1, 5000 ) );
     Options.Add( new IntegerOption( "PROGRESS", 
@@ -205,7 +203,6 @@ namespace Timbl {
     num_of_features = 0;
     target_pos = std::numeric_limits<size_t>::max();
     mvd_threshold = 1;
-    mvdDefaultMetric = Overlap;
     effective_feats = 0;
     num_of_num_features = 0;
     DBEntropy = 0.0;
@@ -264,7 +261,6 @@ namespace Timbl {
 	GlobalMetric     = getMetricClass( m.GlobalMetric->type() );
       UserOptions        = m.UserOptions;
       mvd_threshold      = m.mvd_threshold;
-      mvdDefaultMetric   = m.mvdDefaultMetric;
       num_of_neighbors   = m.num_of_neighbors;
       dynamic_neighbors  = m.dynamic_neighbors;
       num_of_features    = m.num_of_features;
@@ -709,15 +705,12 @@ namespace Timbl {
   void MBLClass::MatrixInfo( ostream& os ) const {
     unsigned int TotalCount = 0;
     for ( size_t f = 0; f < num_of_features; ++f ){
-      assert ( Features[f]->Metric() == 0 ||
-	       Features[f]->Metric()->type() != DefaultMetric );
       if ( !Features[f]->Ignore() &&
 	   Features[f]->matrix_present() &&
-	   ( (  Features[f]->Metric() != 0 &&
-		Features[f]->Metric()->isStorable() ) ||
-	     ( ( Features[f]->Metric() == 0 || 
-		 Features[f]->Metric()->type() == DefaultMetric ) &&
-	       GlobalMetric->isStorable()))){
+	   ( ( Features[f]->Metric() != 0 &&
+	       Features[f]->Metric()->isStorable() ) ||
+	     ( Features[f]->Metric() == 0 &&
+	       GlobalMetric->isStorable())) ){
 	unsigned int Count = Features[f]->matrix_byte_size();
 	os << "Size of value-matrix[" << f+1 << "] = " 
 	   << Count << " Bytes " << endl;
@@ -861,8 +854,6 @@ namespace Timbl {
 	     !Features[j]->Numeric() ){
 	  Features[j]->ClipFreq( (int)rint(clip_factor * 
 					   log((double)Features[j]->EffectiveValues())));
-	  assert ( Features[j]->Metric() == 0 ||
-		   Features[j]->Metric()->type() != DefaultMetric );
 	  if ( !Features[j]->ArrayRead() &&
 	       ( force ||
 		 ( ( Features[j]->Metric() != 0 && 
@@ -883,14 +874,11 @@ namespace Timbl {
   void MBLClass::calculatePrestored(){
     for ( size_t j = tribl_offset; j < effective_feats; ++j ) {
       if ( !PermFeatures[j]->Numeric() ){
-	assert ( PermFeatures[j]->Metric() == 0 ||
-		 PermFeatures[j]->Metric()->type() != DefaultMetric );
 	if ( ( PermFeatures[j]->Metric() != 0 &&
 	       PermFeatures[j]->Metric()->isStorable() ) ||
 	     ( PermFeatures[j]->Metric() == 0 &&
 	       GlobalMetric->isStorable())) {
-	  PermFeatures[j]->store_matrix( GlobalMetric,
-					 mvd_threshold, mvdDefaultMetric );
+	  PermFeatures[j]->store_matrix( GlobalMetric, mvd_threshold );
 	}
       }
     } // j
@@ -1330,10 +1318,6 @@ namespace Timbl {
 	  }
 	}
 	//	cerr << "got here with metric " << toString(TmpMetric) << endl;
-//  	if ( Features[g]->Metric() )
-//  	  cerr << "metric[" << g << "]=" << toString(Features[g]->Metric()->type() ) << endl;
-//  	else
-//  	  cerr << "metric is nog niet gezet" << endl;
 	if ( TmpMetric != Numeric && 
 	     !( TmpMetric == DefaultMetric &&
 		( GlobalMetric->isNumericalMetric( ) ) ) &&
@@ -1667,7 +1651,7 @@ namespace Timbl {
     tester->reset( GlobalMetric->type(), mvd_threshold );
   }
 
-  ostream&  operator<< ( ostream& os, const vector<FeatureValue*>& fv ){
+  ostream& operator<< ( ostream& os, const vector<FeatureValue*>& fv ){
     vector<FeatureValue*>::const_iterator it= fv.begin();
     os << "vector<";
     while( it != fv.end() ){
@@ -1680,7 +1664,7 @@ namespace Timbl {
     return os;
   }
 
-  ostream&  operator<< ( ostream& os, const vector<double>& fv ){
+  ostream& operator<< ( ostream& os, const vector<double>& fv ){
     vector<double>::const_iterator it= fv.begin();
     os << "vector<";
     while( it != fv.end() ){
@@ -1692,7 +1676,6 @@ namespace Timbl {
     os << ">";
     return os;
   }
-
   
   void MBLClass::test_instance( const Instance& Inst,
 				InstanceBase_base *IB,
@@ -2023,11 +2006,11 @@ namespace Timbl {
       }
       else {
 	metricClass *mc = getMetricClass( m );
+	Features[j]->Metric( mc );
 	if ( mc->isNumericalMetric() ){
 	  Features[j]->Numeric( true );
 	  num_of_num_features++;
 	}
-	delete mc;
       }
     }
     Options.FreezeTable();

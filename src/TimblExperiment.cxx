@@ -1419,8 +1419,7 @@ namespace Timbl {
 	  }
 	}
 	else if ( Features[i]->Metric() != 0 &&
-		  Features[i]->Metric()->type() != GlobalMetric->type() &&
-		  Features[i]->Metric()->type() != DefaultMetric ){
+		  Features[i]->Metric()->type() != GlobalMetric->type() ){
 	  ++cnt;
 	  os << endl << "   Feature[" << i+1 << "] : "
 	     << toString( Features[i]->Metric()->type(), true );
@@ -1431,10 +1430,9 @@ namespace Timbl {
 	}
 	else if ( ( ( Features[i]->Metric() != 0 &&
 		      Features[i]->Metric()->type() == GlobalMetric->type() ) ||
-		    ( Features[i]->Metric() == 0 ||
-		      Features[i]->Metric()->type() == DefaultMetric ) ) &&
-		  ( GlobalMetric->isStorable() && 
-		    !Features[i]->matrix_present() ) ){
+		    ( Features[i]->Metric() == 0 &&
+		      GlobalMetric->isStorable() ) ) && 
+		  !Features[i]->matrix_present() ){
 	  ++cnt;
 	  os << endl << "   Feature[" << i+1 
 	     << "] : " << toString( GlobalMetric->type(), true )

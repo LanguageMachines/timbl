@@ -945,6 +945,8 @@ namespace Timbl {
 	else
 	  return pnt->TDistribution;
       }
+      else if ( Inst.FV[pos]->isUnknown() )
+	return NULL;
       else if ( pnt->FValue == Inst.FV[pos] ){
 	if ( pnt->FValue->ValFreq() == 0 )
 	  return NULL;
@@ -1256,9 +1258,9 @@ namespace Timbl {
 	FeatureValue *fv = ibPnt->FValue;
 	if ( InstBase ){
 	  IBtree **pnt = &InstBase;
-	  while ( *pnt && (*pnt)->FValue->Index() < fv->Index() ){
-	    pnt = &(*pnt)->next;
-	  }
+ 	  while ( *pnt && (*pnt)->FValue->Index() < fv->Index() ){
+ 	    pnt = &(*pnt)->next;
+ 	  }
 	  if ( *pnt ){
 	    if ( (*pnt)->FValue->Index() == fv->Index() ){
 	      // this may happen 
@@ -1347,6 +1349,8 @@ namespace Timbl {
   const IBtree *IBtree::search_node( FeatureValue *fv ) const {
     const IBtree *pnt = 0;
     if ( fv ){
+      if ( fv->isUnknown() )
+	return 0;
       pnt = this;
       while ( pnt ){
 	if ( pnt->FValue == fv )
@@ -1362,6 +1366,8 @@ namespace Timbl {
     if ( fast_index.empty() )
       fill_index();
     if ( fv ){
+      if ( fv->isUnknown() )
+	return 0;
       FI_map::const_iterator It = fast_index.find( fv->Index() );
       if ( It != fast_index.end() )
 	result = It->second;

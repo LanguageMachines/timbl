@@ -41,6 +41,8 @@
 #include "timbl/Testers.h"
 
 using namespace std;
+using Common::Epsilon;
+using Common::Log2;
 
 namespace Timbl{
 
@@ -136,6 +138,78 @@ namespace Timbl{
     return dice;
   }  
 
+  double vd_distance( SparseValueProbClass *r, SparseValueProbClass *s ){
+    double result = 0.0;
+    SparseValueProbClass::IDiterator p1 = r->begin();
+    SparseValueProbClass::IDiterator p2 = s->begin();
+    while( p1 != r->end() &&
+	   p2 != s->end() ){
+      if ( p2->first < p1->first ){
+	result += p2->second;
+	++p2;
+      }
+      else if ( p2->first == p1->first ){
+	result += fabs( p1->second - p2->second );
+	++p1;
+	++p2;
+      }
+      else {
+	result += p1->second;
+	++p1;
+      }	  
+    }
+    while ( p1 != r->end() ){
+      result += p1->second;
+      ++p1;
+    }
+    while ( p2 != s->end() ){
+      result += p2->second;
+      ++p2;
+    }
+    result = result / 2.0;
+    return result;
+  }
+  
+  double k_log_k_div_m( double k, double l ) {
+    if ( abs(k+l) < Epsilon )
+      return 0;
+    return k * Log2( (2.0 * k)/( k + l ) );
+  }
+  
+  double jd_distance( SparseValueProbClass *r, SparseValueProbClass *s ){
+    double result = 0.0;
+    SparseValueProbClass::IDiterator p1 = r->begin();
+    SparseValueProbClass::IDiterator p2 = s->begin();
+    while( p1 != r->end() &&
+	   p2 != s->end() ){
+      if ( p2->first < p1->first ){
+	result += p2->second;
+	++p2;
+      }
+      else if ( p2->first == p1->first ){
+	result += k_log_k_div_m( p1->second, p2->second );
+	result += k_log_k_div_m( p2->second, p1->second );
+	++p1;
+	++p2;
+      }
+      else {
+	result += p1->second;
+	++p1;
+      }	  
+    }
+    while ( p1 != r->end() ){
+      result += p1->second;
+      ++p1;
+    }
+    while ( p2 != s->end() ){
+      result += p2->second;
+      ++p2;
+    }
+    result = result / 2.0;
+    return result;
+  }
+  
+
   metricClass *getMetricClass( MetricType mt ){
     switch ( mt ){
     case Overlap:
@@ -172,65 +246,34 @@ namespace Timbl{
   }
 
   double OverlapMetric::distance( FeatureValue *, FeatureValue *, 
-				  size_t, MetricType ) const {
+				  size_t ) const {
     cerr << "unimplemented distance() for Overlap metric!" << endl;
     assert( type() == MaxMetric );
+    return -1.0;
   }
 
   double JeffreyMetric::distance( FeatureValue *F, FeatureValue *G, 
-				  size_t limit, MetricType mt ) const {
+				  size_t limit ) const {
     double result = 0.0;
     if ( G != F ){
       if ( F->ValFreq() < limit ||
 	   G->ValFreq() < limit ){
-	switch ( mt ){
-	case Overlap:
-	  result = 1.0;
-	  break;
-	case Levenshtein:
-	  result = lv_distance( F->Name(), G->Name() );
-	  break;
-	case Dice:
-	  result = dc_distance( F->Name(), G->Name() );
-	  break;
-	default:
-	  string msg = string("Invalid value '") + toString(mt) 
-	    + "' in switch (" 
-	    + __FILE__  + "," + toString(__LINE__) + ")\n"
-	    + "ABORTING now";
-	  throw std::logic_error( msg );
-	}
+	result = 1.0;
       }
       else {
-	result = F->valueClassProb()->jd_distance( G->valueClassProb() );
+	result = jd_distance( F->valueClassProb(), G->valueClassProb() );
       }
     }
     return result;
   }
 
   double LevenshteinMetric::distance( FeatureValue *F, FeatureValue *G, 
-				      size_t limit, MetricType mt ) const {
+				      size_t limit ) const {
     double result = 0.0;
     if ( G != F ){
       if ( F->ValFreq() < limit ||
 	   G->ValFreq() < limit ){
-	switch ( mt ){
-	case Overlap:
-	  result = 1.0;
-	  break;
-	case Levenshtein:
-	  result = lv_distance( F->Name(), G->Name() );
-	  break;
-	case Dice:
-	  result = dc_distance( F->Name(), G->Name() );
-	  break;
-	default:
-	  string msg = string("Invalid value '") + toString(mt) 
-	    + "' in switch (" 
-	    + __FILE__  + "," + toString(__LINE__) + ")\n"
-	    + "ABORTING now";
-	  throw std::logic_error( msg );
-	}
+	result = 1.0;
       }
       else
 	result = lv_distance( F->Name(), G->Name() );
@@ -239,27 +282,11 @@ namespace Timbl{
   }  
 
   double DiceMetric::distance( FeatureValue *F, FeatureValue *G, 
-				  size_t limit, MetricType mt ) const {
+			       size_t limit ) const {
     double result = 0.0;
     if ( F->ValFreq() < limit ||
 	 G->ValFreq() < limit ){
-      switch ( mt ){
-      case Overlap:
-	result = 1.0;
-	break;
-      case Levenshtein:
-	result = lv_distance( F->Name(), G->Name() );
-	break;
-      case Dice:
-	result = dc_distance( F->Name(), G->Name() );
-	break;
-      default:
-	string msg = string("Invalid value '") + toString(mt) 
-	  + "' in switch (" 
-	  + __FILE__  + "," + toString(__LINE__) + ")\n"
-	  + "ABORTING now";
-	throw std::logic_error( msg );
-      }
+      result = 1.0;
     }
     else
       result = dc_distance( F->Name(), G->Name() );
@@ -267,38 +294,23 @@ namespace Timbl{
   }
   
   double DotProductMetric::distance( FeatureValue *, FeatureValue *, 
-				  size_t, MetricType ) const {
+				     size_t ) const {
     cerr << "unimplemented distance() for Dotproduct metric!" << endl;
     assert( type() == MaxMetric );
+    return -1.0;
   }
 
   double ValueDiffMetric::distance( FeatureValue *F, FeatureValue *G, 
-				    size_t limit, MetricType mt ) const {
+				    size_t limit ) const {
     double result = 0.0;
     if ( G != F ){
       if ( F->ValFreq() < limit ||
 	   G->ValFreq() < limit ){
-	switch ( mt ){
-	case Overlap:
-	  result = 1.0;
-	  break;
-	case Levenshtein:
-	  result = lv_distance( F->Name(), G->Name() );
-	  break;
-	case Dice:
-	  result = dc_distance( F->Name(), G->Name() );
-	  break;
-	default:
-	  string msg = string("Invalid value '") + toString(mt) 
-	    + "' in switch (" 
-	    + __FILE__  + "," + toString(__LINE__) + ")\n"
-	    + "ABORTING now";
-	  throw std::logic_error( msg );
-	}
+	result = 1.0;
       }
       else {
 	if ( F->valueClassProb() && G->valueClassProb() )
-	  result = F->valueClassProb()->vd_distance( G->valueClassProb() );
+	  result = vd_distance( F->valueClassProb(), G->valueClassProb() );
 	else
 	  result = 1.0;
       }
@@ -307,15 +319,17 @@ namespace Timbl{
   }
 
   double CosineMetric::distance( FeatureValue *, FeatureValue *, 
-				  size_t, MetricType ) const {
+				 size_t ) const {
     cerr << "unimplemented distance() for Cosine metric!" << endl;
     assert( type() == MaxMetric );
+    return -1.0;
   }
 
   double NumericMetric::distance( FeatureValue *, FeatureValue *, 
-				  size_t, MetricType ) const {
+				  size_t ) const {
     cerr << "unimplemented distance() for Numeric metric!" << endl;
     assert( type() == MaxMetric );
+    return -1.0;
   }
 
   double overlapTester::test( FeatureValue *FV,
