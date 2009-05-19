@@ -1418,15 +1418,15 @@ namespace Timbl {
     metric = getMetricClass(M); 
   };
   
-  bool Feature::store_matrix( metricClass *globalMetric, int limit){
+  bool Feature::store_matrix( metricClass *gmt, int limit){
     //
     // Store a complete distance matrix.
     //
     if ( !metric_matrix )
       metric_matrix = new SparseSymetricMatrix<FeatureValue*>();
-    if ( metric != 0 && metric->type() != globalMetric->type() ){
-      delete metric;
-      metric = globalMetric->clone();
+    assert ( metric == 0 || metric->type() != DefaultMetric );
+    if ( metric == 0 ){
+      metric = gmt->clone();
     }
     if ( PrestoreStatus != ps_failed && metric->isStorable( ) ) {
       try {
