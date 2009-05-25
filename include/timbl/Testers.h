@@ -40,6 +40,7 @@ namespace Timbl{
   class metricClass {
   public:
   metricClass( MetricType m ): _type(m){};
+    ~metricClass() {};
     MetricType type() const { return _type; };
     virtual bool isSimilarityMetric() const = 0;
     virtual bool isNumericalMetric() const = 0;
