@@ -400,7 +400,8 @@ namespace Timbl{
   }
   
   TesterClass::TesterClass( const vector<Feature*>& feat,
-			    const vector<size_t>& perm ):
+			    const vector<size_t>& perm,
+			    int mvdThreshold ):
     _size(feat.size()), features(feat), permutation(perm) {
     permFeatures.resize(_size,0);
     test_feature_val = new metricTester*[_size];
@@ -409,53 +410,39 @@ namespace Timbl{
       test_feature_val[j] = 0;
     }
     distances.resize(_size+1, 0.0);
-  }
-  
-  void TesterClass::reset( MetricType globalMetric, int threshold ){
-    distances.resize(_size+1, 0.0);
     for ( size_t i=0; i < _size; ++i ){
       delete test_feature_val[i];
       test_feature_val[i] = 0;
       if ( features[i]->Ignore() )
 	continue;
-      if ( features[i]->Numeric() ){
+      MetricType TM = features[i]->Metric()->type();
+      switch ( TM ){
+      case Overlap:
+      case Cosine:
+      case DotProduct:
+	test_feature_val[i] = new overlapTester();
+	break;
+      case Numeric:
 	test_feature_val[i] = new numericOverlapTester();
-      }
-      else {
-	MetricType TM;
-	if ( features[i]->Metric() ){
-	  TM = features[i]->Metric()->type();
-	}
-	else 
-	  TM = globalMetric;
-	switch ( TM ){
-	case Overlap:
-	case Cosine:
-	case DotProduct:
-	  test_feature_val[i] = new overlapTester();
-	  break;
-	case Numeric:
-	  test_feature_val[i] = new numericOverlapTester();
-	  break;
-	case Levenshtein:
-	  test_feature_val[i] = new levenshteinTester( threshold );
-	  break;
-	case Dice:
-	  test_feature_val[i] = new diceTester( threshold );
-	  break;
-	case ValueDiff:
-	  test_feature_val[i] = new valueDiffTester( threshold );
-	  break;
-	case JeffreyDiv:
-	  test_feature_val[i] = new jeffreyDiffTester( threshold );
-	  break;
-	default:
-	  string msg = string("Invalid value '") + toString( TM, true ) 
-	    + "' in switch (" 
-	    + __FILE__  + "," + toString(__LINE__) + ")\n"
-	    + "ABORTING now";
-	  throw logic_error( msg );
-	}
+	break;
+      case Levenshtein:
+	test_feature_val[i] = new levenshteinTester( mvdThreshold );
+	break;
+      case Dice:
+	test_feature_val[i] = new diceTester( mvdThreshold );
+	break;
+      case ValueDiff:
+	test_feature_val[i] = new valueDiffTester( mvdThreshold );
+	break;
+      case JeffreyDiv:
+	test_feature_val[i] = new jeffreyDiffTester( mvdThreshold );
+	break;
+      default:
+	string msg = string("Invalid value '") + toString( TM, true ) 
+	  + "' in switch (" 
+	  + __FILE__  + "," + toString(__LINE__) + ")\n"
+	  + "ABORTING now";
+	throw logic_error( msg );
       }
     }
   }
@@ -467,7 +454,6 @@ namespace Timbl{
     offSet = offset;
     FV = &inst.FV;
   }
-
 
   TesterClass::~TesterClass(){
     for ( size_t i=0; i < _size; ++i ){

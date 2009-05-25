@@ -241,8 +241,6 @@ namespace Timbl {
     Feature( int a, int b, StringHash *T );
     bool Ignore() const { return ignore; };
     void Ignore( const bool val ){ ignore = val; };
-    bool Numeric() const { return numeric; };
-    void Numeric( const bool val ){ numeric = val; };
     metricClass *Metric() const { return metric; };
     void Metric( metricClass * m ){ metric = m; };
     void setMetric( const MetricType );

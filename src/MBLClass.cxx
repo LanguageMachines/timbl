@@ -706,11 +706,8 @@ namespace Timbl {
     unsigned int TotalCount = 0;
     for ( size_t f = 0; f < num_of_features; ++f ){
       if ( !Features[f]->Ignore() &&
-	   Features[f]->matrix_present() &&
-	   ( ( Features[f]->Metric() != 0 &&
-	       Features[f]->Metric()->isStorable() ) ||
-	     ( Features[f]->Metric() == 0 &&
-	       GlobalMetric->isStorable())) ){
+	   Features[f]->Metric()->isStorable() &&
+	   Features[f]->matrix_present() ){
 	unsigned int Count = Features[f]->matrix_byte_size();
 	os << "Size of value-matrix[" << f+1 << "] = " 
 	   << Count << " Bytes " << endl;
@@ -762,7 +759,7 @@ namespace Timbl {
 	      }
 	    }
 	    else if ( compare_nocase_n( "Numeric", buf ) ){
-	      if ( Features[index-1]->Numeric() ){
+	      if ( Features[index-1]->Metric()->isNumerical() ){
 		++index;
 		continue;
 	      }
@@ -776,7 +773,7 @@ namespace Timbl {
 	      result = false;
 	    }
 	    else if ( Features[index-1]->Ignore() ||
-		      Features[index-1]->Numeric() ){
+		      Features[index-1]->Metric()->isNumerical() ){
 	      Warning( "Matrix info found for feature #" 
 		       + toString<size_t>(index)
 		       + " (skipped)" );
@@ -822,7 +819,7 @@ namespace Timbl {
       for ( size_t i = 0; i < num_of_features; ++i )
 	if ( Features[i]->Ignore() )
 	  os << "feature # " << i+1 << " Ignored, (-s option)" << endl;
-	else if (Features[i]->Numeric() )
+	else if (Features[i]->Metric()->isNumerical() )
 	  os << "feature # " << i+1 << " Numeric, (-N option)" << endl;
 	else {
 	  os << "feature # " << i+1 << " Matrix: " << endl;
@@ -838,7 +835,7 @@ namespace Timbl {
     bool result = true;
     for ( size_t j = 0; result && j < num_of_features; ++j ) {
       if ( !Features[j]->Ignore() &&
-	   !Features[j]->Numeric() ) {
+	   !Features[j]->Metric()->isNumerical() ) {
 	result = Features[j]->AllocSparseArrays( Dim );
       }
     } // j
@@ -851,18 +848,15 @@ namespace Timbl {
     if ( result ){
       for ( size_t j = 0; j < num_of_features; ++j ) {
 	if ( !Features[j]->Ignore() &&
-	     !Features[j]->Numeric() ){
+	     !Features[j]->Metric()->isNumerical() ){
 	  Features[j]->ClipFreq( (int)rint(clip_factor * 
 					   log((double)Features[j]->EffectiveValues())));
 	  if ( !Features[j]->ArrayRead() &&
 	       ( force ||
-		 ( ( Features[j]->Metric() != 0 && 
-		     Features[j]->Metric()->isStorable() ) ||
-		   ( Features[j]->Metric() == 0 &&
-		     GlobalMetric->isStorable() ) ) ) ){
+		 Features[j]->Metric()->isStorable() ) ){
 	    Features[j]->InitSparseArrays();
-	  } // if force
-	} //if !Ignore
+	  } 
+	}
       } // j
     }  
     return result;
@@ -873,13 +867,9 @@ namespace Timbl {
   */
   void MBLClass::calculatePrestored(){
     for ( size_t j = tribl_offset; j < effective_feats; ++j ) {
-      if ( !PermFeatures[j]->Numeric() ){
-	if ( ( PermFeatures[j]->Metric() != 0 &&
-	       PermFeatures[j]->Metric()->isStorable() ) ||
-	     ( PermFeatures[j]->Metric() == 0 &&
-	       GlobalMetric->isStorable())) {
-	  PermFeatures[j]->store_matrix( GlobalMetric, mvd_threshold );
-	}
+      if ( !PermFeatures[j]->Ignore() && 
+	   PermFeatures[j]->Metric()->isStorable() ){
+	PermFeatures[j]->store_matrix( GlobalMetric, mvd_threshold );
       }
     } // j
     if ( Verbosity(VD_MATRIX) ) 
@@ -1006,7 +996,7 @@ namespace Timbl {
 		 << "\t" << Features[i]->SharedVariance()
 		 << "\t" << Features[i]->InfoGain()
 		 << "\t" << Features[i]->GainRatio();
-	      if ( Features[i]->Numeric() )
+	      if ( Features[i]->Metric()->isNumerical() )
 		os << " NUMERIC";
 	      os << endl;
 	    }
@@ -1027,7 +1017,7 @@ namespace Timbl {
 	      os << setw(7) << Features[i]->EffectiveValues()
 		 << "\t" << Features[i]->InfoGain()
 		 << "\t" << Features[i]->GainRatio();
-	      if ( Features[i]->Numeric() )
+	      if ( Features[i]->Metric()->isNumerical() )
 		os << " NUMERIC";
 	      os << endl;
 	    }
@@ -1272,16 +1262,17 @@ namespace Timbl {
     }
     // Loop over the Features, see if the numerics are non-singular
     // and do the statistics for those features where the metric is changed.
-    MetricType TmpMetric;
     FeatVal_Stat *feat_status = new FeatVal_Stat[num_of_features];
     bool nothing_changed = true;
     for ( size_t g = 0; g < num_of_features; ++g ) {
       feat_status[g] = Unknown;
       if ( Features[g]->Ignore() )
 	continue;
-      TmpMetric = UserOptions[g+1];
+      MetricType TmpMetric = UserOptions[g+1];
+      if ( TmpMetric == DefaultMetric )
+	TmpMetric = metricOption;
       //      cerr << "user option[" << g+1 << "]=" << toString(TmpMetric) << endl;
-      if ( Features[g]->Numeric() ){
+      if ( Features[g]->Metric()->isNumerical() ){
 	//	cerr << "Feature is numeric" << endl;
 	feat_status[g] = Features[g]->prepare_numeric_stats();
 	if ( feat_status[g] == SingletonNumeric &&
@@ -1291,14 +1282,15 @@ namespace Timbl {
 	}
 	else {
 	  if ( feat_status[g] != NumericValue ){
-	    Features[g]->Numeric( false );
 	    nothing_changed = false;
-	    if ( GlobalMetric->isNumericalMetric() )
+	    if ( GlobalMetric->isNumerical() ){
 	      TmpMetric = Overlap;
-	    else
-	      TmpMetric = DefaultMetric;
-	    //	    cerr << "set 1 metric[" << g << "]=" << toString(TmpMetric) << endl;
-	    Features[g]->setMetric(TmpMetric);
+	      Features[g]->setMetric(TmpMetric);
+	    }
+	    else {
+	      TmpMetric = metricOption;
+	      Features[g]->setMetric(metricOption);
+	    }
 	  }
 	  else
 	    TmpMetric = Numeric;
@@ -1318,13 +1310,10 @@ namespace Timbl {
 	  }
 	}
 	//	cerr << "got here with metric " << toString(TmpMetric) << endl;
-	if ( TmpMetric != Numeric && 
-	     !( TmpMetric == DefaultMetric &&
-		( GlobalMetric->isNumericalMetric( ) ) ) &&
-	     ( Features[g]->Metric() == 0 ||
-	       TmpMetric != Features[g]->Metric()->type() ) ){
+	if ( TmpMetric != Numeric &&
+	     TmpMetric != Features[g]->Metric()->type() ){
 	  nothing_changed = false;
-	  //	  cerr << "set 2 metric[" << g << "]=" << toString(TmpMetric) << endl;
+	  // 	  cerr << "set 2 metric[" << g << "]=" << toString(TmpMetric) << endl;
 	  Features[g]->setMetric(TmpMetric);
 	}
       }
@@ -1442,7 +1431,7 @@ namespace Timbl {
 	os << "a" << f+1 << ": ";
 	if ( Features[f]->Ignore() )
 	  os << "Ignore" << endl;
-	else if ( Features[f]->Numeric() )
+	else if ( Features[f]->Metric()->isNumerical() )
 	  os << "Numeric" << endl;
 	else {
 	  // Loop over the values.
@@ -1641,14 +1630,13 @@ namespace Timbl {
   void MBLClass::initTesters() {
     delete tester;
     if ( doSamples() )
-      tester = new ExemplarTester( Features, permutation );
+      tester = new ExemplarTester( Features, permutation, mvd_threshold );
     else if ( GlobalMetric->type() == Cosine )
-      tester = new CosineTester( Features, permutation );
+      tester = new CosineTester( Features, permutation, mvd_threshold );
     else if ( GlobalMetric->type() == DotProduct )
-      tester = new DotProductTester( Features, permutation );
+      tester = new DotProductTester( Features, permutation, mvd_threshold );
     else
-      tester = new DefaultTester( Features, permutation );
-    tester->reset( GlobalMetric->type(), mvd_threshold );
+      tester = new DefaultTester( Features, permutation, mvd_threshold );
   }
 
   ostream& operator<< ( ostream& os, const vector<FeatureValue*>& fv ){
@@ -1998,17 +1986,13 @@ namespace Timbl {
 	Features[j]->Ignore( true );
 	effective_feats--;
       }
-      else if ( m == DefaultMetric ){
-	if ( GlobalMetric->isNumericalMetric() ){
-	  Features[j]->Numeric( true );
-	  num_of_num_features++;
-	}
-      }
       else {
+	if ( m == DefaultMetric ){
+	  m = metricOption;
+	}
 	metricClass *mc = getMetricClass( m );
 	Features[j]->Metric( mc );
-	if ( mc->isNumericalMetric() ){
-	  Features[j]->Numeric( true );
+	if ( mc->isNumerical() ){
 	  num_of_num_features++;
 	}
       }

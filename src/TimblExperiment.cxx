@@ -1411,32 +1411,16 @@ namespace Timbl {
     for ( size_t i = 0; i < NumOfFeatures(); ++i ){
       if ( !Features[i]->Ignore() &&
 	   InvPerm[i]+1 > TRIBL_offset() ){
-	if ( Features[i]->Numeric() ){
-	  if ( !GlobalMetric->isNumericalMetric() ){
-	    cnt++;
-	    os << endl << "   Feature[" << i+1 << "] : "
-	       << toString( Numeric, true );
-	  }
-	}
-	else if ( Features[i]->Metric() != 0 &&
-		  Features[i]->Metric()->type() != GlobalMetric->type() ){
+	if ( Features[i]->Metric()->type() != GlobalMetric->type() ){
 	  ++cnt;
 	  os << endl << "   Feature[" << i+1 << "] : "
 	     << toString( Features[i]->Metric()->type(), true );
-	  if ( Features[i]->Metric()->isStorable() ||
-	       ( Features[i]->Metric()->type() == DefaultMetric && 
-		 GlobalMetric->isStorable() ) )
-	    os << " (Prestored)";
-	}
-	else if ( ( ( Features[i]->Metric() != 0 &&
-		      Features[i]->Metric()->type() == GlobalMetric->type() ) ||
-		    ( Features[i]->Metric() == 0 &&
-		      GlobalMetric->isStorable() ) ) && 
-		  !Features[i]->matrix_present() ){
-	  ++cnt;
-	  os << endl << "   Feature[" << i+1 
-	     << "] : " << toString( GlobalMetric->type(), true )
-	     << " (Not Prestored)";
+	  if ( Features[i]->Metric()->isStorable() ){
+	    if ( Features[i]->matrix_present() )
+	      os << " (Prestored)";
+	    else
+	      os << " (Not Prestored)";
+	  }
 	}
       }
     }

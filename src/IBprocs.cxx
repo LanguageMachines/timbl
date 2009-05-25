@@ -47,6 +47,7 @@ typedef std::ostream LogStream;
 #include "timbl/Options.h"
 #include "timbl/BestArray.h"
 #include "timbl/MBLClass.h"
+#include "timbl/Testers.h"
 
 using namespace std;
 
@@ -397,7 +398,7 @@ namespace Timbl {
       bool first = true;
       for ( size_t i=0; i < num_of_features; ++i )
 	if ( !Features[i]->Ignore() &&
-	     Features[i]->Numeric() ){
+	     Features[i]->Metric()->isNumerical() ){
 	  if ( !first )
 	    os << ", ";
 	  else
@@ -410,7 +411,7 @@ namespace Timbl {
 	first = true;
 	for ( size_t j=0; j < num_of_features; ++j )
 	  if ( !Features[j]->Ignore() &&
-	       Features[j]->Numeric() ){
+	       Features[j]->Metric()->isNumerical() ){
 	    if ( !first )
 	      os << " , ";
 	    else

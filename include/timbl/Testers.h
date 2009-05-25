@@ -43,7 +43,7 @@ namespace Timbl{
     virtual ~metricClass() {};
     MetricType type() const { return _type; };
     virtual bool isSimilarityMetric() const = 0;
-    virtual bool isNumericalMetric() const = 0;
+    virtual bool isNumerical() const = 0;
     virtual bool isStorable() const = 0;
     virtual double distance( FeatureValue *, FeatureValue *, size_t=1 ) const = 0;
     metricClass *clone() const{ return getMetricClass(_type); };
@@ -55,7 +55,7 @@ namespace Timbl{
   public:
   OverlapMetric(): metricClass( Overlap ){};
     bool isSimilarityMetric() const { return false; };
-    bool isNumericalMetric() const { return false; };
+    bool isNumerical() const { return false; };
     bool isStorable() const { return false; };
     double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
@@ -64,7 +64,7 @@ namespace Timbl{
   public:
   ValueDiffMetric(): metricClass( ValueDiff ){};
     bool isSimilarityMetric() const { return false; };
-    bool isNumericalMetric() const { return false; };
+    bool isNumerical() const { return false; };
     bool isStorable() const { return true; };
     double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
@@ -73,7 +73,7 @@ namespace Timbl{
   public:
   NumericMetric(): metricClass( Numeric ){};
     bool isSimilarityMetric() const { return false; };
-    bool isNumericalMetric() const { return true; };
+    bool isNumerical() const { return true; };
     bool isStorable() const { return false; };
     double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
@@ -82,7 +82,7 @@ namespace Timbl{
   public:
   CosineMetric(): metricClass( Cosine ){};
     bool isSimilarityMetric() const { return true; };
-    bool isNumericalMetric() const { return true; };
+    bool isNumerical() const { return true; };
     bool isStorable() const { return false; };
     double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
@@ -91,7 +91,7 @@ namespace Timbl{
   public:
   DotProductMetric(): metricClass( DotProduct ){};
     bool isSimilarityMetric() const { return true; };
-    bool isNumericalMetric() const { return true; };
+    bool isNumerical() const { return true; };
     bool isStorable() const { return false; };
     double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
@@ -100,7 +100,7 @@ namespace Timbl{
   public:
   DiceMetric(): metricClass( Dice ){};
     bool isSimilarityMetric() const { return false; };
-    bool isNumericalMetric() const { return false; };
+    bool isNumerical() const { return false; };
     bool isStorable() const { return true; };
     double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
@@ -109,7 +109,7 @@ namespace Timbl{
   public:
   JeffreyMetric(): metricClass( JeffreyDiv ){};
     bool isSimilarityMetric() const { return false; };
-    bool isNumericalMetric() const { return false; };
+    bool isNumerical() const { return false; };
     bool isStorable() const { return true; };
     double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
@@ -118,7 +118,7 @@ namespace Timbl{
   public:
   LevenshteinMetric(): metricClass( Levenshtein ){};
     bool isSimilarityMetric() const { return false; };
-    bool isNumericalMetric() const { return false; };
+    bool isNumerical() const { return false; };
     bool isStorable() const { return true; };
     double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
@@ -190,9 +190,9 @@ namespace Timbl{
   class TesterClass {
   public:
     TesterClass( const std::vector<Feature*>&, 
-		 const std::vector<size_t> & );
+		 const std::vector<size_t> &,
+		 int );
     virtual ~TesterClass();
-    void reset( MetricType, int );
     void init( const Instance&, size_t, size_t );
     virtual size_t test( std::vector<FeatureValue *>&, 
 			 size_t,
@@ -213,8 +213,9 @@ namespace Timbl{
   class DefaultTester: public TesterClass {
   public:
   DefaultTester( const std::vector<Feature*>& pf, 
-		 const std::vector<size_t>& p ): 
-    TesterClass( pf, p ){};  
+		 const std::vector<size_t>& p,
+		 int t ): 
+    TesterClass( pf, p, t ){};  
     double getDistance( size_t ) const;
     size_t test( std::vector<FeatureValue *>&, 
 		 size_t,
@@ -224,8 +225,9 @@ namespace Timbl{
   class ExemplarTester: public TesterClass {
   public:
   ExemplarTester( const std::vector<Feature*>& pf,
-		  const std::vector<size_t>& p ): 
-    TesterClass( pf, p ){};  
+		  const std::vector<size_t>& p,
+		  int t ): 
+    TesterClass( pf, p, t ){};  
     double getDistance( size_t ) const;
     size_t test( std::vector<FeatureValue *>&, 
 		 size_t,
@@ -235,8 +237,9 @@ namespace Timbl{
   class CosineTester: public TesterClass {
   public:
   CosineTester( const std::vector<Feature*>& pf,
-		const std::vector<size_t>& p ): 
-    TesterClass( pf, p ){};  
+		const std::vector<size_t>& p,
+		int t ): 
+    TesterClass( pf, p, t ){};  
     double getDistance( size_t ) const;
     size_t test( std::vector<FeatureValue *>&, 
 		 size_t,
@@ -246,8 +249,9 @@ namespace Timbl{
   class DotProductTester: public TesterClass {
   public:
   DotProductTester( const std::vector<Feature*>& pf,
-		    const std::vector<size_t>& p ): 
-    TesterClass( pf, p ){};  
+		    const std::vector<size_t>& p,
+		    int t): 
+    TesterClass( pf, p, t ){};  
     double getDistance( size_t ) const;
     size_t test( std::vector<FeatureValue *>&, 
 		 size_t,
