@@ -738,10 +738,10 @@ int main(int argc, char *argv[]){
       Run->Set_Single_Threaded();
     Default_Output_Names( Opts );
     if ( Do_CV ){
-      if ( !checkInputFile( TestFile ) )
-	exit(0);
-      Run->CVprepare( WgtInFile, WgtType, ProbInFile );
-      Run->Test( TestFile, "" );
+      if ( checkInputFile( TestFile ) ){
+	Run->CVprepare( WgtInFile, WgtType, ProbInFile );
+	Run->Test( TestFile, "" );
+      }
       delete Run;
     }
     else if ( Do_Server ){
@@ -750,8 +750,10 @@ int main(int argc, char *argv[]){
 	   !checkInputFile( dataFile ) ||
 	   !checkInputFile( WgtInFile ) ||
 	   !checkInputFile( ProbInFile ) ||
-	   !checkOutputFile( ProbOutFile ) )
-	exit(0);
+	   !checkOutputFile( ProbOutFile ) ){
+	delete Run;
+	return 3;
+      }
       if ( TreeInFile != "" ){
 	if ( !Run->GetInstanceBase( TreeInFile ) ){
 	  return 3;
@@ -784,8 +786,10 @@ int main(int argc, char *argv[]){
 	   !checkOutputFile( XOutFile ) ||
 	   !checkOutputFile( NamesFile ) ||
 	   !checkOutputFile( WgtOutFile ) ||
-	   !checkOutputFile( ProbOutFile ) )
-	exit(0);
+	   !checkOutputFile( ProbOutFile ) ){
+	delete Run;
+	return 3;
+      }
 
       // normal cases....
       if ( TreeInFile == "" ){
