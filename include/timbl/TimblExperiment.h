@@ -369,6 +369,7 @@ class IG_Experiment: public TimblExperiment {
   void testing_info( std::ostream&, const std::string&, const std::string& );
   void initExperiment( bool = false );
   bool checkLine( const std::string& );
+  bool sanityCheck() const;
   const TargetValue *LocalClassify( const Instance&,
 				    double&,
 				    bool& );
