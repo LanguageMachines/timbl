@@ -114,31 +114,10 @@ namespace Timbl {
   }  
 
   bool IG_Experiment::checkFile( const string& fileName ){
-    if ( !TimblExperiment::checkFile( fileName ) )
+    if ( TimblExperiment::checkFile( fileName ) )
+      return sanityCheck();
+    else
       return false;
-    else if ( IBStatus() != Pruned ){
-      Warning( "you tried to apply the IGTree algorithm on a complete,"
-	       "(non-pruned) Instance Base" );
-      return false;
-    }
-    else {
-      if ( num_of_neighbors != 1 ){
-	Warning( "number of neighbors set to 1 for IGTree test!" );
-	num_of_neighbors = 1;
-      }
-      if ( decay_flag  != Zero ){
-	Warning( "Decay impossible for IGTree test, (k=1)" );
-	decay_flag = Zero;
-      }
-      if ( GlobalMetric && GlobalMetric->type() != Overlap ){
-	Warning( "Metric set to Overlap for IGTree test." );
-	delete GlobalMetric;
-	GlobalMetric = 0;
-      }
-      if ( !GlobalMetric )
-	GlobalMetric = getMetricClass( Overlap );
-    }
-    return true;
   }
     
   bool IG_Experiment::build_file_index( const string& file_name, 
@@ -440,32 +419,33 @@ namespace Timbl {
   }
 
   bool IG_Experiment::checkLine( const string& line ){
-    if ( !TimblExperiment::checkLine( line ) )
+    if ( TimblExperiment::checkLine( line ) )
+      return sanityCheck();
+    else
       return false;
-    else if ( IBStatus() != Pruned ){
+  }
+  
+  bool IG_Experiment::sanityCheck() const {
+    bool status = true;
+    if ( IBStatus() != Pruned ){
       Warning( "you tried to apply the IGTree algorithm on a complete,"
 	       "(non-pruned) Instance Base" );
-      return false;
+      status = false;
     }
-    else {
-      if ( num_of_neighbors != 1 ){
-	Warning( "number of neighbors set to 1 for IGTree test!" );
-	num_of_neighbors = 1;
-      }
-      if ( decay_flag != Zero ){
-	Warning( "Decay impossible for IGTree test, (k=1)" );
-	decay_flag = Zero;
-      }
-      if ( GlobalMetric && GlobalMetric->type() != Overlap ){
-	Warning( "Metric set to Overlap for IGTree test." );
-	delete GlobalMetric;
-	GlobalMetric = 0;
-      }
-      if ( !GlobalMetric )
-	GlobalMetric = getMetricClass( Overlap );
+    if ( num_of_neighbors != 1 ){
+      Warning( "number of neighbors must be 1 for IGTree test!" );
+      status = false;
     }
-    return true;
-  }      
+    if ( decay_flag != Zero ){
+      Warning( "Decay impossible for IGTree test, (while k=1)" );
+      status = false;
+    }
+    if ( GlobalMetric->type() != Overlap ){
+      Warning( "Metric must be Overlap for IGTree test." );
+      status = false;
+    }
+    return status;
+  }
   
   const TargetValue *IG_Experiment::LocalClassify( const Instance& Inst,
 						   double& Distance, 
