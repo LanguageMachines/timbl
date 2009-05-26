@@ -237,7 +237,6 @@ namespace Timbl{
       return new DiceMetric();
       break;
     case Ignore:
-    case DefaultMetric:
       return 0;
       break;
     default:

@@ -138,9 +138,9 @@ namespace Timbl {
     Options.Add( new BoolOption( "HASHED_TREE", 
 				 &hashed_trees, true ) );
     Options.Add( new MetricOption( "GLOBAL_METRIC", 
-				   &metricOption, Overlap ) );
+				   &globalMetricOption, Overlap ) );
     Options.Add( new MetricArrayOption( "METRICS", 
-					UserOptions, DefaultMetric, 
+					UserOptions, Overlap, 
 					MaxFeatures+1 ) );
     Options.Add( new IntegerOption( "MVD_LIMIT", 
 				    &mvd_threshold, 1, 1, 100000 ) );
@@ -1269,15 +1269,12 @@ namespace Timbl {
       if ( Features[g]->Ignore() )
 	continue;
       MetricType TmpMetric = UserOptions[g+1];
-      if ( TmpMetric == DefaultMetric )
-	TmpMetric = metricOption;
-      //      cerr << "user option[" << g+1 << "]=" << toString(TmpMetric) << endl;
       if ( Features[g]->Metric()->isNumerical() ){
 	//	cerr << "Feature is numeric" << endl;
 	feat_status[g] = Features[g]->prepare_numeric_stats();
 	if ( feat_status[g] == SingletonNumeric &&
-	     ( input_format == SparseBin 
-	       && ( GlobalMetric->isSimilarityMetric( ) ) ) ){
+	     input_format == SparseBin &&
+	     GlobalMetric->isSimilarityMetric( ) ){
 	  // ok
 	}
 	else {
@@ -1285,12 +1282,11 @@ namespace Timbl {
 	    nothing_changed = false;
 	    if ( GlobalMetric->isNumerical() ){
 	      TmpMetric = Overlap;
-	      Features[g]->setMetric(TmpMetric);
 	    }
 	    else {
-	      TmpMetric = metricOption;
-	      Features[g]->setMetric(metricOption);
+	      TmpMetric = globalMetricOption;
 	    }
+	    Features[g]->setMetric(TmpMetric);
 	  }
 	  else
 	    TmpMetric = Numeric;
@@ -1318,7 +1314,7 @@ namespace Timbl {
 	}
       }
     } // end g
-    if ( GlobalMetric->isSimilarityMetric( ) && !nothing_changed ){
+    if ( GlobalMetric->isSimilarityMetric() && !nothing_changed ){
       // check to see if ALL features are still Numeric.
       // otherwise we can't do Inner product!
       bool first = true;
@@ -1628,12 +1624,14 @@ namespace Timbl {
   }
 
   void MBLClass::initTesters() {
+    delete GlobalMetric;
+    GlobalMetric = getMetricClass( globalMetricOption );
     delete tester;
     if ( doSamples() )
       tester = new ExemplarTester( Features, permutation, mvd_threshold );
-    else if ( GlobalMetric->type() == Cosine )
+    else if ( globalMetricOption == Cosine )
       tester = new CosineTester( Features, permutation, mvd_threshold );
-    else if ( GlobalMetric->type() == DotProduct )
+    else if ( globalMetricOption == DotProduct )
       tester = new DotProductTester( Features, permutation, mvd_threshold );
     else
       tester = new DefaultTester( Features, permutation, mvd_threshold );
@@ -1979,7 +1977,7 @@ namespace Timbl {
     effective_feats = num_of_features;
     num_of_num_features = 0;
     delete GlobalMetric;
-    GlobalMetric = getMetricClass( metricOption );
+    GlobalMetric = getMetricClass( globalMetricOption );
     for ( size_t j = 0; j < num_of_features; ++j ){
       MetricType m = UserOptions[j+1];
       if ( m == Ignore ){
@@ -1987,9 +1985,6 @@ namespace Timbl {
 	effective_feats--;
       }
       else {
-	if ( m == DefaultMetric ){
-	  m = metricOption;
-	}
 	metricClass *mc = getMetricClass( m );
 	Features[j]->Metric( mc );
 	if ( mc->isNumerical() ){

@@ -250,13 +250,15 @@ namespace Timbl {
 		       std::vector<MetricType>& mp, 
 		       MetricType m,
 		       size_t s ):
-      OptionArrayClass<MetricType>( n, mp, s ){ 
+    OptionArrayClass<MetricType>( n, mp, s ), def(m){ 
       for ( size_t i=0; i < s; i++ )
 	TA[i] = m;
     };
     bool set_option( const std::string& line );
     std::ostream& show_opt( std::ostream &os ) const;
     std::ostream& show_full( std::ostream &os ) const;
+  private:
+    MetricType def;
   };
 
   inline bool MetricArrayOption::set_option( const std::string& line ){ 
@@ -276,7 +278,7 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : ";
     for ( size_t i=0; i < Size; i++ )
-      if ( TA[i] != DefaultMetric )
+      if ( TA[i] != def )
 	os << i << ":" << toString<MetricType>(TA[i]) << ", ";
     return os;
   }
@@ -285,13 +287,13 @@ namespace Timbl {
     os.width(20);
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : comma separated metricvalues, [";
-    bool frst = true;
+    bool first = true;
     for ( size_t i=0; i < Size; i++ ){
-      if ( TA[i] != DefaultMetric ){
-	if ( !frst )
+      if ( TA[i] != def ){
+	if ( !first )
 	  os << ",";
 	else
-	  frst = false;
+	  first = false;
 	os << i << ":" << toString<MetricType>(TA[i]);
       }
     }

@@ -177,7 +177,7 @@ namespace Timbl {
     double decay_alfa;
     double decay_beta;
     bool MBL_init;
-    MetricType metricOption;
+    MetricType globalMetricOption;
     bool do_diversify;
     bool initProbabilityArrays( bool );
     void calculatePrestored();

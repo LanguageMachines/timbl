@@ -101,7 +101,7 @@ namespace Timbl {
     target_pos = -1;
     metricsArray.resize(MaxFeats+1);
     for ( int i=0; i < MaxFeats+1; ++i ){
-      metricsArray[i] = DefaultMetric;
+      metricsArray[i] = UnknownMetric;
     }
     outPath = "";
     logFile = "";
@@ -452,7 +452,7 @@ namespace Timbl {
       string tmp = string( it, eit ); 
       size_t k;
       if ( stringTo<size_t>( tmp, k, 1, metricsArray.size() ) ){
-	if ( metricsArray[k] != DefaultMetric && metricsArray[k] != Value ){
+	if ( metricsArray[k] != UnknownMetric && metricsArray[k] != Value ){
 	  Error( "metric of feature " + tmp +
 		 " is multiply changed!" );
 	  return false;
@@ -490,7 +490,7 @@ namespace Timbl {
 	}
 	else {
 	  for ( size_t j=k+1; j <= m && j <= metricsArray.size(); ++j ){
-	    if ( metricsArray[j] != DefaultMetric 
+	    if ( metricsArray[j] != UnknownMetric 
 		 && metricsArray[j] != Value ){
 	      Error( "metric of feature " + toString<int>(j) + 
 		     " is multiply changed!" );
@@ -547,17 +547,34 @@ namespace Timbl {
 	return false;
       }
       if ( p == line.end() ){
+	//
+	// only -m options, no further specifications
+	//
 	if ( Def == Ignore ){
 	  Error( "Ignore without further specification for metric: -m " + Mline );
 	  return false;
 	}
-	return true;
+	else {
+	  // set the defaults
+	  for ( vector<MetricType>::iterator it=metricsArray.begin();
+		it != metricsArray.end();
+		++it ){
+	    *it = Def;
+	  }
+	  return true;
+	}
       }
       else if ( *p != ':' ){
 	Error( "missing ':' after default value in -m option" );
 	return false;
       }
       else {
+	// deviating options expected. reset the array
+	for ( vector<MetricType>::iterator it=metricsArray.begin();
+	      it != metricsArray.end();
+	      ++it ){
+	  *it = UnknownMetric;
+	}
 	++p;
 	MetricType TmpMT;
 	while( p != line.end() ){
@@ -607,13 +624,14 @@ namespace Timbl {
 	  return false;
 	}
 	else {
-	  if ( Def == Ignore ){
-	    for ( vector<MetricType>::iterator it=metricsArray.begin();
-		  it != metricsArray.end();
-		  ++it ){
-	      if ( *it == DefaultMetric )
-		*it = Ignore;
-	    }
+	  //
+	  // set defaults for those still unset
+	  //
+	  for ( vector<MetricType>::iterator it=metricsArray.begin();
+		it != metricsArray.end();
+		++it ){
+	    if ( *it == UnknownMetric )
+	      *it = Def;
 	  }
 	}
       }

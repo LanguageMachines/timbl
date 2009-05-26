@@ -50,7 +50,6 @@ namespace Timbl {
 				     { "CV", "Cross Validate" } };
   
   const char *MetricName[][2] = { { "U", "Unknown Metric" },
-				  { "NeverUseThis", "Default" },
 				  { "I", "Ignore" },
 				  { "N", "Numeric" },
 				  { "D", "Dot product" },

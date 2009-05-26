@@ -113,7 +113,7 @@ namespace Timbl {
   }
   
   
-  enum MetricType { UnknownMetric, DefaultMetric, Ignore, 
+  enum MetricType { UnknownMetric, Ignore, 
 		    Numeric, DotProduct, Cosine, Overlap, Levenshtein, 
 		    Dice, ValueDiff, JeffreyDiv, MaxMetric };
   

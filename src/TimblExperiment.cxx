@@ -282,8 +282,6 @@ namespace Timbl {
   void TimblExperiment::initExperiment( bool all_vd ){ 
     if ( !ExpInvalid() ){
       if ( !MBL_init ){  // do this only when necessary
-	delete GlobalMetric;
-	GlobalMetric = getMetricClass( metricOption );
 	stats.clear();
 	delete confusionInfo;
 	confusionInfo = 0;
