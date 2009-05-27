@@ -688,8 +688,8 @@ namespace Timbl {
       bool mood = false;
       string myoptarg;
       string long_option = get_option( *curr_opt, myoptarg, mood );
-      //      cerr << "long option:" << long_option 
-      // cerr << " myoptarg:" << myoptarg << endl;
+      //      cerr << "long option:" << long_option << endl;
+      //      cerr << " myoptarg:" << myoptarg << endl;
       char option = long_option[0];
       if ( !strchr( ok_opt, option ) ){
 	// invalid option
@@ -955,10 +955,14 @@ namespace Timbl {
 	
       case 's':
 	if ( long_option == "sloppy" ){
-	  do_sloppy_loo = true;
+	  string up = myoptarg;
+	  uppercase(up);
+	  do_sloppy_loo = ( up=="TRUE" || up=="YES" );
 	}
 	else if ( long_option == "silly" ){
-	  do_silly = true;
+	  string up = myoptarg;
+	  uppercase(up);
+	  do_silly =  ( up=="TRUE" || up=="YES" );
 	}
 	else {
 	  do_sample_weights = true;
