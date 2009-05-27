@@ -153,9 +153,9 @@ namespace Timbl {
       if ( OptPars->Algo() != Unknown_a ){
 	pimpl = Create_Pimpl( OptPars->Algo(), name, OptPars );
       }
-    else {
-      pimpl = Create_Pimpl( IB1_a, name, OptPars );
-    }
+      else {
+	pimpl = Create_Pimpl( IB1_a, name, OptPars );
+      }
       if ( pimpl )
 	if ( !pimpl->ConfirmOptions() ){
 	  delete pimpl;
