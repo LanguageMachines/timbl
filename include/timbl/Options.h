@@ -248,7 +248,7 @@ namespace Timbl {
   public:
     MetricArrayOption( const std::string& n, 
 		       std::vector<MetricType>& mp, 
-		       MetricType m,
+		       MetricType& m,
 		       size_t s ):
     OptionArrayClass<MetricType>( n, mp, s ), def(m){ 
       for ( size_t i=0; i < s; i++ )
@@ -258,7 +258,7 @@ namespace Timbl {
     std::ostream& show_opt( std::ostream &os ) const;
     std::ostream& show_full( std::ostream &os ) const;
   private:
-    MetricType def;
+    const MetricType& def;
   };
 
   inline bool MetricArrayOption::set_option( const std::string& line ){ 

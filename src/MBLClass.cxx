@@ -140,7 +140,7 @@ namespace Timbl {
     Options.Add( new MetricOption( "GLOBAL_METRIC", 
 				   &globalMetricOption, Overlap ) );
     Options.Add( new MetricArrayOption( "METRICS", 
-					UserOptions, Overlap, 
+					UserOptions, globalMetricOption, 
 					MaxFeatures+1 ) );
     Options.Add( new IntegerOption( "MVD_LIMIT", 
 				    &mvd_threshold, 1, 1, 100000 ) );
@@ -205,7 +205,7 @@ namespace Timbl {
     mvd_threshold = 1;
     effective_feats = 0;
     num_of_num_features = 0;
-    DBEntropy = 0.0;
+    DBEntropy = -1.0;
     ChopInput = 0;
     MaxFeatures = Size;
     runningPhase = LearnWords;
@@ -287,7 +287,7 @@ namespace Timbl {
       FeatureStrings = m.FeatureStrings;
       effective_feats = m.effective_feats;
       num_of_num_features    = m.num_of_num_features;
-      DBEntropy = 0.0;
+      DBEntropy = -1.0;
       ChopInput = 0;
       setInputFormat( m.input_format );
       //one extra to store the target!
@@ -1242,7 +1242,7 @@ namespace Timbl {
   }
   
   void MBLClass::calculate_fv_entropy( bool always ){
-    bool realy_first =  DBEntropy < Epsilon;
+    bool realy_first =  DBEntropy < 0.0;
     if ( always || realy_first ){
       // if it's the first time (DBEntropy == 0 ) or
       // if always, we have to (re)calculate everything
@@ -1270,7 +1270,6 @@ namespace Timbl {
 	continue;
       MetricType TmpMetric = UserOptions[g+1];
       if ( Features[g]->Metric()->isNumerical() ){
-	//	cerr << "Feature is numeric" << endl;
 	feat_status[g] = Features[g]->prepare_numeric_stats();
 	if ( feat_status[g] == SingletonNumeric &&
 	     input_format == SparseBin &&
@@ -1305,11 +1304,9 @@ namespace Timbl {
 				     need_all_weights );
 	  }
 	}
-	//	cerr << "got here with metric " << toString(TmpMetric) << endl;
 	if ( TmpMetric != Numeric &&
 	     TmpMetric != Features[g]->Metric()->type() ){
 	  nothing_changed = false;
-	  // 	  cerr << "set 2 metric[" << g << "]=" << toString(TmpMetric) << endl;
 	  Features[g]->setMetric(TmpMetric);
 	}
       }
@@ -1347,9 +1344,9 @@ namespace Timbl {
     // Give a warning for singular features, except when it's
     // a result of a forced recalculation or when the input format is
     // Sparse ??
-    if ( !nothing_changed &&
-	 ( input_format != Sparse && input_format != SparseBin ) &&
-	 ( realy_first || !always ) ){
+    if ( ( input_format != Sparse && input_format != SparseBin ) &&
+	 ( realy_first ||
+	   ( !nothing_changed && !always ) ) ){
       bool first = true;
       ostringstream ostr1;
       ostringstream ostr2;
