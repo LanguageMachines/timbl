@@ -242,7 +242,6 @@ namespace Timbl {
     bool Ignore() const { return ignore; };
     void Ignore( const bool val ){ ignore = val; };
     metricClass *Metric() const { return metric; };
-    void Metric( metricClass * m ){ metric = m; };
     void setMetric( const MetricType );
     double Weight() const { return weight; };
     void SetWeight( const double w ) { weight = w; };
@@ -271,7 +270,7 @@ namespace Timbl {
     bool ArrayRead(){ return vcpb_read; };
     bool matrix_present( ) const;
     unsigned int matrix_byte_size() const;
-    bool store_matrix( metricClass *, int = 1 );
+    bool store_matrix( int = 1 );
     void delete_matrix();
     void print_matrix( bool s = false ) const;
     void print_vc_pb_array( std::ostream& ) const;

@@ -440,7 +440,7 @@ namespace Timbl {
       Warning( "Decay impossible for IGTree test, (while k=1)" );
       status = false;
     }
-    if ( GlobalMetric->type() != Overlap ){
+    if ( globalMetricOption != Overlap ){
       Warning( "Metric must be Overlap for IGTree test." );
       status = false;
     }

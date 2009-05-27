@@ -1394,7 +1394,7 @@ namespace Timbl {
   }
   
   void TimblExperiment::show_metric_info( ostream& os ) const {
-    os << "Global metric : " << toString( GlobalMetric->type(), true);
+    os << "Global metric : " << toString( globalMetricOption, true);
     if ( GlobalMetric->isStorable() ){
       os << ", Prestored matrix";
     }
@@ -1409,7 +1409,7 @@ namespace Timbl {
     for ( size_t i = 0; i < NumOfFeatures(); ++i ){
       if ( !Features[i]->Ignore() &&
 	   InvPerm[i]+1 > TRIBL_offset() ){
-	if ( Features[i]->Metric()->type() != GlobalMetric->type() ){
+	if ( Features[i]->Metric()->type() != globalMetricOption ){
 	  ++cnt;
 	  os << endl << "   Feature[" << i+1 << "] : "
 	     << toString( Features[i]->Metric()->type(), true );

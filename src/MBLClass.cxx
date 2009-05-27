@@ -869,7 +869,7 @@ namespace Timbl {
     for ( size_t j = tribl_offset; j < effective_feats; ++j ) {
       if ( !PermFeatures[j]->Ignore() && 
 	   PermFeatures[j]->Metric()->isStorable() ){
-	PermFeatures[j]->store_matrix( GlobalMetric, mvd_threshold );
+	PermFeatures[j]->store_matrix( mvd_threshold );
       }
     } // j
     if ( Verbosity(VD_MATRIX) ) 
@@ -1985,9 +1985,8 @@ namespace Timbl {
 	effective_feats--;
       }
       else {
-	metricClass *mc = getMetricClass( m );
-	Features[j]->Metric( mc );
-	if ( mc->isNumerical() ){
+	Features[j]->setMetric( m );
+	if ( Features[j]->Metric()->isNumerical() ){
 	  num_of_num_features++;
 	}
       }

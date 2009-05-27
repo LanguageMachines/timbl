@@ -364,10 +364,16 @@ namespace Timbl {
       }
       else
 	Exp->SetOption(  "EXEMPLAR_WEIGHTS: false" );
-      if ( local_metric != UnknownMetric ){
-	optline = "GLOBAL_METRIC: " + toString(local_metric);
-	Exp->SetOption( optline );
+      if ( local_metric == UnknownMetric ){
+	// Ok, so NO defaults at all (API usage for instance)
+	local_metric = Overlap;
+	for ( size_t j=0; j <= metricsArray.size(); ++j ){
+	  metricsArray[j] = Overlap;
+	}
+	
       }
+      optline = "GLOBAL_METRIC: " + toString(local_metric);
+      Exp->SetOption( optline );
       if ( local_weight != Unknown_w ){
 	optline = "WEIGHTING: " + toString(local_weight);
 	Exp->SetOption( optline );

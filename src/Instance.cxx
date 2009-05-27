@@ -1420,15 +1420,12 @@ namespace Timbl {
     }
   };
   
-  bool Feature::store_matrix( metricClass *gmt, int limit){
+  bool Feature::store_matrix( int limit){
     //
     // Store a complete distance matrix.
     //
     if ( !metric_matrix )
       metric_matrix = new SparseSymetricMatrix<FeatureValue*>();
-    if ( metric == 0 ){
-      metric = gmt->clone();
-    }
     if ( PrestoreStatus != ps_failed && metric->isStorable( ) ) {
       try {
 	for ( unsigned int ii=0; ii < ValuesArray.size(); ++ii ){
