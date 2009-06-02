@@ -98,15 +98,11 @@ namespace Timbl{
     delete [] test_feature_val;
   }
 
-  double overlapTestFunction::test( FeatureValue *FV,
+  double overlapTestFunction::test( FeatureValue *F,
 				    FeatureValue *G,
 				    Feature *Feat ) const {
-    double result = 0.0;
-    if ( !FV->isUnknown() && FV->ValFreq() == 0 )
-      result = 1.0;
-    else if ( FV != G ){
-      result = Feat->Weight();
-    }
+    double result = Feat->distance( F, G );
+    result *= Feat->Weight();
     return result;
   }
 
@@ -124,8 +120,7 @@ namespace Timbl{
     double r1, r2, result;
     if ( FV_to_real( FV, r1 ) &&
 	 FV_to_real( G, r2 ) )
-      result = fabs( (r1-r2)/
-		     (Feat->Max() - Feat->Min()));
+      result = fabs( (r1-r2)/ (Feat->Max() - Feat->Min()) );
     else
       result = 1.0;
     result *= Feat->Weight();

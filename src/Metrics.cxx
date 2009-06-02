@@ -244,11 +244,13 @@ namespace Timbl{
     }
   }
 
-  double OverlapMetric::distance( FeatureValue *, FeatureValue *, 
+  double OverlapMetric::distance( FeatureValue *F,
+				  FeatureValue *G, 
 				  size_t ) const {
-    cerr << "unimplemented distance() for Overlap metric!" << endl;
-    assert( type() == MaxMetric );
-    return -1.0;
+    if ( F == G )
+      return 0.0;
+    else
+      return 1.0;
   }
 
   double JeffreyMetric::distance( FeatureValue *F, FeatureValue *G, 
