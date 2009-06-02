@@ -24,9 +24,6 @@
       Timbl@uvt.nl
 */
 
-#define IB2_HACK 1
-
-
 #include <string>
 #include <vector>
 #include <map>
@@ -416,12 +413,7 @@ namespace Timbl {
 	    }
 	    else {
 	      bool found;
-#ifdef IB2_HACK
 	      bool go_on = true;
-#else
-	      bool go_on = ( IB2_offset() == 0 ||
-			     stats.dataLines() <= IB2_offset() );
-#endif
 	      if ( !Verbosity(SILENT) ){
 		Info( "Phase 1: Reading Datafile: " + FileName );
 		time_stamp( "Start:     ", 0 );
@@ -432,11 +424,6 @@ namespace Timbl {
 		//
 		if (( stats.dataLines() % Progress() ) == 0)
 		  time_stamp( "Examining: ", stats.dataLines() );
-#ifndef IB2_HACK
-		if ( IB2_offset() > 0 && stats.dataLines() >= IB2_offset() )
-		  go_on = false;
-		else {
-#endif
 		  found = false;
 		  while ( !found && 
 			  nextLine( datafile, Buffer ) ){
@@ -448,9 +435,6 @@ namespace Timbl {
 		    }
 		  }
 		  go_on = found;
-#ifndef IB2_HACK
-		}
-#endif
 	      }
 	      if ( stats.dataLines() < 1 ){
 		Error( "no useful data in: " + FileName );
@@ -1089,9 +1073,7 @@ namespace Timbl {
 	      *Dbg(mydebug) << "adding " << &CurrInst << endl;
 	      ++Added;
 	      ++TotalAdded;
-#ifdef IB2_HACK
 	      MBL_init = true; // avoid recalculations in LocalClassify
-#endif
 	      
 	    }
 	    // Progress update.
@@ -1117,9 +1099,7 @@ namespace Timbl {
 	      IBInfo( *Log(mylog) );
 	      LearningInfo( *Log(mylog) );
 	    }
-#ifdef IB2_HACK
 	    MBL_init = false; // force recalculations when testing
-#endif 
 	  }
 	}
     }
