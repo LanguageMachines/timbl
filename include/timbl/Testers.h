@@ -28,31 +28,31 @@
 #define TESTERS_H
 
 namespace Timbl{
-  class metricTester {
+  class metricTestFunction {
   public:
-    virtual ~metricTester(){};
+    virtual ~metricTestFunction(){};
     virtual double test( FeatureValue *, 
 			 FeatureValue *, 
 			 Feature * ) const = 0;
   };
 
-  class overlapTester: public metricTester {
+  class overlapTestFunction: public metricTestFunction {
   public:
     double test( FeatureValue *FV,
 		 FeatureValue *G,
 		 Feature *Feat ) const;
   };
 
-  class numericOverlapTester: public metricTester {
+  class numericOverlapTestFunction: public metricTestFunction {
   public:
     double test( FeatureValue *FV,
 		 FeatureValue *G,
 		 Feature *Feat ) const;
   };
 
-  class valueDiffTester: public metricTester {
+  class valueDiffTestFunction: public metricTestFunction {
   public:
-  valueDiffTester( int t ): metricTester(), threshold( t ){};
+  valueDiffTestFunction( int t ): metricTestFunction(), threshold( t ){};
     double test( FeatureValue *F,
 		 FeatureValue *G,
 		 Feature *Feat ) const;
@@ -76,7 +76,7 @@ namespace Timbl{
     size_t effSize;
     size_t offSet;
     const std::vector<FeatureValue *> *FV;
-    metricTester **test_feature_val;
+    metricTestFunction **test_feature_val;
     const std::vector<Feature *> &features;
     std::vector<Feature *> permFeatures;
     const std::vector<size_t> &permutation;

@@ -240,6 +240,7 @@ namespace Timbl {
   class Feature: public BaseFeatTargClass {
   public:
     Feature( int a, int b, StringHash *T );
+    ~Feature();
     bool Ignore() const { return ignore; };
     void Ignore( const bool val ){ ignore = val; };
     metricClass *Metric() const { return metric; };
@@ -260,7 +261,7 @@ namespace Timbl {
     void Min( const double val ){ n_min = val; };
     double Max() const { return n_max; };
     void Max( const double val ){ n_max = val; };
-    ~Feature();
+    double distance( FeatureValue *, FeatureValue *, size_t=1 ) const;
     FeatureValue *add_value( const std::string&, TargetValue * );
     FeatureValue *add_value( unsigned int, TargetValue * );
     FeatureValue *Lookup( const std::string& ) const ;

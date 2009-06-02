@@ -30,9 +30,6 @@
 namespace Timbl{
 #include <climits> // for INT_MAX
 
-  double lv_distance( const std::string&, const std::string& );
-  double dc_distance( const std::string&, const std::string& );
-
   static const int maxSimilarity = INT_MAX;
   
   metricClass *getMetricClass( MetricType );

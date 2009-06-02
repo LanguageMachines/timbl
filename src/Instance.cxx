@@ -1031,6 +1031,11 @@ namespace Timbl {
     }
   }
 
+  double Feature::distance( FeatureValue *F, FeatureValue *G, 
+			    size_t t ) const {
+    return metric->distance( F, G, t );
+  }
+
   ostream& operator<<(ostream& os, const ValueDistribution& vd ) {
     string tmp;
     vd.DistToString( tmp );

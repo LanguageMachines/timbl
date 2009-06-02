@@ -63,7 +63,7 @@ namespace Timbl{
 			    int mvdThreshold ):
     _size(feat.size()), features(feat), permutation(perm) {
     permFeatures.resize(_size,0);
-    test_feature_val = new metricTester*[_size];
+    test_feature_val = new metricTestFunction*[_size];
     for ( size_t j=0; j < _size; ++j ){
       permFeatures[j] = feat[perm[j]];
       test_feature_val[j] = 0;
@@ -75,11 +75,11 @@ namespace Timbl{
       if ( features[i]->Ignore() )
 	continue;
       if ( features[i]->Metric()->isStorable() )
- 	test_feature_val[i] = new valueDiffTester( mvdThreshold );
+ 	test_feature_val[i] = new valueDiffTestFunction( mvdThreshold );
       else if ( features[i]->Metric()->isNumerical() )
-	test_feature_val[i] = new numericOverlapTester();
+	test_feature_val[i] = new numericOverlapTestFunction();
       else
- 	test_feature_val[i] = new overlapTester();
+ 	test_feature_val[i] = new overlapTestFunction();
     }
   }
   
@@ -98,9 +98,9 @@ namespace Timbl{
     delete [] test_feature_val;
   }
 
-  double overlapTester::test( FeatureValue *FV,
-			      FeatureValue *G,
-			      Feature *Feat ) const {
+  double overlapTestFunction::test( FeatureValue *FV,
+				    FeatureValue *G,
+				    Feature *Feat ) const {
     double result = 0.0;
     if ( !FV->isUnknown() && FV->ValFreq() == 0 )
       result = 1.0;
@@ -118,9 +118,9 @@ namespace Timbl{
     return false;
   }  
   
-  double numericOverlapTester::test( FeatureValue *FV,
-				     FeatureValue *G,
-				     Feature *Feat ) const {
+  double numericOverlapTestFunction::test( FeatureValue *FV,
+					   FeatureValue *G,
+					   Feature *Feat ) const {
     double r1, r2, result;
     if ( FV_to_real( FV, r1 ) &&
 	 FV_to_real( G, r2 ) )
@@ -132,10 +132,10 @@ namespace Timbl{
     return result;
   }
   
-  double valueDiffTester::test( FeatureValue *F,
-				FeatureValue *G,
-				Feature *Feat ) const {
-    double result = Feat->Metric()->distance( F, G, threshold );
+  double valueDiffTestFunction::test( FeatureValue *F,
+				      FeatureValue *G,
+				      Feature *Feat ) const {
+    double result = Feat->distance( F, G, threshold );
     result *= Feat->Weight();
     return result;
   }
