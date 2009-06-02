@@ -47,6 +47,7 @@ typedef std::ostream LogStream;
 #include "timbl/Options.h"
 #include "timbl/BestArray.h"
 #include "timbl/MBLClass.h"
+#include "timbl/Metrics.h"
 #include "timbl/Testers.h"
 
 using namespace std;

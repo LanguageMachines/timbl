@@ -48,7 +48,7 @@ typedef std::ostream LogStream;
 #include "timbl/Instance.h"
 #include "timbl/neighborSet.h"
 #include "timbl/Statistics.h"
-#include "timbl/Testers.h"
+#include "timbl/Metrics.h"
 #include "timbl/CommandLine.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/BestArray.h"

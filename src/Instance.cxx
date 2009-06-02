@@ -46,7 +46,7 @@
 #include "timbl/Tree.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
-#include "timbl/Testers.h"
+#include "timbl/Metrics.h"
 
 #ifdef PTHREADS
 #include <pthread.h>

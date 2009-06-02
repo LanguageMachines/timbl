@@ -62,6 +62,7 @@ typedef std::ostream LogStream;
 #include "timbl/SocketBasics.h"
 #include "timbl/BestArray.h"
 #include "timbl/Testers.h"
+#include "timbl/Metrics.h"
 #include "timbl/Choppers.h"
 #include "timbl/MBLClass.h"
 
@@ -1626,12 +1627,8 @@ namespace Timbl {
     delete tester;
     if ( doSamples() )
       tester = new ExemplarTester( Features, permutation, mvd_threshold );
-    else if ( globalMetricOption == Cosine )
-      tester = new CosineTester( Features, permutation, mvd_threshold );
-    else if ( globalMetricOption == DotProduct )
-      tester = new DotProductTester( Features, permutation, mvd_threshold );
-    else
-      tester = new DefaultTester( Features, permutation, mvd_threshold );
+    else 
+      tester = getTester( globalMetricOption, Features, permutation, mvd_threshold );
   }
 
   ostream& operator<< ( ostream& os, const vector<FeatureValue*>& fv ){

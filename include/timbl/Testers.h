@@ -27,102 +27,7 @@
 #ifndef TESTERS_H
 #define TESTERS_H
 
-#include <climits>
-
 namespace Timbl{
-  double lv_distance( const std::string&, const std::string& );
-  double dc_distance( const std::string&, const std::string& );
-
-  static const int maxSimilarity = INT_MAX;
-  
-  metricClass *getMetricClass( MetricType );
-
-  class metricClass {
-  public:
-  metricClass( MetricType m ): _type(m){};
-    virtual ~metricClass() {};
-    MetricType type() const { return _type; };
-    virtual bool isSimilarityMetric() const = 0;
-    virtual bool isNumerical() const = 0;
-    virtual bool isStorable() const = 0;
-    virtual double distance( FeatureValue *, FeatureValue *, size_t=1 ) const = 0;
-    metricClass *clone() const{ return getMetricClass(_type); };
-  private:
-    MetricType _type;
-  };
-
-  class OverlapMetric: public metricClass {
-  public:
-  OverlapMetric(): metricClass( Overlap ){};
-    bool isSimilarityMetric() const { return false; };
-    bool isNumerical() const { return false; };
-    bool isStorable() const { return false; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
-  };
-  
-  class ValueDiffMetric: public metricClass {
-  public:
-  ValueDiffMetric(): metricClass( ValueDiff ){};
-    bool isSimilarityMetric() const { return false; };
-    bool isNumerical() const { return false; };
-    bool isStorable() const { return true; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
-  };
-  
-  class NumericMetric: public metricClass {
-  public:
-  NumericMetric(): metricClass( Numeric ){};
-    bool isSimilarityMetric() const { return false; };
-    bool isNumerical() const { return true; };
-    bool isStorable() const { return false; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
-  };
-
-  class CosineMetric: public metricClass {
-  public:
-  CosineMetric(): metricClass( Cosine ){};
-    bool isSimilarityMetric() const { return true; };
-    bool isNumerical() const { return true; };
-    bool isStorable() const { return false; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
-  };
-
-  class DotProductMetric: public metricClass {
-  public:
-  DotProductMetric(): metricClass( DotProduct ){};
-    bool isSimilarityMetric() const { return true; };
-    bool isNumerical() const { return true; };
-    bool isStorable() const { return false; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
-  };
-
-  class DiceMetric: public metricClass {
-  public:
-  DiceMetric(): metricClass( Dice ){};
-    bool isSimilarityMetric() const { return false; };
-    bool isNumerical() const { return false; };
-    bool isStorable() const { return true; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
-  };
-
-  class JeffreyMetric: public metricClass {
-  public:
-  JeffreyMetric(): metricClass( JeffreyDiv ){};
-    bool isSimilarityMetric() const { return false; };
-    bool isNumerical() const { return false; };
-    bool isStorable() const { return true; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
-  };
-
-  class LevenshteinMetric: public metricClass {
-  public:
-  LevenshteinMetric(): metricClass( Levenshtein ){};
-    bool isSimilarityMetric() const { return false; };
-    bool isNumerical() const { return false; };
-    bool isStorable() const { return true; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
-  };
-
   class metricTester {
   public:
     virtual ~metricTester(){};
@@ -144,47 +49,15 @@ namespace Timbl{
 		 FeatureValue *G,
 		 Feature *Feat ) const;
   };
-  
 
-  class valueTester: public metricTester {
+  class valueDiffTester: public metricTester {
   public:
-  valueTester( int t ): metricTester(), threshold( t ){};
+  valueDiffTester( int t ): metricTester(), threshold( t ){};
+    double test( FeatureValue *F,
+		 FeatureValue *G,
+		 Feature *Feat ) const;
   protected:
     int threshold;
-  private:
-    valueTester();
-  };
-  
-  class valueDiffTester: public valueTester {
-  public:
-  valueDiffTester( int t ): valueTester( t){};
-    double test( FeatureValue *F,
-		 FeatureValue *G,
-		 Feature *Feat ) const;
-  };
-  
-  class jeffreyDiffTester: public valueTester {
-  public:
-  jeffreyDiffTester( int t ): valueTester( t){};
-    double test( FeatureValue *F,
-		 FeatureValue *G,
-		 Feature *Feat ) const;
-  };
-  
-  class levenshteinTester: public valueTester {
-  public:
-  levenshteinTester( int t ): valueTester( t){};
-    double test( FeatureValue *F,
-		 FeatureValue *G,
-		 Feature *Feat ) const;
-  };
-  
-  class diceTester: public valueTester {
-  public:
-  diceTester( int t ): valueTester( t){};
-    double test( FeatureValue *F,
-		 FeatureValue *G,
-		 Feature *Feat ) const;
   };
   
   class TesterClass {
@@ -234,29 +107,45 @@ namespace Timbl{
 		 double );
   };
 
-  class CosineTester: public TesterClass {
+  class SimilarityTester: public TesterClass {
+  public:
+  SimilarityTester( const std::vector<Feature*>& pf,
+		    const std::vector<size_t>& p,
+		    int t ): 
+    TesterClass( pf, p, t ){};
+    ~SimilarityTester() {};
+    double getDistance( size_t ) const;
+    virtual size_t test( std::vector<FeatureValue *>&, 
+			 size_t,
+			 double ) = 0;
+  };
+  
+  class CosineTester: public SimilarityTester {
   public:
   CosineTester( const std::vector<Feature*>& pf,
 		const std::vector<size_t>& p,
 		int t ): 
-    TesterClass( pf, p, t ){};  
-    double getDistance( size_t ) const;
+    SimilarityTester( pf, p, t ){};  
     size_t test( std::vector<FeatureValue *>&, 
 		 size_t,
 		 double );
   };
   
-  class DotProductTester: public TesterClass {
+  class DotProductTester: public SimilarityTester {
   public:
   DotProductTester( const std::vector<Feature*>& pf,
 		    const std::vector<size_t>& p,
 		    int t): 
-    TesterClass( pf, p, t ){};  
-    double getDistance( size_t ) const;
+    SimilarityTester( pf, p, t ){};  
     size_t test( std::vector<FeatureValue *>&, 
 		 size_t,
 		 double );
   };
+
+  TesterClass* getTester( MetricType,
+			  const std::vector<Feature*>&, 
+			  const std::vector<size_t>&,
+			  int );
 
 }  
 
