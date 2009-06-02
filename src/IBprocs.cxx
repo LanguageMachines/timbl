@@ -43,12 +43,10 @@ typedef std::ostream LogStream;
 #define Log(X) (X)
 #define Dbg(X) (X)
 #endif
-#include "timbl/neighborSet.h"
 #include "timbl/Options.h"
 #include "timbl/BestArray.h"
 #include "timbl/MBLClass.h"
 #include "timbl/Metrics.h"
-#include "timbl/Testers.h"
 
 using namespace std;
 

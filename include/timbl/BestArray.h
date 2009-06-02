@@ -26,6 +26,8 @@
 #ifndef BESTARRAY_H
 #define BESTARRAY_H
 
+#include "timbl/neighborSet.h"
+
 namespace Timbl {
 
   class BestRec {

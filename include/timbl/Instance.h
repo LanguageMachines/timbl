@@ -30,6 +30,7 @@
 #include <list>
 #include <vector>
 #include <map>
+#include "timbl/MsgClass.h"
 #include "timbl/Matrices.h"
 
 namespace Timbl {

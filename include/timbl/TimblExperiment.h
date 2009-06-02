@@ -27,6 +27,10 @@
 #ifndef TIMBLEXP_H
 #define TIMBLEXP_H
 
+#include "timbl/BestArray.h"
+#include "timbl/Statistics.h"
+#include "timbl/MBLClass.h"
+
 namespace Timbl {
 
   class TimblAPI;

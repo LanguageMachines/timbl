@@ -40,10 +40,6 @@
 #include "timbl/Options.h"
 #include "timbl/Tree.h"
 #include "timbl/Instance.h"
-#include "timbl/Statistics.h"
-#include "timbl/Testers.h"
-#include "timbl/neighborSet.h"
-#include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
 
 #ifdef USE_LOGSTREAMS
@@ -54,7 +50,6 @@ typedef std::ostream LogStream;
 #define Dbg(X) (X)
 #endif
 
-#include "timbl/MBLClass.h"
 #include "timbl/TimblExperiment.h"
 
 namespace Timbl {
