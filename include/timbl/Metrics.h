@@ -43,7 +43,6 @@ namespace Timbl{
     virtual bool isNumerical() const = 0;
     virtual bool isStorable() const = 0;
     virtual double distance( FeatureValue *, FeatureValue *, size_t=1 ) const = 0;
-    metricClass *clone() const{ return getMetricClass(_type); };
   private:
     MetricType _type;
   };
@@ -53,9 +52,6 @@ namespace Timbl{
   distanceMetricClass( MetricType m ): metricClass(m){};
     virtual ~distanceMetricClass() {};
     bool isSimilarityMetric() const { return false; };
-    virtual bool isNumerical() const = 0;
-    virtual bool isStorable() const = 0;
-    virtual double distance( FeatureValue *, FeatureValue *, size_t=1 ) const = 0;
   };
 
   class OverlapMetric: public distanceMetricClass {
@@ -109,6 +105,7 @@ namespace Timbl{
   class similarityMetricClass: public metricClass {
   public:
   similarityMetricClass( MetricType m ): metricClass( m ){};
+    virtual ~similarityMetricClass() {};
     bool isSimilarityMetric() const { return true; };
     bool isNumerical() const { return true; };
     bool isStorable() const { return false; };
