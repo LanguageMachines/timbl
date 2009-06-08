@@ -90,9 +90,9 @@ namespace Timbl{
 			  const std::vector<size_t>& permutation,
 			  int mvdThreshold ){
     if ( m == Cosine )
-      return new CosineTester( features, permutation, mvdThreshold );
+      return new CosineTester( features, permutation );
     else if ( m == DotProduct )
-      return new DotProductTester( features, permutation, mvdThreshold );
+      return new DotProductTester( features, permutation );
     else
       return new DistanceTester( features, permutation, mvdThreshold );
   }
