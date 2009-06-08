@@ -48,78 +48,83 @@ namespace Timbl{
     MetricType _type;
   };
 
-  class OverlapMetric: public metricClass {
+  class distanceMetricClass: public metricClass {
   public:
-  OverlapMetric(): metricClass( Overlap ){};
+  distanceMetricClass( MetricType m ): metricClass(m){};
+    virtual ~distanceMetricClass() {};
     bool isSimilarityMetric() const { return false; };
+    virtual bool isNumerical() const = 0;
+    virtual bool isStorable() const = 0;
+    virtual double distance( FeatureValue *, FeatureValue *, size_t=1 ) const = 0;
+  };
+
+  class OverlapMetric: public distanceMetricClass {
+  public:
+  OverlapMetric(): distanceMetricClass( Overlap ){};
     bool isNumerical() const { return false; };
     bool isStorable() const { return false; };
     double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
   
-  class ValueDiffMetric: public metricClass {
+  class NumericMetric: public distanceMetricClass {
   public:
-  ValueDiffMetric(): metricClass( ValueDiff ){};
-    bool isSimilarityMetric() const { return false; };
+  NumericMetric(): distanceMetricClass( Numeric ){};
+    bool isNumerical() const { return true; };
+    bool isStorable() const { return false; };
+    double distance( FeatureValue *, FeatureValue *, size_t ) const;
+  };
+
+  class ValueDiffMetric: public distanceMetricClass {
+  public:
+  ValueDiffMetric(): distanceMetricClass( ValueDiff ){};
     bool isNumerical() const { return false; };
     bool isStorable() const { return true; };
     double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
   
-  class NumericMetric: public metricClass {
+  class DiceMetric: public distanceMetricClass {
   public:
-  NumericMetric(): metricClass( Numeric ){};
-    bool isSimilarityMetric() const { return false; };
-    bool isNumerical() const { return true; };
-    bool isStorable() const { return false; };
+  DiceMetric(): distanceMetricClass( Dice ){};
+    bool isNumerical() const { return false; };
+    bool isStorable() const { return true; };
     double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
 
-  class CosineMetric: public metricClass {
+  class JeffreyMetric: public distanceMetricClass {
   public:
-  CosineMetric(): metricClass( Cosine ){};
+  JeffreyMetric(): distanceMetricClass( JeffreyDiv ){};
+    bool isNumerical() const { return false; };
+    bool isStorable() const { return true; };
+    double distance( FeatureValue *, FeatureValue *, size_t ) const;
+  };
+
+  class LevenshteinMetric: public distanceMetricClass {
+  public:
+  LevenshteinMetric(): distanceMetricClass( Levenshtein ){};
+    bool isNumerical() const { return false; };
+    bool isStorable() const { return true; };
+    double distance( FeatureValue *, FeatureValue *, size_t ) const;
+  };
+
+  class similarityMetricClass: public metricClass {
+  public:
+  similarityMetricClass( MetricType m ): metricClass( m ){};
     bool isSimilarityMetric() const { return true; };
     bool isNumerical() const { return true; };
     bool isStorable() const { return false; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
 
-  class DotProductMetric: public metricClass {
+  class CosineMetric: public similarityMetricClass {
   public:
-  DotProductMetric(): metricClass( DotProduct ){};
-    bool isSimilarityMetric() const { return true; };
-    bool isNumerical() const { return true; };
-    bool isStorable() const { return false; };
+  CosineMetric(): similarityMetricClass( Cosine ){};
     double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
 
-  class DiceMetric: public metricClass {
+  class DotProductMetric: public similarityMetricClass {
   public:
-  DiceMetric(): metricClass( Dice ){};
-    bool isSimilarityMetric() const { return false; };
-    bool isNumerical() const { return false; };
-    bool isStorable() const { return true; };
+  DotProductMetric(): similarityMetricClass( DotProduct ){};
     double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
-
-  class JeffreyMetric: public metricClass {
-  public:
-  JeffreyMetric(): metricClass( JeffreyDiv ){};
-    bool isSimilarityMetric() const { return false; };
-    bool isNumerical() const { return false; };
-    bool isStorable() const { return true; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
-  };
-
-  class LevenshteinMetric: public metricClass {
-  public:
-  LevenshteinMetric(): metricClass( Levenshtein ){};
-    bool isSimilarityMetric() const { return false; };
-    bool isNumerical() const { return false; };
-    bool isStorable() const { return true; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
-  };
-
 
 }  
 

@@ -1390,11 +1390,11 @@ namespace Timbl {
     for ( size_t i = 0; i < NumOfFeatures(); ++i ){
       if ( !Features[i]->Ignore() &&
 	   InvPerm[i]+1 > TRIBL_offset() ){
-	if ( Features[i]->Metric()->type() != globalMetricOption ){
+	MetricType mt =  Features[i]->getMetricType();
+	if ( mt != globalMetricOption ){
 	  ++cnt;
-	  os << endl << "   Feature[" << i+1 << "] : "
-	     << toString( Features[i]->Metric()->type(), true );
-	  if ( Features[i]->Metric()->isStorable() ){
+	  os << endl << "   Feature[" << i+1 << "] : " << toString( mt, true );
+	  if ( Features[i]->isStorableMetric() ){
 	    if ( Features[i]->matrix_present() )
 	      os << " (Prestored)";
 	    else

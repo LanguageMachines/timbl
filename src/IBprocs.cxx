@@ -397,7 +397,7 @@ namespace Timbl {
       bool first = true;
       for ( size_t i=0; i < num_of_features; ++i )
 	if ( !Features[i]->Ignore() &&
-	     Features[i]->Metric()->isNumerical() ){
+	     Features[i]->isNumerical() ){
 	  if ( !first )
 	    os << ", ";
 	  else
@@ -410,7 +410,7 @@ namespace Timbl {
 	first = true;
 	for ( size_t j=0; j < num_of_features; ++j )
 	  if ( !Features[j]->Ignore() &&
-	       Features[j]->Metric()->isNumerical() ){
+	       Features[j]->isNumerical() ){
 	    if ( !first )
 	      os << " , ";
 	    else

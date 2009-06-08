@@ -243,8 +243,8 @@ namespace Timbl {
     ~Feature();
     bool Ignore() const { return ignore; };
     void Ignore( const bool val ){ ignore = val; };
-    metricClass *Metric() const { return metric; };
-    void setMetric( const MetricType );
+    bool setMetricType( const MetricType );
+    MetricType getMetricType() const;
     double Weight() const { return weight; };
     void SetWeight( const double w ) { weight = w; };
     double InfoGain() const { return info_gain; };
@@ -267,6 +267,8 @@ namespace Timbl {
     FeatureValue *Lookup( const std::string& ) const ;
     bool decrement_value( FeatureValue *, TargetValue * );
     bool increment_value( FeatureValue *, TargetValue * );
+    bool isNumerical() const;
+    bool isStorableMetric() const;
     bool AllocSparseArrays( size_t );
     void InitSparseArrays();
     bool ArrayRead(){ return vcpb_read; };

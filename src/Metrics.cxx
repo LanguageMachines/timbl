@@ -140,6 +140,8 @@ namespace Timbl{
 
   double vd_distance( SparseValueProbClass *r, SparseValueProbClass *s ){
     double result = 0.0;
+    if ( ! ( r && s ) )
+      return 1.0;
     SparseValueProbClass::IDiterator p1 = r->begin();
     SparseValueProbClass::IDiterator p2 = s->begin();
     while( p1 != r->end() &&
@@ -253,6 +255,15 @@ namespace Timbl{
       return 1.0;
   }
 
+
+  inline bool FV_to_real( FeatureValue *FV, double &result ){
+    if ( FV ){
+      if ( stringTo<double>( FV->Name(), result ) )
+	return true;
+    }
+    return false;
+  }  
+
   double JeffreyMetric::distance( FeatureValue *F, FeatureValue *G, 
 				  size_t limit ) const {
     double result = 0.0;
@@ -294,13 +305,6 @@ namespace Timbl{
     return result;
   }
   
-  double DotProductMetric::distance( FeatureValue *, FeatureValue *, 
-				     size_t ) const {
-    cerr << "unimplemented distance() for Dotproduct metric!" << endl;
-    assert( type() == MaxMetric );
-    return -1.0;
-  }
-
   double ValueDiffMetric::distance( FeatureValue *F, FeatureValue *G, 
 				    size_t limit ) const {
     double result = 0.0;
@@ -309,29 +313,30 @@ namespace Timbl{
 	   G->ValFreq() < limit ){
 	result = 1.0;
       }
-      else {
-	if ( F->valueClassProb() && G->valueClassProb() )
-	  result = vd_distance( F->valueClassProb(), G->valueClassProb() );
-	else
-	  result = 1.0;
-      }
+      else
+	result = vd_distance( F->valueClassProb(), G->valueClassProb() );
     }
     return result;
   }
 
-  double CosineMetric::distance( FeatureValue *, FeatureValue *, 
-				 size_t ) const {
-    cerr << "unimplemented distance() for Cosine metric!" << endl;
-    assert( type() == MaxMetric );
+  double NumericMetric::distance( FeatureValue *, FeatureValue *, 
+				  size_t ) const {
+    throw( logic_error( "unimplemented distance() for Numeric metric!" ) );
+    return -1.0;
+  }
+  
+  double DotProductMetric::distance( FeatureValue *, FeatureValue *, 
+				     size_t ) const {
+    throw( logic_error( "unimplemented distance() for Dotproduct metric!" ) );
     return -1.0;
   }
 
-  double NumericMetric::distance( FeatureValue *, FeatureValue *, 
-				  size_t ) const {
-    cerr << "unimplemented distance() for Numeric metric!" << endl;
-    assert( type() == MaxMetric );
+  double CosineMetric::distance( FeatureValue *, FeatureValue *, 
+				 size_t ) const {
+    throw( logic_error( "unimplemented distance() for Cosine metric!" ) );
     return -1.0;
   }
+
   
 }  
 

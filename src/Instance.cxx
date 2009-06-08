@@ -1313,7 +1313,21 @@ namespace Timbl {
     } 
     return true;
   }
-  
+
+  bool Feature::isNumerical() const {
+    if ( metric && metric->isNumerical() )
+      return true;
+    else
+      return false;
+  }
+
+  bool Feature::isStorableMetric() const {
+    if ( metric && metric->isStorable() )
+      return true;
+    else
+      return false;
+  }
+
   BaseFeatTargClass::BaseFeatTargClass( int Size, int Inc, StringHash *T ):
     CurSize( Size ),
     Increment( Inc ),
@@ -1418,13 +1432,17 @@ namespace Timbl {
     PrestoreStatus = ps_undef;
   }
   
-  void Feature::setMetric( const MetricType M ){ 
+  bool Feature::setMetricType( const MetricType M ){ 
     if ( !metric || ( metric && M != metric->type() ) ){
       delete metric; 
       metric = getMetricClass(M); 
+      return true;
     }
+    return false;
   };
   
+  MetricType Feature::getMetricType() const { return metric->type(); };
+
   bool Feature::store_matrix( int limit){
     //
     // Store a complete distance matrix.

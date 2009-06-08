@@ -46,6 +46,45 @@ using Common::Log2;
 
 namespace Timbl{
 
+
+  double overlapTestFunction::test( FeatureValue *F,
+				   FeatureValue *G,
+				   Feature *Feat ) const {
+    double result = Feat->distance( F, G );
+    result *= Feat->Weight();
+    return result;
+  }
+    
+  inline bool FV_to_real( FeatureValue *FV, double &result ){
+    if ( FV ){
+      if ( stringTo<double>( FV->Name(), result ) )
+	return true;
+    }
+    return false;
+  }  
+
+  double numericOverlapTestFunction::test( FeatureValue *F,
+					   FeatureValue *G,
+					   Feature *Feat ) const {
+    double r1, r2, result;
+    if ( FV_to_real( F, r1 ) &&
+	 FV_to_real( G, r2 ) )
+      result = fabs( (r1-r2)/ (Feat->Max() - Feat->Min()) );
+    else
+      result = 1.0;
+    result *= Feat->Weight();
+    return result;
+  }
+
+  double valueDiffTestFunction::test( FeatureValue *F,
+				      FeatureValue *G,
+				      Feature *Feat ) const {
+    double result = Feat->distance( F, G, threshold );
+    result *= Feat->Weight();
+    return result;
+  }
+
+
   TesterClass* getTester( MetricType m, 
 			  const std::vector<Feature*>& features, 
 			  const std::vector<size_t>& permutation,
@@ -74,12 +113,13 @@ namespace Timbl{
       test_feature_val[i] = 0;
       if ( features[i]->Ignore() )
 	continue;
-      if ( features[i]->Metric()->isStorable() )
+      if ( features[i]->isStorableMetric() )
  	test_feature_val[i] = new valueDiffTestFunction( mvdThreshold );
-      else if ( features[i]->Metric()->isNumerical() )
-	test_feature_val[i] = new numericOverlapTestFunction();
       else
- 	test_feature_val[i] = new overlapTestFunction();
+	if ( features[i]->isNumerical() )
+	  test_feature_val[i] = new numericOverlapTestFunction();
+	else
+	  test_feature_val[i] = new overlapTestFunction();
     }
   }
   
@@ -97,49 +137,7 @@ namespace Timbl{
     }
     delete [] test_feature_val;
   }
-
-  double overlapTestFunction::test( FeatureValue *F,
-				    FeatureValue *G,
-				    Feature *Feat ) const {
-    double result = Feat->distance( F, G );
-    result *= Feat->Weight();
-    return result;
-  }
-
-  inline bool FV_to_real( FeatureValue *FV, double &result ){
-    if ( FV ){
-      if ( stringTo<double>( FV->Name(), result ) )
-	return true;
-    }
-    return false;
-  }  
   
-  double numericOverlapTestFunction::test( FeatureValue *FV,
-					   FeatureValue *G,
-					   Feature *Feat ) const {
-    double r1, r2, result;
-    if ( FV_to_real( FV, r1 ) &&
-	 FV_to_real( G, r2 ) )
-      result = fabs( (r1-r2)/ (Feat->Max() - Feat->Min()) );
-    else
-      result = 1.0;
-    result *= Feat->Weight();
-    return result;
-  }
-  
-  double valueDiffTestFunction::test( FeatureValue *F,
-				      FeatureValue *G,
-				      Feature *Feat ) const {
-    double result = Feat->distance( F, G, threshold );
-    result *= Feat->Weight();
-    return result;
-  }
-
-  
-  double DefaultTester::getDistance( size_t pos ) const{
-    return distances[pos];
-  }
-
   size_t DefaultTester::test( vector<FeatureValue *>& G, 
 			      size_t CurPos,
 			      double Threshold ) {
@@ -157,7 +155,7 @@ namespace Timbl{
     return effSize;
   }
 
-  double ExemplarTester::getDistance( size_t pos ) const{
+  double DefaultTester::getDistance( size_t pos ) const{
     return distances[pos];
   }
 
@@ -176,6 +174,10 @@ namespace Timbl{
     return effSize;
   } 
   
+  double ExemplarTester::getDistance( size_t pos ) const{
+    return distances[pos];
+  }
+
   double innerProduct( FeatureValue *FV,
 		       FeatureValue *G ) {
     double r1, r2, result;
@@ -186,10 +188,6 @@ namespace Timbl{
     else
       result = 0.0;
     return result;
-  }
-
-  double SimilarityTester::getDistance( size_t pos ) const{
-    return maxSimilarity - distances[pos];
   }
 
   size_t CosineTester::test( vector<FeatureValue *>& G, 
@@ -223,6 +221,10 @@ namespace Timbl{
       distances[i+1] = distances[i] + result;
     }
     return effSize;
+  }
+
+  double SimilarityTester::getDistance( size_t pos ) const{
+    return maxSimilarity - distances[pos];
   }
   
 }  

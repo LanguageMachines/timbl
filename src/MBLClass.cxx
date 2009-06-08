@@ -705,7 +705,7 @@ namespace Timbl {
     unsigned int TotalCount = 0;
     for ( size_t f = 0; f < num_of_features; ++f ){
       if ( !Features[f]->Ignore() &&
-	   Features[f]->Metric()->isStorable() &&
+	   Features[f]->isStorableMetric() &&
 	   Features[f]->matrix_present() ){
 	unsigned int Count = Features[f]->matrix_byte_size();
 	os << "Size of value-matrix[" << f+1 << "] = " 
@@ -758,7 +758,7 @@ namespace Timbl {
 	      }
 	    }
 	    else if ( compare_nocase_n( "Numeric", buf ) ){
-	      if ( Features[index-1]->Metric()->isNumerical() ){
+	      if ( Features[index-1]->isNumerical() ){
 		++index;
 		continue;
 	      }
@@ -772,7 +772,7 @@ namespace Timbl {
 	      result = false;
 	    }
 	    else if ( Features[index-1]->Ignore() ||
-		      Features[index-1]->Metric()->isNumerical() ){
+		      Features[index-1]->isNumerical() ){
 	      Warning( "Matrix info found for feature #" 
 		       + toString<size_t>(index)
 		       + " (skipped)" );
@@ -818,7 +818,7 @@ namespace Timbl {
       for ( size_t i = 0; i < num_of_features; ++i )
 	if ( Features[i]->Ignore() )
 	  os << "feature # " << i+1 << " Ignored, (-s option)" << endl;
-	else if (Features[i]->Metric()->isNumerical() )
+	else if (Features[i]->isNumerical() )
 	  os << "feature # " << i+1 << " Numeric, (-N option)" << endl;
 	else {
 	  os << "feature # " << i+1 << " Matrix: " << endl;
@@ -834,7 +834,7 @@ namespace Timbl {
     bool result = true;
     for ( size_t j = 0; result && j < num_of_features; ++j ) {
       if ( !Features[j]->Ignore() &&
-	   !Features[j]->Metric()->isNumerical() ) {
+	   !Features[j]->isNumerical() ) {
 	result = Features[j]->AllocSparseArrays( Dim );
       }
     } // j
@@ -847,12 +847,12 @@ namespace Timbl {
     if ( result ){
       for ( size_t j = 0; j < num_of_features; ++j ) {
 	if ( !Features[j]->Ignore() &&
-	     !Features[j]->Metric()->isNumerical() ){
+	     !Features[j]->isNumerical() ){
 	  Features[j]->ClipFreq( (int)rint(clip_factor * 
 					   log((double)Features[j]->EffectiveValues())));
 	  if ( !Features[j]->ArrayRead() &&
 	       ( force ||
-		 Features[j]->Metric()->isStorable() ) ){
+		 Features[j]->isStorableMetric() ) ){
 	    Features[j]->InitSparseArrays();
 	  } 
 	}
@@ -867,7 +867,7 @@ namespace Timbl {
   void MBLClass::calculatePrestored(){
     for ( size_t j = tribl_offset; j < effective_feats; ++j ) {
       if ( !PermFeatures[j]->Ignore() && 
-	   PermFeatures[j]->Metric()->isStorable() ){
+	   PermFeatures[j]->isStorableMetric() ){
 	PermFeatures[j]->store_matrix( mvd_threshold );
       }
     } // j
@@ -995,7 +995,7 @@ namespace Timbl {
 		 << "\t" << Features[i]->SharedVariance()
 		 << "\t" << Features[i]->InfoGain()
 		 << "\t" << Features[i]->GainRatio();
-	      if ( Features[i]->Metric()->isNumerical() )
+	      if ( Features[i]->isNumerical() )
 		os << " NUMERIC";
 	      os << endl;
 	    }
@@ -1016,7 +1016,7 @@ namespace Timbl {
 	      os << setw(7) << Features[i]->EffectiveValues()
 		 << "\t" << Features[i]->InfoGain()
 		 << "\t" << Features[i]->GainRatio();
-	      if ( Features[i]->Metric()->isNumerical() )
+	      if ( Features[i]->isNumerical() )
 		os << " NUMERIC";
 	      os << endl;
 	    }
@@ -1268,7 +1268,7 @@ namespace Timbl {
       if ( Features[g]->Ignore() )
 	continue;
       MetricType TmpMetric = UserOptions[g+1];
-      if ( Features[g]->Metric()->isNumerical() ){
+      if ( Features[g]->isNumerical() ){
 	feat_status[g] = Features[g]->prepare_numeric_stats();
 	if ( feat_status[g] == SingletonNumeric &&
 	     input_format == SparseBin &&
@@ -1284,7 +1284,7 @@ namespace Timbl {
 	    else {
 	      TmpMetric = globalMetricOption;
 	    }
-	    Features[g]->setMetric(TmpMetric);
+	    Features[g]->setMetricType(TmpMetric);
 	  }
 	  else
 	    TmpMetric = Numeric;
@@ -1303,11 +1303,8 @@ namespace Timbl {
 				     need_all_weights );
 	  }
 	}
-	if ( TmpMetric != Numeric &&
-	     TmpMetric != Features[g]->Metric()->type() ){
-	  nothing_changed = false;
-	  Features[g]->setMetric(TmpMetric);
-	}
+	if ( TmpMetric != Numeric )
+	  nothing_changed = !Features[g]->setMetricType(TmpMetric);
       }
     } // end g
     if ( GlobalMetric->isSimilarityMetric() && !nothing_changed ){
@@ -1423,7 +1420,7 @@ namespace Timbl {
 	os << "a" << f+1 << ": ";
 	if ( Features[f]->Ignore() )
 	  os << "Ignore" << endl;
-	else if ( Features[f]->Metric()->isNumerical() )
+	else if ( Features[f]->isNumerical() )
 	  os << "Numeric" << endl;
 	else {
 	  // Loop over the values.
@@ -1977,8 +1974,8 @@ namespace Timbl {
 	effective_feats--;
       }
       else {
-	Features[j]->setMetric( m );
-	if ( Features[j]->Metric()->isNumerical() ){
+	Features[j]->setMetricType( m );
+	if ( Features[j]->isNumerical() ){
 	  num_of_num_features++;
 	}
       }

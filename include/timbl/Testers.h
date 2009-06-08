@@ -45,9 +45,9 @@ namespace Timbl{
 
   class numericOverlapTestFunction: public metricTestFunction {
   public:
-    double test( FeatureValue *,
-		 FeatureValue *,
-		 Feature * ) const;
+    double test( FeatureValue *FV,
+		 FeatureValue *G,
+		 Feature *Feat ) const;
   };
 
   class valueDiffTestFunction: public metricTestFunction {
