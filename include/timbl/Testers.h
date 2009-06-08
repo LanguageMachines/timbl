@@ -63,9 +63,8 @@ namespace Timbl{
   class TesterClass {
   public:
     TesterClass( const std::vector<Feature*>&, 
-		 const std::vector<size_t> &,
-		 int );
-    virtual ~TesterClass();
+		 const std::vector<size_t> & );
+    virtual ~TesterClass(){};
     void init( const Instance&, size_t, size_t );
     virtual size_t test( std::vector<FeatureValue *>&, 
 			 size_t,
@@ -76,43 +75,33 @@ namespace Timbl{
     size_t effSize;
     size_t offSet;
     const std::vector<FeatureValue *> *FV;
-    metricTestFunction **test_feature_val;
     const std::vector<Feature *> &features;
     std::vector<Feature *> permFeatures;
     const std::vector<size_t> &permutation;
     std::vector<double> distances;
   };
   
-  class DefaultTester: public TesterClass {
+  class DistanceTester: public TesterClass {
   public:
-  DefaultTester( const std::vector<Feature*>& pf, 
-		 const std::vector<size_t>& p,
-		 int t ): 
-    TesterClass( pf, p, t ){};  
+    DistanceTester( const std::vector<Feature*>&, 
+		    const std::vector<size_t>&,
+		    int );
+    ~DistanceTester();
     double getDistance( size_t ) const;
     size_t test( std::vector<FeatureValue *>&, 
 		 size_t,
 		 double ); 
+  private:
+    metricTestFunction **metricTest;
+
   };
   
-  class ExemplarTester: public TesterClass {
-  public:
-  ExemplarTester( const std::vector<Feature*>& pf,
-		  const std::vector<size_t>& p,
-		  int t ): 
-    TesterClass( pf, p, t ){};  
-    double getDistance( size_t ) const;
-    size_t test( std::vector<FeatureValue *>&, 
-		 size_t,
-		 double );
-  };
-
   class SimilarityTester: public TesterClass {
   public:
   SimilarityTester( const std::vector<Feature*>& pf,
 		    const std::vector<size_t>& p,
-		    int t ): 
-    TesterClass( pf, p, t ){};
+		    int ): 
+    TesterClass( pf, p ){};
     ~SimilarityTester() {};
     double getDistance( size_t ) const;
     virtual size_t test( std::vector<FeatureValue *>&, 

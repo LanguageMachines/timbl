@@ -1555,27 +1555,24 @@ namespace Timbl {
     }
     size_t CurPos = 0;
     while ( Bpnt ) {
-      double dummy = -0.0;
+      // call test() with a maximum threshold, to prevent stepping out early
       size_t EndPos  = tester->test( CurrentFV,
 				     CurPos,
-				     dummy );
-      if ( EndPos == EffFeat ){
-	// we finished with a certain amount of succes
-	ValueDistribution ResultDist;
-	ResultDist.SetFreq( Bpnt->Value(), Bpnt->Freq() );
-	string origI;
-	if ( Verbosity(NEAR_N) ){
-	  origI = formatInstance( Inst.FV, CurrentFV, 
-				  ib_offset, 
-				  num_of_features );
-	}
-	double Distance = WeightFun( tester->getDistance(EndPos),
-				     Bpnt->Weight() );
-	bestArray.addResult( Distance, &ResultDist, origI );
+				     DBL_MAX );
+      if ( EndPos != EffFeat ){
+	throw( logic_error( "Exemplar testing: test should not stop before last feature" ) );
       }
-      else {
-	EndPos++; // out of luck, compensate for roll-back
+      ValueDistribution ResultDist;
+      ResultDist.SetFreq( Bpnt->Value(), Bpnt->Freq() );
+      string origI;
+      if ( Verbosity(NEAR_N) ){
+	origI = formatInstance( Inst.FV, CurrentFV, 
+				ib_offset, 
+				num_of_features );
       }
+      double Distance = WeightFun( tester->getDistance(EndPos),
+				   Bpnt->Weight() );
+      bestArray.addResult( Distance, &ResultDist, origI );
       CurPos = EndPos-1;
       ++lastpos;
       if ( lastpos != best_distrib->end() ){
@@ -1620,10 +1617,7 @@ namespace Timbl {
     delete GlobalMetric;
     GlobalMetric = getMetricClass( globalMetricOption );
     delete tester;
-    if ( doSamples() )
-      tester = new ExemplarTester( Features, permutation, mvd_threshold );
-    else 
-      tester = getTester( globalMetricOption, Features, permutation, mvd_threshold );
+    tester = getTester( globalMetricOption, Features, permutation, mvd_threshold );
   }
 
   ostream& operator<< ( ostream& os, const vector<FeatureValue*>& fv ){

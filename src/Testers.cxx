@@ -48,9 +48,9 @@ namespace Timbl{
 
 
   double overlapTestFunction::test( FeatureValue *F,
-				   FeatureValue *G,
-				   Feature *Feat ) const {
-    double result = Feat->distance( F, G );
+				    FeatureValue *G,
+				    Feature *Feat ) const {
+    double result = Feat->fvDistance( F, G );
     result *= Feat->Weight();
     return result;
   }
@@ -79,7 +79,7 @@ namespace Timbl{
   double valueDiffTestFunction::test( FeatureValue *F,
 				      FeatureValue *G,
 				      Feature *Feat ) const {
-    double result = Feat->distance( F, G, threshold );
+    double result = Feat->fvDistance( F, G, threshold );
     result *= Feat->Weight();
     return result;
   }
@@ -94,33 +94,17 @@ namespace Timbl{
     else if ( m == DotProduct )
       return new DotProductTester( features, permutation, mvdThreshold );
     else
-      return new DefaultTester( features, permutation, mvdThreshold );
+      return new DistanceTester( features, permutation, mvdThreshold );
   }
 
   TesterClass::TesterClass( const vector<Feature*>& feat,
-			    const vector<size_t>& perm,
-			    int mvdThreshold ):
+			    const vector<size_t>& perm ):
     _size(feat.size()), features(feat), permutation(perm) {
     permFeatures.resize(_size,0);
-    test_feature_val = new metricTestFunction*[_size];
     for ( size_t j=0; j < _size; ++j ){
       permFeatures[j] = feat[perm[j]];
-      test_feature_val[j] = 0;
     }
     distances.resize(_size+1, 0.0);
-    for ( size_t i=0; i < _size; ++i ){
-      delete test_feature_val[i];
-      test_feature_val[i] = 0;
-      if ( features[i]->Ignore() )
-	continue;
-      if ( features[i]->isStorableMetric() )
- 	test_feature_val[i] = new valueDiffTestFunction( mvdThreshold );
-      else
-	if ( features[i]->isNumerical() )
-	  test_feature_val[i] = new numericOverlapTestFunction();
-	else
-	  test_feature_val[i] = new overlapTestFunction();
-    }
   }
   
   void TesterClass::init( const Instance& inst,
@@ -131,22 +115,44 @@ namespace Timbl{
     FV = &inst.FV;
   }
 
-  TesterClass::~TesterClass(){
+  DistanceTester::~DistanceTester(){
     for ( size_t i=0; i < _size; ++i ){
-      delete test_feature_val[i];
+      delete metricTest[i];
     }
-    delete [] test_feature_val;
+    delete [] metricTest;
   }
   
-  size_t DefaultTester::test( vector<FeatureValue *>& G, 
+  DistanceTester::DistanceTester( const vector<Feature*>& feat,
+				  const vector<size_t>& perm,
+				  int mvdmThreshold ): 
+    TesterClass( feat, perm ){
+    metricTest = new metricTestFunction*[_size];
+    for ( size_t j=0; j < _size; ++j ){
+      metricTest[j] = 0;
+    }
+    for ( size_t i=0; i < _size; ++i ){
+      delete metricTest[i];
+      metricTest[i] = 0;
+      if ( features[i]->Ignore() )
+	continue;
+      if ( features[i]->isStorableMetric() )
+ 	metricTest[i] = new valueDiffTestFunction( mvdmThreshold );
+      else if ( features[i]->isNumerical() )
+	metricTest[i] = new numericOverlapTestFunction();
+      else
+	metricTest[i] = new overlapTestFunction();
+    }
+  }  
+
+  size_t DistanceTester::test( vector<FeatureValue *>& G, 
 			      size_t CurPos,
 			      double Threshold ) {
     size_t i;
     size_t TrueF;
     for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
-      double result = test_feature_val[permutation[TrueF]]->test( (*FV)[TrueF],
-								  G[i],
-								  permFeatures[TrueF] );
+      double result = metricTest[permutation[TrueF]]->test( (*FV)[TrueF],
+							    G[i],
+							    permFeatures[TrueF] );
       distances[i+1] = distances[i] + result;
       if ( distances[i+1] > Threshold ){
 	return i;
@@ -155,26 +161,7 @@ namespace Timbl{
     return effSize;
   }
 
-  double DefaultTester::getDistance( size_t pos ) const{
-    return distances[pos];
-  }
-
-  size_t ExemplarTester::test( vector<FeatureValue *>& G, 
-			       size_t CurPos,
-			       double ){
-    double result;
-    size_t TrueF;
-    size_t i;
-    for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
-      result = test_feature_val[permutation[TrueF]]->test( (*FV)[TrueF],
-							   G[i],
-							   permFeatures[TrueF] );
-      distances[i+1] = distances[i] + result;
-    }
-    return effSize;
-  } 
-  
-  double ExemplarTester::getDistance( size_t pos ) const{
+  double DistanceTester::getDistance( size_t pos ) const{
     return distances[pos];
   }
 

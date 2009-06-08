@@ -261,7 +261,7 @@ namespace Timbl {
     void Min( const double val ){ n_min = val; };
     double Max() const { return n_max; };
     void Max( const double val ){ n_max = val; };
-    double distance( FeatureValue *, FeatureValue *, size_t=1 ) const;
+    double fvDistance( FeatureValue *, FeatureValue *, size_t=1 ) const;
     FeatureValue *add_value( const std::string&, TargetValue * );
     FeatureValue *add_value( unsigned int, TargetValue * );
     FeatureValue *Lookup( const std::string& ) const ;

@@ -1031,8 +1031,8 @@ namespace Timbl {
     }
   }
 
-  double Feature::distance( FeatureValue *F, FeatureValue *G, 
-			    size_t t ) const {
+  double Feature::fvDistance( FeatureValue *F, FeatureValue *G, 
+			      size_t t ) const {
     return metric->distance( F, G, t );
   }
 
