@@ -4,7 +4,7 @@
 # $URL $
 
 AC_PREREQ(2.59)
-AC_INIT([Timbl], [6.2.0-beta], [timbl@uvt.nl])
+AC_INIT([Timbl], [6.2.0], [timbl@uvt.nl])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_MACRO_DIR([m4])
@@ -23,8 +23,7 @@ else
 fi
 
 # Checks for programs.
-# when available, we prefer the Intel Compiler
-AC_PROG_CXX( [icpc g++] )
+AC_PROG_CXX( [g++] )
 
 if $cxx_flags_were_set; then
   CXXFLAGS=$CXXFLAGS
