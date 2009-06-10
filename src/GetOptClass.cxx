@@ -410,11 +410,7 @@ namespace Timbl {
 		      for ( size_t i=0; i < metricsArray.size(); ++i ){
 			if ( !first ){
 			  if ( metricsArray[i] == Ignore ){
-			    Error( "-m:I is not possible now" );
-			    return false;
-			  }
-			  else if ( metricsArray[i] == Numeric ){
-			    Error( "-m:N is not possible now" );
+			    Error( "-m:I is not possible at this stage" );
 			    return false;
 			  }
 			}
