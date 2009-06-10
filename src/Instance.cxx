@@ -708,7 +708,8 @@ namespace Timbl {
   struct D_D {
     D_D(){ dist = NULL; value = 0.0; };
     D_D( FeatureValue *fv ){
-      stringTo<double>( fv->Name(), value );
+      if ( !stringTo<double>( fv->Name(), value ) )
+	throw( logic_error("called DD with an non-numeric value" ) );
       dist = &fv->TargetDist;
     }
     ValueDistribution *dist;
@@ -1639,19 +1640,14 @@ namespace Timbl {
   }
   
   TargetValue *Target::add_value( unsigned int index, int freq ){
-    //    cerr << "Add Target index=" << index << endl;
     IVCmaptype::const_iterator it = ValuesMap.find( index );
     if(  it == ValuesMap.end() ){
-      //      cerr << "it is NEW " << endl;
       const string& name = TokenTree->ReverseLookup( index );
-      //      cerr << "reverse terurns " << name << endl;
       // we want to store the singleton value for this index
       // so we MUST reverse lookup the index
       TargetValue *tv =  new TargetValue( name, index );
       tv->ValFreq( freq );
-      //      cerr << "Created: " << tv << endl;
       ValuesMap[index] = tv;
-      //      cerr << "and inserted at index " << index << endl;
       ValuesArray.push_back( tv );
     }
     else {
