@@ -117,7 +117,15 @@ namespace Timbl{
     // http://en.wikibooks.org/wiki/Algorithm_implementation/Strings/Dice's_coefficient
     multiset<string> string1_bigrams;
     multiset<string> string2_bigrams;
-    
+
+    unsigned int ls1 = string1.length();
+    unsigned int ls2 = string2.length();
+    if ( ls1 <= 1 && ls2 <= 1 ){
+      if ( string1 == string2 )
+	return 0.0;
+      else
+	return 1.0;
+    }
     for(unsigned int i = 0; i < (string1.length() - 1); i++) {      // extract character bigrams from string1
       string1_bigrams.insert(string1.substr(i, 2));
     }
@@ -296,12 +304,14 @@ namespace Timbl{
   double DiceMetric::distance( FeatureValue *F, FeatureValue *G, 
 			       size_t limit ) const {
     double result = 0.0;
-    if ( F->ValFreq() < limit ||
-	 G->ValFreq() < limit ){
-      result = 1.0;
+    if ( G != F ){
+      if ( F->ValFreq() < limit ||
+	   G->ValFreq() < limit ){
+	result = 1.0;
+      }
+      else
+	result = dc_distance( F->Name(), G->Name() );
     }
-    else
-      result = dc_distance( F->Name(), G->Name() );
     return result;
   }
   
