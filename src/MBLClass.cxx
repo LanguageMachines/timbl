@@ -1267,34 +1267,30 @@ namespace Timbl {
       feat_status[g] = Unknown;
       if ( Features[g]->Ignore() )
 	continue;
+      bool metricChanged = false;
       MetricType TmpMetric = UserOptions[g+1];
-      if ( Features[g]->isNumerical() ){
+      if ( TmpMetric == Numeric ){
 	feat_status[g] = Features[g]->prepare_numeric_stats();
 	if ( feat_status[g] == SingletonNumeric &&
 	     input_format == SparseBin &&
 	     GlobalMetric->isSimilarityMetric( ) ){
 	  // ok
 	}
-	else {
-	  if ( feat_status[g] != NumericValue ){
-	    nothing_changed = false;
-	    if ( GlobalMetric->isNumerical() ){
-	      TmpMetric = Overlap;
-	    }
-	    else {
-	      TmpMetric = globalMetricOption;
-	    }
-	    Features[g]->setMetricType(TmpMetric);
+	else if ( feat_status[g] != NumericValue ){
+	  if ( GlobalMetric->isNumerical() ){
+	    TmpMetric = Overlap;
 	  }
-	  else
-	    TmpMetric = Numeric;
+	  else {
+	    TmpMetric = globalMetricOption;
+	  }
 	} 
       }
-      else if ( Features[g]->TotalValues() == 1 )
+      else if ( Features[g]->ValuesArray.size() == 1 )
 	feat_status[g] = Singleton;
       if ( always || realy_first ){
+	metricChanged = !Features[g]->setMetricType(TmpMetric);
 	if ( Weighting != UserDefined_w ){
-	  if ( TmpMetric == Numeric ){
+	  if ( Features[g]->isNumerical() ){
 	    Features[g]->NumStatistics( DBEntropy, Targets, Bin_Size,
 					need_all_weights );
 	  }
@@ -1303,9 +1299,9 @@ namespace Timbl {
 				     need_all_weights );
 	  }
 	}
-	if ( TmpMetric != Numeric )
-	  nothing_changed = !Features[g]->setMetricType(TmpMetric);
       }
+      if ( metricChanged )
+	nothing_changed = false;
     } // end g
     if ( GlobalMetric->isSimilarityMetric() && !nothing_changed ){
       // check to see if ALL features are still Numeric.
@@ -1340,13 +1336,12 @@ namespace Timbl {
     // Give a warning for singular features, except when it's
     // a result of a forced recalculation or when the input format is
     // Sparse ??
-    if ( ( input_format != Sparse && input_format != SparseBin ) &&
-	 ( realy_first ||
-	   ( !nothing_changed && !always ) ) ){
+    if ( realy_first &&
+	 ( input_format != Sparse && input_format != SparseBin ) ){
       bool first = true;
       ostringstream ostr1;
       ostringstream ostr2;
-      for ( size_t ff = 0; ff < num_of_features; ++ff ) 
+      for ( size_t ff = 0; ff < num_of_features; ++ff ) {
 	if ( feat_status[ff] == Singleton ||
 	     feat_status[ff] == SingletonNumeric ){
 	  if ( first ){
@@ -1366,6 +1361,7 @@ namespace Timbl {
 	  else
 	    ostr1 << ff+1;
 	}
+      }
       if ( !first  ){
 	Warning( ostr1.str() );
       }
