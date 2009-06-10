@@ -126,16 +126,16 @@ namespace Timbl{
       else
 	return 1.0;
     }
-    for(unsigned int i = 0; i < (string1.length() - 1); i++) {      // extract character bigrams from string1
+    for(unsigned int i = 0; i < (ls1 - 1); i++) {      // extract character bigrams from string1
       string1_bigrams.insert(string1.substr(i, 2));
     }
-    for(unsigned int i = 0; i < (string2.length() - 1); i++) {      // extract character bigrams from string2
+    for(unsigned int i = 0; i < (ls2 - 1); i++) {      // extract character bigrams from string2
       string2_bigrams.insert(string2.substr(i, 2));
     }
     
     int overlap = 0;
     
-    for(unsigned int j = 0; j < (string2.length() - 1); j++) {      // extract character bigrams from string2 and overlap
+    for(unsigned int j = 0; j < (ls2 - 1); j++) {      // extract character bigrams from string2 and overlap
       overlap += string1_bigrams.count(string2.substr(j, 2));
     }
     
