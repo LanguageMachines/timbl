@@ -581,6 +581,16 @@ namespace Timbl {
 	  case 'J' :
 	    TmpMT = JeffreyDiv;
 	    break;
+	  case 'D' :
+	    if ( *(p+1) && *(p+1) == 'C' ){
+	      ++p;
+	      TmpMT = Dice;
+	    }
+	    else {
+	      Error( "illegal value in metric description: -m " + Mline );
+	      return false;
+	    }
+	    break;
 	  case 'M' :
 	    TmpMT = ValueDiff;
 	    break;
