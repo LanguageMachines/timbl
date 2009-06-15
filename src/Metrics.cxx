@@ -115,17 +115,19 @@ namespace Timbl{
   double dc_distance( const string& string1, const string& string2 ){
     // code taken from:
     // http://en.wikibooks.org/wiki/Algorithm_implementation/Strings/Dice's_coefficient
-    multiset<string> string1_bigrams;
-    multiset<string> string2_bigrams;
-
     unsigned int ls1 = string1.length();
     unsigned int ls2 = string2.length();
     if ( ls1 <= 1 && ls2 <= 1 ){
-      if ( string1 == string2 )
+      if ( string1 == string2 ){
 	return 0.0;
-      else
+      }
+      else {
 	return 1.0;
+      }
     }
+    multiset<string> string1_bigrams;
+    multiset<string> string2_bigrams;
+
     for(unsigned int i = 0; i < (ls1 - 1); i++) {      // extract character bigrams from string1
       string1_bigrams.insert(string1.substr(i, 2));
     }
