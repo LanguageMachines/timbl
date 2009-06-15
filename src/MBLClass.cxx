@@ -315,7 +315,6 @@ namespace Timbl {
       delete Targets;
       delete TargetStrings;
       delete FeatureStrings;
-      delete GlobalMetric;
     }
     else if ( is_synced ){
       delete InstanceBase;
@@ -323,6 +322,7 @@ namespace Timbl {
     else {
       InstanceBase->CleanPartition( false );
     }
+    delete GlobalMetric;
     delete tester;
     delete decay;
     delete ChopInput;
