@@ -113,7 +113,9 @@ namespace Timbl{
     bool WriteInstanceBaseLevels( const std::string& = "", unsigned int=0 );
     bool GetInstanceBase( const std::string& = "" );
     bool WriteArrays( const std::string& = "" );
+    bool WriteMatrices( const std::string& = "" );
     bool GetArrays( const std::string& = "" );
+    bool GetMatrices( const std::string& = "" );
     bool WriteNamesFile( const std::string& = "" );
     bool ShowWeights( std::ostream& ) const;
     bool ShowOptions( std::ostream& ) const;

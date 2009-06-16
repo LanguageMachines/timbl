@@ -61,6 +61,8 @@ string dataFile = "";
 string TestFile = "";
 string OutputFile = "";
 string PercFile = "";
+string MatrixInFile = "";
+string MatrixOutFile = "";
 string TreeInFile = "";
 string TreeOutFile = "";
 string levelTreeOutFile = "";
@@ -390,18 +392,6 @@ void Adjust_Default_Values( TimblOpts& Opts ){
     Opts.Add( 'm', "O", false );
     // Default Metric = Overlap
   }
-  else if ( value[0] == 'M' ) {
-    if ( algorithm == IGTREE ){
-      cerr << "Metric must be Overlap for IGTREE, (use -mO:...)" << endl;
-      exit(1);
-    }
-  }
-  else if ( value[0] == 'J' ) {
-    if ( algorithm == IGTREE ){
-      cerr << "Metric must be Overlap for IGTREE, (use -mO:...)" << endl;
-      exit(1);
-    }
-  }
   if ( Opts.Find( '%', value, mood ) ){
     Do_Save_Perc = true;
     Opts.Delete( '%' );
@@ -423,6 +413,8 @@ bool get_file_names( TimblOpts& Opts ){
   TestFile = "";
   OutputFile = "";
   PercFile = "";
+  MatrixInFile = "";
+  MatrixOutFile = "";
   TreeInFile = "";
   TreeOutFile = "";
   levelTreeOutFile = "";
@@ -463,6 +455,14 @@ bool get_file_names( TimblOpts& Opts ){
     NamesFile = correct_path( value, O_Path, true );
     Opts.Delete( 'n' );
   }
+  if ( Opts.Find( 'J', value, mood ) ){
+    MatrixOutFile = correct_path( value, O_Path, true );
+    Opts.Delete( 'J' );
+  }
+  if ( Opts.Find( 'j', value, mood ) ){
+      MatrixInFile = correct_path( value, O_Path, true );
+      Opts.Delete( 'j' );
+    }
   if ( Opts.Find( 'o', value, mood ) ){
     if ( Do_CV ){
       cerr << "-o option not possible for Cross Validation testing" << endl;
@@ -642,6 +642,9 @@ void Do_Test( TimblAPI *Run ){
     // just one test...
     if ( ProbInFile != "" )
       Run->GetArrays( ProbInFile );
+    if ( MatrixInFile != "" ) {
+      Run->GetMatrices( MatrixInFile );
+    }
     if ( Do_NS )
       Run->NS_Test( TestFile, OutputFile );
     else
@@ -669,6 +672,9 @@ void Do_Test( TimblAPI *Run ){
 	}
 	if ( ProbInFile != "" )
 	  Run->GetArrays( ProbInFile );
+	if ( MatrixInFile != "" ) {
+	  Run->GetMatrices( MatrixInFile );
+	}
 	if ( Do_NS )
 	  Run->NS_Test( TestFile, OutputFile );
 	else
@@ -749,6 +755,7 @@ int main(int argc, char *argv[]){
       if ( !checkInputFile( TreeInFile ) ||
 	   !checkInputFile( dataFile ) ||
 	   !checkInputFile( WgtInFile ) ||
+	   !checkInputFile( MatrixInFile ) ||
 	   !checkInputFile( ProbInFile ) ||
 	   !checkOutputFile( ProbOutFile ) ){
 	delete Run;
@@ -771,6 +778,9 @@ int main(int argc, char *argv[]){
 	Run->WriteArrays( ProbOutFile );
       if ( ProbInFile != "" )
 	Run->GetArrays( ProbInFile );
+      if ( MatrixInFile != "" ) {
+	Run->GetMatrices( MatrixInFile );
+      }
       Run->StartServer( ServerPort, Max_Connections );
       return 0;
     }
@@ -780,12 +790,14 @@ int main(int argc, char *argv[]){
 	   !checkInputFile( dataFile ) ||
 	   !checkInputFile( TestFile ) ||
 	   !checkInputFile( WgtInFile ) ||
+	   !checkInputFile( MatrixInFile ) ||
 	   !checkInputFile( ProbInFile ) ||
 	   !checkOutputFile( TreeOutFile ) ||
 	   !checkOutputFile( levelTreeOutFile ) ||
 	   !checkOutputFile( XOutFile ) ||
 	   !checkOutputFile( NamesFile ) ||
 	   !checkOutputFile( WgtOutFile ) ||
+	   !checkOutputFile( MatrixOutFile ) ||
 	   !checkOutputFile( ProbOutFile ) ){
 	delete Run;
 	return 3;
@@ -832,6 +844,9 @@ int main(int argc, char *argv[]){
 					      levelTreeLevel );
 	      if ( XOutFile != "" )
 		Run->WriteInstanceBaseXml( XOutFile );
+	      if ( MatrixOutFile != "" ) {
+		Run->WriteMatrices( MatrixOutFile );
+	      }
 	    }
 	    else 
 	      do_test = false; // no testing because of problems

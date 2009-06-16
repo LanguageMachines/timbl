@@ -616,6 +616,16 @@ bool TimblAPI::GetArrays( const string& f ){
     return false;
 }
 
+bool TimblAPI::WriteMatrices( const string& ){
+  throw( logic_error("WriteMatrices not implemented yet" ) );
+  return false;
+}
+  
+bool TimblAPI::GetMatrices( const string& ){
+  throw( logic_error("GetMatrices not implemented yet" ) );
+  return false;
+}
+
 bool TimblAPI::ShowBestNeighbors( ostream& os ) const{
   return Valid() && pimpl->showBestNeighbors( os );
 }
