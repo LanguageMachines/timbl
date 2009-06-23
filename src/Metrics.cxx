@@ -115,18 +115,21 @@ namespace Timbl{
   double dc_distance( const string& string1, const string& string2 ){
     // code taken from:
     // http://en.wikibooks.org/wiki/Algorithm_implementation/Strings/Dice's_coefficient
+    //    cerr << "bereken dc(" << string1 << "," << string2 << ")." << endl;
     unsigned int ls1 = string1.length();
     unsigned int ls2 = string2.length();
     if ( ls1 <= 1 && ls2 <= 1 ){
       if ( string1 == string2 ){
+	//	cerr << "resultaat = 0.0" << endl;
 	return 0.0;
       }
       else {
+	//	cerr << "resultaat = 1.0" << endl;
 	return 1.0;
       }
     }
-    multiset<string> string1_bigrams;
-    multiset<string> string2_bigrams;
+    set<string> string1_bigrams;
+    set<string> string2_bigrams;
 
     for(unsigned int i = 0; i < (ls1 - 1); i++) {      // extract character bigrams from string1
       string1_bigrams.insert(string1.substr(i, 2));
@@ -137,14 +140,18 @@ namespace Timbl{
     
     int overlap = 0;
     
-    for(unsigned int j = 0; j < (ls2 - 1); j++) {      // extract character bigrams from string2 and overlap
-      overlap += string1_bigrams.count(string2.substr(j, 2));
-    }
-    
+    set<string>::const_iterator it = string2_bigrams.begin();
+    while ( it != string2_bigrams.end() ){
+      if ( string1_bigrams.find( *it ) != string1_bigrams.end() )
+      	++overlap;
+      ++ it;
+    }    
     // calculate 1 - dice coefficient
     int total = string1_bigrams.size() + string2_bigrams.size();
+    //    cerr << "overlap = " << overlap << " total = " << total << endl;
     float dice = (float)(overlap * 2) / (float)total;
     dice = 1.0 - dice;
+    //    cerr << "resultaat = " << dice << endl;
     return dice;
   }  
 
