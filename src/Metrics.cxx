@@ -115,43 +115,53 @@ namespace Timbl{
   double dc_distance( const string& string1, const string& string2 ){
     // code taken from:
     // http://en.wikibooks.org/wiki/Algorithm_implementation/Strings/Dice's_coefficient
-    //    cerr << "bereken dc(" << string1 << "," << string2 << ")." << endl;
     unsigned int ls1 = string1.length();
     unsigned int ls2 = string2.length();
-    if ( ls1 <= 1 && ls2 <= 1 ){
-      if ( string1 == string2 ){
-	//	cerr << "resultaat = 0.0" << endl;
-	return 0.0;
-      }
-      else {
-	//	cerr << "resultaat = 1.0" << endl;
-	return 1.0;
-      }
-    }
-    set<string> string1_bigrams;
-    set<string> string2_bigrams;
-
-    for(unsigned int i = 0; i < (ls1 - 1); i++) {      // extract character bigrams from string1
-      string1_bigrams.insert(string1.substr(i, 2));
-    }
-    for(unsigned int i = 0; i < (ls2 - 1); i++) {      // extract character bigrams from string2
-      string2_bigrams.insert(string2.substr(i, 2));
-    }
-    
+    double dice;
     int overlap = 0;
-    
-    set<string>::const_iterator it = string2_bigrams.begin();
-    while ( it != string2_bigrams.end() ){
-      if ( string1_bigrams.find( *it ) != string1_bigrams.end() )
-      	++overlap;
-      ++ it;
-    }    
-    // calculate 1 - dice coefficient
-    int total = string1_bigrams.size() + string2_bigrams.size();
-    //    cerr << "overlap = " << overlap << " total = " << total << endl;
-    float dice = (float)(overlap * 2) / (float)total;
+    int total = 0;
+    if ( ls1 <= 1 || ls2 <= 1 ){
+      // back-off naar unigrammen
+      set<char> string1_unigrams;
+      set<char> string2_unigrams;
+      
+      for(unsigned int i = 0; i < ls1; i++) {
+	string1_unigrams.insert(string1[i]);
+      }
+      for(unsigned int i = 0; i < ls2; i++) {
+	string2_unigrams.insert(string2[i]);
+      }
+      
+      set<char>::const_iterator it = string2_unigrams.begin();
+      while ( it != string2_unigrams.end() ){
+	if ( string1_unigrams.find( *it ) != string1_unigrams.end() )
+	  ++overlap;
+	++it;
+      }
+      total = string1_unigrams.size() + string2_unigrams.size();
+    }
+    else {
+      set<string> string1_bigrams;
+      set<string> string2_bigrams;
+      
+      for(unsigned int i = 0; i < (ls1 - 1); i++) {      // extract character bigrams from string1
+	string1_bigrams.insert(string1.substr(i, 2));
+      }
+      for(unsigned int i = 0; i < (ls2 - 1); i++) {      // extract character bigrams from string2
+	string2_bigrams.insert(string2.substr(i, 2));
+      }
+      
+      set<string>::const_iterator it = string2_bigrams.begin();
+      while ( it != string2_bigrams.end() ){
+	if ( string1_bigrams.find( *it ) != string1_bigrams.end() )
+	  ++overlap;
+	++ it;
+      }
+      total = string1_bigrams.size() + string2_bigrams.size();
+    }
+    dice = (double)(overlap * 2) / (double)total;
+    // we will return 1 - dice coefficient ad distance
     dice = 1.0 - dice;
-    //    cerr << "resultaat = " << dice << endl;
     return dice;
   }  
 
