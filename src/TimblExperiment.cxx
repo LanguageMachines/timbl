@@ -71,6 +71,7 @@ typedef std::ostream LogStream;
 #include "timbl/CommandLine.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
+#include "timbl/SocketBasics.h"
 #include "timbl/ServerProcs.h"
 
 namespace Timbl {
@@ -217,7 +218,7 @@ namespace Timbl {
     return *this;
   }
   
-  TimblExperiment *TimblExperiment::CreateClient( int socketid ) const {
+  TimblExperiment *TimblExperiment::CreateClient( ServerSocket *socket ) const {
     TimblExperiment *result = 0;
     switch ( Algorithm() ){
     case IB1_a:
@@ -231,15 +232,15 @@ namespace Timbl {
 		  toString(algorithm) );
     }
     *result = *this;
-    string line = "Client on socket: " + toString<int>( socketid );
+    string line = "Client on socket: " + toString<int>( socket->getSockId() );
 #ifdef USE_LOGSTREAMS
     result->myerr->message( line );
     result->mydebug->message( line );
 #endif
     if ( OptParams ){
-      result->OptParams = OptParams->Clone( socketid );
+      result->OptParams = OptParams->Clone( socket );
     }
-    result->Socket( socketid );
+    result->Socket( socket );
     result->WFileName = WFileName;
     result->CurrentDataFile = CurrentDataFile;
     *Dbg(mydebug) << "created a new Client" << endl;
@@ -267,7 +268,7 @@ namespace Timbl {
     result->mydebug->message( line );
 #endif
     if ( OptParams ){
-      result->OptParams = OptParams->Clone( -1 );
+      result->OptParams = OptParams->Clone( 0 );
     }
     result->WFileName = WFileName;
     result->CurrentDataFile = "";

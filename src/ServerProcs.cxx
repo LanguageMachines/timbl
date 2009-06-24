@@ -65,14 +65,13 @@ typedef std::ostream LogStream;
 using namespace std;
 
 namespace Timbl {
-  using namespace SocketProcs;
 
 #ifndef PTHREADS
-  bool do_command( const string&, TimblExperiment *Exp, int ){
+  bool do_command( const string&, TimblExperiment *Exp ){
     *Log(Exp->my_err()) << "Server Mode not available" << endl;
     return false;
   }
-  int ClassifyFromSocket( TimblExperiment *Exp, int  ){
+  int ClassifyFromSocket( TimblExperiment *Exp ){
     *Log(Exp->my_err()) << "Server Mode not available" << endl;
     return -1;
   }
@@ -148,42 +147,46 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     return line.find( "NEIGHBORS" ) != string::npos;
   }
   
-  bool do_command( const string& Line, TimblExperiment *Exp, int Sock_Num ){
+  bool do_command( const string& Line, TimblExperiment *Exp ){
     bool go_on = true;
     if ( Exp->SetOptions( Line ) ){
       if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	*Log(Exp->my_log()) << Sock_Num << ": Command :" << Line << endl;
+	*Log(Exp->my_log()) << Exp->TcpSocket()->getSockId()
+			    << ": Command :" << Line << endl;
       if ( Exp->ConfirmOptions() )
-	go_on = write_line( Sock_Num, "OK\n" );
+	go_on = Exp->TcpSocket()->write( "OK\n" );
       else {
       }
     }
     else {
       if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	*Log(Exp->my_log()) << Sock_Num << ": Don't understand '" 
+	*Log(Exp->my_log()) << Exp->TcpSocket()->getSockId()
+			    << ": Don't understand '" 
 			    << Line << "'" << endl;
     }
     return go_on;
   }
  
-  int ClassifyFromSocket( TimblExperiment *Exp, int Sock_Num ){ 
+  int ClassifyFromSocket( TimblExperiment *Exp ){ 
     string Line, Command, Param;
     double Distance;
     int result = 0;
     bool go_on = true;
-    while ( go_on && read_line( Sock_Num, Line, TCP_BUFFER_SIZE ) ){
+    ServerSocket *sock = Exp->TcpSocket();
+    *Dbg(Exp->my_debug()) << "ClassifyFromSocket: " 
+			  << sock->getSockId() << endl;    
+    while ( go_on && sock->read( Line ) ){
       *Dbg(Exp->my_debug()) << "Line=" << Line << endl;
       Split( Line, Command, Param );
       switch ( check_command(Command) ){
       case Set:
-	go_on = do_command( Param, Exp, Sock_Num );
+	go_on = do_command( Param, Exp );
 	break;
       case Query:
 	go_on = Exp->ShowSettings( *Log(Exp->my_log()) );
 	break;
       case Exit:
-	go_on = write_line( Sock_Num, "OK" ) && 
-	  write_line( Sock_Num, " Closing\n" );
+	go_on = sock->write( "OK" ) && sock->write( " Closing\n" );
 	return result;
 	break;
       case Classify:{
@@ -193,22 +196,23 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	string Answer;
 	if ( Exp->Classify( SLine, Answer, Distrib, Distance ) ){
 	  if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	    *Log(Exp->my_log()) << Sock_Num << ": " << SLine << " --> " 
+	    *Log(Exp->my_log()) << sock->getSockId() << ": " 
+				<< SLine << " --> " 
 				<< Answer << " " << Distrib 
 				<< " " << Distance << endl;
-	  go_on = write_line( Sock_Num, "CATEGORY {" ) &&
-	    write_line( Sock_Num, Answer ) &&
-	    write_line( Sock_Num, "}" );
+	  go_on = sock->write( "CATEGORY {" ) &&
+	    sock->write( Answer ) &&
+	    sock->write( "}" );
 	  if ( go_on ){
 	    if ( Exp->Verbosity(DISTRIB) ){
-	      go_on = write_line( Sock_Num, " DISTRIBUTION " ) &&
-		write_line( Sock_Num, Distrib );
+	      go_on = sock->write( " DISTRIBUTION " ) &&
+		sock->write( Distrib );
 	    }
 	    if ( go_on ){
 	      if ( Exp->Verbosity(DISTANCE) ){
-		go_on = write_line( Sock_Num, " DISTANCE {" ) &&
-		  write_line( Sock_Num, toString<double>(Distance) ) &&
-		  write_line( Sock_Num, "}" );
+		go_on = sock->write( " DISTANCE {" ) &&
+		  sock->write( toString<double>(Distance) ) &&
+		  sock->write( "}" );
 	      }
 	      if ( go_on ){
 		if ( Exp->Verbosity(NEAR_N) ){
@@ -216,36 +220,37 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 		  tmp << " NEIGHBORS\n";
 		  Exp->showBestNeighbors( tmp );
 		  tmp << "ENDNEIGHBORS";
-		  go_on = write_line( Sock_Num, tmp.str() );
+		  go_on = sock->write( tmp.str() );
 		}
 	      }
 	    }
 	  }
 	  if ( go_on )
-	    go_on = write_line( Sock_Num, "\n" );
+	    go_on = sock->write( "\n" );
 	}
 	else {
 	  if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	    *Log(Exp->my_log()) << Sock_Num << ": Classify Failed on '" 
+	    *Log(Exp->my_log()) << sock->getSockId()
+				<< ": Classify Failed on '" 
 				<< SLine << "'" << endl;
 	  
 	}
       }
       break;
       case Comment:
-	go_on = write_line( Sock_Num, "SKIP " ) &&
-	  write_line( Sock_Num, Line ) &&
-	  write_line( Sock_Num, "\n" );
+	go_on = sock->write( "SKIP " ) &&
+	  sock->write( Line ) &&
+	  sock->write( "\n" );
 	break;
       default:
 	if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	  *Log(Exp->my_log()) << Sock_Num << ": Don't understand '" 
+	  *Log(Exp->my_log()) << sock->getSockId() << ": Don't understand '" 
 			      << Line << "'" << endl;
-	go_on = write_line( Sock_Num, "ERROR { Illegal instruction:'" ) &&
-	  write_line( Sock_Num, Command ) &&
-	  write_line( Sock_Num, "' in line:" ) &&
-	  write_line( Sock_Num, Line ) &&
-	  write_line( Sock_Num, "}\n" );
+	go_on = sock->write( "ERROR { Illegal instruction:'" ) &&
+	  sock->write( Command ) &&
+	  sock->write( "' in line:" ) &&
+	  sock->write( Line ) &&
+	  sock->write( "}\n" );
 	break;
       }
     }
@@ -260,7 +265,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 
 
   void show_results(  ostream& os, time_t before, time_t after, int nw ){
-    os << "Thread " << pthread_self() << ", terminated at: " 
+    os << "Thread " << (unsigned int)pthread_self() << ", terminated at: " 
        << asctime( localtime( &after ) )
        << "Total time used in this thread: " 
 	   << after - before 
@@ -274,7 +279,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
   // ***** This is the routine that is executed from a new thread *******
   void *do_chld( void *arg ){
     TimblExperiment *Exp = (TimblExperiment*)arg;
-    int     mysockfd = Exp->TcpSocket();
+    ServerSocket *mysock = Exp->TcpSocket();
     static int service_count=0;
 #ifdef __sgi__
     static pthread_mutex_t my_lock = {PTHREAD_MUTEX_INITIALIZER};
@@ -285,8 +290,8 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     // use a mutex to update the global service counter
     service_count++;
     if ( service_count > Exp->Max_Connections() ){
-      write_line( mysockfd, "Maximum connections exceeded\n" );
-      write_line( mysockfd, "try again later...\n" );
+      mysock->write( "Maximum connections exceeded\n" );
+      mysock->write( "try again later...\n" );
       pthread_mutex_unlock( &my_lock );
       cerr << "Thread " << pthread_self() << " refused " << endl;
     }
@@ -295,7 +300,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       // Greeting message for the client
       //
       //
-      write_line( mysockfd, "Welcome to the Timbl server.\n" );
+      mysock->write( "Welcome to the Timbl server.\n" );
       // process the test material
       // and do the timing
       //
@@ -304,13 +309,14 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       // report connection to the server terminal
       //
       char line[256];
-      sprintf( line, "Thread %u, on Socket %d", (unsigned int)pthread_self(), mysockfd );
+      sprintf( line, "Thread %u, on Socket %d", (unsigned int)pthread_self(),
+	       mysock->getSockId() );
       Exp->my_debug().message( line );
       *Log(Exp->my_log()) << line << ", started at: " 
 			  << asctime( localtime( &timebefore) ) << endl;  
       
       signal( SIGPIPE, BrokenPipeChildFun );
-      int nw = ClassifyFromSocket( Exp, mysockfd );
+      int nw = ClassifyFromSocket( Exp );
       time( &timeafter );
       show_results(  *Log(Exp->my_log()), timebefore, timeafter, nw );
       //
@@ -320,10 +326,6 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       pthread_mutex_unlock(&my_lock);
       // close the socket and exit this thread
       //
-      if ( close( mysockfd ) < 0 ){
-	cerr << "closing problems on " << mysockfd
-	     << " (" << strerror(errno) <<  ")" << endl;
-      };
       delete Exp;
     }
     return NULL;
@@ -590,73 +592,32 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     }
     *Log(Mother->my_log()) << "Starting Server on port:" << TCP_PORT << endl;
 
-    int newsockfd;
     pthread_t chld_thr;
 
-    struct addrinfo hints, *res, *resSave;
-    memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_flags    = AI_PASSIVE;
-    hints.ai_family   = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-    
-    string service = toString<int>(TCP_PORT);
-    int status = getaddrinfo( 0, service.c_str(), &hints, &res);
-    if ( status != 0) {
-      cerr << "getaddrinfo error:: [" << gai_strerror(status) << "]\n" << endl;
-    }
-    
-    resSave = res;
-    int sockfd = -1;
-    // try to start up server
-    // 
-    while ( res ){
-      sockfd = socket( res->ai_family, res->ai_socktype, res->ai_protocol );
-      if ( sockfd >= 0 ){
-	int val = 1;
-	if ( setsockopt( sockfd, SOL_SOCKET, SO_REUSEADDR, 
-			 (void *)&val, sizeof(val) ) == 0 ){
-	  val = 1;
-	  if ( setsockopt( sockfd, IPPROTO_TCP, TCP_NODELAY, 
-			   (void *)&val, sizeof(val) ) == 0 ){
-	    if ( bind( sockfd, res->ai_addr, res->ai_addrlen ) == 0 )
-	      break;
-	  }
-	}
-	status = errno;
-	close( sockfd );
-	sockfd = -1;
-      }
-      res = res->ai_next;
-    }
-    
-    freeaddrinfo( resSave );
-    if ( sockfd < 0 ){
-      *Log(Mother->my_err()) << "failed to start Server " << endl;
+    ServerSocket server;
+    string portString = toString<int>(TCP_PORT);
+    if ( !server.connect( portString ) ){
+      *Log(Mother->my_err()) << "failed to start Server: " 
+			     << server.getMessage() << endl;
       exit(0);
     }
-    
-    if ( listen(sockfd, 5) < 0 ) {
-      int eno = errno;
+    cerr << "connect to socket " << server.getSockId() << endl;
+    if ( !server.listen( 5 ) ) {
       // maximum of 5 pending requests
-      *Log(Mother->my_err()) << "server: can't bind local address" 
-			     << " (" << strerror(eno) << ")" << endl; 
+      *Log(Mother->my_err()) << server.getMessage() << endl;
       exit(0);
     }
+    cerr << "listen to socket " << server.getSockId() << endl;
     
     int failcount = 0;
     while( true ){ // waiting for connections loop
       signal( SIGPIPE, SIG_IGN );
-      struct sockaddr_storage cli_addr;
-      TIMBL_SOCKLEN_T clilen = sizeof(cli_addr);
-      newsockfd = accept( sockfd, (struct sockaddr *)&cli_addr, &clilen );
-      if( newsockfd < 0 ){
-	int err = errno;
-	*Log(Mother->my_err()) << "accept fails, errno= " << err
-			       << " (" << strerror(err) << ")" << endl;
+      ServerSocket *newSocket = new ServerSocket();
+      if ( !server.accept( *newSocket ) ){
+	*Log(Mother->my_err()) << server.getMessage() << endl;
 	if ( ++failcount > 20 ){
 	  *Log(Mother->my_err()) << "accept failcount >20 " << endl;
 	  *Log(Mother->my_err()) << "server stopped." << endl;
-	  close(sockfd);
 	  exit(EXIT_FAILURE);
 	}
 	else {
@@ -665,14 +626,16 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       }
       else {
 	failcount = 0;
-	show_connection( *Log(Mother->my_log()), newsockfd, 
-			 (struct sockaddr *)&cli_addr, clilen );
+	*Log(Mother->my_log()) << "Accepting Connection #" 
+			       << newSocket->getSockId()
+			       << " from remote host: " 
+			       << newSocket->getClientName() << endl;
 	// create a new thread to process the incoming request 
 	// (The thread will terminate itself when done processing
 	// and release its socket handle)
 	//
 	*Dbg(Mother->my_debug()) << " Voor Create Client " << endl;
-	TimblExperiment *Chld = Mother->CreateClient( newsockfd );
+	TimblExperiment *Chld = Mother->CreateClient( newSocket );
 	*Dbg(Mother->my_debug()) << " Na Create Client " << endl;
 	*Dbg(Chld->my_debug()) << "voor pthread_create " << endl;
 	pthread_create( &chld_thr, &attr, do_chld, (void *)Chld );
@@ -687,25 +650,22 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 		  const string& NODE, const string& TCP_PORT, 
 		  bool classify_mode ){
     bool Stop_C_Flag = false;
-    int    sockfd;
     cout << "Starting Client on node:" << NODE << ", port:" 
 	 << TCP_PORT << endl;
-
-    sockfd = make_connection( NODE, TCP_PORT );
-    if ( sockfd > 0 ){
+    ClientSocket client;
+    if ( client.connect(NODE, TCP_PORT) ){
       string TestLine, ResultLine;
       string Code, Rest;
-      if ( read_line( sockfd, ResultLine, TCP_BUFFER_SIZE ) ){
+      if ( client.read( ResultLine ) ){
 	cout << ResultLine << endl;
 	cout << "Start entering commands please:" << endl;
 	while( !Stop_C_Flag &&
 	       getline( Input, TestLine ) ){ 
 	  if ( classify_mode )
-	    write_line( sockfd, "c " );
-	  if ( write_line( sockfd, TestLine ) &&
-	       write_line( sockfd, "\n" ) ){
+	    client.write( "c " );
+	  if ( client.write( TestLine + "\n" ) ){
 	  repeat:
-	    if ( read_line( sockfd, ResultLine, TCP_BUFFER_SIZE ) ){
+	    if ( client.read( ResultLine ) ){
 	      if ( ResultLine == "" ) goto repeat;
 	      Split( ResultLine, Code, Rest );
 	      switch ( get_code( Code ) ){
@@ -724,7 +684,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 		  Output << TestLine << " --> ";
 		Output << ResultLine << endl;
 		if ( also_neighbors )
-		  while ( read_line( sockfd, ResultLine, TCP_BUFFER_SIZE ) ){
+		  while ( client.read( ResultLine ) ){
 		    Split( ResultLine, Code, Rest );
 		    Output << ResultLine << endl;
 		    if ( get_code( Code ) == EndNeighbors )
@@ -734,7 +694,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	      }
 	      case Status:
 		Output << ResultLine << endl;
-		while ( read_line( sockfd, ResultLine, TCP_BUFFER_SIZE ) ){
+		while ( client.read( ResultLine ) ){
 		  Split( ResultLine, Code, Rest );
 		  Output << ResultLine << endl;
 		  if ( get_code( Code ) == EndStatus )
@@ -753,7 +713,9 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	    Stop_C_Flag = true;
 	}
       }
-      close( sockfd );
+    }
+    else {
+      cerr << "connection failed: " + client.getMessage() << endl;
     }
   }
 #endif // PTHREADS

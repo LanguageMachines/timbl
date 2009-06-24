@@ -38,7 +38,7 @@ namespace Timbl {
   public:
     GetOptClass( CL_Options&  );
     virtual ~GetOptClass();
-    GetOptClass *Clone( int = 0 ) const;
+    GetOptClass *Clone( ServerSocket* = 0 ) const;
     bool parse_options( const CL_Options&, const int=0 );
     void set_default_options( const int=0 );
     bool definitive_options( TimblExperiment * );
@@ -89,7 +89,7 @@ namespace Timbl {
     bool do_server;
     bool do_diversify;
     std::vector<MetricType>metricsArray;
-    int parent_socket;
+    ServerSocket *parent_socket;
     std::string inPath;
     std::string outPath;
     std::string logFile;

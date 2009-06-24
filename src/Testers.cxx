@@ -46,12 +46,22 @@ using Common::Log2;
 
 namespace Timbl{
 
+  //#define DBGTEST
 
   double overlapTestFunction::test( FeatureValue *F,
 				    FeatureValue *G,
 				    Feature *Feat ) const {
+#ifdef DBGTEST
+    cerr << "overlap_distance(" << F << "," << G << ") = ";
+#endif
     double result = Feat->fvDistance( F, G );
+#ifdef DBGTEST
+    cerr << result;
+#endif
     result *= Feat->Weight();
+#ifdef DBGTEST
+    cerr << " gewogen " << result << endl;
+#endif
     return result;
   }
     
@@ -67,20 +77,38 @@ namespace Timbl{
 					   FeatureValue *G,
 					   Feature *Feat ) const {
     double r1, r2, result;
+#ifdef DBGTEST
+    cerr << "numeric_distance(" << F << "," << G << ") = ";
+#endif
     if ( FV_to_real( F, r1 ) &&
 	 FV_to_real( G, r2 ) )
       result = fabs( (r1-r2)/ (Feat->Max() - Feat->Min()) );
     else
       result = 1.0;
+#ifdef DBGTEST
+    cerr << result;
+#endif
     result *= Feat->Weight();
+#ifdef DBGTEST
+    cerr << " gewogen " << result << endl;
+#endif
     return result;
   }
 
   double valueDiffTestFunction::test( FeatureValue *F,
 				      FeatureValue *G,
 				      Feature *Feat ) const {
+#ifdef DBGTEST
+    cerr << toString(Feat->getMetricType()) << "_distance(" << F << "," << G << ") = ";
+#endif
     double result = Feat->fvDistance( F, G, threshold );
+#ifdef DBGTEST
+    cerr << result;
+#endif
     result *= Feat->Weight();
+#ifdef DBGTEST
+    cerr << " gewogen " << result << endl;
+#endif
     return result;
   }
 
@@ -145,8 +173,8 @@ namespace Timbl{
   }  
 
   size_t DistanceTester::test( vector<FeatureValue *>& G, 
-			      size_t CurPos,
-			      double Threshold ) {
+			       size_t CurPos,
+			       double Threshold ) {
     size_t i;
     size_t TrueF;
     for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){

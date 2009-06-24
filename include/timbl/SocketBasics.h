@@ -39,11 +39,46 @@
 #include <arpa/inet.h>
 #endif
 
-namespace SocketProcs {
+namespace Timbl {
   int make_connection( const std::string&, const std::string& );
   
   bool read_line( int, std::string&, int );
   bool write_line( int, const std::string& );
+
+  class Socket {
+  public: 
+    Socket(): valid(false), sock(-1){};
+    virtual ~Socket() { if ( sock >= 0 ) ::close(sock); };
+    bool isValid() const { return valid; };
+    std::string getMessage() const { return mess; };
+    int getSockId(){ return sock; };
+    bool read( std::string& );
+    bool write( const std::string& );
+  protected:
+    bool valid;
+    int sock;
+    std::string mess;
+#ifdef HAVE_GETADDRINFO
+    struct addrinfo hints;
+#else
+    struct sockaddr_in address;
+#endif
+  };
+
+  class ClientSocket: public Socket {
+  public:
+    bool connect( const std::string&, const std::string& );
+  };
+  
+  class ServerSocket: public Socket {
+  public:
+    bool connect( const std::string& );
+    bool listen( unsigned int );
+    bool accept( ServerSocket& );
+    std::string getClientName() const { return clientName; };
+  private:
+    std::string clientName;
+  };
 }
 
 #endif

@@ -178,20 +178,18 @@ namespace Timbl {
   {
   }
   
-  GetOptClass *GetOptClass::Clone( int tcp_id ) const{
+  GetOptClass *GetOptClass::Clone( ServerSocket *sock ) const{
     GetOptClass *result = new GetOptClass(*this);
-    result->parent_socket = tcp_id;
+    result->parent_socket = sock;
     return result;
   }
   
 #ifdef PTHREADS
-  using SocketProcs::write_line;
-  
   void GetOptClass::Error( const string& out_line ) const {
     if ( parent_socket )
-      write_line( parent_socket, "ERROR { " ) &&
-	write_line( parent_socket, out_line ) &&
-	write_line( parent_socket, " }\n" );
+      parent_socket->write( "ERROR { " ) &&
+	parent_socket->write( out_line ) &&
+	parent_socket->write( " }\n" );
     else {
       cerr << "Error:" << out_line << endl;
     }

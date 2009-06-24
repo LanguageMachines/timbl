@@ -322,6 +322,7 @@ namespace Timbl {
     else {
       InstanceBase->CleanPartition( false );
     }
+    delete tcp_socket;
     delete GlobalMetric;
     delete tester;
     delete decay;
@@ -335,7 +336,6 @@ namespace Timbl {
   }
 
 #ifdef PTHREADS
-  using SocketProcs::write_line;
   
   void MBLClass::Info( const string& out_line ) const {
     // Info NEVER to socket !
@@ -346,10 +346,10 @@ namespace Timbl {
  }
   
   void MBLClass::Warning( const string& out_line ) const {
-    if ( Socket() )
-      write_line( Socket(), "ERROR { " ) &&
-	write_line( Socket(), out_line ) &&
-	write_line( Socket(), " }\n" );
+    if ( tcp_socket )
+      tcp_socket->write( "ERROR { " ) &&
+	tcp_socket->write( out_line ) &&
+	tcp_socket->write( " }\n" );
     else {
       if ( exp_name != "" )
 	*Log(myerr) << "Warning:-" << exp_name << "-" << out_line << endl;
@@ -359,10 +359,10 @@ namespace Timbl {
   }
   
   void MBLClass::Error( const string& out_line ) const {
-    if ( Socket() )
-      write_line( Socket(), "ERROR { " ) &&
-	write_line( Socket(), out_line ) &&
-	write_line( Socket(), " }\n" );
+    if ( tcp_socket )
+      tcp_socket->write( "ERROR { " ) &&
+	tcp_socket->write( out_line ) &&
+	tcp_socket->write( " }\n" );
     else {
       if ( exp_name != "" )
 	*Log(myerr) << "Error:-" << exp_name << "-" << out_line << endl;
@@ -373,10 +373,10 @@ namespace Timbl {
   }
   
   void MBLClass::FatalError( const string& out_line ) const {
-    if ( Socket() )
-      write_line( Socket(), "ERROR { " ) &&
-	write_line( Socket(), out_line ) &&
-	write_line( Socket(), " }\n" );
+    if ( tcp_socket )
+      tcp_socket->write( "ERROR { " ) &&
+	tcp_socket->write( out_line ) &&
+	tcp_socket->write( " }\n" );
     else {
       if ( exp_name != "" )
 	*Log(myerr) << "-" << exp_name << "-";
@@ -393,7 +393,7 @@ namespace Timbl {
   bool MBLClass::ShowOptions( ostream& os ) const{
     bool result = true;
     if ( is_copy ){
-      result = write_line( tcp_socket, "STATUS\n" );
+      result = tcp_socket->write( "STATUS\n" );
     }
     else
       os << "Possible Experiment Settings (current value between []):" 
@@ -403,8 +403,8 @@ namespace Timbl {
       Options.Show_Options( tmp );
       string tmp_s = tmp.str();
       if ( is_copy )
-	result = write_line( tcp_socket, tmp_s ) &&
-	  write_line( tcp_socket, "ENDSTATUS\n" );
+	result = tcp_socket->write( tmp_s ) &&
+	  tcp_socket->write( "ENDSTATUS\n" );
       else
 	os << tmp_s << endl;
     }
@@ -414,7 +414,7 @@ namespace Timbl {
   bool MBLClass::ShowSettings( ostream& os ) const{
     bool result = true;
     if ( is_copy ){
-      result = write_line( tcp_socket, "STATUS\n" );
+      result = tcp_socket->write( "STATUS\n" );
     }
     else
       os << "Current Experiment Settings :" << endl;
@@ -423,8 +423,8 @@ namespace Timbl {
       Options.Show_Settings( tmp );
       string tmp_s = tmp.str();
       if ( is_copy )
-	result = write_line( tcp_socket, tmp_s ) &&
-	  write_line( tcp_socket, "ENDSTATUS\n" );
+	result = tcp_socket->write( tmp_s ) &&
+	  tcp_socket->write( "ENDSTATUS\n" );
       else
 	os << tmp_s << endl;
     }

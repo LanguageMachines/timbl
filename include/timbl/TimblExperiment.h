@@ -101,10 +101,10 @@ namespace Timbl {
     void setOutPath( const std::string& s ){ outPath = s; };
     void setLogFile( const std::string& s ){ logFile = s; };
     void setPidFile( const std::string& s ){ pidFile = s; };
-    TimblExperiment *CreateClient( int ) const;
+    TimblExperiment *CreateClient( ServerSocket* ) const;
     TimblExperiment *splitChild() const;
     VerbosityFlags ServerVerbosity() { return get_s_verbosity(); };
-    int TcpSocket() const { return Socket(); };
+    ServerSocket *TcpSocket() const { return Socket(); };
     int Max_Connections() const { return max_conn; };
     bool SetOptions( int, const char ** );
     bool SetOptions( const std::string& );

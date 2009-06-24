@@ -33,6 +33,7 @@ namespace Timbl {
   class TesterClass;
   class metricTester;
   class Chopper;
+  class ServerSocket;
 
   class MBLClass {
   public:
@@ -116,8 +117,8 @@ namespace Timbl {
     void Error( const std::string& ) const;
     void FatalError( const std::string& ) const;
     size_t MaxFeats() const { return MaxFeatures; };
-    void Socket( int so ){ tcp_socket = so ; };
-    int Socket() const { return tcp_socket; };
+    void Socket( ServerSocket *so ){ tcp_socket = so ; };
+    ServerSocket *Socket() const { return tcp_socket; };
     int Progress() const { return progress; };
     void Progress( int p ){ progress =  p; };
     bool MBLInit() const { return MBL_init; };
@@ -198,7 +199,7 @@ namespace Timbl {
     int F_length;
     int clip_factor;
     int Bin_Size;
-    int tcp_socket;
+    ServerSocket *tcp_socket;
     int progress;
     size_t tribl_offset;
     unsigned igThreshold;
