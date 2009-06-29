@@ -33,6 +33,8 @@
 #include <cassert>
 #include <cstdlib>
 
+#include <sys/time.h>
+
 #include "timbl/MsgClass.h"
 #include "timbl/Common.h"
 #include "timbl/StringOps.h"

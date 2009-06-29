@@ -32,6 +32,8 @@
 #include <iomanip>
 #include <cassert>
 
+#include <sys/time.h>
+
 #include "timbl/MsgClass.h"
 #include "timbl/Common.h"
 #include "timbl/StringOps.h"

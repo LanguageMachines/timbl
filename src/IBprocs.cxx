@@ -24,6 +24,7 @@
       Timbl@uvt.nl
 */
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
 #include <map>
