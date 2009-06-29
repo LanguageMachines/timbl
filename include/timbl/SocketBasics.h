@@ -40,15 +40,11 @@
 #endif
 
 namespace Timbl {
-  int make_connection( const std::string&, const std::string& );
-  
-  bool read_line( int, std::string&, int );
-  bool write_line( int, const std::string& );
 
   class Socket {
   public: 
     Socket(): valid(false), sock(-1){};
-    virtual ~Socket() { if ( sock >= 0 ) ::close(sock); };
+    virtual ~Socket();
     bool isValid() const { return valid; };
     std::string getMessage() const { return mess; };
     int getSockId(){ return sock; };

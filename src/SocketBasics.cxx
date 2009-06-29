@@ -45,18 +45,6 @@ namespace Timbl {
 
 #ifndef PTHREADS
   // define stubs
-  int make_connection( const string&, const string&, int ){
-    cerr << "No Socket operations available." << endl;
-    return -1;
-  }
-  bool read_line( int, string&, int){
-    cerr << "No Socket operations available." << endl;
-    return false;
-  }
-  bool write_line( int, const string& ){
-    cerr << "No Socket operations available." << endl;
-    return false;
-  }
   
   bool Socket::read( string& line ){
     cerr << "No Socket operations available." << endl;
@@ -69,6 +57,10 @@ namespace Timbl {
   }
 
 #else
+  
+  Socket::~Socket() { 
+    if ( sock >= 0 ) ::close(sock); 
+  };
 
   bool Socket::read( string& line ){
     if ( !valid ){
@@ -81,7 +73,7 @@ namespace Timbl {
     char last_read = 0;
     char *current_position = buf;
     long int bytes_read = -1;
-    while (last_read != 10) { // read upto \lf
+    while (last_read != 10) { // read 1 character at a time upto \lf
       bytes_read = ::read( sock, &last_read, 1 );
       if ( bytes_read <= 0) {
 	// The other side may have closed unexpectedly 
@@ -93,7 +85,7 @@ namespace Timbl {
 	total_count++;
       }
     }
-    if ( bytes_read  < 0 ) {
+    if ( bytes_read <= 0 ) {
       mess = "read: failed before a newline was found";
       return false;
     }
@@ -134,30 +126,9 @@ namespace Timbl {
   
 
 #ifndef HAVE_GETADDRINFO
-  /* Take a service name, and a service type, and return a port number.  If the
-     service name is not found, it tries it as a decimal number.  The number
-     returned is byte ordered for the network. */
-  int atoport( const char *service ){
-    int port;
-    long int lport;
-    struct servent *serv;
-    char *errpos;
-    
-    /* First try to read it from /etc/services */
-    serv = getservbyname(service, "tcp");
-    if (serv != NULL)
-      port = serv->s_port;
-    else { /* Not in services, maybe a number? */
-      lport = strtol(service,&errpos,0);
-      if ( (errpos[0] != 0) || (lport < 1) || (lport > 65535) )
-	return -1; /* Invalid port address */
-      port = htons(lport);
-   }
-    return port;
-  }
 
-  /* Converts ascii text to in_addr struct.  NULL is returned if the address
-     can not be found. */
+  // Converts ascii text to in_addr struct.
+  // NULL is returned if the address can not be found.
   struct in_addr *atoaddr( const char *address){
     struct hostent *host;
     static struct in_addr saddr;
@@ -167,181 +138,115 @@ namespace Timbl {
     if (saddr.s_addr != (unsigned int)-1) {
       return &saddr;
     }
-   host = gethostbyname(address);
-   if (host != NULL) {
-     return (struct in_addr *) *host->h_addr_list;
-   }
-   return NULL;
-  }
-
-  /* This is a generic function to make a connection to a given server/port.
-     service is the port name/number,
-     type is either SOCK_STREAM or SOCK_DGRAM, and
-     netaddress is the host name to connect to.
-     The function returns the socket, ready for action.*/
-  int make_connection( const string& service,
-		       const string& netaddress ){
-    /* First convert service from a string, to a number... */
-    int port = -1;
-    struct in_addr *addr;
-    int sock, connected;
-    struct sockaddr_in address;
-    
-    port = atoport(service.c_str() );
-    if (port == -1) {
-      fprintf(stderr,"make_connection:  Invalid socket type.\n");
-      return -1;
+    host = gethostbyname(address);
+    if (host != NULL) {
+      return (struct in_addr *) *host->h_addr_list;
     }
-    addr = atoaddr(netaddress.c_str());
-    if (addr == NULL) {
-      fprintf(stderr,"make_connection:  Invalid network address.\n");
-      return -1;
-    }
-    
-    memset((char *) &address, 0, sizeof(address));
-    address.sin_family = AF_INET;
-    address.sin_port = (port);
-    address.sin_addr.s_addr = addr->s_addr;
-    
-    sock = socket(AF_INET, SOCK_STREAM, 0);
-    int val = 1;
-    setsockopt( sock, SOL_SOCKET, SO_REUSEADDR, (void *)&val, sizeof(val) );
-    val = 1;
-    setsockopt( sock, IPPROTO_TCP, TCP_NODELAY, (void *)&val, sizeof(val) );
-    
-    connected = connect(sock, (struct sockaddr *) &address,
-			sizeof(address));
-    if (connected < 0) {
-      printf( "Failed connecting to %s on port %d.\n",
-	      inet_ntoa(*addr),htons(port));
-      perror("connect");
-      return -1;
-    }
-    return sock;
-  }
-  
-  //     This function reads from a socket, until it recieves a linefeed
-  //     character.  It fills the buffer "str" up to the maximum size "count".
-  //     This function will return -1 if the socket is closed during the read
-  //     operation.
-  //     Note that if a single line exceeds the length of count, the extra data
-  //     will be read and discarded!  You have been warned. 
-  long int sock_read(int sockfd,char *str, long int count){
-    long int total_count = 0;
-    char last_read = 0;
-    char *current_position = str;
-    while (last_read != 10) {
-      long int bytes_read = read( sockfd, &last_read, 1 );
-      if (bytes_read <= 0) {
-	// The other side may have closed unexpectedly 
-	return -1; 
-      }
-      if ( (total_count < count) && 
-	   (last_read != 10) && (last_read !=13) ) {
-	*current_position++ = last_read;
-	total_count++;
-      }
-    }
-    if (count > 0)
-      *current_position = 0;
-    return total_count;
-  }
-
-  long int sock_write( int sockfd, const char *str ){
-    // This is just like the write() system call, accept that it will
-    // make sure that all data is transmitted. 
-    // return -1 if the connection is closed while it is trying to write.
-    size_t bytes_sent = 0;
-    long int this_write;
-    size_t count = strlen( str );
-    while (bytes_sent < count) {
-      do {
-	this_write = write(sockfd, str, count - bytes_sent);
-      } while ( (this_write < 0) && (errno == EINTR) );
-      if (this_write <= 0)
-	return this_write;
-      bytes_sent += this_write;
-      str += this_write;
-    }
-    return count;
-  }
-
-  bool read_line( int socknum, string& line, int Size ){
-    char *tmp = new char[Size];
-    line = "";
-    if ( sock_read( socknum, tmp, Size ) < 0 ) {
-      delete [] tmp;
-      return false;
-    }
-    else {
-      line = tmp;
-      delete [] tmp;
-      return true;
-    }
-  }
-
-  bool write_line( int socknum, const string& line ){
-    // write a line to the socket
-    if ( !line.empty() )
-      if ( sock_write( socknum, line.c_str() ) < 0 ) {
-	return false;
-      }
-    return true;
+    return NULL;
   }
 
   bool ClientSocket::connect( const string& host, const string& portNum ){
-    /* First convert service from a string, to a number... */
-    int port = -1;
-    struct in_addr *addr;
-    int sock, connected;
-    
-    port = atoport(portNum.c_str() );
+    valid = false;
+    int port = stringTo<int>(portNum );
     if (port == -1) {
-      mess = string( "ClientSocket connect: Invalid socket type: (" )
-	+ portNum + ")";
+      mess = "ClientSocket connect: invalid port number";
       return false;
     }
-    addr = atoaddr( host.c_str());
+    struct in_addr *addr = atoaddr( host.c_str() );
     if (addr == NULL) {
-      mess = string( "ClientSocket connect: Invalid hostname: (")
-	+ host + ")";
+      mess = "ClientSocket connect:  Invalid host.";
       return false;
     }
+    
     memset((char *) &address, 0, sizeof(address));
     address.sin_family = AF_INET;
-    address.sin_port = (port);
+    address.sin_port = htons(port);
     address.sin_addr.s_addr = addr->s_addr;
-    
     sock = socket(AF_INET, SOCK_STREAM, 0);
-    int val = 1;
-    setsockopt( sock, SOL_SOCKET, SO_REUSEADDR, (void *)&val, sizeof(val) );
-    val = 1;
-    setsockopt( sock, IPPROTO_TCP, TCP_NODELAY, (void *)&val, sizeof(val) );
-    
-    connected = connect(sock, (struct sockaddr *) &address,
-			sizeof(address));
-    if (connected < 0) {
-      mess = string( "Failed connecting to ") +  inet_ntoa(*addr) 
-		     + " on port " + port + ".",
-		     inet_ntoa(*addr),htons(port);
-      return false;
+    if ( sock < 0 ){
+      mess = "ClientSocket connect: socket failed";
     }
-    else
-      valid = true;
+    else {
+      int val = 1;
+      setsockopt( sock, SOL_SOCKET, SO_REUSEADDR, (void *)&val, sizeof(val) );
+      val = 1;
+      setsockopt( sock, IPPROTO_TCP, TCP_NODELAY, (void *)&val, sizeof(val) );
+      int connected = ::connect( sock, (struct sockaddr *) &address,
+				 sizeof(address));
+      if (connected < 0) {
+	mess = string( "ClientSocket connect: ") + host + ":" + portNum +
+	  " failed (" + strerror( errno ) + ")";
+      }
+      else
+	valid = true;
+    }
+    return valid;
+  }
+  
+  bool ServerSocket::connect( const string& port ){
+    sock = -1;
+    valid = false;
+    sock = socket( AF_INET, SOCK_STREAM, 0 );
+    if ( sock < 0 ){
+      mess = string("ServerSocket connect: socket failed (" )
+	+ strerror( errno ) + ")";
+    }
+    else {
+      int val = 1;
+      setsockopt( sock, SOL_SOCKET, SO_REUSEADDR,
+		  (void *)&val, sizeof(val) );
+      val = 1;
+      setsockopt( sock, IPPROTO_TCP, TCP_NODELAY,
+		  (void *)&val, sizeof(val) );
+      struct sockaddr_in serv_addr;
+      memset((char *) &serv_addr, 0, sizeof(serv_addr));
+      serv_addr.sin_family = AF_INET;
+      serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+      int TCP_PORT = stringTo<int>(port);
+      serv_addr.sin_port = htons(TCP_PORT);
+      if ( bind( sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr) ) < 0 ){
+	mess = string( "ServerSocket connect: bind failed (" )
+	  + strerror( errno ) + ")";
+      }
+      else {
+	valid = true;
+      }
+    }
     return valid;
   }
 
-  bool ServerSocket::connect( const string& port ){
-    mess = "connect to do!" ;
-    return false;
-  }
-  bool ServerSocket::listen( unsigned int num ){
-    mess = "listen to do!" ;
-    return false;
-  }
   bool ServerSocket::accept( ServerSocket& newSocket ){
-    mess = "accept to do!" ;
-    return false;
+    newSocket.valid = false;
+    newSocket.sock = -1;
+    struct sockaddr_storage cli_addr;
+    TIMBL_SOCKLEN_T clilen = sizeof(cli_addr);
+    int newsock = ::accept( sock, (struct sockaddr *)&cli_addr, &clilen );
+    if( newsock < 0 ){
+      mess = string("ServerSocket: accept failed: (") + strerror(errno) + ")";
+    }
+    else {
+      string clientname;
+      struct sockaddr_in rem;
+      TIMBL_SOCKLEN_T remlen = sizeof(rem);
+      if ( getpeername( newsock, (struct sockaddr *)&rem, &remlen ) >= 0 ){
+	struct hostent *host = gethostbyaddr( (char *)&rem.sin_addr,
+					      sizeof rem.sin_addr,
+					      AF_INET );
+	if ( host ){
+	  clientname = host->h_name;
+	  char **p;
+	  for (p = host->h_addr_list; *p != 0; p++) {
+	    struct in_addr in;
+	    (void) memcpy(&in.s_addr, *p, sizeof (in.s_addr));
+	    clientname += string(" [") + inet_ntoa(in) + "]";
+	  }
+	}
+      }
+      newSocket.clientName = clientname;
+      newSocket.sock = newsock;
+      newSocket.valid = true;
+    }
+    return newSocket.valid;
   }
 
 #else
@@ -358,8 +263,8 @@ namespace Timbl {
     sock = -1;
     if ( (eno=getaddrinfo( hostString.c_str(), portString.c_str(),
 			   &hints, &res ) ) != 0 ){
-      mess = "ClientSocket: getting address from '" +
-	hostString + "' failed, err = " + gai_strerror(eno);
+      mess = "ClientSocket connect: invalid hostname '" +
+	hostString + "' (" + gai_strerror(eno) + ")";
     }
     else {
       aip = res;
@@ -436,16 +341,6 @@ namespace Timbl {
     return valid;
   }
 
-  bool ServerSocket::listen( unsigned int num ){
-    if ( ::listen( sock, num) < 0 ) {
-      // maximum of 5 pending requests
-      mess = string("server-listen failed: (") + strerror(errno) + ")";
-      return false;
-    }
-    else
-      return true;
-  }
-
   bool ServerSocket::accept( ServerSocket& newSocket ){
     newSocket.valid = false;
     newSocket.sock = -1;
@@ -486,6 +381,17 @@ namespace Timbl {
   }
 
 #endif 
+
+  bool ServerSocket::listen( unsigned int num ){
+    if ( ::listen( sock, num) < 0 ) {
+      // maximum of 5 pending requests
+      mess = string("server-listen failed: (") + strerror(errno) + ")";
+      return false;
+    }
+    else
+      return true;
+  }
+
 
 #endif // PTHREADS
 }

@@ -36,7 +36,7 @@
 
 #include <sys/time.h>
 
-#include "config.h" // for TIMBL_SOCKLEN_T and HAVE_GETADDRINFO
+#include "config.h" // for TIMBL_SOCKLEN_T
 #include "timbl/Common.h"
 #include "timbl/StringOps.h"
 #include "timbl/MsgClass.h"
@@ -176,7 +176,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     *Dbg(Exp->my_debug()) << "ClassifyFromSocket: " 
 			  << sock->getSockId() << endl;    
     while ( go_on && sock->read( Line ) ){
-      *Dbg(Exp->my_debug()) << "Line=" << Line << endl;
+      *Dbg(Exp->my_debug()) << "Line='" << Line << "'" << endl;
       Split( Line, Command, Param );
       switch ( check_command(Command) ){
       case Set:
@@ -281,11 +281,8 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     TimblExperiment *Exp = (TimblExperiment*)arg;
     ServerSocket *mysock = Exp->TcpSocket();
     static int service_count=0;
-#ifdef __sgi__
-    static pthread_mutex_t my_lock = {PTHREAD_MUTEX_INITIALIZER};
-#else
+
     static pthread_mutex_t my_lock = PTHREAD_MUTEX_INITIALIZER;
-#endif
     pthread_mutex_lock(&my_lock);
     // use a mutex to update the global service counter
     service_count++;
@@ -293,7 +290,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       mysock->write( "Maximum connections exceeded\n" );
       mysock->write( "try again later...\n" );
       pthread_mutex_unlock( &my_lock );
-      cerr << "Thread " << pthread_self() << " refused " << endl;
+      cerr << "Thread " << (unsigned int)pthread_self() << " refused " << endl;
     }
     else {
       pthread_mutex_unlock( &my_lock );
@@ -337,196 +334,6 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     }
   }
   
-#ifndef HAVE_GETADDRINFO
-  void show_connection( ostream& os, struct hostent *host, int sock ){
-    os << "Accepting Connection #" << sock
-       << " from remote host: " << host->h_name;
-    char **p;
-    for (p = host->h_addr_list; *p != 0; p++) {
-      struct in_addr in;
-      (void) memcpy(&in.s_addr, *p, sizeof (in.s_addr));
-      os << " [" << inet_ntoa(in) << "]";
-    }
-    os << endl;
-  }
-
-  void RunServer( TimblExperiment *Mother, int TCP_PORT ){
-    string pidFile = Mother->pidFile;
-    string logFile = Mother->logFile;
-    if ( !pidFile.empty() ){
-      // check validity of pidfile
-      if ( pidFile[0] != '/' ) // make sure the path is absolute
-	pidFile = '/' + pidFile;
-      unlink( pidFile.c_str() );
-      ofstream pid_file( pidFile.c_str() ) ;
-      if ( !pid_file ){
-	*Log(Mother->my_err())<< "unable to create pidfile:"<< pidFile << endl;
-	*Log(Mother->my_err())<< "TimblServer NOT Started" << endl;
-	exit(1);
-      }
-    }
-    if ( !logFile.empty() ){
-      if ( logFile[0] != '/' ) // make sure the path is absolute
-	logFile = '/' + logFile;
-      ostream *tmp = new ofstream( logFile.c_str() );
-      if ( tmp && tmp->good() ){
-	*Log(Mother->my_err()) << "switching logging to file " 
-			       << logFile << endl;
-	Mother->my_log().associate( *tmp );
-	Mother->my_err().associate( *tmp );
-	*Log(Mother->my_log())  << "Started logging " << endl;	
-	*Log(Mother->my_log())  << "Server verbosity " << toString<VerbosityFlags>( Mother->ServerVerbosity()) << endl;	
-      }
-      else {
-	*Log(Mother->my_err()) << "unable to create logfile: " << logFile << endl;
-	*Log(Mother->my_err()) << "not started" << endl;
-	exit(1);
-      }
-    }
-#if defined( __sgi__ )
-    int start = _daemonize( 0, -1, -1, -1 );
-#else
-    int start = daemon( 0, 0 );
-#endif
-    if ( start < 0 ){
-      cerr << "failed to daemonize error= " << strerror(errno) << endl;
-      exit(1);
-    };
-
-    if ( !pidFile.empty() ){
-      // we have a liftoff!
-      // signal it to the world
-      ofstream pid_file( pidFile.c_str() ) ;
-      if ( !pid_file ){
-	*Log(Mother->my_err()) << "unable to create pidfile:"<< pidFile << endl;
-	*Log(Mother->my_err()) << "TimblServer NOT Started" << endl;
-	exit(1);
-      }
-      else {
-	pid_t pid = getpid();
-	pid_file << pid << endl;
-      }
-    }
-
-    int    sockfd, newsockfd;
-    TIMBL_SOCKLEN_T clilen, remlen;
-    struct sockaddr_in cli_addr, serv_addr, rem_addr;
-    struct hostent *host;
-    pthread_t chld_thr;
-    pthread_attr_t attr;
-    clilen = sizeof(cli_addr);
-    remlen = sizeof(rem_addr);
-    // set the attributes
-    if ( pthread_attr_init(&attr) ||
-         pthread_attr_setdetachstate( &attr, PTHREAD_CREATE_DETACHED ) ){
-      *Log(Mother->my_err()) << "Threads: couldn't set attributes" << endl;
-      exit(0);
-    }
-    // start up server
-    //
-    *Log(Mother->my_log()) << "Starting Server on port:" << TCP_PORT << endl;
-    if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0 ){
-      *Log(Mother->my_err()) << "server: can't open stream socket" << endl;
-      exit(0);
-    }
-    memset((char *) &serv_addr, 0, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    serv_addr.sin_port = htons(TCP_PORT);
-
-    int val = 1;
-    setsockopt( sockfd, SOL_SOCKET, SO_REUSEADDR,
-                (void *)&val, sizeof(val) );
-    val = 1;
-    setsockopt( sockfd, IPPROTO_TCP, TCP_NODELAY,
-                (void *)&val, sizeof(val) );
-    if( bind( sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr) ) < 0 ||
-        listen(sockfd, 5) < 0 ) {
-      int eno = errno;
-      // maximum of 5 pending requests
-      *Log(Mother->my_err()) << "server: can't bind local address"
-                             << " (" << strerror(eno) << ")" << endl;
-      exit(0);
-    }
-
-    int failcount = 0;
-    while( true ){ // waiting for connections loop
-      signal( SIGPIPE, SIG_IGN );
-      newsockfd = accept( sockfd, (struct sockaddr *)&cli_addr, &clilen );
-      if( newsockfd < 0 ){
-        int err = errno;
-        *Log(Mother->my_err()) << "accept fails, errno= " << err
-                               << " (" << strerror(err) << ")" << endl;
-        if ( ++failcount > 20 ){
-          *Log(Mother->my_err()) << "accept failcount >20 " << endl;
-          *Log(Mother->my_err()) << "server stopped." << endl;
-          close(sockfd);
-          exit(EXIT_FAILURE);
-        }
-        else {
-          continue;
-        }
-      }
-      else {
-        failcount = 0;
-        if ( getpeername( newsockfd,
-                          (struct sockaddr *)&rem_addr,
-                          &remlen ) < 0 ){
-          int err = errno;
-          *Log(Mother->my_err()) << "getpeername, "  << strerror(err) << endl;
-        }else if ( (host = gethostbyaddr( (char *)&rem_addr.sin_addr,
-                                          sizeof rem_addr.sin_addr,
-                                          AF_INET) ) == NULL ){
-          int err=errno;
-          *Log(Mother->my_err()) << "gethostbyadd " << strerror(err) << endl;
-        }
-        else {
-          show_connection( *Log(Mother->my_log()), host, newsockfd );
-        }
-        // create a new thread to process the incoming request
-        // (The thread will terminate itself when done processing
-        // and release its socket handle)
-        //
-        *Dbg(Mother->my_debug()) << " Voor Create Client " << endl;
-        TimblExperiment *Chld = Mother->CreateClient( newsockfd );
-        *Dbg(Mother->my_debug()) << " Na Create Client " << endl;
-        *Dbg(Chld->my_debug()) << "voor pthread_create " << endl;
-        pthread_create( &chld_thr, &attr, do_chld, (void *)Chld );
-      }
-      // the server is now free to accept another socket request
-    }
-    pthread_attr_destroy(&attr);
-  }
-
-#else
-  void show_connection( ostream& os, int sock, 
-			const sockaddr *addr, TIMBL_SOCKLEN_T len ){
-
-    string result;
-    char host_name[NI_MAXHOST];
-    int err = getnameinfo( addr,
-			   len,
-			   host_name, sizeof(host_name),
-			   0, 0,
-			   0 );
-    if ( err != 0 ){
-      result = string(" failed: getnameinfo ") + strerror(errno);
-    }
-    else {
-      result = host_name;
-    }
-    err = getnameinfo( addr,
-		       len,
-		       host_name, sizeof(host_name),
-		       0, 0,
-		       NI_NUMERICHOST );
-    if ( err == 0 ){
-      result += string(" [") + host_name + "]";
-    }
-    os << "Accepting Connection #" << sock
-       << " from remote host: " << result << endl;
-  }
-
   void RunServer( TimblExperiment *Mother, int TCP_PORT ){
     string logFile =  Mother->logFile;
     string pidFile =  Mother->pidFile;
@@ -560,11 +367,10 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	exit(1);
       }
     }
-#if defined( __sgi__ )
-    int start = _daemonize( 0, -1, -1, -1 );
-#else
-    int start = daemon( 0, 0 );
-#endif
+
+    // int start = daemon( 0, 0 );
+    int start = 1;
+
     if ( start < 0 ){
       cerr << "failed to daemonize error= " << strerror(errno) << endl;
       exit(1);
@@ -601,13 +407,12 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 			     << server.getMessage() << endl;
       exit(0);
     }
-    cerr << "connect to socket " << server.getSockId() << endl;
+
     if ( !server.listen( 5 ) ) {
       // maximum of 5 pending requests
       *Log(Mother->my_err()) << server.getMessage() << endl;
       exit(0);
     }
-    cerr << "listen to socket " << server.getSockId() << endl;
     
     int failcount = 0;
     while( true ){ // waiting for connections loop
@@ -644,7 +449,6 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     }
     pthread_attr_destroy(&attr); 
   }
-#endif  
   
   void RunClient( istream& Input, ostream& Output, 
 		  const string& NODE, const string& TCP_PORT, 
