@@ -368,8 +368,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       }
     }
 
-    // int start = daemon( 0, 0 );
-    int start = 1;
+    int start = daemon( 0, 0 );
 
     if ( start < 0 ){
       cerr << "failed to daemonize error= " << strerror(errno) << endl;
