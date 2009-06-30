@@ -40,7 +40,7 @@
 
 using namespace std;
 
-namespace Timbl {
+namespace Sockets {
   const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers
 
 #ifndef PTHREADS
@@ -125,131 +125,7 @@ namespace Timbl {
   }
   
 
-#ifndef HAVE_GETADDRINFO
-
-  // Converts ascii text to in_addr struct.
-  // NULL is returned if the address can not be found.
-  struct in_addr *atoaddr( const char *address){
-    struct hostent *host;
-    static struct in_addr saddr;
-    
-    /* First try it as aaa.bbb.ccc.ddd. */
-    saddr.s_addr = inet_addr(address);
-    if (saddr.s_addr != (unsigned int)-1) {
-      return &saddr;
-    }
-    host = gethostbyname(address);
-    if (host != NULL) {
-      return (struct in_addr *) *host->h_addr_list;
-    }
-    return NULL;
-  }
-
-  bool ClientSocket::connect( const string& host, const string& portNum ){
-    valid = false;
-    int port = stringTo<int>(portNum );
-    if (port == -1) {
-      mess = "ClientSocket connect: invalid port number";
-      return false;
-    }
-    struct in_addr *addr = atoaddr( host.c_str() );
-    if (addr == NULL) {
-      mess = "ClientSocket connect:  Invalid host.";
-      return false;
-    }
-    
-    memset((char *) &address, 0, sizeof(address));
-    address.sin_family = AF_INET;
-    address.sin_port = htons(port);
-    address.sin_addr.s_addr = addr->s_addr;
-    sock = socket(AF_INET, SOCK_STREAM, 0);
-    if ( sock < 0 ){
-      mess = "ClientSocket connect: socket failed";
-    }
-    else {
-      int val = 1;
-      setsockopt( sock, SOL_SOCKET, SO_REUSEADDR, (void *)&val, sizeof(val) );
-      val = 1;
-      setsockopt( sock, IPPROTO_TCP, TCP_NODELAY, (void *)&val, sizeof(val) );
-      int connected = ::connect( sock, (struct sockaddr *) &address,
-				 sizeof(address));
-      if (connected < 0) {
-	mess = string( "ClientSocket connect: ") + host + ":" + portNum +
-	  " failed (" + strerror( errno ) + ")";
-      }
-      else
-	valid = true;
-    }
-    return valid;
-  }
-  
-  bool ServerSocket::connect( const string& port ){
-    sock = -1;
-    valid = false;
-    sock = socket( AF_INET, SOCK_STREAM, 0 );
-    if ( sock < 0 ){
-      mess = string("ServerSocket connect: socket failed (" )
-	+ strerror( errno ) + ")";
-    }
-    else {
-      int val = 1;
-      setsockopt( sock, SOL_SOCKET, SO_REUSEADDR,
-		  (void *)&val, sizeof(val) );
-      val = 1;
-      setsockopt( sock, IPPROTO_TCP, TCP_NODELAY,
-		  (void *)&val, sizeof(val) );
-      struct sockaddr_in serv_addr;
-      memset((char *) &serv_addr, 0, sizeof(serv_addr));
-      serv_addr.sin_family = AF_INET;
-      serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-      int TCP_PORT = stringTo<int>(port);
-      serv_addr.sin_port = htons(TCP_PORT);
-      if ( bind( sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr) ) < 0 ){
-	mess = string( "ServerSocket connect: bind failed (" )
-	  + strerror( errno ) + ")";
-      }
-      else {
-	valid = true;
-      }
-    }
-    return valid;
-  }
-
-  bool ServerSocket::accept( ServerSocket& newSocket ){
-    newSocket.valid = false;
-    newSocket.sock = -1;
-    struct sockaddr_storage cli_addr;
-    TIMBL_SOCKLEN_T clilen = sizeof(cli_addr);
-    int newsock = ::accept( sock, (struct sockaddr *)&cli_addr, &clilen );
-    if( newsock < 0 ){
-      mess = string("ServerSocket: accept failed: (") + strerror(errno) + ")";
-    }
-    else {
-      string clientname;
-      struct sockaddr_in rem;
-      TIMBL_SOCKLEN_T remlen = sizeof(rem);
-      if ( getpeername( newsock, (struct sockaddr *)&rem, &remlen ) >= 0 ){
-	struct hostent *host = gethostbyaddr( (char *)&rem.sin_addr,
-					      sizeof rem.sin_addr,
-					      AF_INET );
-	if ( host ){
-	  clientname = host->h_name;
-	  char **p;
-	  for (p = host->h_addr_list; *p != 0; p++) {
-	    struct in_addr in;
-	    (void) memcpy(&in.s_addr, *p, sizeof (in.s_addr));
-	    clientname += string(" [") + inet_ntoa(in) + "]";
-	  }
-	}
-      }
-      newSocket.clientName = clientname;
-      newSocket.sock = newsock;
-      newSocket.valid = true;
-    }
-    return newSocket.valid;
-  }
-
-#else
+#ifdef HAVE_GETADDRINFO
 
   bool ClientSocket::connect( const string& hostString,
 			      const string& portString ){
@@ -378,6 +254,130 @@ namespace Timbl {
       newSocket.valid = true;
       return true;
     }
+  }
+
+#else
+
+  // Converts ascii text to in_addr struct.
+  // NULL is returned if the address can not be found.
+  struct in_addr *atoaddr( const char *address){
+    struct hostent *host;
+    static struct in_addr saddr;
+    
+    /* First try it as aaa.bbb.ccc.ddd. */
+    saddr.s_addr = inet_addr(address);
+    if (saddr.s_addr != (unsigned int)-1) {
+      return &saddr;
+    }
+    host = gethostbyname(address);
+    if (host != NULL) {
+      return (struct in_addr *) *host->h_addr_list;
+    }
+    return NULL;
+  }
+
+  bool ClientSocket::connect( const string& host, const string& portNum ){
+    valid = false;
+    int port = stringTo<int>(portNum );
+    if (port == -1) {
+      mess = "ClientSocket connect: invalid port number";
+      return false;
+    }
+    struct in_addr *addr = atoaddr( host.c_str() );
+    if (addr == NULL) {
+      mess = "ClientSocket connect:  Invalid host.";
+      return false;
+    }
+    
+    memset((char *) &address, 0, sizeof(address));
+    address.sin_family = AF_INET;
+    address.sin_port = htons(port);
+    address.sin_addr.s_addr = addr->s_addr;
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if ( sock < 0 ){
+      mess = "ClientSocket connect: socket failed";
+    }
+    else {
+      int val = 1;
+      setsockopt( sock, SOL_SOCKET, SO_REUSEADDR, (void *)&val, sizeof(val) );
+      val = 1;
+      setsockopt( sock, IPPROTO_TCP, TCP_NODELAY, (void *)&val, sizeof(val) );
+      int connected = ::connect( sock, (struct sockaddr *) &address,
+				 sizeof(address));
+      if (connected < 0) {
+	mess = string( "ClientSocket connect: ") + host + ":" + portNum +
+	  " failed (" + strerror( errno ) + ")";
+      }
+      else
+	valid = true;
+    }
+    return valid;
+  }
+  
+  bool ServerSocket::connect( const string& port ){
+    sock = -1;
+    valid = false;
+    sock = socket( AF_INET, SOCK_STREAM, 0 );
+    if ( sock < 0 ){
+      mess = string("ServerSocket connect: socket failed (" )
+	+ strerror( errno ) + ")";
+    }
+    else {
+      int val = 1;
+      setsockopt( sock, SOL_SOCKET, SO_REUSEADDR,
+		  (void *)&val, sizeof(val) );
+      val = 1;
+      setsockopt( sock, IPPROTO_TCP, TCP_NODELAY,
+		  (void *)&val, sizeof(val) );
+      struct sockaddr_in serv_addr;
+      memset((char *) &serv_addr, 0, sizeof(serv_addr));
+      serv_addr.sin_family = AF_INET;
+      serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+      int TCP_PORT = stringTo<int>(port);
+      serv_addr.sin_port = htons(TCP_PORT);
+      if ( bind( sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr) ) < 0 ){
+	mess = string( "ServerSocket connect: bind failed (" )
+	  + strerror( errno ) + ")";
+      }
+      else {
+	valid = true;
+      }
+    }
+    return valid;
+  }
+
+  bool ServerSocket::accept( ServerSocket& newSocket ){
+    newSocket.valid = false;
+    newSocket.sock = -1;
+    struct sockaddr_storage cli_addr;
+    TIMBL_SOCKLEN_T clilen = sizeof(cli_addr);
+    int newsock = ::accept( sock, (struct sockaddr *)&cli_addr, &clilen );
+    if( newsock < 0 ){
+      mess = string("ServerSocket: accept failed: (") + strerror(errno) + ")";
+    }
+    else {
+      string clientname;
+      struct sockaddr_in rem;
+      TIMBL_SOCKLEN_T remlen = sizeof(rem);
+      if ( getpeername( newsock, (struct sockaddr *)&rem, &remlen ) >= 0 ){
+	struct hostent *host = gethostbyaddr( (char *)&rem.sin_addr,
+					      sizeof rem.sin_addr,
+					      AF_INET );
+	if ( host ){
+	  clientname = host->h_name;
+	  char **p;
+	  for (p = host->h_addr_list; *p != 0; p++) {
+	    struct in_addr in;
+	    (void) memcpy(&in.s_addr, *p, sizeof (in.s_addr));
+	    clientname += string(" [") + inet_ntoa(in) + "]";
+	  }
+	}
+      }
+      newSocket.clientName = clientname;
+      newSocket.sock = newsock;
+      newSocket.valid = true;
+    }
+    return newSocket.valid;
   }
 
 #endif 

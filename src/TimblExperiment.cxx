@@ -52,7 +52,6 @@
 #include "timbl/Tree.h"
 #include "timbl/Instance.h"
 #include "timbl/Choppers.h"
-//#include "timbl/Testers.h"
 #include "timbl/Metrics.h"
 #include "timbl/Statistics.h"
 #include "timbl/neighborSet.h"
@@ -67,11 +66,11 @@ typedef std::ostream LogStream;
 #define Dbg(X) (X)
 #endif
 
+#include "timbl/SocketBasics.h"
 #include "timbl/MBLClass.h"
 #include "timbl/CommandLine.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
-#include "timbl/SocketBasics.h"
 #include "timbl/ServerProcs.h"
 
 namespace Timbl {

@@ -28,12 +28,12 @@
 
 namespace Timbl {
   using namespace Common;
+  using namespace Sockets;
 
   class InstanceBase_base;
   class TesterClass;
   class metricTester;
   class Chopper;
-  class ServerSocket;
 
   class MBLClass {
   public:
@@ -217,7 +217,6 @@ namespace Timbl {
 	!( runningPhase == TestWords && no_samples_test ); }
     bool keep_distributions;
     double DBEntropy;
-    //    std::vector<std::string>ChoppedInput;
     void fill_table();
     void InvalidMessage() const ;
     double calculate_db_entropy( Target * );

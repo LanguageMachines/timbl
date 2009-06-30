@@ -39,7 +39,7 @@
 #include <arpa/inet.h>
 #endif
 
-namespace Timbl {
+namespace Sockets {
 
   class Socket {
   public: 

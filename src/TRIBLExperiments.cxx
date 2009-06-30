@@ -53,6 +53,7 @@ typedef std::ostream LogStream;
 #define Dbg(X) (X)
 #endif
 
+#include "timbl/SocketBasics.h"
 #include "timbl/MBLClass.h"
 #include "timbl/TimblExperiment.h"
 

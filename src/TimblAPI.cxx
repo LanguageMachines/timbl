@@ -36,6 +36,7 @@
 #include "timbl/neighborSet.h"
 #include "timbl/BestArray.h"
 #include "timbl/Statistics.h"
+#include "timbl/SocketBasics.h"
 #include "timbl/MBLClass.h"
 #include "timbl/GetOptClass.h"
 

@@ -53,7 +53,7 @@ typedef std::ostream LogStream;
 using namespace std;
 
 namespace Timbl {
-
+  
   void GetOptClass::set_default_options( int Max ){
     local_algo = IB1_a;
     local_metric = UnknownMetric;
@@ -178,7 +178,7 @@ namespace Timbl {
   {
   }
   
-  GetOptClass *GetOptClass::Clone( ServerSocket *sock ) const{
+  GetOptClass *GetOptClass::Clone( Sockets::ServerSocket *sock ) const{
     GetOptClass *result = new GetOptClass(*this);
     result->parent_socket = sock;
     return result;
