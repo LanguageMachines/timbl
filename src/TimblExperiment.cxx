@@ -1688,6 +1688,39 @@ namespace Timbl {
     }
   }
 
+  bool TimblExperiment::WriteMatrices( const std::string& FileName ){
+    ofstream out( FileName.c_str(), ios::out | ios::trunc );
+    if ( !out ) {
+      Warning( "Problem opening matrices file '" + 
+	       FileName + "' (not written)" );
+      return false;
+    }
+    else {
+      if ( !Verbosity(SILENT) )
+	Info( "Saving Matrices in " + FileName );
+      initExperiment( );
+      return writeMatrices( out );
+    }
+    }
+    
+  bool TimblExperiment::GetMatrices( const std::string& FileName ){
+    ifstream inf( FileName.c_str(), ios::in );
+    if ( !inf ){
+      Error( "Problem opening matrices file " + FileName );
+      return false;
+    }
+    else {
+      if ( !Verbosity(SILENT) )
+	Info( "Reading matrices from " + FileName );
+      if ( !readMatrices( inf ) ){
+	Error( "Errors found in file " + FileName );
+	return false;
+      }
+      else
+	return true;
+    }
+  }
+
   bool TimblExperiment::SaveWeights( const std::string& FileName ){
     if ( ConfirmOptions() ){
       // Open the output file.

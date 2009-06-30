@@ -717,6 +717,73 @@ namespace Timbl {
       os << "Total Size of value-matrices " << TotalCount << " Bytes " 
 	 << endl << endl;
   }
+
+  bool MBLClass::readMatrices( istream& is ){
+    for ( size_t i = 0; i < num_of_features; ++i ){
+      string line;
+      if ( getline( is, line ) ){
+	//	cerr << "probeer '" << line << "'" << endl;
+	if ( line.find( "Feature" ) != 0 )
+	  return false;
+	else {
+	  line = line.substr( 8 );
+	  string::size_type pos = line.find_first_not_of("0123456789");
+	  string nums = line.substr( 0, pos );
+	  size_t num;
+	  if ( !stringTo( nums, num ) ){
+	    Error( "missing entry for Feature " + toString(i) );
+	    return false;
+	  }
+	  else {
+	    line = line.substr( pos );
+	    if ( line.find( "ignored" ) != string::npos ){
+	      Features[i]->Ignore(true);
+	      getline( is, line ); // skip 1 line
+	    }
+	    else if ( line.find( "metric" ) != string::npos ){
+	      line = line.substr( line.find("=")+2 );
+	      MetricType m;
+	      if ( ! stringTo( line, m ) )
+		return false;
+	      else
+		Features[i]->setMetricType( m );
+	      // seems useless!
+
+	      //	      cerr << "metric is now " 
+	      //	   << toString(Features[i]->getMetricType()) << endl;
+	      if ( !Features[i]->fill_matrix( is ) )
+		  return false;
+	    }
+	    else {
+	      getline( is, line ); // skip 1 empty line
+	    }
+	  }
+	}
+      }
+      else
+	return false;
+    }
+    return true;
+  }
+
+  bool MBLClass::writeMatrices( ostream& os ) const {
+    for ( size_t i = 0; i < num_of_features; ++i ){
+      os << "Feature " << i+1;
+      if ( Features[i]->Ignore() )
+	os << " ignored.\n" << endl;
+      else if ( !Features[i]->matrix_present() ){
+	if ( Features[i]->isStorableMetric() )
+	  os << " not calculated yet.\n" << endl;
+	else
+	  os << " not avaliable.\n" << endl;
+      }
+      else {
+	os << " metric = " << toString(Features[i]->getMetricType()) << endl;
+	Features[i]->print_matrix( os );
+      }
+    }
+    return os.good();
+  }
   
   bool MBLClass::readArrays( istream& is ){
     bool result = true;
@@ -877,7 +944,7 @@ namespace Timbl {
 	  if (Features[i]->matrix_present( ) ){
 	    *Log(mylog) << "Value matrix of feature # " 
 			<< i+1 << endl;
-	    Features[i]->print_matrix();
+	    Features[i]->print_matrix( *Log(mylog), false );
 	    *Log(mylog) << endl;
 	  }
 	  else {

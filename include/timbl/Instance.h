@@ -276,7 +276,8 @@ namespace Timbl {
     unsigned int matrix_byte_size() const;
     bool store_matrix( int = 1 );
     void delete_matrix();
-    void print_matrix( bool s = false ) const;
+    bool fill_matrix( std::istream& );
+    void print_matrix( std::ostream&, bool = false ) const;
     void print_vc_pb_array( std::ostream& ) const;
     bool read_vc_pb_array( std::istream &  );
     FeatVal_Stat prepare_numeric_stats();

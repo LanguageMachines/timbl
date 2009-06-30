@@ -115,6 +115,8 @@ namespace Timbl {
     void UseOptions( GetOptClass * );
     bool WriteArrays( const std::string& );
     bool GetArrays( const std::string& );
+    bool WriteMatrices( const std::string& );
+    bool GetMatrices( const std::string& );
     bool SaveWeights( const std::string& );
     bool GetWeights( const std::string&, WeightType );
     bool GetCurrentWeights( std::vector<double>& );

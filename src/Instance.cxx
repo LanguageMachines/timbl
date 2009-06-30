@@ -1594,44 +1594,83 @@ namespace Timbl {
     return true;
   }
 
-  void Feature::print_matrix( bool shrt ) const {
+  bool Feature::fill_matrix( istream &is ) {
+    if ( !metric_matrix )
+      metric_matrix = new SparseSymetricMatrix<FeatureValue*>();
+    else
+      metric_matrix->Clear();
+    string line;
+    while ( getline(is,line) ){
+      if ( line.empty() ) break;
+      vector<string> arr;
+      double d;
+      if ( split_at( line, arr, " " ) != 2 ){
+	Error( "wrong line in inputfile" );
+	return false;
+      }
+      else if ( arr[0].length() < 2 ){
+	Error( "wrong line in inputfile" );
+	return false;
+      }
+      else if ( !stringTo( arr[1], d ) ) {
+	Error( "wrong line in inputfile" );
+	return false;
+      }
+      else {
+	string stripped = arr[0].substr(1,arr[0].length()-2);
+	vector<string> parts;
+	if ( split_at( stripped, parts, "," ) != 2 ){
+	  Error( "wrong line in inputfile" );
+	  return false;
+	}
+	else {
+	  FeatureValue *F1 = Lookup(parts[0]);
+	  FeatureValue *F2 = Lookup(parts[1]);
+	  metric_matrix->Assign( F1, F2, d );
+	}
+      }
+    }
+    return true;
+  }
+
+  void Feature::print_matrix( ostream &os, bool full ) const {
     //
     // Print the matrix.
     //
-    if ( shrt ){
-      cout << " a " << ValuesArray.size() << "x" << ValuesArray.size()
-	   << " matrix" << endl;
-    }
-    else {
-      int old_prec = cout.precision();
-      cout.setf( ios::scientific );
+    int old_prec = os.precision();
+    os.setf( ios::scientific );
+    if ( full ){
       VCarrtype::const_iterator it1 = ValuesArray.begin();
       while ( it1 != ValuesArray.end() ){
 	FeatureValue *FV_i = (FeatureValue *)(*it1);
-	cout.width(6);
-	cout.setf(ios::left, ios::adjustfield);
-	cout << FV_i << ":";
-	cout.width(12); 
-	cout.precision(3);
-	cout.setf(ios::right, ios::adjustfield);
+	os.width(6);
+	os.setf(ios::left, ios::adjustfield);
+	os << FV_i << ":";
+	os.width(12); 
+	os.precision(3);
+	os.setf(ios::right, ios::adjustfield);
 	VCarrtype::const_iterator it2 = ValuesArray.begin();
 	while ( it2 !=  ValuesArray.end() ){
 	  FeatureValue *FV_j = (FeatureValue *)(*it2);
-	  cout.width(12); 
-	  cout.precision(3);
-	  cout.setf(ios::right, ios::adjustfield);
+	  os.width(12); 
+	  os.precision(3);
+	  os.setf(ios::right, ios::adjustfield);
 	  if ( FV_i->ValFreq() < matrix_clip_freq ||
-	       FV_j->ValFreq() < matrix_clip_freq )
-	    cout << "*";
+	       FV_j->ValFreq() < matrix_clip_freq ){
+	    os << "*";
+	  }
 	  else
-	    cout << metric_matrix->Extract(FV_i,FV_j);
+	    os << metric_matrix->Extract(FV_i,FV_j);
 	  ++it2;
 	} 
-	cout << endl;
+	os << endl;
 	++it1;
-      } 
-      cout << setprecision( old_prec );
+      }
     }
+    else {
+      os << *metric_matrix << endl;
+    }
+    os << setprecision( old_prec );
   }
   
   TargetValue *Target::add_value( const string& valstr, int freq ){

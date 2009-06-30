@@ -617,14 +617,12 @@ bool TimblAPI::GetArrays( const string& f ){
     return false;
 }
 
-bool TimblAPI::WriteMatrices( const string& ){
-  throw( logic_error("WriteMatrices not implemented yet" ) );
-  return false;
+bool TimblAPI::WriteMatrices( const string& f ){
+  return Valid() && pimpl->WriteMatrices( f );
 }
   
-bool TimblAPI::GetMatrices( const string& ){
-  throw( logic_error("GetMatrices not implemented yet" ) );
-  return false;
+bool TimblAPI::GetMatrices( const string& f ){
+  return Valid() && pimpl->GetMatrices( f );
 }
 
 bool TimblAPI::ShowBestNeighbors( ostream& os ) const{

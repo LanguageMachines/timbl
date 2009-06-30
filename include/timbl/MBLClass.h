@@ -53,6 +53,8 @@ namespace Timbl {
 
     bool writeArrays( std::ostream& );
     bool readArrays( std::istream& );
+    bool writeMatrices( std::ostream& ) const;
+    bool readMatrices( std::istream& );
     bool writeWeights( std::ostream& ) const;
     bool readWeights( std::istream&, WeightType );
     bool writeNamesFile( std::ostream& ) const;
