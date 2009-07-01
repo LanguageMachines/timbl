@@ -205,7 +205,6 @@ namespace Timbl {
   void IG_Experiment::compressIndex( const featureMultiIndex& fmIndex,
 				     featureMultiIndex& res ){
     res.clear();
-    //    cerr << "voor compress: " << fmIndex << endl;
     featureMultiIndex::const_iterator fmIt = fmIndex.begin();
     while ( fmIt != fmIndex.end() ){
       if ( fmIt->second.size() < igOffset() ){
@@ -218,15 +217,12 @@ namespace Timbl {
 	FeatureValue *fv = 0;
 	size_t totalCnt = 0;
 	while ( mit != fmIt->second.end() ){
-	  //	  cerr << "inner loop compress " << mit->first << endl;
 	  pair<Mit,Mit> range = fmIt->second.equal_range( mit->first );
 	  size_t cnt = fmIt->second.count( mit->first );
 	  if ( cnt > igOffset() ){
-	    //	    cerr << "simpel, cnt = " << cnt << endl;
 	    res[fmIt->first].insert( range.first, range.second );
 	  }
 	  else {
-	    //	    cerr << "rommel, cnt = " << cnt << endl;
 	    if ( !fv )
 	      fv = mit->first;
 	    for ( Mit rit=range.first; rit != range.second; ++rit)
@@ -247,7 +243,6 @@ namespace Timbl {
       }
       ++fmIt;
     }
-    //    cerr << "na compress: " << res << endl;
   }
 
   bool IG_Experiment::Learn( const string& FileName ){
