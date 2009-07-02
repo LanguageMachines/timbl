@@ -166,8 +166,7 @@ namespace Timbl {
     }
     else
       return fileName;
-  }
-  
+  }  
 
   bool CV_Experiment::Test( const string& FileName,
 			    const string& OutFile, 
