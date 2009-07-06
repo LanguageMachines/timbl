@@ -455,14 +455,14 @@ bool get_file_names( TimblOpts& Opts ){
     NamesFile = correct_path( value, O_Path, true );
     Opts.Delete( 'n' );
   }
-  if ( Opts.Find( 'J', value, mood ) ){
+  if ( Opts.Find( "matrixout", value, mood ) ){
     MatrixOutFile = correct_path( value, O_Path, true );
-    Opts.Delete( 'J' );
+    Opts.Delete( "matrixout" );
   }
-  if ( Opts.Find( 'j', value, mood ) ){
-      MatrixInFile = correct_path( value, O_Path, true );
-      Opts.Delete( 'j' );
-    }
+  if ( Opts.Find( "matrixin", value, mood ) ){
+    MatrixInFile = correct_path( value, I_Path, true );
+    Opts.Delete( "matrixin" );
+  }
   if ( Opts.Find( 'o', value, mood ) ){
     if ( Do_CV ){
       cerr << "-o option not possible for Cross Validation testing" << endl;
