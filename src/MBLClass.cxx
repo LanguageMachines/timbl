@@ -775,7 +775,7 @@ namespace Timbl {
 	if ( Features[i]->isStorableMetric() )
 	  os << " not calculated yet.\n" << endl;
 	else
-	  os << " not avaliable.\n" << endl;
+	  os << " not available.\n" << endl;
       }
       else {
 	os << " metric = " << toString(Features[i]->getMetricType()) << endl;
@@ -949,7 +949,7 @@ namespace Timbl {
 	  }
 	  else {
 	    *Log(mylog) << "Value Difference matrix of feature # " 
-			<< i+1 << endl << "Not avaliable." << endl;
+			<< i+1 << endl << "Not available." << endl;
 	  }
 	}
   }
