@@ -272,7 +272,7 @@ namespace Timbl {
     bool AllocSparseArrays( size_t );
     void InitSparseArrays();
     bool ArrayRead(){ return vcpb_read; };
-    bool matrix_present( ) const;
+    bool matrixPresent( bool& ) const;
     unsigned int matrix_byte_size() const;
     bool store_matrix( int = 1 );
     void delete_matrix();
@@ -291,7 +291,7 @@ namespace Timbl {
     bool ignore;
     bool numeric;
     bool vcpb_read;
-    enum ps_stat{ ps_undef, ps_failed, ps_ok };
+    enum ps_stat{ ps_undef, ps_failed, ps_ok, ps_read };
     enum ps_stat PrestoreStatus;
     MetricType Prestored_metric;
     double entropy;

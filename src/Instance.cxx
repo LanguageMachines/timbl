@@ -1367,8 +1367,17 @@ namespace Timbl {
     delete metric; 
   }
 
-  bool Feature::matrix_present() const {
-    return metric_matrix != 0 && PrestoreStatus == ps_ok;
+  bool Feature::matrixPresent( bool& isRead ) const {
+    isRead = false;
+    if ( metric_matrix != 0 ){
+      if ( PrestoreStatus == ps_ok )
+	return true;
+      else if ( PrestoreStatus == ps_read ){
+	isRead = true;
+	return true;
+      }
+    }
+    return false;
   }
   
   unsigned int Feature::matrix_byte_size() const {
@@ -1448,6 +1457,8 @@ namespace Timbl {
     //
     // Store a complete distance matrix.
     //
+    if ( PrestoreStatus == ps_read )
+      return true;
     if ( !metric_matrix )
       metric_matrix = new SparseSymetricMatrix<FeatureValue*>();
     if ( PrestoreStatus != ps_failed && metric->isStorable( ) ) {
@@ -1630,6 +1641,7 @@ namespace Timbl {
 	}
       }
     }
+    PrestoreStatus = ps_read;
     return true;
   }
 

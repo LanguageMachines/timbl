@@ -703,10 +703,11 @@ namespace Timbl {
   
   void MBLClass::MatrixInfo( ostream& os ) const {
     unsigned int TotalCount = 0;
+    bool dummy;
     for ( size_t f = 0; f < num_of_features; ++f ){
       if ( !Features[f]->Ignore() &&
 	   Features[f]->isStorableMetric() &&
-	   Features[f]->matrix_present() ){
+	   Features[f]->matrixPresent( dummy ) ){
 	unsigned int Count = Features[f]->matrix_byte_size();
 	os << "Size of value-matrix[" << f+1 << "] = " 
 	   << Count << " Bytes " << endl;
@@ -719,49 +720,47 @@ namespace Timbl {
   }
 
   bool MBLClass::readMatrices( istream& is ){
-    for ( size_t i = 0; i < num_of_features; ++i ){
-      string line;
-      if ( getline( is, line ) ){
-	//	cerr << "probeer '" << line << "'" << endl;
-	if ( line.find( "Feature" ) != 0 )
+    string line;
+    bool skip = false;
+    while ( getline( is, line ) ){
+      line = compress( line );
+      if ( line.empty() )
+	continue;
+      if ( line.find( "Feature" ) != 0 ){
+	if ( skip )
+	  continue;
+	else
 	  return false;
+      }
+      else {
+	skip = false;
+	line = line.substr( 8 );
+	string::size_type pos = line.find_first_not_of("0123456789");
+	string nums = line.substr( 0, pos );
+	size_t num;
+	if ( !stringTo( nums, num ) ){
+	  FatalError( "no feature index found in the inputfile" );
+	}
 	else {
-	  line = line.substr( 8 );
-	  string::size_type pos = line.find_first_not_of("0123456789");
-	  string nums = line.substr( 0, pos );
-	  size_t num;
-	  if ( !stringTo( nums, num ) ){
-	    Error( "missing entry for Feature " + toString(i) );
-	    return false;
-	  }
+	  if ( pos == string::npos )
+	    line = "";
 	  else {
-	    line = line.substr( pos );
-	    if ( line.find( "ignored" ) != string::npos ){
-	      Features[i]->Ignore(true);
-	      getline( is, line ); // skip 1 line
+	    line = compress( line.substr( pos ) );
+	  }
+	  if ( line.empty() ){
+	    if ( !Features[num-1]->isStorableMetric() ){
+	      Warning( "Ignoring entry for feature " + nums
+		       + " which is NOT set to a storable metric type."
+		       + " use -m commandline option to set metrics" );
+	      skip = true;
 	    }
-	    else if ( line.find( "metric" ) != string::npos ){
-	      line = line.substr( line.find("=")+2 );
-	      MetricType m;
-	      if ( ! stringTo( line, m ) )
-		return false;
-	      else
-		Features[i]->setMetricType( m );
-	      // seems useless!
-
-	      //	      cerr << "metric is now " 
-	      //	   << toString(Features[i]->getMetricType()) << endl;
-	      if ( !Features[i]->fill_matrix( is ) )
-		  return false;
-	    }
-	    else {
-	      getline( is, line ); // skip 1 empty line
-	    }
+	    else if ( !Features[num-1]->fill_matrix( is ) )
+	      return false;
+	    else
+	      Info( "read ValueMatrix for feature " + nums );
 	  }
 	}
       }
-      else
-	return false;
     }
     return true;
   }
@@ -769,16 +768,12 @@ namespace Timbl {
   bool MBLClass::writeMatrices( ostream& os ) const {
     for ( size_t i = 0; i < num_of_features; ++i ){
       os << "Feature " << i+1;
-      if ( Features[i]->Ignore() )
-	os << " ignored.\n" << endl;
-      else if ( !Features[i]->matrix_present() ){
-	if ( Features[i]->isStorableMetric() )
-	  os << " not calculated yet.\n" << endl;
-	else
-	  os << " not available.\n" << endl;
+      bool dummy;
+      if ( !Features[i]->matrixPresent(  dummy ) ){
+	os << " not available.\n" << endl;
       }
       else {
-	os << " metric = " << toString(Features[i]->getMetricType()) << endl;
+	os << endl;
 	Features[i]->print_matrix( os );
       }
     }
@@ -941,7 +936,8 @@ namespace Timbl {
     if ( Verbosity(VD_MATRIX) ) 
       for ( size_t i = 0; i < num_of_features; ++i )
 	if ( !Features[i]->Ignore() ){
-	  if (Features[i]->matrix_present( ) ){
+	  bool dummy;
+	  if (Features[i]->matrixPresent( dummy ) ){
 	    *Log(mylog) << "Value matrix of feature # " 
 			<< i+1 << endl;
 	    Features[i]->print_matrix( *Log(mylog), false );

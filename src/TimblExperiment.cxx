@@ -1395,8 +1395,12 @@ namespace Timbl {
 	  ++cnt;
 	  os << endl << "   Feature[" << i+1 << "] : " << toString( mt, true );
 	  if ( Features[i]->isStorableMetric() ){
-	    if ( Features[i]->matrix_present() )
-	      os << " (Prestored)";
+	    bool readM = false;
+	    if ( Features[i]->matrixPresent( readM ) )
+	      if ( readM )
+		os << " (User Defined)";
+	      else
+		os << " (Prestored)";
 	    else
 	      os << " (Not Prestored)";
 	  }
