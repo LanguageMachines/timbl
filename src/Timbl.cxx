@@ -806,7 +806,7 @@ int main(int argc, char *argv[]){
       // normal cases....
       if ( TreeInFile == "" ){
 	// normal case
-	//   learning and maybe a testing pahse
+	//   learning and maybe a testing phase
 	if ( WgtOutFile != "" )
 	  Run->SetOptions( "ALL_WEIGHTS: true" );
 	if ( Run->Prepare( dataFile ) ){
@@ -823,6 +823,7 @@ int main(int argc, char *argv[]){
 	  
 	  do_test = TestFile != "" || Do_Indirect;
 	  if ( do_test ||     // something to test ?
+	       MatrixOutFile != "" || // or at least to produce
 	       TreeOutFile != "" || // or at least to produce
 	       levelTreeOutFile != "" || // or at least to produce
 	       XOutFile != "" ){ // or at least to produce
