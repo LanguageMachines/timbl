@@ -97,7 +97,7 @@ inline std::ostream& operator << (std::ostream& os,
   while ( it1 != m.my_mat.end() ){
     typename SparseSymetricMatrix<T>::CDmap::const_iterator it2 = it1->second.begin();
     while ( it2 != it1->second.end() ){
-      os << "[" << it1->first << "," << it2->first << "] "
+      os << "[" << it1->first << ",\t" << it2->first << "] "
 	<< it2->second << std::endl;
       ++it2;
     }
