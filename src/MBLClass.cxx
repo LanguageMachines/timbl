@@ -940,7 +940,7 @@ namespace Timbl {
 	  if (Features[i]->matrixPresent( dummy ) ){
 	    *Log(mylog) << "Value matrix of feature # " 
 			<< i+1 << endl;
-	    Features[i]->print_matrix( *Log(mylog), false );
+	    Features[i]->print_matrix( *Log(mylog), true );
 	    *Log(mylog) << endl;
 	  }
 	  else {
