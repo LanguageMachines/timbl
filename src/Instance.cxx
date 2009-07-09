@@ -1035,9 +1035,9 @@ namespace Timbl {
   double Feature::fvDistance( FeatureValue *F, FeatureValue *G, 
 			      size_t t ) const {
     bool dummy;
-    if ( matrixPresent( dummy ) )
-      return metric_matrix->Extract( F, G );
-    else
+//     if ( metric->isStorable() && matrixPresent( dummy ) )
+//       return metric_matrix->Extract( F, G );
+//     else
       return metric->distance( F, G, t );
   }
 
