@@ -1034,7 +1034,11 @@ namespace Timbl {
 
   double Feature::fvDistance( FeatureValue *F, FeatureValue *G, 
 			      size_t t ) const {
-    return metric->distance( F, G, t );
+    bool dummy;
+    if ( matrixPresent( dummy ) )
+      return metric_matrix->Extract( F, G );
+    else
+      return metric->distance( F, G, t );
   }
 
   ostream& operator<<(ostream& os, const ValueDistribution& vd ) {
