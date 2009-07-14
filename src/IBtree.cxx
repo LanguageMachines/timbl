@@ -1258,47 +1258,42 @@ namespace Timbl {
 	FeatureValue *fv = ibPnt->FValue;
 	if ( InstBase ){
 	  IBtree **pnt = &InstBase;
- 	  while ( *pnt && (*pnt)->FValue->Index() < fv->Index() ){
-	    cerr << "mishit " << (*pnt)->FValue << "(" << (*pnt)->FValue->Index() << ") - " << fv << "(" << fv->Index() << ")" << endl;
- 	    pnt = &(*pnt)->next;
- 	  }
-	  if ( *pnt ){
-	    if ( (*pnt)->FValue->Index() == fv->Index() ){
-	      // this may happen 
-	      // snip the link and insert at our link
-	      IBtree *snip = ibPnt->link;
-	      ibPnt->link = 0;
-	      delete ibPnt->TDistribution;
-	      ibPnt->TDistribution = 0;
-	      --ib->ibCount;
-	      delete ibPnt;
-	      while ( snip ){
-		if ( PersistentDistributions )
-		  (*pnt)->TDistribution->Merge( *snip->TDistribution ); 
-		else
-		  delete snip->TDistribution;
-		IBtree **tmp = &(*pnt)->link;
-		while ( *tmp && (*tmp)->FValue->Index() < snip->FValue->Index() ){
-		  tmp = &(*tmp)->next;
-		}
-		IBtree *nxt = snip->next;
-		snip->next = 0;
-		if ( *tmp ){
-		  if( (*tmp)->FValue->Index() == snip->FValue->Index() ){
-		    return false;
-		  }
-		  snip->next = *tmp;
-		}
-		*tmp = snip;
-		snip = nxt;
+	  if ( (*pnt)->FValue->Index() < fv->Index() ){
+	    FatalError( "MergeSub assumes sorted additions!" );
+	    return false;
+	  }
+	  if ( (*pnt)->FValue->Index() == fv->Index() ){
+	    // this may happen 
+	    // snip the link and insert at our link
+	    IBtree *snip = ibPnt->link;
+	    ibPnt->link = 0;
+	    delete ibPnt->TDistribution;
+	    ibPnt->TDistribution = 0;
+	    --ib->ibCount;
+	    delete ibPnt;
+	    while ( snip ){
+	      if ( PersistentDistributions )
+		(*pnt)->TDistribution->Merge( *snip->TDistribution ); 
+	      else
+		delete snip->TDistribution;
+	      IBtree **tmp = &(*pnt)->link;
+	      while ( *tmp && (*tmp)->FValue->Index() < snip->FValue->Index() ){
+		tmp = &(*tmp)->next;
 	      }
-	    }
-	    else {
-	      ibPnt->next = *pnt;
-	      *pnt = ibPnt;
+	      IBtree *nxt = snip->next;
+	      snip->next = 0;
+	      if ( *tmp ){
+		if( (*tmp)->FValue->Index() == snip->FValue->Index() ){
+		  return false;
+		}
+		snip->next = *tmp;
+	      }
+	      *tmp = snip;
+	      snip = nxt;
 	    }
 	  }
 	  else {
+	    ibPnt->next = *pnt;
 	    *pnt = ibPnt;
 	  }
 	}
