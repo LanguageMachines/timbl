@@ -26,6 +26,7 @@
 
 #include <string>
 #include <map>
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <iomanip>
@@ -229,7 +230,7 @@ namespace Timbl {
        << T.myTime.tv_usec << " microseconds" << endl;
     return os;
   }
-  
+
   void IG_Experiment::compressIndex( const featureMultiIndex& fmIndex,
 				     featureMultiIndex& res ){
     res.clear();
@@ -341,19 +342,15 @@ namespace Timbl {
 	//
 	ifstream datafile( CurrentDataFile.c_str(), ios::in);
 	//
-	Feature *Feat =  Features[permutation[0]];
-	IVCmaptype::const_iterator it = Feat->ValuesMap.begin();
-	//
-	// don't ask why. but we need to iterate the Map here, not the Array
-	//
-	while ( it !=  Feat->ValuesMap.end() ){
-	  FeatureValue *the_fv = (FeatureValue*)(it->second);
-	  //	  cerr << "handle feature " << the_fv << endl;
-	  featureMultiIndex::const_iterator fmIt = fmIndex.find( the_fv );
-	  if ( fmIt == fmIndex.end() ){
+	featureMultiIndex::const_iterator it = fmIndex.begin();
+	while ( it != fmIndex.end() ){
+	  FeatureValue *the_fv = (FeatureValue*)(it->first);
+	  //	  cerr << "handle feature " << the_fv << " met index " << the_fv->Index() << endl;
+	  MultiIndex::const_iterator fmIt = it->second.begin();
+	  if ( fmIt == it->second.end() ){
 	    FatalError( "panic" );
 	  }
-	  if ( igOffset() > 0 && fmIt->second.size() > igOffset() ){
+	  if ( igOffset() > 0 && it->second.size() > igOffset() ){
 	    //	    cerr << "within offset!" << endl;
 	    IVCmaptype::const_iterator it2
 	      = Features[permutation[1]]->ValuesMap.begin();
@@ -367,7 +364,7 @@ namespace Timbl {
 	      FeatureValue *the2fv = (FeatureValue*)(it2->second);
 	      //	      cerr << "handle secondary feature " << the2fv << endl;
 	      typedef MultiIndex::const_iterator mit;
-	      pair<mit,mit> b = fmIt->second.equal_range( the2fv );
+	      pair<mit,mit> b = it->second.equal_range( the2fv );
 	      for ( mit i = b.first; i != b.second; ++i ){
 		datafile.seekg( i->second );
 		nextLine( datafile, Buffer );
@@ -431,8 +428,8 @@ namespace Timbl {
 	  }
 	  else {
 	    //	    cerr << "other case!" << endl;
-	    MultiIndex::const_iterator mIt = fmIt->second.begin();
-	    while ( mIt != fmIt->second.end() ){
+	    MultiIndex::const_iterator mIt = it->second.begin();
+	    while ( mIt != it->second.end() ){
 	      datafile.seekg( mIt->second );
 	      nextLine( datafile, Buffer );
 	      chopLine( Buffer );

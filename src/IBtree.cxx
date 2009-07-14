@@ -1259,6 +1259,7 @@ namespace Timbl {
 	if ( InstBase ){
 	  IBtree **pnt = &InstBase;
  	  while ( *pnt && (*pnt)->FValue->Index() < fv->Index() ){
+	    cerr << "mishit " << (*pnt)->FValue << "(" << (*pnt)->FValue->Index() << ") - " << fv << "(" << fv->Index() << ")" << endl;
  	    pnt = &(*pnt)->next;
  	  }
 	  if ( *pnt ){

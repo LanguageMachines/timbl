@@ -384,8 +384,15 @@ class IG_Experiment: public TimblExperiment {
 		     const TargetValue *,
 		     const double );
  private:
-  typedef std::multimap<FeatureValue*,std::streamsize> MultiIndex;
-  typedef std::map<FeatureValue*, MultiIndex> featureMultiIndex;
+  class fCmp {
+  public:
+    bool operator()( const FeatureValue* F, const FeatureValue* G ) const{
+      return F->Index() > G->Index();
+    }
+  };  
+
+  typedef std::multimap<FeatureValue*,std::streamsize > MultiIndex;
+  typedef std::map<FeatureValue*, MultiIndex, fCmp > featureMultiIndex;
   friend std::ostream& operator<< ( std::ostream&, const featureMultiIndex& );
   friend std::ostream& operator<< ( std::ostream&, const MultiIndex& );
   bool build_file_index( const std::string&, featureMultiIndex&  );
