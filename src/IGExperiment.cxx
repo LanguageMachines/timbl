@@ -32,7 +32,6 @@
 #include <iomanip>
 #include <cassert>
 #include <cstdlib>
-#include <sys/time.h>
 
 #include "timbl/MsgClass.h"
 #include "timbl/Common.h"
@@ -203,34 +202,6 @@ namespace Timbl {
     return os;
   }
 
-  class Timer {
-  public:
-    friend ostream& operator << ( ostream& os, const Timer& T );
-    Timer(){ reset(); };
-    void reset(){ myTime.tv_sec=0; myTime.tv_usec=0; };
-    void start(){
-      gettimeofday( &startTime, 0 );
-    };
-    void stop(){
-      timeval now;
-      gettimeofday( &now, 0 );
-      long usecs = (myTime.tv_sec + now.tv_sec - startTime.tv_sec) * 1000000 
-	+ myTime.tv_usec + now.tv_usec - startTime.tv_usec;
-      ldiv_t div = ldiv( usecs, 1000000 );
-      myTime.tv_sec = div.quot;
-      myTime.tv_usec = div.rem;
-    };
-  private:
-    timeval startTime;
-    timeval myTime;
-  };
-
-  ostream& operator << ( ostream& os, const Timer& T ){
-    os << T.myTime.tv_sec << " seconds and " 
-       << T.myTime.tv_usec << " microseconds" << endl;
-    return os;
-  }
-
   void IG_Experiment::compressIndex( const featureMultiIndex& fmIndex,
 				     featureMultiIndex& res ){
     res.clear();
@@ -276,13 +247,13 @@ namespace Timbl {
 
   bool IG_Experiment::Learn( const string& FileName ){
     bool result = true;
-    Timer mergeT;
-    Timer subMergeT;
-    Timer totMergeT;
-    Timer pruneT;
-    Timer subPruneT;
-    Timer specialPruneT;
-    Timer totalT;
+    Common::Timer mergeT;
+    Common::Timer subMergeT;
+    Common::Timer totMergeT;
+    Common::Timer pruneT;
+    Common::Timer subPruneT;
+    Common::Timer specialPruneT;
+    Common::Timer totalT;
     if ( ExpInvalid() ||
 	 !ConfirmOptions() ){
       result = false;
@@ -313,7 +284,7 @@ namespace Timbl {
     if ( result ) {
       InitInstanceBase();
       featureMultiIndex fmIndexRaw;
-      Timer t;
+      Common::Timer t;
       t.start();
       result = build_file_index( CurrentDataFile, fmIndexRaw );
       t.stop();
@@ -321,7 +292,7 @@ namespace Timbl {
       totalT.start();
       if ( result ){
 	featureMultiIndex fmIndex;
-	Timer t;
+	Common::Timer t;
 	t.start();
 	//	cerr << "compressing index " << fmIndexRaw << endl;
 	compressIndex( fmIndexRaw, fmIndex );
@@ -459,7 +430,7 @@ namespace Timbl {
 	      //	      cerr << outInstanceBase << endl;
 	      //	      time_stamp( "Before Merge: " );
 	      //	      cerr << InstanceBase << endl;
-	      Timer extraT;
+	      Common::Timer extraT;
 	      mergeT.start();
 	      extraT.start();
 	      if ( !InstanceBase->MergeSub( outInstanceBase ) ){

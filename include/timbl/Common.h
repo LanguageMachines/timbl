@@ -30,6 +30,7 @@
 #include <cmath>
 #include <cfloat>
 #include <cassert>
+#include <sys/time.h>
 
 namespace Common {
   const double Epsilon = DBL_EPSILON;   // smallest x so that 1+x != 1
@@ -65,6 +66,21 @@ namespace Common {
       return(0.0);
     return(log(number) / log(2.0));
   }
+
+  class Timer {
+  public:
+    friend std::ostream& operator << ( std::ostream& os, const Timer& T );
+    Timer(){ reset(); };
+    void reset(){ myTime.tv_sec=0; myTime.tv_usec=0; };
+    void start(){
+      gettimeofday( &startTime, 0 );
+    };
+    void stop();
+  private:
+    timeval startTime;
+    timeval myTime;
+  };
+
   
 }
 #endif
