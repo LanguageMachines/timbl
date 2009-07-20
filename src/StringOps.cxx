@@ -126,15 +126,17 @@ namespace Timbl {
 
   string compress( const string& s ){
     // remove leading and trailing spaces from a string
-    string::const_iterator b_it = s.begin();
-    while ( b_it != s.end() && isspace( *b_it ) ) ++b_it;
-    string::const_iterator e_it = s.end();
-    --e_it;
-    while ( e_it != s.begin() && isspace( *e_it ) ) --e_it;
-    if ( b_it > e_it )
-      return "";
-    else
-      return string( b_it, e_it+1 );
+    string result;
+    if ( !s.empty() ){
+      string::const_iterator b_it = s.begin();
+      while ( b_it != s.end() && isspace( *b_it ) ) ++b_it;
+      string::const_iterator e_it = s.end();
+      --e_it;
+      while ( e_it != s.begin() && isspace( *e_it ) ) --e_it;
+      if ( b_it <= e_it )
+	result = string( b_it, e_it+1 );
+    }
+    return result;
   }
   
   size_t split_at( const string& src, vector<string>& results, 
