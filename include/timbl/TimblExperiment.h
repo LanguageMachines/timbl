@@ -123,7 +123,8 @@ namespace Timbl {
     bool ShowOptions( std::ostream& );
     bool ShowSettings( std::ostream& );
     bool showBestNeighbors( std::ostream& ) const;
-    bool showStatistics( std::ostream& os ) const;
+    bool showStatistics( std::ostream& ) const;
+    void showInputFormat( std::ostream& ) const;
     const std::string& ExpName() const { return exp_name; };
     bool Classify( const std::string& , std::string& );
     bool Classify( const std::string& , std::string&, double& );

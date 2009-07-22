@@ -187,6 +187,7 @@ namespace Timbl {
     void initDecay();
     void initTesters();
     Chopper *ChopInput;
+    int F_length;
   private:
     size_t MaxFeatures;
     std::vector<MetricType> UserOptions;
@@ -198,7 +199,6 @@ namespace Timbl {
     size_t num_of_num_features;
     size_t target_pos;
     size_t effective_feats;
-    int F_length;
     int clip_factor;
     int Bin_Size;
     ServerSocket *tcp_socket;

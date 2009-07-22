@@ -390,6 +390,13 @@ namespace Timbl {
 	    Error( "Unable to initialize from file :'" + FileName + "'\n" );
 	  }
 	  else {
+	    if ( !Verbosity(SILENT) ){
+	      *Log(mylog) << "Examine datafile '" << FileName 
+			  << "' gave the following results:"
+			  << endl
+			  << "Number of Features: " << Num << endl;
+	      showInputFormat( *Log(mylog) );
+	    }
 	    if ( NumOfFeatures() == 0 ){
 	      Initialize( Num );
 	    }
@@ -752,6 +759,33 @@ namespace Timbl {
     return result;
   }
   
+  void TimblExperiment::showInputFormat( ostream& os ) const {
+    switch ( InputFormat() ){
+    case C4_5:
+      os << "InputFormat       : C4.5";
+      break;
+    case SparseBin:
+      os << "InputFormat       : Sparse Binary";
+      break;
+    case Sparse:
+      os << "InputFormat       : Sparse";
+      break;
+    case ARFF:
+      os << "InputFormat       : ARFF";
+      break;
+    case Columns:
+      os << "InputFormat       : Columns";
+      break;
+    case Compact:
+      os << "InputFormat       : Compact, (Feature Length = "
+	 << F_length << ")";
+      break;
+    default:
+      os << "InputFormat unknown\n";
+    }
+    os << endl << endl;
+  }
+  
   void TimblExperiment::show_progress( ostream& os,time_t start ){
     char time_string[26];
     struct tm *curtime;
@@ -1112,24 +1146,31 @@ namespace Timbl {
     bool result = false;
     if ( !ExpInvalid() &&
 	 ConfirmOptions() ){
-      size_t i;
+      size_t numF =0;
       runningPhase = TestWords;
       if ( IBStatus() == Invalid )
 	Warning( "you tried to apply the " + toString( algorithm ) +
 		 " algorithm, but no Instance Base is available yet" );
       else if ( FileName != "" &&
-		( i = examineData( FileName )) != NumOfFeatures() ){
-	if ( i == 0 ){
+		( numF = examineData( FileName )) != NumOfFeatures() ){
+	if ( numF == 0 ){
 	  Error( "unable to use the data from '" + FileName +
 		 "', wrong Format?" );
 	}
 	else
 	  Error( "mismatch between number of features in Testfile " +
 		 FileName + " and the Instancebase (" +
-		 toString<size_t>(i) + " vs. " + 
+		 toString<size_t>(numF) + " vs. " + 
 		 toString<size_t>(NumOfFeatures()) + ")" ); 
       }
       else {
+	if ( !Verbosity(SILENT) && FileName != "" ){
+	  *Log(mylog) << "Examine datafile '" << FileName 
+		      << "' gave the following results:"
+		      << endl
+		      << "Number of Features: " << numF << endl;
+	  showInputFormat( *Log(mylog) );
+	}	
 	initExperiment();
 	result = true;
       }

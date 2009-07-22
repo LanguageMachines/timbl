@@ -113,6 +113,13 @@ namespace Timbl {
 	  *Dbg(mydebug) << "examine : " << name << endl;
 	  size_t tmp = examineData( name );
 	  if ( tmp != 0 ){
+	    if ( !Verbosity(SILENT) ){
+	      *Log(mylog) << "Examine datafile '" << FileName 
+			  << "' gave the following results:"
+			  << endl
+			  << "Number of Features: " << tmp << endl;
+	      showInputFormat( *Log(mylog) );
+	    }
 	    FileNames[pos++] = name;
 	    if ( size == 0 )
 	      size = tmp;

@@ -1840,35 +1840,6 @@ namespace Timbl {
     return Chopper::getInputFormat( inBuffer, chopExamples() );
   }
 
-  inline void show_input_format( ostream& os,
-				 InputFormatType IF,
-				 int F_length ) {
-    switch ( IF ){
-    case C4_5:
-      os << "InputFormat       : C4.5";
-      break;
-    case SparseBin:
-      os << "InputFormat       : Sparse Binary";
-      break;
-    case Sparse:
-      os << "InputFormat       : Sparse";
-      break;
-    case ARFF:
-      os << "InputFormat       : ARFF";
-      break;
-    case Columns:
-      os << "InputFormat       : Columns";
-      break;
-    case Compact:
-      os << "InputFormat       : Compact, (Feature Length = "
-	 << F_length << ")";
-      break;
-    default:
-      os << "InputFormat unknown\n";
-    }
-    os << endl << endl;
-  }
-  
   size_t MBLClass::examineData( const string& FileName ){
     // Looks at the data files, counts num_of_features.
     // and sets input_format variables.
@@ -1970,12 +1941,6 @@ namespace Timbl {
 	return 0;
       }
       else {
-	if ( !Verbosity(SILENT) ){
-	  *Log(mylog) << "Examine datafile '" << FileName 
-		      << "' gave the following results:"
-		      << endl
-		      << "Number of Features: " << NumF << endl;
-	}
 	if ( NumF > MaxFeatures ){
 	  Error( "Number of Features exceeds the maximum number. "
 		 "(currently " + toString<size_t>(MaxFeatures) +
@@ -1983,8 +1948,6 @@ namespace Timbl {
 	  return 0;
 	}
 	setInputFormat( IF );
-	if ( !Verbosity(SILENT) )
-	  show_input_format( *Log(mylog), IF, F_length );
       }
     }
     return NumF;
