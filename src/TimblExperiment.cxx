@@ -280,6 +280,7 @@ namespace Timbl {
   void TimblExperiment::initExperiment( bool all_vd ){ 
     if ( !ExpInvalid() ){
       if ( !MBL_init ){  // do this only when necessary
+	runningPhase = TestWords;
 	stats.clear();
 	delete confusionInfo;
 	confusionInfo = 0;
@@ -1146,34 +1147,34 @@ namespace Timbl {
     bool result = false;
     if ( !ExpInvalid() &&
 	 ConfirmOptions() ){
-      size_t numF =0;
       runningPhase = TestWords;
       if ( IBStatus() == Invalid )
 	Warning( "you tried to apply the " + toString( algorithm ) +
 		 " algorithm, but no Instance Base is available yet" );
-      else if ( FileName != "" &&
-		( numF = examineData( FileName )) != NumOfFeatures() ){
-	if ( numF == 0 ){
-	  Error( "unable to use the data from '" + FileName +
-		 "', wrong Format?" );
+      else if ( FileName != "" ){
+	size_t numF =0;
+	if ( (numF = examineData( FileName )) != NumOfFeatures() ){
+	  if ( numF == 0 ){
+	    Error( "unable to use the data from '" + FileName +
+		   "', wrong Format?" );
+	  }
+	  else
+	    Error( "mismatch between number of features in Testfile " +
+		   FileName + " and the Instancebase (" +
+		   toString<size_t>(numF) + " vs. " + 
+		   toString<size_t>(NumOfFeatures()) + ")" ); 
+	  return result;
 	}
-	else
-	  Error( "mismatch between number of features in Testfile " +
-		 FileName + " and the Instancebase (" +
-		 toString<size_t>(numF) + " vs. " + 
-		 toString<size_t>(NumOfFeatures()) + ")" ); 
-      }
-      else {
-	if ( !Verbosity(SILENT) && FileName != "" ){
+	if ( !Verbosity(SILENT) ){
 	  *Log(mylog) << "Examine datafile '" << FileName 
 		      << "' gave the following results:"
 		      << endl
 		      << "Number of Features: " << numF << endl;
 	  showInputFormat( *Log(mylog) );
-	}	
-	initExperiment();
-	result = true;
-      }
+	}
+      }	
+      initExperiment();
+      result = true;
     }
     return result;
   }
