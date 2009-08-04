@@ -207,21 +207,20 @@ namespace Timbl {
 	  if ( longOpt ){
 	    if ( Mood )
 	      throw std::runtime_error("invalid option: " + Option );
-	    Optchar = 0;
 	    string::size_type pos = Option.find( "=" );
 	    if ( pos == string::npos ){
-	      Option = Option.erase(0,2);
-	      Optword = Option;
+	      Optword = Option.erase(0,2);
+	      Option = "";
 	    }
 	    else {
 	      Optword = Option.substr( 2, pos-2 );
 	      Option = Option.substr( pos+1 );
 	    }
+	    Optchar = Optword[0];
 	  }
 	  else {
 	    Optchar = Option[1];
-	    Optword = Option;
-	    Optword = Optword.erase(0,1);
+	    Optword = Optchar;
 	    Option = Option.erase(0,2);
 	  }
 	}
@@ -236,8 +235,7 @@ namespace Timbl {
 	    Option = tmpOption;
 	    ++arg_ind;
 	    if ( !Optchar ){
-	      Optchar = Option[1];
-	      Option = Option.erase(0,2);
+	      Optchar = Optword[0];
 	    }
 	  }
 	}
