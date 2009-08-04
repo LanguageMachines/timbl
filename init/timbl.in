@@ -44,7 +44,7 @@ fi
 case "$1" in
   start)
         echo -n "Starting $DESC: $NAME"
-        start-stop-daemon --start --quiet --pidfile $PIDFILE --chuid $USER --exec $DAEMON -- -pidfile=$PIDFILE -logfile=$LOGFILE $TIMBLSERVER_OPTS
+        start-stop-daemon --start --quiet --pidfile $PIDFILE --chuid $USER --exec $DAEMON -- --pidfile=$PIDFILE --logfile=$LOGFILE $TIMBLSERVER_OPTS
         echo "."
 
         ;;
