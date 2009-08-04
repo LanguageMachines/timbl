@@ -651,6 +651,10 @@ namespace Timbl {
     return Opts.OptWord();
   }      
 
+  inline bool isBool( const string& s ){
+    return s == "TRUE" || s == "YES" || s == "FALSE" || s == "NO";
+  }
+
   bool GetOptClass::parse_options( const CL_Options& opts,
 				   const int mode ){
     opt_changed = true;
@@ -733,11 +737,15 @@ namespace Timbl {
 	
       case 'B':
 	if ( long_option == "Beam" ){
-	  BeamSize = stringTo<int>( myoptarg );
-	  if ( BeamSize <= 0 ){
+	  if ( !stringTo<int>( myoptarg, BeamSize ) 
+	       || BeamSize <= 0 ){
 	    Error( "illegal value for -Beam option: " + myoptarg );
 	    return false;
 	  }
+	}
+	else if ( myoptarg.find("eam") != string::npos ){
+	  Error( "invalid option: Did you mean '--B" + myoptarg + "'?" );
+	  return false;
 	}
 	else {
 	  BinSize = stringTo<int>( myoptarg );
@@ -810,6 +818,10 @@ namespace Timbl {
       case 'D':
 	if ( long_option == "Diversify" )
 	  do_diversify = true;
+	else if ( myoptarg.find("iversify") != string::npos ){
+	  Error( "invalid option: Did you mean '--D" + myoptarg + "'?" );
+	  return false;
+    	}
 	else if ( long_option.size() > 1 ){
 	  Error( "unknown Option " + long_option );
 	  return false;
@@ -874,6 +886,10 @@ namespace Timbl {
 	if ( long_option == "logfile" ){
 	  logFile = myoptarg;
 	}
+	else if ( myoptarg.find("ogfile") != string::npos ){
+	  Error( "invalid option: Did you mean '--l" + myoptarg + "'?" );
+	  return false;
+    	}
 	else {
 	  f_length = stringTo<int>( myoptarg );
 	  if ( f_length <= 0 ){
@@ -929,6 +945,10 @@ namespace Timbl {
 	if ( long_option == "pidfile" ){
 	  pidFile = myoptarg;
 	}
+	else if ( myoptarg.find("idfile") != string::npos ){
+	  Error( "invalid option: Did you mean '--l" + myoptarg + "'?" );
+	  return false;
+    	}
 	else {
 	  local_progress = stringTo<int>( myoptarg );
 	}
@@ -955,12 +975,27 @@ namespace Timbl {
 	if ( long_option == "sloppy" ){
 	  string up = myoptarg;
 	  uppercase(up);
+	  if ( !isBool(up) ){
+	    Error( "invalid value for " + long_option + ": '" 
+		   + myoptarg + "'" );
+	    return false;
+	  }
 	  do_sloppy_loo = ( up=="TRUE" || up=="YES" );
 	}
 	else if ( long_option == "silly" ){
 	  string up = myoptarg;
 	  uppercase(up);
-	  do_silly =  ( up=="TRUE" || up=="YES" );
+	  if ( !isBool(up) ){
+	    Error( "invalid value for " + long_option + ": '" 
+		   + myoptarg + "'" );
+	    return false;
+	  }
+	  do_silly = ( up=="TRUE" || up=="YES" );
+	}
+	else if ( myoptarg.find("loppy") != string::npos 
+		  || myoptarg.find("illy") != string::npos ){
+	  Error( "invalid option: Did you mean '--s" + myoptarg + "'?" );
+	  return false;
 	}
 	else {
 	  do_sample_weights = true;
@@ -990,7 +1025,15 @@ namespace Timbl {
 	
       case 'T': {
 	if ( long_option == "Threshold" ){
-	  igThreshold = stringTo<int>(myoptarg);
+	  if ( !stringTo<int>(myoptarg, igThreshold ) 
+	       || igThreshold < 0 ){
+	    Error( "invalid value for Threshold: " + myoptarg );
+	    return false;
+	  }
+	}
+	else if ( myoptarg.find("hreshold") != string::npos ){
+	  Error( "invalid option: Did you mean '--T" + myoptarg + "'?" );
+	  return false;
 	}
 	else if ( !stringTo<OrdeningType>( myoptarg, local_order ) ){
 	  local_order = UnknownOrdening;

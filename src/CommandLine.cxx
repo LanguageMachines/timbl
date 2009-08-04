@@ -29,6 +29,7 @@
 #include <vector>
 #include <ostream>
 #include <iostream>
+#include <stdexcept>
 
 #include "timbl/CommandLine.h"
 
@@ -202,16 +203,26 @@ namespace Timbl {
       else {
 	Mood = Option[0] == '+';
 	if ( Option.size() > 1 ){
-	  Optchar = Option[1];
-	  Optword = Option;
-	  Optword = Optword.erase(0,1);
-	  string::size_type pos = Optword.find( "=" );
-	  if ( pos == string::npos )
-	    Option = Option.erase(0,2);
+	  longOpt = Option[1] == '-';
+	  if ( longOpt ){
+	    if ( Mood )
+	      throw std::runtime_error("invalid option: " + Option );
+	    Optchar = 0;
+	    string::size_type pos = Option.find( "=" );
+	    if ( pos == string::npos ){
+	      Option = Option.erase(0,2);
+	      Optword = Option;
+	    }
+	    else {
+	      Optword = Option.substr( 2, pos-2 );
+	      Option = Option.substr( pos+1 );
+	    }
+	  }
 	  else {
-	    longOpt = true;
-	    Option = Optword.substr( pos+1 );
-	    Optword = Optword.substr( 0, pos );
+	    Optchar = Option[1];
+	    Optword = Option;
+	    Optword = Optword.erase(0,1);
+	    Option = Option.erase(0,2);
 	  }
 	}
 	else {
