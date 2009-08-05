@@ -261,39 +261,39 @@ namespace Timbl {
     return result;
   }
 
-inline Weighting WT_to_W( WeightType wt ){
-  Weighting w;
-  switch ( wt ){
-  case UserDefined_w: w = UD;
-    break;
-  case No_w: w = NW;
-    break;
-  case GR_w: w = GR;
-    break;
-  case IG_w: w = IG;
-    break;
-  case X2_w: w = X2;
-    break;
-  case SV_w: w = SV;
-    break;
-  default:
+  inline Weighting WT_to_W( WeightType wt ){
+    Weighting w;
+    switch ( wt ){
+    case UserDefined_w: w = UD;
+      break;
+    case No_w: w = NW;
+      break;
+    case GR_w: w = GR;
+      break;
+    case IG_w: w = IG;
+      break;
+    case X2_w: w = X2;
+      break;
+    case SV_w: w = SV;
+      break;
+    default:
+      w = UNKNOWN_W;
+    }
+    return w;
+  }
+  
+  bool string_to( const string& s, Weighting& w ){
     w = UNKNOWN_W;
+    WeightType tmp;
+    if ( stringTo<WeightType>( s, tmp ) ){
+      w = WT_to_W( tmp );
+      if( w == UNKNOWN_W )
+	return false;
+      return true;
+    }
+    return false;
   }
-  return w;
-}
-
-bool string_to( const string& s, Weighting& w ){
-  w = UNKNOWN_W;
-  WeightType tmp;
-  if ( stringTo<WeightType>( s, tmp ) ){
-    w = WT_to_W( tmp );
-    if( w == UNKNOWN_W )
-      return false;
-    return true;
-  }
-  return false;
-}
-
+  
   Algorithm TimblAPI::Algo() const {
     Algorithm result = UNKNOWN_ALG;
     if ( pimpl ){
@@ -514,162 +514,162 @@ bool string_to( const string& s, Weighting& w ){
       return false;
   }
   
-bool TimblAPI::GetWeights( const string& f, Weighting w ){
-  if ( Valid() ){
-    WeightType tmp;
-    switch ( w ){
-    case UNKNOWN_W: tmp = Unknown_w;
-      break;
-    case NW: tmp = No_w;
-      break;
-    case GR: tmp = GR_w;
-      break;
-    case IG: tmp = IG_w;
-      break;
-    case X2: tmp = X2_w;
-      break;
-    case SV: tmp = SV_w;
-      break;
-    default:
-      return false;
+  bool TimblAPI::GetWeights( const string& f, Weighting w ){
+    if ( Valid() ){
+      WeightType tmp;
+      switch ( w ){
+      case UNKNOWN_W: tmp = Unknown_w;
+	break;
+      case NW: tmp = No_w;
+	break;
+      case GR: tmp = GR_w;
+	break;
+      case IG: tmp = IG_w;
+	break;
+      case X2: tmp = X2_w;
+	break;
+      case SV: tmp = SV_w;
+	break;
+      default:
+	return false;
+      }
+      return pimpl->GetWeights( f, tmp );
     }
-    return pimpl->GetWeights( f, tmp );
-  }
   else 
     return false;
-}
-
-Weighting TimblAPI::CurrentWeighting() const{
-  if ( Valid() )
-    return WT_to_W( pimpl->CurrentWeighting() );
-  else
+  }
+  
+  Weighting TimblAPI::CurrentWeighting() const{
+    if ( Valid() )
+      return WT_to_W( pimpl->CurrentWeighting() );
+    else
+      return UNKNOWN_W;
+  }
+  
+  Weighting TimblAPI::GetCurrentWeights( std::vector<double>& res ) const {
+    res.clear();
+    if ( Valid() ){
+      if ( pimpl->GetCurrentWeights( res ) )
+	return CurrentWeighting();
+    }
     return UNKNOWN_W;
-}
-
-Weighting TimblAPI::GetCurrentWeights( std::vector<double>& res ) const {
-  res.clear();
-  if ( Valid() ){
-    if ( pimpl->GetCurrentWeights( res ) )
-      return CurrentWeighting();
   }
-  return UNKNOWN_W;
-}
-
-bool TimblAPI::SetOptions( const string& argv ){
-  return Valid() && pimpl->SetOptions( argv );
-}
-
-bool TimblAPI::SetIndirectOptions( const TimblOpts& O ){
-  return Valid() && pimpl->IndirectOptions( *O.pimpl );
-}
-
-string TimblAPI::ExpName() const {
-  if ( pimpl ) // return the name, even when !Valid()
-    return pimpl->ExpName();
-  else
-    return "ERROR";
-}
-
-bool TimblAPI::WriteNamesFile( const string& f ){
-  if ( Valid() ) {
-    return pimpl->WriteNamesFile( f );
+  
+  bool TimblAPI::SetOptions( const string& argv ){
+    return Valid() && pimpl->SetOptions( argv );
   }
-  else
-    return false;
-}
-
-bool TimblAPI::WriteInstanceBase( const string& f ){
-  if ( Valid() ){
-    return pimpl->WriteInstanceBase( f );
+  
+  bool TimblAPI::SetIndirectOptions( const TimblOpts& O ){
+    return Valid() && pimpl->IndirectOptions( *O.pimpl );
   }
-  else
-    return false;
-}
-
-bool TimblAPI::WriteInstanceBaseXml( const string& f ){
-  if ( Valid() ){
-    return pimpl->WriteInstanceBaseXml( f );
+  
+  string TimblAPI::ExpName() const {
+    if ( pimpl ) // return the name, even when !Valid()
+      return pimpl->ExpName();
+    else
+      return "ERROR";
   }
-  else
-    return false;
-}
-
+  
+  bool TimblAPI::WriteNamesFile( const string& f ){
+    if ( Valid() ) {
+      return pimpl->WriteNamesFile( f );
+    }
+    else
+      return false;
+  }
+  
+  bool TimblAPI::WriteInstanceBase( const string& f ){
+    if ( Valid() ){
+      return pimpl->WriteInstanceBase( f );
+    }
+    else
+      return false;
+  }
+  
+  bool TimblAPI::WriteInstanceBaseXml( const string& f ){
+    if ( Valid() ){
+      return pimpl->WriteInstanceBaseXml( f );
+    }
+    else
+      return false;
+  }
+  
   bool TimblAPI::WriteInstanceBaseLevels( const string& f, unsigned int l ){
-  if ( Valid() ){
-    return pimpl->WriteInstanceBaseLevels( f, l );
+    if ( Valid() ){
+      return pimpl->WriteInstanceBaseLevels( f, l );
+    }
+    else
+      return false;
   }
-  else
-    return false;
-}
-
-bool TimblAPI::GetInstanceBase( const string& f ){
-  if ( Valid() ){
-    if ( !pimpl->ReadInstanceBase( f ) )
-      i_am_fine = false;
-    return Valid();
-  }
-  else
-    return false;
-}
-
-bool TimblAPI::WriteArrays( const string& f ){
-  if ( Valid() ){
-    return pimpl->WriteArrays( f );
-  }
-  else
-    return false;
-}
-
-bool TimblAPI::GetArrays( const string& f ){
-  if ( Valid() ){
-    return pimpl->GetArrays( f );
-  }
-  else
-    return false;
-}
-
-bool TimblAPI::WriteMatrices( const string& f ){
-  return Valid() && pimpl->WriteMatrices( f );
-}
   
-bool TimblAPI::GetMatrices( const string& f ){
-  return Valid() && pimpl->GetMatrices( f );
-}
-
-bool TimblAPI::ShowBestNeighbors( ostream& os ) const{
-  return Valid() && pimpl->showBestNeighbors( os );
-}
-
-bool TimblAPI::ShowWeights( ostream& os ) const{
-  return Valid() && pimpl->ShowWeights( os );
-}
-
-bool TimblAPI::ShowOptions( ostream& os ) const{
-  return Valid() && pimpl->ShowOptions( os );
-}
-
-bool TimblAPI::ShowSettings( ostream& os ) const{
-  return Valid() && pimpl->ShowSettings( os );
-}
-
-bool TimblAPI::ShowStatistics( ostream& os ) const{
-  return Valid() && pimpl->showStatistics( os );
-}
-
-bool TimblAPI::StartServer( const int port, const int max_c ){
-  return Valid() && pimpl->StartServer( port, max_c );
-}
-
-bool TimblAPI::Set_Single_Threaded(){
-  return Valid() && pimpl->SetSingleThreaded();
-}
-
-string TimblAPI::VersionInfo( bool full ){
-  return Common::VersionInfo( full );
-}
+  bool TimblAPI::GetInstanceBase( const string& f ){
+    if ( Valid() ){
+      if ( !pimpl->ReadInstanceBase( f ) )
+	i_am_fine = false;
+      return Valid();
+    }
+    else
+      return false;
+  }
   
-int TimblAPI::Default_Max_Feats() {
-  return Common::DEFAULT_MAX_FEATS;
-}
-
+  bool TimblAPI::WriteArrays( const string& f ){
+    if ( Valid() ){
+      return pimpl->WriteArrays( f );
+    }
+    else
+      return false;
+  }
+  
+  bool TimblAPI::GetArrays( const string& f ){
+    if ( Valid() ){
+      return pimpl->GetArrays( f );
+    }
+    else
+      return false;
+  }
+  
+  bool TimblAPI::WriteMatrices( const string& f ){
+    return Valid() && pimpl->WriteMatrices( f );
+  }
+  
+  bool TimblAPI::GetMatrices( const string& f ){
+    return Valid() && pimpl->GetMatrices( f );
+  }
+  
+  bool TimblAPI::ShowBestNeighbors( ostream& os ) const{
+    return Valid() && pimpl->showBestNeighbors( os );
+  }
+  
+  bool TimblAPI::ShowWeights( ostream& os ) const{
+    return Valid() && pimpl->ShowWeights( os );
+  }
+  
+  bool TimblAPI::ShowOptions( ostream& os ) const{
+    return Valid() && pimpl->ShowOptions( os );
+  }
+  
+  bool TimblAPI::ShowSettings( ostream& os ) const{
+    return Valid() && pimpl->ShowSettings( os );
+  }
+  
+  bool TimblAPI::ShowStatistics( ostream& os ) const{
+    return Valid() && pimpl->showStatistics( os );
+  }
+  
+  bool TimblAPI::StartServer( const int port, const int max_c ){
+    return Valid() && pimpl->StartServer( port, max_c );
+  }
+  
+  bool TimblAPI::Set_Single_Threaded(){
+    return Valid() && pimpl->SetSingleThreaded();
+  }
+  
+  string TimblAPI::VersionInfo( bool full ){
+    return Common::VersionInfo( full );
+  }
+  
+  int TimblAPI::Default_Max_Feats() {
+    return Common::DEFAULT_MAX_FEATS;
+  }
+  
 }
