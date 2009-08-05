@@ -102,6 +102,8 @@ namespace Timbl{
     bool Classify( const std::string&, std::string&, 
 		   std::string&, double& );
     bool ShowBestNeighbors( std::ostream& ) const;
+    size_t matchDepth() const;
+    bool matchedAtTerminal() const;
     std::string ExpName() const;
     static std::string VersionInfo( bool = false );
     bool SaveWeights( const std::string& = "" );

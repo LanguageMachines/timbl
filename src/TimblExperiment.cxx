@@ -190,6 +190,8 @@ namespace Timbl {
     WFileName( "" ),
     ibCount( 0 ),
     confusionInfo( 0 ),
+    match_depth(-1),
+    last_leaf(true),
     estimate( 0 ),
     max_conn( 10 )
   {
@@ -279,6 +281,7 @@ namespace Timbl {
 
   void TimblExperiment::initExperiment( bool all_vd ){ 
     if ( !ExpInvalid() ){
+      match_depth = NumOfFeatures();
       if ( !MBL_init ){  // do this only when necessary
 	stats.clear();
 	delete confusionInfo;
@@ -990,6 +993,9 @@ namespace Timbl {
       else
 	outfile << " " << Distance;
       outfile.precision(OldPrec);
+    }
+    if ( Verbosity(MATCH_DEPTH) ){
+      outfile << " " << matchDepth() << ":" << (matchedAtTerminal()?"L":"N");
     }
     outfile << endl;
     showBestNeighbors( outfile );

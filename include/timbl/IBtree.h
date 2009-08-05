@@ -112,7 +112,7 @@ namespace Timbl {
     virtual const ValueDistribution *NextGraphTest( std::vector<FeatureValue *>&, 
 					      size_t& );
     unsigned long int GetDistSize( ) const { return NumOfTails; };
-    virtual const ValueDistribution *IG_test( const Instance& , int&, bool&,
+    virtual const ValueDistribution *IG_test( const Instance& , size_t&, bool&,
 					      const TargetValue *& );
     virtual IB_InstanceBase *TRIBL_test( const Instance& , size_t,
 					 const TargetValue *&,
@@ -210,7 +210,7 @@ namespace Timbl {
     void Prune( const TargetValue *, long = 0 );
     void specialPrune( const TargetValue * );
     bool IsPruned() const { return Pruned; };
-    const ValueDistribution *IG_test( const Instance& , int&, bool&,
+    const ValueDistribution *IG_test( const Instance& , size_t&, bool&,
 				      const TargetValue *& );
     bool ReadIB( std::istream &, std::vector<Feature *>&, Target *, int );
     bool ReadIB( std::istream &, std::vector<Feature *>&, Target *,

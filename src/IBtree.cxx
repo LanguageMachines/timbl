@@ -1483,7 +1483,7 @@ namespace Timbl {
   }
   
   const ValueDistribution *InstanceBase_base::IG_test( const Instance& , 
-						       int &,
+						       size_t &,
 						       bool &,
 						       const TargetValue *& ){
     FatalError( "IG_test " );
@@ -1491,7 +1491,7 @@ namespace Timbl {
   }
 
   const ValueDistribution *IG_InstanceBase::IG_test( const Instance& Inst, 
-						     int &end_level,
+						     size_t &end_level,
 						     bool &leaf,
 						     const TargetValue *&result ) {
     // The Test function for the IG algorithm, returns a pointer to the

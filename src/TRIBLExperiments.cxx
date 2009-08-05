@@ -132,6 +132,8 @@ namespace Timbl {
 					  Res, TrResultDist,
 					  level );
       if ( !SubTree ){
+	match_depth = level;
+	last_leaf = false;
 	Distance = sum_remaining_weights(level);
 	if ( TrResultDist ){
 	  if ( level == 0 )
@@ -253,6 +255,7 @@ namespace Timbl {
 	  bestResult.addDisposable( ResultDist1 );
 	}
 	SubTree->CleanPartition( true );
+	match_depth = level;
 	Distance = getBestDistance();
       }
       else {

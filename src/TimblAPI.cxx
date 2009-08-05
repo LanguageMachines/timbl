@@ -480,6 +480,17 @@ bool string_to( const string& s, Weighting& w ){
     return Valid() && pimpl->Classify( s, d, e, f );
   }
 
+  size_t TimblAPI::matchDepth() const {
+    if ( Valid() )
+      return pimpl->matchDepth();
+    else
+      return -1;
+  }
+
+  bool TimblAPI::matchedAtTerminal() const {
+    return  Valid() && pimpl->matchedAtTerminal();
+  }
+
   bool TimblAPI::initExperiment( ){
     if ( Valid() ){
       pimpl->initExperiment( true );

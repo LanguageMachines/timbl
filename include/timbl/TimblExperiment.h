@@ -129,6 +129,8 @@ namespace Timbl {
     bool Classify( const std::string& , std::string& );
     bool Classify( const std::string& , std::string&, double& );
     bool Classify( const std::string& , std::string&, std::string&, double& );
+    size_t matchDepth() const { return match_depth; };
+    bool matchedAtTerminal() const { return last_leaf; };
     
     virtual AlgorithmType Algorithm() const = 0;
     const TargetValue *Classify( const std::string& Line, 
@@ -163,8 +165,7 @@ namespace Timbl {
     
     const neighborSet *NB_Classify( const std::string& );
     
-    bool LocalTest( const Instance& , std::ostream& );
-    
+    bool LocalTest( const Instance& , std::ostream& );    
     
   protected:
     TimblExperiment( const AlgorithmType, const std::string& = "" );
@@ -180,10 +181,10 @@ namespace Timbl {
 			       const std::string&,
 			       const std::string& );
     virtual bool checkFile( const std::string& );
-    virtual void show_results( std::ostream&,
-			       const std::string&, 
-			       const TargetValue *,
-			       const double ) ;
+    void show_results( std::ostream&,
+		       const std::string&, 
+		       const TargetValue *,
+		       const double ) ;
     void testInstance( const Instance&,
 		       InstanceBase_base *,
 		       size_t = 0 );
@@ -215,6 +216,8 @@ namespace Timbl {
     ConfusionMatrix *confusionInfo;
     StatisticsClass stats;
     resultStore bestResult;
+    size_t match_depth;
+    bool last_leaf;
     
   private:
     TimblExperiment( const TimblExperiment& );
@@ -334,64 +337,60 @@ class TRIBL_Experiment: public TimblExperiment {
   bool GetInstanceBase( std::istream& );
 };
 
-class TRIBL2_Experiment: public TimblExperiment {
- public:
+  class TRIBL2_Experiment: public TimblExperiment {
+  public:
   TRIBL2_Experiment( const size_t N = DEFAULT_MAX_FEATS, 
 		     const std::string& s = "",
 		     const bool init = true ): 
     TimblExperiment( TRIBL2_a, s ) {
-    if ( init ) InitClass( N );
+      if ( init ) InitClass( N );
+    };
+    void InitInstanceBase();
+  protected:
+    TimblExperiment *clone() const {
+      return new TRIBL2_Experiment( MaxFeats(), "", false ); };
+    bool checkFile( const std::string& );
+    AlgorithmType Algorithm() const { return TRIBL2_a; };
+    bool checkLine( const std::string& );
+    const TargetValue *LocalClassify( const Instance& ,
+				      double&,
+				      bool& );
+  private:
+    bool GetInstanceBase( std::istream& );
   };
-  void InitInstanceBase();
- protected:
-  TimblExperiment *clone() const {
-    return new TRIBL2_Experiment( MaxFeats(), "", false ); };
-  bool checkFile( const std::string& );
-  AlgorithmType Algorithm() const { return TRIBL2_a; };
-  bool checkLine( const std::string& );
-  const TargetValue *LocalClassify( const Instance& ,
-				    double&,
-				    bool& );
- private:
-  bool GetInstanceBase( std::istream& );
-};
 
-class IG_Experiment: public TimblExperiment {
- public:
+  class IG_Experiment: public TimblExperiment {
+  public:
   IG_Experiment( const size_t N = DEFAULT_MAX_FEATS,
 		 const std::string& s = "",
 		 const bool init = true ): 
-    TimblExperiment( IGTREE_a, s ), last_depth(-1),last_leaf(false) { 
-    if ( init ) InitClass( N );
-  };
+    TimblExperiment( IGTREE_a, s ) { 
+      if ( init ) InitClass( N );
+    };
     bool Learn( const std::string& f = "" );
-  AlgorithmType Algorithm() const { return IGTREE_a; };
-  void InitInstanceBase();
-  bool WriteInstanceBase( const std::string& );
-  bool ReadInstanceBase( const std::string& );
- protected:
-  TimblExperiment *clone() const { 
-    return new IG_Experiment( MaxFeats(), "", false ); };
-  bool checkFile( const std::string& );
-  void testing_info( std::ostream&, const std::string&, const std::string& );
-  void initExperiment( bool = false );
-  bool checkLine( const std::string& );
-  bool sanityCheck() const;
-  const TargetValue *LocalClassify( const Instance&,
-				    double&,
-				    bool& );
-  void show_results( std::ostream&,
-		     const std::string&,
-		     const TargetValue *,
-		     const double );
- private:
-  class fCmp {
-  public:
-    bool operator()( const FeatureValue* F, const FeatureValue* G ) const{
-      return F->Index() > G->Index();
-    }
-  };  
-
+    AlgorithmType Algorithm() const { return IGTREE_a; };
+    void InitInstanceBase();
+    bool WriteInstanceBase( const std::string& );
+    bool ReadInstanceBase( const std::string& );
+  protected:
+    TimblExperiment *clone() const { 
+      return new IG_Experiment( MaxFeats(), "", false ); };
+    bool checkFile( const std::string& );
+    void testing_info( std::ostream&, const std::string&, const std::string& );
+    void initExperiment( bool = false );
+    bool checkLine( const std::string& );
+    bool sanityCheck() const;
+    const TargetValue *LocalClassify( const Instance&,
+				      double&,
+				      bool& );
+  private:
+    class fCmp {
+    public:
+      bool operator()( const FeatureValue* F, const FeatureValue* G ) const{
+	return F->Index() > G->Index();
+      }
+    };  
+    
   typedef std::multimap<FeatureValue*,std::streamsize > MultiIndex;
   typedef std::map<FeatureValue*, MultiIndex, fCmp > featureMultiIndex;
   friend std::ostream& operator<< ( std::ostream&, const featureMultiIndex& );
@@ -399,8 +398,6 @@ class IG_Experiment: public TimblExperiment {
   bool build_file_index( const std::string&, featureMultiIndex&  );
   void compressIndex( const featureMultiIndex&, featureMultiIndex& );
   bool GetInstanceBase( std::istream& );
-  int last_depth;
-  bool last_leaf;
 };
 
 }

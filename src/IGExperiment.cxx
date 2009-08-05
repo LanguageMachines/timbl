@@ -67,29 +67,6 @@ namespace Timbl {
 					false, KeepDistributions() );
   }
   
-  void IG_Experiment::show_results( ostream& outfile, 
-				    const string& dString,
-				    const TargetValue *Best,
-				    const double Distance ) {
-    show_org_input( outfile );
-    outfile << CodeToStr(Best->Name());
-    if ( Verbosity(DISTRIB) ){
-      outfile << " " << dString;
-    }
-    if ( Verbosity(DISTANCE) ) {
-      int OldPrec = outfile.precision(DBL_DIG-1);
-      outfile.setf(ios::showpoint);
-      outfile.width(8);
-      outfile << " " << Distance;
-      outfile.precision(OldPrec);
-    }
-    if ( Verbosity(MATCH_DEPTH) ){
-      outfile << " " << last_depth << ":" << (last_leaf?"L":"N");
-    }
-    outfile << endl;
-    showBestNeighbors( outfile );
-  }
-  
   void IG_Experiment::initExperiment( bool ){ 
     if ( !ExpInvalid() ) {
       if ( !MBL_init ){  // do this only when necessary
@@ -490,7 +467,7 @@ namespace Timbl {
   const TargetValue *IG_Experiment::LocalClassify( const Instance& Inst,
 						   double& Distance, 
 						   bool& exact ){
-    last_depth = -1;
+    match_depth = -1;
     last_leaf = false;
     exact = false;
     bool Tie = false;
@@ -498,14 +475,14 @@ namespace Timbl {
     bestResult.reset( beamSize, normalisation, norm_factor, Targets );
     const TargetValue *TV = NULL;
     const ValueDistribution *ResultDist 
-      = InstanceBase->IG_test( Inst, last_depth, last_leaf, TV );
-    if ( last_depth == 0 ){
+      = InstanceBase->IG_test( Inst, match_depth, last_leaf, TV );
+    if ( match_depth == 0 ){
       // when level 0, ResultDist == TopDistribution
       TV = InstanceBase->TopTarget( Tie );
     }
-    Distance = sum_remaining_weights( last_depth );
+    Distance = sum_remaining_weights( match_depth );
     if ( InstanceBase->PersistentD() && ResultDist ){
-      if ( last_depth == 0 )
+      if ( match_depth == 0 )
 	bestResult.addTop( ResultDist );
       else
 	bestResult.addConstant( ResultDist );
