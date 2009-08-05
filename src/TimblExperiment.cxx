@@ -1513,70 +1513,60 @@ namespace Timbl {
     if ( checkFile( FileName ) ){
       // Open the files
       //
-      istream *testfile;
-      ostream *outfile = NULL;;
       ifstream inp_file;
       ofstream out_file;
-      if ( FileName == "-" )
-	testfile = &cin;
-      else {
-	inp_file.open( FileName.c_str(), ios::in);
-	testfile = &inp_file;
+      inp_file.open( FileName.c_str(), ios::in);
+      if ( !inp_file) {
+	Error( "can't open: " + FileName );
       }
-      if ( OutFile == "-" )
-	outfile = &cout;
       else {
 	out_file.open( OutFile.c_str(), ios::out | ios::trunc );
-	if ( out_file )
-	  outfile = &out_file;
-      }
-      if (!outfile) {
-	Error( "can't open: " + OutFile );
-      }
-      else {
-	string Buffer;
-	stats.clear();
-	if ( !Verbosity(SILENT) )
-	  testing_info( *Log(mylog), FileName, OutFile );
-      
-	// Start time.
-	//
-	time_t lStartTime;
-	time(&lStartTime);
-	timeval startTime;
-	gettimeofday( &startTime, 0 );
-	if ( InputFormat() == ARFF )
-	  skipARFFHeader( *testfile );
-	while ( nextLine( *testfile, Buffer ) ){
-	  if ( !chopLine( Buffer ) ) {
-	    Warning( "testfile, skipped line #" + 
-		     toString<int>( stats.totalLines() ) +
-		     "\n" + Buffer );
-	  }
-	  else {
-	    chopped_to_instance( TestWords );
-	    bool exact = LocalTest( CurrInst, *outfile );
-	    if ( exact ){ // remember that a perfect match may be incorrect!
-	      if ( Verbosity(EXACT) ) {
-		*Log(mylog) << "Exacte match:\n";
-		show_org_input( *Log(mylog) );
-		*Log(mylog) << endl;
-	      }
-	    }
-	    if ( !Verbosity(SILENT) )
-	      // Display progress counter.
-	      show_progress( *Log(mylog), lStartTime );
-	  }
-	}// end while.
-	if ( OutFile != "-" )
-	  out_file.close();
-	if ( !Verbosity(SILENT) ){
-	  time_stamp( "Ready:  ", stats.dataLines() );
-	  show_speed_summary( *Log(mylog), startTime );
-	  showStatistics( *Log(mylog) );
+	if ( !out_file) {
+	  Error( "can't open: " + OutFile );
 	}
-	createPercFile( PercFile );
-	result = true;
+	else {
+	  string Buffer;
+	  stats.clear();
+	  if ( !Verbosity(SILENT) )
+	    testing_info( *Log(mylog), FileName, OutFile );
+	  
+	  // Start time.
+	  //
+	  time_t lStartTime;
+	  time(&lStartTime);
+	  timeval startTime;
+	  gettimeofday( &startTime, 0 );
+	  if ( InputFormat() == ARFF )
+	    skipARFFHeader( inp_file );
+	  while ( nextLine( inp_file, Buffer ) ){
+	    if ( !chopLine( Buffer ) ) {
+	      Warning( "testfile, skipped line #" + 
+		       toString<int>( stats.totalLines() ) +
+		     "\n" + Buffer );
+	    }
+	    else {
+	      chopped_to_instance( TestWords );
+	      bool exact = LocalTest( CurrInst, out_file );
+	      if ( exact ){ // remember that a perfect match may be incorrect!
+		if ( Verbosity(EXACT) ) {
+		  *Log(mylog) << "Exacte match:\n";
+		  show_org_input( *Log(mylog) );
+		  *Log(mylog) << endl;
+		}
+	      }
+	      if ( !Verbosity(SILENT) )
+		// Display progress counter.
+		show_progress( *Log(mylog), lStartTime );
+	    }
+	  }// end while.
+	  if ( !Verbosity(SILENT) ){
+	    time_stamp( "Ready:  ", stats.dataLines() );
+	    show_speed_summary( *Log(mylog), startTime );
+	    showStatistics( *Log(mylog) );
+	  }
+	  createPercFile( PercFile );
+	  result = true;
+	}
       }
     }
     return result;
@@ -1594,63 +1584,53 @@ namespace Timbl {
     if ( checkFile( FileName ) ){
       // Open the files
       //
-      istream *testfile;
-      ostream *outfile = NULL;;
       ifstream inp_file;
-      ofstream out_file;
-      if ( FileName == "-" )
-	testfile = &cin;
-      else {
-	inp_file.open( FileName.c_str(), ios::in);
-	testfile = &inp_file;
+      inp_file.open( FileName.c_str(), ios::in);
+      if (!inp_file) {
+	Error( "can't open: " + FileName );
       }
-      if ( OutFile == "-" )
-	outfile = &cout;
       else {
+	ofstream out_file;
 	out_file.open( OutFile.c_str(), ios::out | ios::trunc );
-	if ( out_file )
-	  outfile = &out_file;
-      }
-      if (!outfile) {
-	Error( "can't open: " + OutFile );
-      }
-      else {
-	string Buffer;
-	stats.clear();
-	if ( !Verbosity(SILENT) )
-	  testing_info( *Log(mylog), FileName, OutFile );
-      
-	// Start time.
-	//
-	time_t lStartTime;
-	time(&lStartTime);
-	timeval startTime;
-	gettimeofday( &startTime, 0 );
-	if ( InputFormat() == ARFF )
-	  skipARFFHeader( *testfile );
-	while ( nextLine( *testfile, Buffer ) ){
-	  if ( !chopLine( Buffer ) ) {
-	    Warning( "testfile, skipped line #" + 
-		     toString<int>( stats.totalLines() ) +
-		     "\n" + Buffer );
-	  }
-	  else {
-	    chopped_to_instance( TestWords );
-	    const neighborSet *res = LocalClassify( CurrInst );
-	    show_org_input( *outfile );
-	    *outfile << endl << *res;
-	    if ( !Verbosity(SILENT) )
-	      // Display progress counter.
-	      show_progress( *Log(mylog), lStartTime );
-	  }
-	}// end while.
-	if ( OutFile != "-" )
-	  out_file.close();
-	if ( !Verbosity(SILENT) ){
-	  time_stamp( "Ready:  ", stats.dataLines() );
-	  show_speed_summary( *Log(mylog), startTime );
+	if (!out_file) {
+	  Error( "can't open: " + OutFile );
 	}
-	result = true;
+	else {
+	  string Buffer;
+	  stats.clear();
+	  if ( !Verbosity(SILENT) )
+	    testing_info( *Log(mylog), FileName, OutFile );
+	  
+	  // Start time.
+	  //
+	  time_t lStartTime;
+	  time(&lStartTime);
+	  timeval startTime;
+	  gettimeofday( &startTime, 0 );
+	  if ( InputFormat() == ARFF )
+	    skipARFFHeader( inp_file );
+	  while ( nextLine( inp_file, Buffer ) ){
+	    if ( !chopLine( Buffer ) ) {
+	      Warning( "testfile, skipped line #" + 
+		       toString<int>( stats.totalLines() ) +
+		       "\n" + Buffer );
+	    }
+	    else {
+	      chopped_to_instance( TestWords );
+	      const neighborSet *res = LocalClassify( CurrInst );
+	      show_org_input( out_file );
+	      out_file << endl << *res;
+	      if ( !Verbosity(SILENT) )
+		// Display progress counter.
+		show_progress( *Log(mylog), lStartTime );
+	    }
+	  }// end while.
+	  if ( !Verbosity(SILENT) ){
+	    time_stamp( "Ready:  ", stats.dataLines() );
+	    show_speed_summary( *Log(mylog), startTime );
+	  }
+	  result = true;
+	}
       }
     }
     return result;

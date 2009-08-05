@@ -1848,9 +1848,7 @@ namespace Timbl {
     InputFormatType IF = UnknownInputFormat;
     // Open the file.
     //
-    if ( FileName == "-" )
-      return num_of_features;
-    else if ( FileName == "" ) {
+    if ( FileName == "" ) {
       Warning( "couldn't initialize: No FileName specified " );
       return 0;
     }

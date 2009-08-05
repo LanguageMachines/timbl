@@ -130,69 +130,60 @@ namespace Timbl {
     if ( checkFile( "" ) ){
       // Open the files
       //
-      istream *testfile;
-      ostream *outfile;
       ifstream inp_file;
-      ofstream out_file;
-      if ( FileName == "-" )
-	testfile = &cin;
-      else {
-	inp_file.open( FileName.c_str(), ios::in);
-	testfile = &inp_file;
+      inp_file.open( FileName.c_str(), ios::in);
+      if ( !inp_file ){
+	Error( "can't open: " + FileName );
       }
-      if ( OutFile == "-" )
-	outfile = &cout;
       else {
+	ofstream out_file;
 	out_file.open( OutFile.c_str(), ios::out | ios::trunc);
-	outfile = &out_file;
-      }
-      if (!outfile) {
-	Error( "can't open: " + OutFile );
-      }
-      else {
-	string Buffer;
-	stats.clear();
-	confusionInfo = 0;
-	if ( Verbosity(ADVANCED_STATS) )
-	  confusionInfo = new ConfusionMatrix( Targets->ValuesArray.size() );
-	testing_info( *Log(mylog), FileName, OutFile );
-	// Start time.
-	//
-	time_t lStartTime;
-	time(&lStartTime);
-	timeval startTime;
-	gettimeofday( &startTime, 0 );
-	if ( InputFormat() == ARFF )
-	  skipARFFHeader( *testfile );
-	while ( nextLine( *testfile, Buffer ) ){
-	  if ( !chopLine( Buffer ) ) {
-	    Warning( "testfile, skipped line #" + 
-		     toString<int>( stats.totalLines() ) +
-		     "\n" + Buffer );
-	  }
-	  else {
-	    chopped_to_instance( TestWords );
-	    Decrement( CurrInst );
-	    bool exact = LocalTest( CurrInst, *outfile );
-	    if ( exact ){ // remember that a perfect match may be incorrect!
-	      if ( Verbosity(EXACT) ) {
+	if (!out_file) {
+	  Error( "can't open: " + OutFile );
+	}
+	else {
+	  string Buffer;
+	  stats.clear();
+	  confusionInfo = 0;
+	  if ( Verbosity(ADVANCED_STATS) )
+	    confusionInfo = new ConfusionMatrix( Targets->ValuesArray.size() );
+	  testing_info( *Log(mylog), FileName, OutFile );
+	  // Start time.
+	  //
+	  time_t lStartTime;
+	  time(&lStartTime);
+	  timeval startTime;
+	  gettimeofday( &startTime, 0 );
+	  if ( InputFormat() == ARFF )
+	    skipARFFHeader( inp_file );
+	  while ( nextLine( inp_file, Buffer ) ){
+	    if ( !chopLine( Buffer ) ) {
+	      Warning( "testfile, skipped line #" + 
+		       toString<int>( stats.totalLines() ) +
+		       "\n" + Buffer );
+	    }
+	    else {
+	      chopped_to_instance( TestWords );
+	      Decrement( CurrInst );
+	      bool exact = LocalTest( CurrInst, out_file );
+	      if ( exact ){ // remember that a perfect match may be incorrect!
+		if ( Verbosity(EXACT) ) {
 		*Log(mylog) << "Exacte match:\n";
 		show_org_input( *Log(mylog) );
 		*Log(mylog) << endl;
+		}
 	      }
+	      // Display progress counter.
+	      show_progress( *Log(mylog), lStartTime );
+	      Increment( CurrInst );
 	    }
-	    // Display progress counter.
-	    show_progress( *Log(mylog), lStartTime );
-	    Increment( CurrInst );
-	  }
-	}// end while.
-	if ( OutFile != "-" )
-	  out_file.close();
-	time_stamp( "Ready:  ", stats.dataLines() );
-	show_speed_summary( *Log(mylog), startTime );
-	showStatistics( *Log(mylog) );
-	createPercFile( PercFile );
-	result = true;
+	  }// end while.
+	  time_stamp( "Ready:  ", stats.dataLines() );
+	  show_speed_summary( *Log(mylog), startTime );
+	  showStatistics( *Log(mylog) );
+	  createPercFile( PercFile );
+	  result = true;
+	}
       }
     }
     return result;
