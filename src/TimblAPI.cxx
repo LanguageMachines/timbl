@@ -393,7 +393,9 @@ namespace Timbl {
 	return false;
       if ( out.empty() && Algo() != CV )
 	return false;
-      return pimpl->Test( in, out, p );
+      if ( !pimpl->Test( in, out ) )
+	return false;
+      return pimpl->createPercFile( p );
     }
   }
   

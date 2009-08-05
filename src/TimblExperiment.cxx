@@ -949,11 +949,12 @@ namespace Timbl {
     return true;
   }
 
-  void TimblExperiment::createPercFile( const string& fileName ) const {
+  bool TimblExperiment::createPercFile( const string& fileName ) const {
     if ( fileName != "" ) {
       ofstream outfile( fileName.c_str(), ios::out | ios::trunc);
       if (!outfile) {
 	Warning( "can't open: " + fileName );
+	return false;
       }
       else {
 	outfile 
@@ -964,6 +965,7 @@ namespace Timbl {
 	outfile.close();
       }
     }
+    return true;
   }
   
   bool TimblExperiment::showBestNeighbors( ostream& outfile ) const {
@@ -1507,8 +1509,7 @@ namespace Timbl {
   }
 
   bool TimblExperiment::Test( const string& FileName,
-			      const string& OutFile, 
-			      const string& PercFile ){
+			      const string& OutFile ){
     bool result = false;
     if ( checkFile( FileName ) ){
       // Open the files
@@ -1564,7 +1565,6 @@ namespace Timbl {
 	    show_speed_summary( *Log(mylog), startTime );
 	    showStatistics( *Log(mylog) );
 	  }
-	  createPercFile( PercFile );
 	  result = true;
 	}
       }

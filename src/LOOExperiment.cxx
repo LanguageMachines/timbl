@@ -124,8 +124,7 @@ namespace Timbl {
   }
 
   bool LOO_Experiment::Test( const string& FileName,
-			     const string& OutFile, 
-			     const string& PercFile ){
+			     const string& OutFile ){
     bool result = false;
     if ( checkFile( "" ) ){
       // Open the files
@@ -181,7 +180,6 @@ namespace Timbl {
 	  time_stamp( "Ready:  ", stats.dataLines() );
 	  show_speed_summary( *Log(mylog), startTime );
 	  showStatistics( *Log(mylog) );
-	  createPercFile( PercFile );
 	  result = true;
 	}
       }

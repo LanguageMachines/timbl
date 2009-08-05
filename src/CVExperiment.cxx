@@ -176,12 +176,10 @@ namespace Timbl {
   }  
 
   bool CV_Experiment::Test( const string& FileName,
-			    const string& OutFile, 
-			    const string& PercFile ){
+			    const string& OutFile ){
     if ( !ConfirmOptions() )
       return false;
     (void)OutFile;
-    (void)PercFile;
     bool result = false;
     VerbosityFlags keep = get_verbosity();
     set_verbosity( SILENT );
@@ -206,8 +204,11 @@ namespace Timbl {
 	  GetWeights( CV_WfileName, CV_fileW );
 	if ( !CV_PfileName.empty() )
 	  GetArrays( CV_PfileName );
-	result = TimblExperiment::Test( FileNames[SkipFile], outName,
-					percName );
+	result = TimblExperiment::Test( FileNames[SkipFile], outName );
+	if ( result )
+	  result = createPercFile( percName );
+	if ( !result )
+	  return false;
 	set_verbosity( SILENT );
 	Expand( FileNames[SkipFile] );
 	Remove( FileNames[SkipFile+1] );
@@ -221,8 +222,9 @@ namespace Timbl {
 	GetWeights( CV_WfileName, CV_fileW );
       if ( !CV_PfileName.empty() )
 	GetArrays( CV_PfileName );
-      result = TimblExperiment::Test( FileNames[NumOfFiles-1], outName, 
-				      percName ); 
+      result = TimblExperiment::Test( FileNames[NumOfFiles-1], outName ); 
+      if ( result )
+	result = createPercFile( percName );
     }
     return result;
   }

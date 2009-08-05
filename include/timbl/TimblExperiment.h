@@ -83,8 +83,7 @@ namespace Timbl {
     virtual bool Remove( const std::string& ){
     FatalError( "Remove" ); return false;};
     virtual bool Test( const std::string&,
-		       const std::string&, 
-		       const std::string& = "" );
+		       const std::string& );
     virtual bool NS_Test( const std::string&,
 			  const std::string& );
     virtual void InitInstanceBase() = 0;
@@ -194,7 +193,7 @@ namespace Timbl {
     bool skipARFFHeader( std::istream & );
     
     void show_progress( std::ostream& os, time_t );
-    void createPercFile( const std::string& = "" ) const;
+    bool createPercFile( const std::string& = "" ) const;
     
     void show_speed_summary( std::ostream& os,
 			     const timeval& ) const;
@@ -276,8 +275,7 @@ class LOO_Experiment: public IB1_Experiment {
     IB1_Experiment( N, s ) {
   };
   bool Test( const std::string&,
-	     const std::string&,
-	     const std::string& = "" );
+	     const std::string& );
   AlgorithmType Algorithm() const { return LOO_a; };
   bool ReadInstanceBase( const std::string& );
  protected:
@@ -295,8 +293,7 @@ class CV_Experiment: public IB1_Experiment {
   bool Learn( const std::string& = "" );
   bool Prepare( const std::string& = "" );
   bool Test( const std::string&,
-	     const std::string&,
-	     const std::string& = "" );
+	     const std::string& );
   bool CVprepare( const std::string& = "",
 		  WeightType = GR_w,
 		  const std::string& = "" );
