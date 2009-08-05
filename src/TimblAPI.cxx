@@ -487,8 +487,8 @@ namespace Timbl {
       return -1;
   }
 
-  bool TimblAPI::matchedAtTerminal() const {
-    return  Valid() && pimpl->matchedAtTerminal();
+  bool TimblAPI::matchedAtLeaf() const {
+    return  Valid() && pimpl->matchedAtLeaf();
   }
 
   bool TimblAPI::initExperiment( ){

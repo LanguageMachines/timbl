@@ -130,7 +130,7 @@ namespace Timbl {
     bool Classify( const std::string& , std::string&, double& );
     bool Classify( const std::string& , std::string&, std::string&, double& );
     size_t matchDepth() const { return match_depth; };
-    bool matchedAtTerminal() const { return last_leaf; };
+    bool matchedAtLeaf() const { return last_leaf; };
     
     virtual AlgorithmType Algorithm() const = 0;
     const TargetValue *Classify( const std::string& Line, 

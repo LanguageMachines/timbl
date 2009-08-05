@@ -103,7 +103,7 @@ namespace Timbl{
 		   std::string&, double& );
     bool ShowBestNeighbors( std::ostream& ) const;
     size_t matchDepth() const;
-    bool matchedAtTerminal() const;
+    bool matchedAtLeaf() const;
     std::string ExpName() const;
     static std::string VersionInfo( bool = false );
     bool SaveWeights( const std::string& = "" );

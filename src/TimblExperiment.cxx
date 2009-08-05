@@ -995,7 +995,7 @@ namespace Timbl {
       outfile.precision(OldPrec);
     }
     if ( Verbosity(MATCH_DEPTH) ){
-      outfile << " " << matchDepth() << ":" << (matchedAtTerminal()?"L":"N");
+      outfile << " " << matchDepth() << ":" << (matchedAtLeaf()?"L":"N");
     }
     outfile << endl;
     showBestNeighbors( outfile );
