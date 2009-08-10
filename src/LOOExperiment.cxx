@@ -96,19 +96,17 @@ namespace Timbl {
     }
   }
   
-  bool LOO_Experiment::checkFile( const string& FileName ){
-    if ( !IB1_Experiment::checkFile( FileName ) )
-      return false;
-    else if ( doSamples() ){
+  bool LOO_Experiment::checkTestFile(){
+    // no need to test the Testfile
+    // it is the same as the trainfile, so already checked
+    if ( doSamples() ){
       FatalError( "Cannot Leave One Out on a file with Examplar Weighting" );
       return false;
     }
     return true;
   }
 
-  void LOO_Experiment::testing_info( ostream& os,
-				     const string&,
-				     const string& OutFile ){
+  void LOO_Experiment::showTestingInfo( ostream& os ){
     if ( Verbosity(OPTIONS ) )
       ShowSettings( os );
     os << endl << "Starting to test using Leave One Out";
@@ -116,7 +114,7 @@ namespace Timbl {
       os << " using SLOPPY metric calculations" << endl;
     else
       os << endl;
-    os   << "Writing output in:          " << OutFile << endl
+    os   << "Writing output in:          " << outStreamName << endl
 	 << "Algorithm     : LOO" << endl;
     show_metric_info( os );
     show_weight_info( os );
@@ -126,63 +124,48 @@ namespace Timbl {
   bool LOO_Experiment::Test( const string& FileName,
 			     const string& OutFile ){
     bool result = false;
-    if ( checkFile( "" ) ){
-      // Open the files
+    if ( initTestFiles( FileName, OutFile ) ){
+      string Buffer;
+      initExperiment();
+      stats.clear();
+      confusionInfo = 0;
+      if ( Verbosity(ADVANCED_STATS) )
+	confusionInfo = new ConfusionMatrix( Targets->ValuesArray.size() );
+      showTestingInfo( *Log(mylog) );
+      // Start time.
       //
-      ifstream inp_file;
-      inp_file.open( FileName.c_str(), ios::in);
-      if ( !inp_file ){
-	Error( "can't open: " + FileName );
-      }
-      else {
-	ofstream out_file;
-	out_file.open( OutFile.c_str(), ios::out | ios::trunc);
-	if (!out_file) {
-	  Error( "can't open: " + OutFile );
+      time_t lStartTime;
+      time(&lStartTime);
+      timeval startTime;
+      gettimeofday( &startTime, 0 );
+      if ( InputFormat() == ARFF )
+	skipARFFHeader( testStream );
+      while ( nextLine( testStream, Buffer ) ){
+	if ( !chopLine( Buffer ) ) {
+	  Warning( "testfile, skipped line #" + 
+		   toString<int>( stats.totalLines() ) +
+		   "\n" + Buffer );
 	}
 	else {
-	  string Buffer;
-	  stats.clear();
-	  confusionInfo = 0;
-	  if ( Verbosity(ADVANCED_STATS) )
-	    confusionInfo = new ConfusionMatrix( Targets->ValuesArray.size() );
-	  testing_info( *Log(mylog), FileName, OutFile );
-	  // Start time.
-	  //
-	  time_t lStartTime;
-	  time(&lStartTime);
-	  timeval startTime;
-	  gettimeofday( &startTime, 0 );
-	  if ( InputFormat() == ARFF )
-	    skipARFFHeader( inp_file );
-	  while ( nextLine( inp_file, Buffer ) ){
-	    if ( !chopLine( Buffer ) ) {
-	      Warning( "testfile, skipped line #" + 
-		       toString<int>( stats.totalLines() ) +
-		       "\n" + Buffer );
+	  chopped_to_instance( TestWords );
+	  Decrement( CurrInst );
+	  bool exact = LocalTest( CurrInst, outStream );
+	  if ( exact ){ // remember that a perfect match may be incorrect!
+	    if ( Verbosity(EXACT) ) {
+	      *Log(mylog) << "Exacte match:\n";
+	      show_org_input( *Log(mylog) );
+	      *Log(mylog) << endl;
 	    }
-	    else {
-	      chopped_to_instance( TestWords );
-	      Decrement( CurrInst );
-	      bool exact = LocalTest( CurrInst, out_file );
-	      if ( exact ){ // remember that a perfect match may be incorrect!
-		if ( Verbosity(EXACT) ) {
-		*Log(mylog) << "Exacte match:\n";
-		show_org_input( *Log(mylog) );
-		*Log(mylog) << endl;
-		}
-	      }
-	      // Display progress counter.
-	      show_progress( *Log(mylog), lStartTime );
-	      Increment( CurrInst );
-	    }
-	  }// end while.
-	  time_stamp( "Ready:  ", stats.dataLines() );
-	  show_speed_summary( *Log(mylog), startTime );
-	  showStatistics( *Log(mylog) );
-	  result = true;
+	  }
+	  // Display progress counter.
+	  show_progress( *Log(mylog), lStartTime );
+	  Increment( CurrInst );
 	}
-      }
+      }// end while.
+      time_stamp( "Ready:  ", stats.dataLines() );
+      show_speed_summary( *Log(mylog), startTime );
+      showStatistics( *Log(mylog) );
+      result = true;
     }
     return result;
   }

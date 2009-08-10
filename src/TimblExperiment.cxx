@@ -1145,12 +1145,40 @@ namespace Timbl {
 	    MBL_init = false; // force recalculations when testing
 	  }
 	}
+      }
     }
-  }
     return result;
   }
   
-  bool TimblExperiment::checkFile( const string& FileName ){
+  bool TimblExperiment::initTestFiles( const string& InFileName,
+				       const string& OutFileName ){
+    if ( InFileName != testStreamName || !testStream.good() ){
+      testStream.close();
+      testStream.open( InFileName.c_str(), ios::in);
+    }
+    if ( !testStream ) {
+      Error( "can't open: " + InFileName );
+    }
+    else {
+      if ( OutFileName != outStreamName || !outStream.good() ){
+	outStream.close();
+	outStream.open( OutFileName.c_str(), ios::out | ios::trunc );
+      }
+      if ( !outStream ) {
+	Error( "can't open: " + OutFileName );
+      }
+      else {
+	testStreamName = InFileName;
+	outStreamName = OutFileName;
+	if ( checkTestFile() ){
+	  return true;
+	}
+      }
+    }
+    return false;
+  }
+
+  bool TimblExperiment::checkTestFile(){
     bool result = false;
     if ( !ExpInvalid() &&
 	 ConfirmOptions() ){
@@ -1158,36 +1186,35 @@ namespace Timbl {
       if ( IBStatus() == Invalid )
 	Warning( "you tried to apply the " + toString( algorithm ) +
 		 " algorithm, but no Instance Base is available yet" );
-      else if ( FileName != "" ){
+      else if ( testStreamName != "" ){
 	size_t numF =0;
-	if ( (numF = examineData( FileName )) != NumOfFeatures() ){
+	if ( (numF = examineData( testStreamName )) != NumOfFeatures() ){
 	  if ( numF == 0 ){
-	    Error( "unable to use the data from '" + FileName +
+	    Error( "unable to use the data from '" + testStreamName +
 		   "', wrong Format?" );
 	  }
 	  else
 	    Error( "mismatch between number of features in Testfile " +
-		   FileName + " and the Instancebase (" +
+		   testStreamName + " and the Instancebase (" +
 		   toString<size_t>(numF) + " vs. " + 
 		   toString<size_t>(NumOfFeatures()) + ")" ); 
 	  return result;
 	}
 	if ( !Verbosity(SILENT) ){
-	  *Log(mylog) << "Examine datafile '" << FileName 
+	  *Log(mylog) << "Examine datafile '" << testStreamName 
 		      << "' gave the following results:"
 		      << endl
 		      << "Number of Features: " << numF << endl;
 	  showInputFormat( *Log(mylog) );
 	}
       }	
-      initExperiment();
       result = true;
     }
     return result;
   }
   
-  bool IB1_Experiment::checkFile( const string& FileName ){
-    if ( !TimblExperiment::checkFile( FileName ) )
+  bool IB1_Experiment::checkTestFile(){
+    if ( !TimblExperiment::checkTestFile() )
       return false;
     else if ( IBStatus() == Pruned ){
       Warning( "you tried to apply the " + toString( algorithm) +
@@ -1197,8 +1224,8 @@ namespace Timbl {
     return true;
   }
   
-  bool IB2_Experiment::checkFile( const string& FileName ){
-    if ( !IB1_Experiment::checkFile( FileName ) )
+  bool IB2_Experiment::checkTestFile(){
+    if ( !IB1_Experiment::checkTestFile() )
       return false;
     else if ( IB2_offset() == 0 ){
       Error( "missing bootstrap information for IB2 algorithm." );
@@ -1495,13 +1522,11 @@ namespace Timbl {
       os << " } " << endl;
   }
 
-  void TimblExperiment::testing_info( ostream& os, 
-				      const string& FileName, 
-				      const string& OutFile ){
+  void TimblExperiment::showTestingInfo( ostream& os ) {
     if ( Verbosity(OPTIONS ) )
       ShowSettings( os );
-    os << endl << "Starting to test, Testfile: " << FileName << endl
-       << "Writing output in:          " << OutFile << endl
+    os << endl << "Starting to test, Testfile: " << testStreamName << endl
+       << "Writing output in:          " << outStreamName << endl
        << "Algorithm     : " << toString( Algorithm() ) << endl;
     show_metric_info( os );
     show_weight_info( os );
@@ -1511,63 +1536,47 @@ namespace Timbl {
   bool TimblExperiment::Test( const string& FileName,
 			      const string& OutFile ){
     bool result = false;
-    if ( checkFile( FileName ) ){
-      // Open the files
+    if ( initTestFiles( FileName, OutFile ) ){
+      string Buffer;
+      initExperiment();
+      stats.clear();
+      if ( !Verbosity(SILENT) )
+	showTestingInfo( *Log(mylog) );
+      // Start time.
       //
-      ifstream inp_file;
-      ofstream out_file;
-      inp_file.open( FileName.c_str(), ios::in);
-      if ( !inp_file) {
-	Error( "can't open: " + FileName );
-      }
-      else {
-	out_file.open( OutFile.c_str(), ios::out | ios::trunc );
-	if ( !out_file) {
-	  Error( "can't open: " + OutFile );
+      time_t lStartTime;
+      time(&lStartTime);
+      timeval startTime;
+      gettimeofday( &startTime, 0 );
+      if ( InputFormat() == ARFF )
+	skipARFFHeader( testStream );
+      while ( nextLine( testStream, Buffer ) ){
+	if ( !chopLine( Buffer ) ) {
+	  Warning( "testfile, skipped line #" + 
+		   toString<int>( stats.totalLines() ) +
+		   "\n" + Buffer );
 	}
 	else {
-	  string Buffer;
-	  stats.clear();
-	  if ( !Verbosity(SILENT) )
-	    testing_info( *Log(mylog), FileName, OutFile );
-	  
-	  // Start time.
-	  //
-	  time_t lStartTime;
-	  time(&lStartTime);
-	  timeval startTime;
-	  gettimeofday( &startTime, 0 );
-	  if ( InputFormat() == ARFF )
-	    skipARFFHeader( inp_file );
-	  while ( nextLine( inp_file, Buffer ) ){
-	    if ( !chopLine( Buffer ) ) {
-	      Warning( "testfile, skipped line #" + 
-		       toString<int>( stats.totalLines() ) +
-		     "\n" + Buffer );
+	  chopped_to_instance( TestWords );
+	  bool exact = LocalTest( CurrInst, outStream );
+	  if ( exact ){ // remember that a perfect match may be incorrect!
+	    if ( Verbosity(EXACT) ) {
+	      *Log(mylog) << "Exacte match:\n";
+	      show_org_input( *Log(mylog) );
+	      *Log(mylog) << endl;
 	    }
-	    else {
-	      chopped_to_instance( TestWords );
-	      bool exact = LocalTest( CurrInst, out_file );
-	      if ( exact ){ // remember that a perfect match may be incorrect!
-		if ( Verbosity(EXACT) ) {
-		  *Log(mylog) << "Exacte match:\n";
-		  show_org_input( *Log(mylog) );
-		  *Log(mylog) << endl;
-		}
-	      }
-	      if ( !Verbosity(SILENT) )
-		// Display progress counter.
-		show_progress( *Log(mylog), lStartTime );
-	    }
-	  }// end while.
-	  if ( !Verbosity(SILENT) ){
-	    time_stamp( "Ready:  ", stats.dataLines() );
-	    show_speed_summary( *Log(mylog), startTime );
-	    showStatistics( *Log(mylog) );
 	  }
-	  result = true;
+	  if ( !Verbosity(SILENT) )
+	    // Display progress counter.
+	    show_progress( *Log(mylog), lStartTime );
 	}
+      }// end while.
+      if ( !Verbosity(SILENT) ){
+	time_stamp( "Ready:  ", stats.dataLines() );
+	show_speed_summary( *Log(mylog), startTime );
+	showStatistics( *Log(mylog) );
       }
+      result = true;
     }
     return result;
   }
@@ -1581,57 +1590,41 @@ namespace Timbl {
   bool IB1_Experiment::NS_Test( const string& FileName,
 				const string& OutFile ){
     bool result = false;
-    if ( checkFile( FileName ) ){
-      // Open the files
+    if ( initTestFiles( FileName, OutFile ) ){
+      string Buffer;
+      initExperiment();
+      stats.clear();
+      if ( !Verbosity(SILENT) )
+	showTestingInfo( *Log(mylog) );
+      // Start time.
       //
-      ifstream inp_file;
-      inp_file.open( FileName.c_str(), ios::in);
-      if (!inp_file) {
-	Error( "can't open: " + FileName );
-      }
-      else {
-	ofstream out_file;
-	out_file.open( OutFile.c_str(), ios::out | ios::trunc );
-	if (!out_file) {
-	  Error( "can't open: " + OutFile );
+      time_t lStartTime;
+      time(&lStartTime);
+      timeval startTime;
+      gettimeofday( &startTime, 0 );
+      if ( InputFormat() == ARFF )
+	skipARFFHeader( testStream );
+      while ( nextLine( testStream, Buffer ) ){
+	if ( !chopLine( Buffer ) ) {
+	  Warning( "testfile, skipped line #" + 
+		   toString<int>( stats.totalLines() ) +
+		   "\n" + Buffer );
 	}
 	else {
-	  string Buffer;
-	  stats.clear();
+	  chopped_to_instance( TestWords );
+	  const neighborSet *res = LocalClassify( CurrInst );
+	  show_org_input( outStream );
+	  outStream << endl << *res;
 	  if ( !Verbosity(SILENT) )
-	    testing_info( *Log(mylog), FileName, OutFile );
-	  
-	  // Start time.
-	  //
-	  time_t lStartTime;
-	  time(&lStartTime);
-	  timeval startTime;
-	  gettimeofday( &startTime, 0 );
-	  if ( InputFormat() == ARFF )
-	    skipARFFHeader( inp_file );
-	  while ( nextLine( inp_file, Buffer ) ){
-	    if ( !chopLine( Buffer ) ) {
-	      Warning( "testfile, skipped line #" + 
-		       toString<int>( stats.totalLines() ) +
-		       "\n" + Buffer );
-	    }
-	    else {
-	      chopped_to_instance( TestWords );
-	      const neighborSet *res = LocalClassify( CurrInst );
-	      show_org_input( out_file );
-	      out_file << endl << *res;
-	      if ( !Verbosity(SILENT) )
-		// Display progress counter.
-		show_progress( *Log(mylog), lStartTime );
-	    }
-	  }// end while.
-	  if ( !Verbosity(SILENT) ){
-	    time_stamp( "Ready:  ", stats.dataLines() );
-	    show_speed_summary( *Log(mylog), startTime );
-	  }
-	  result = true;
+	    // Display progress counter.
+	    show_progress( *Log(mylog), lStartTime );
 	}
+      }// end while.
+      if ( !Verbosity(SILENT) ){
+	time_stamp( "Ready:  ", stats.dataLines() );
+	show_speed_summary( *Log(mylog), startTime );
       }
+      result = true;
     }
     return result;
   }

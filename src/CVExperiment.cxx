@@ -80,8 +80,8 @@ namespace Timbl {
     return true;
   }
 
-  bool CV_Experiment::checkFile( const string& FileName ){
-    if ( !IB1_Experiment::checkFile( FileName ) )
+  bool CV_Experiment::checkTestFile(){
+    if ( !IB1_Experiment::checkTestFile() )
       return false;
     else if ( doSamples() ){
       FatalError( "Cannot Cross validate on a file with Examplar Weighting" );

@@ -86,8 +86,8 @@ namespace Timbl {
     }
   }  
 
-  bool IG_Experiment::checkFile( const string& fileName ){
-    if ( TimblExperiment::checkFile( fileName ) )
+  bool IG_Experiment::checkTestFile(){
+    if ( TimblExperiment::checkTestFile() )
       return sanityCheck();
     else
       return false;
@@ -498,19 +498,6 @@ namespace Timbl {
     else if ( Tie )
       stats.addTieFailure();
     return TV;
-  }
-
-  void IG_Experiment::testing_info( ostream& os,
-				    const string& FileName,
-				    const string& OutFile ){
-    if ( Verbosity(OPTIONS) )
-      ShowSettings( os );
-    os << endl << "Starting to test, Testfile: " << FileName << endl
-       << "Writing output in:          " << OutFile << endl
-       << "Algorithm     : IGTree" << endl;
-    show_ignore_info( os );
-    show_weight_info( os );
-    os << endl;
   }
 
   bool IG_Experiment::WriteInstanceBase( const string& FileName ){

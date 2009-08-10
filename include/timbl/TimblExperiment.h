@@ -27,6 +27,7 @@
 #ifndef TIMBLEXP_H
 #define TIMBLEXP_H
 
+#include <fstream>
 #include "timbl/BestArray.h"
 #include "timbl/Statistics.h"
 #include "timbl/MBLClass.h"
@@ -176,10 +177,9 @@ namespace Timbl {
 					      bool& );
     
     virtual bool GetInstanceBase( std::istream& ) = 0;
-    virtual void testing_info( std::ostream&, 
-			       const std::string&,
-			       const std::string& );
-    virtual bool checkFile( const std::string& );
+    virtual void showTestingInfo( std::ostream& );
+    virtual bool checkTestFile();
+    bool initTestFiles( const std::string&, const std::string& );
     void show_results( std::ostream&,
 		       const std::string&, 
 		       const TargetValue *,
@@ -211,6 +211,10 @@ namespace Timbl {
     std::string pidFile;
     std::string WFileName;
     std::string outPath;
+    std::string testStreamName;
+    std::string outStreamName;
+    std::ifstream testStream;
+    std::ofstream outStream;
     unsigned long ibCount; 
     ConfusionMatrix *confusionInfo;
     StatisticsClass stats;
@@ -243,7 +247,7 @@ class IB1_Experiment: public TimblExperiment {
   TimblExperiment *clone() const { 
     return new IB1_Experiment( MaxFeats(), "", false ); 
   };
-  bool checkFile( const std::string& );
+  bool checkTestFile();
   bool checkLine( const std::string& );
   bool Increment( const Instance& I ) { return UnHideInstance( I ); };
   bool Decrement( const Instance& I ) { return HideInstance( I ); };
@@ -263,7 +267,7 @@ class IB2_Experiment: public IB1_Experiment {
   bool Learn( const std::string& = "" );
   AlgorithmType Algorithm() const { return IB2_a; };
  protected:
-  bool checkFile( const std::string& );
+  bool checkTestFile( );
   TimblExperiment *clone() const { return new IB2_Experiment( MaxFeats() ); };
   bool Expand_N( const std::string& );
   bool show_learn_progress( std::ostream& os, time_t, size_t );
@@ -279,9 +283,9 @@ class LOO_Experiment: public IB1_Experiment {
   AlgorithmType Algorithm() const { return LOO_a; };
   bool ReadInstanceBase( const std::string& );
  protected:
-  bool checkFile( const std::string& );
+  bool checkTestFile( );
   void initExperiment( bool = false );
-  void testing_info( std::ostream&, const std::string&, const std::string& );
+  void showTestingInfo( std::ostream& );
 };
 
 class CV_Experiment: public IB1_Experiment {
@@ -299,7 +303,7 @@ class CV_Experiment: public IB1_Experiment {
 		  const std::string& = "" );
   AlgorithmType Algorithm() const { return CV_a; };
  protected:
-  bool checkFile( const std::string& );
+  bool checkTestFile();
   bool get_file_names( const std::string& );
  private:
   CV_Experiment( const CV_Experiment& );
@@ -323,8 +327,8 @@ class TRIBL_Experiment: public TimblExperiment {
  protected:
   TimblExperiment *clone() const { 
     return new TRIBL_Experiment( MaxFeats(), "", false ); };
-  void testing_info( std::ostream&, const std::string&, const std::string& );
-  bool checkFile( const std::string& );
+  void showTestingInfo( std::ostream& );
+  bool checkTestFile();
   AlgorithmType Algorithm() const { return TRIBL_a; };
   bool checkLine( const std::string& );
   const TargetValue *LocalClassify( const Instance& , 
@@ -346,7 +350,7 @@ class TRIBL_Experiment: public TimblExperiment {
   protected:
     TimblExperiment *clone() const {
       return new TRIBL2_Experiment( MaxFeats(), "", false ); };
-    bool checkFile( const std::string& );
+    bool checkTestFile();
     AlgorithmType Algorithm() const { return TRIBL2_a; };
     bool checkLine( const std::string& );
     const TargetValue *LocalClassify( const Instance& ,
@@ -372,8 +376,7 @@ class TRIBL_Experiment: public TimblExperiment {
   protected:
     TimblExperiment *clone() const { 
       return new IG_Experiment( MaxFeats(), "", false ); };
-    bool checkFile( const std::string& );
-    void testing_info( std::ostream&, const std::string&, const std::string& );
+    bool checkTestFile();
     void initExperiment( bool = false );
     bool checkLine( const std::string& );
     bool sanityCheck() const;

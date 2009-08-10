@@ -82,8 +82,8 @@ namespace Timbl {
 					    KeepDistributions() );
   }
   
-  bool TRIBL_Experiment::checkFile( const string& FileName ){
-    if ( !TimblExperiment::checkFile( FileName ) )
+  bool TRIBL_Experiment::checkTestFile(){
+    if ( !TimblExperiment::checkTestFile() )
       return false;
     else if ( IBStatus() == Pruned ){
       Warning( "you tried to apply the " + toString( algorithm) +
@@ -97,8 +97,8 @@ namespace Timbl {
     return true;
   }
   
-  bool TRIBL2_Experiment::checkFile( const string& FileName ){
-    if ( !TimblExperiment::checkFile( FileName ) )
+  bool TRIBL2_Experiment::checkTestFile(){
+    if ( !TimblExperiment::checkTestFile() )
       return false;
     else if ( IBStatus() == Pruned ){
       Warning( "you tried to apply the " + toString( algorithm) +
@@ -281,13 +281,11 @@ namespace Timbl {
     return Res;
   }
 
-  void TRIBL_Experiment::testing_info( ostream& os, 
-				       const string& FileName,
-				       const string& OutFile ){
+  void TRIBL_Experiment::showTestingInfo( ostream& os ){
     if ( Verbosity(OPTIONS) )
       ShowSettings( os );
-    os << endl << "Starting to test, Testfile: " << FileName << endl
-       <<	"Writing output in:          " << OutFile << endl
+    os << endl << "Starting to test, Testfile: " << testStreamName << endl
+       <<	"Writing output in:          " << outStreamName << endl
        << "Algorithm     : TRIBL, q = " << TRIBL_offset() << endl;
     show_metric_info( os );
     show_weight_info( os );
