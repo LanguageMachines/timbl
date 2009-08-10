@@ -377,6 +377,7 @@ class TRIBL_Experiment: public TimblExperiment {
     TimblExperiment *clone() const { 
       return new IG_Experiment( MaxFeats(), "", false ); };
     bool checkTestFile();
+    void showTestingInfo( std::ostream& );
     void initExperiment( bool = false );
     bool checkLine( const std::string& );
     bool sanityCheck() const;
