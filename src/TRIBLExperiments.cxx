@@ -301,7 +301,7 @@ namespace Timbl {
     int Version;
     string range_buf;
     if ( !get_IB_Info( is, Pruned, Version, Hashed, range_buf ) ){
-      Error( "Can'n retrieve Instance-Base\n" );
+      return false;
     }
     else if ( Pruned ){
       Error( "Instance-base is Pruned!, NOT valid for " +
@@ -348,7 +348,7 @@ namespace Timbl {
     int Version;
     string range_buf;
     if ( !get_IB_Info( is, Pruned, Version, Hashed, range_buf ) ){
-      Error( "Can'n retrieve Instance-Base\n" );
+      return false;
     }
     else if ( Pruned ){
       Error( "Instance-base is Pruned!, NOT valid for " +

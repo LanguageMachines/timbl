@@ -157,8 +157,10 @@ namespace Timbl {
 			      int& Version,
 			      bool& Hashed,
 			      string& range_buf ){
-    if ( ExpInvalid() )
+    if ( ExpInvalid() ){
+      Error( "Can't retrieve Instance-Base\n" );
       return false;
+    }
     if ( Options.TableFrozen() ||
 	 num_of_features != 0 ){
       Warning( "unable to read an Instance Base while another"
@@ -308,6 +310,7 @@ namespace Timbl {
     }
     else {
       num_of_features = 0;
+      Error( "Can't retrieve Instance-Base\n" );
       return false;
     }
   }
