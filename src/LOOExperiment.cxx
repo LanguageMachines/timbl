@@ -129,6 +129,10 @@ namespace Timbl {
     if ( initTestFiles( FileName, OutFile ) ){
       initExperiment();
       stats.clear();
+      delete confusionInfo;
+      confusionInfo = 0;
+      if ( Verbosity(ADVANCED_STATS) )
+	confusionInfo = new ConfusionMatrix( Targets->ValuesArray.size() );
       showTestingInfo( *Log(mylog) );
       // Start time.
       //
