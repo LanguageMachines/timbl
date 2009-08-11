@@ -1152,26 +1152,29 @@ namespace Timbl {
   
   bool TimblExperiment::initTestFiles( const string& InFileName,
 				       const string& OutFileName ){
-    if ( InFileName != testStreamName || !testStream.good() ){
-      testStream.close();
-      testStream.open( InFileName.c_str(), ios::in);
-    }
-    if ( !testStream ) {
-      Error( "can't open: " + InFileName );
-    }
-    else {
-      if ( OutFileName != outStreamName || !outStream.good() ){
-	outStream.close();
-	outStream.open( OutFileName.c_str(), ios::out | ios::trunc );
+    if ( !ExpInvalid() &&
+	 ConfirmOptions() ){
+      if ( InFileName != testStreamName || !testStream.good() ){
+	testStream.close();
+	testStream.open( InFileName.c_str(), ios::in);
       }
-      if ( !outStream ) {
-	Error( "can't open: " + OutFileName );
+      if ( !testStream ) {
+	Error( "can't open: " + InFileName );
       }
       else {
-	testStreamName = InFileName;
-	outStreamName = OutFileName;
-	if ( checkTestFile() ){
-	  return true;
+	if ( OutFileName != outStreamName || !outStream.good() ){
+	  outStream.close();
+	  outStream.open( OutFileName.c_str(), ios::out | ios::trunc );
+	}
+	if ( !outStream ) {
+	  Error( "can't open: " + OutFileName );
+	}
+	else {
+	  testStreamName = InFileName;
+	  outStreamName = OutFileName;
+	  if ( checkTestFile() ){
+	    return true;
+	  }
 	}
       }
     }
@@ -1179,38 +1182,33 @@ namespace Timbl {
   }
 
   bool TimblExperiment::checkTestFile(){
-    bool result = false;
-    if ( !ExpInvalid() &&
-	 ConfirmOptions() ){
+    if ( IBStatus() == Invalid )
+      Warning( "you tried to apply the " + toString( algorithm ) +
+	       " algorithm, but no Instance Base is available yet" );
+    else {
       runningPhase = TestWords;
-      if ( IBStatus() == Invalid )
-	Warning( "you tried to apply the " + toString( algorithm ) +
-		 " algorithm, but no Instance Base is available yet" );
-      else if ( testStreamName != "" ){
-	size_t numF =0;
-	if ( (numF = examineData( testStreamName )) != NumOfFeatures() ){
-	  if ( numF == 0 ){
-	    Error( "unable to use the data from '" + testStreamName +
-		   "', wrong Format?" );
-	  }
-	  else
-	    Error( "mismatch between number of features in Testfile " +
-		   testStreamName + " and the Instancebase (" +
-		   toString<size_t>(numF) + " vs. " + 
-		   toString<size_t>(NumOfFeatures()) + ")" ); 
-	  return result;
+      size_t numF =0;
+      if ( (numF = examineData( testStreamName )) != NumOfFeatures() ){
+	if ( numF == 0 ){
+	  Error( "unable to use the data from '" + testStreamName +
+		 "', wrong Format?" );
 	}
-	if ( !Verbosity(SILENT) ){
-	  *Log(mylog) << "Examine datafile '" << testStreamName 
-		      << "' gave the following results:"
-		      << endl
-		      << "Number of Features: " << numF << endl;
-	  showInputFormat( *Log(mylog) );
-	}
-      }	
-      result = true;
-    }
-    return result;
+	else
+	  Error( "mismatch between number of features in Testfile " +
+		 testStreamName + " and the Instancebase (" +
+		 toString<size_t>(numF) + " vs. " + 
+		 toString<size_t>(NumOfFeatures()) + ")" ); 
+	return false;
+      }
+      if ( !Verbosity(SILENT) ){
+	*Log(mylog) << "Examine datafile '" << testStreamName 
+		    << "' gave the following results:"
+		    << endl
+		    << "Number of Features: " << numF << endl;
+	showInputFormat( *Log(mylog) );
+      }
+    }	
+    return true;
   }
   
   bool IB1_Experiment::checkTestFile(){
@@ -1523,25 +1521,25 @@ namespace Timbl {
   }
 
   void TimblExperiment::showTestingInfo( ostream& os ) {
-    if ( Verbosity(OPTIONS ) )
-      ShowSettings( os );
-    os << endl << "Starting to test, Testfile: " << testStreamName << endl
-       << "Writing output in:          " << outStreamName << endl
-       << "Algorithm     : " << toString( Algorithm() ) << endl;
-    show_metric_info( os );
-    show_weight_info( os );
-    os << decay << endl;
+    if ( !Verbosity(SILENT) ){
+      if ( Verbosity(OPTIONS ) )
+	ShowSettings( os );
+      os << endl << "Starting to test, Testfile: " << testStreamName << endl
+	 << "Writing output in:          " << outStreamName << endl
+	 << "Algorithm     : " << toString( Algorithm() ) << endl;
+      show_metric_info( os );
+      show_weight_info( os );
+      os << decay << endl;
+    }
   }
 
   bool TimblExperiment::Test( const string& FileName,
 			      const string& OutFile ){
     bool result = false;
     if ( initTestFiles( FileName, OutFile ) ){
-      string Buffer;
       initExperiment();
       stats.clear();
-      if ( !Verbosity(SILENT) )
-	showTestingInfo( *Log(mylog) );
+      showTestingInfo( *Log(mylog) );
       // Start time.
       //
       time_t lStartTime;
@@ -1550,6 +1548,7 @@ namespace Timbl {
       gettimeofday( &startTime, 0 );
       if ( InputFormat() == ARFF )
 	skipARFFHeader( testStream );
+      string Buffer;
       while ( nextLine( testStream, Buffer ) ){
 	if ( !chopLine( Buffer ) ) {
 	  Warning( "testfile, skipped line #" + 
@@ -1591,11 +1590,9 @@ namespace Timbl {
 				const string& OutFile ){
     bool result = false;
     if ( initTestFiles( FileName, OutFile ) ){
-      string Buffer;
       initExperiment();
       stats.clear();
-      if ( !Verbosity(SILENT) )
-	showTestingInfo( *Log(mylog) );
+      showTestingInfo( *Log(mylog) );
       // Start time.
       //
       time_t lStartTime;
@@ -1604,6 +1601,7 @@ namespace Timbl {
       gettimeofday( &startTime, 0 );
       if ( InputFormat() == ARFF )
 	skipARFFHeader( testStream );
+      string Buffer;
       while ( nextLine( testStream, Buffer ) ){
 	if ( !chopLine( Buffer ) ) {
 	  Warning( "testfile, skipped line #" + 

@@ -107,30 +107,28 @@ namespace Timbl {
   }
 
   void LOO_Experiment::showTestingInfo( ostream& os ){
-    if ( Verbosity(OPTIONS ) )
-      ShowSettings( os );
-    os << endl << "Starting to test using Leave One Out";
-    if ( Do_Sloppy_LOO() )
-      os << " using SLOPPY metric calculations" << endl;
-    else
-      os << endl;
-    os   << "Writing output in:          " << outStreamName << endl
-	 << "Algorithm     : LOO" << endl;
-    show_metric_info( os );
-    show_weight_info( os );
-    os << decay << endl;
+    if ( !Verbosity(SILENT) ){
+      if ( Verbosity(OPTIONS ) )
+	ShowSettings( os );
+      os << endl << "Starting to test using Leave One Out";
+      if ( Do_Sloppy_LOO() )
+	os << " using SLOPPY metric calculations" << endl;
+      else
+	os << endl;
+      os   << "Writing output in:          " << outStreamName << endl
+	   << "Algorithm     : LOO" << endl;
+      show_metric_info( os );
+      show_weight_info( os );
+      os << decay << endl;
+    }
   }
 
   bool LOO_Experiment::Test( const string& FileName,
 			     const string& OutFile ){
     bool result = false;
     if ( initTestFiles( FileName, OutFile ) ){
-      string Buffer;
       initExperiment();
       stats.clear();
-      confusionInfo = 0;
-      if ( Verbosity(ADVANCED_STATS) )
-	confusionInfo = new ConfusionMatrix( Targets->ValuesArray.size() );
       showTestingInfo( *Log(mylog) );
       // Start time.
       //
@@ -140,6 +138,7 @@ namespace Timbl {
       gettimeofday( &startTime, 0 );
       if ( InputFormat() == ARFF )
 	skipARFFHeader( testStream );
+      string Buffer;
       while ( nextLine( testStream, Buffer ) ){
 	if ( !chopLine( Buffer ) ) {
 	  Warning( "testfile, skipped line #" + 
