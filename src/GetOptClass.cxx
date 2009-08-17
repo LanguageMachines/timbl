@@ -359,7 +359,7 @@ namespace Timbl {
       if ( local_metric == UnknownMetric ){
 	// Ok, so NO defaults at all (API usage for instance)
 	local_metric = Overlap;
-	for ( size_t j=0; j <= metricsArray.size(); ++j ){
+	for ( size_t j=0; j < metricsArray.size(); ++j ){
 	  metricsArray[j] = Overlap;
 	}
 	
