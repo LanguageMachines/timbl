@@ -1154,18 +1154,14 @@ namespace Timbl {
 				       const string& OutFileName ){
     if ( !ExpInvalid() &&
 	 ConfirmOptions() ){
-      if ( InFileName != testStreamName || !testStream.good() ){
-	testStream.close();
-	testStream.open( InFileName.c_str(), ios::in);
-      }
+      testStream.close();
+      testStream.open( InFileName.c_str(), ios::in);
       if ( !testStream ) {
 	Error( "can't open: " + InFileName );
       }
       else {
-	if ( OutFileName != outStreamName || !outStream.good() ){
-	  outStream.close();
-	  outStream.open( OutFileName.c_str(), ios::out | ios::trunc );
-	}
+	outStream.close();
+	outStream.open( OutFileName.c_str(), ios::out | ios::trunc );
 	if ( !outStream ) {
 	  Error( "can't open: " + OutFileName );
 	}
