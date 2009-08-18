@@ -501,16 +501,18 @@ namespace Timbl {
   }
 
   void IG_Experiment::showTestingInfo( ostream& os ){
-    if ( Verbosity(OPTIONS) )
-      ShowSettings( os );
-    os << endl << "Starting to test, Testfile: " << testStreamName << endl
-       << "Writing output in:          " << outStreamName << endl
-       << "Algorithm     : IGTree" << endl;
-    show_ignore_info( os );
-    show_weight_info( os );
-    os << endl;
+    if ( !Verbosity(SILENT)) {
+      if ( Verbosity(OPTIONS) )
+	ShowSettings( os );
+      os << endl << "Starting to test, Testfile: " << testStreamName << endl
+	 << "Writing output in:          " << outStreamName << endl
+	 << "Algorithm     : IGTree" << endl;
+      show_ignore_info( os );
+      show_weight_info( os );
+      os << endl;
+    }
   }
-
+  
 
   bool IG_Experiment::WriteInstanceBase( const string& FileName ){
     bool result = false;

@@ -282,14 +282,16 @@ namespace Timbl {
   }
 
   void TRIBL_Experiment::showTestingInfo( ostream& os ){
-    if ( Verbosity(OPTIONS) )
-      ShowSettings( os );
-    os << endl << "Starting to test, Testfile: " << testStreamName << endl
-       <<	"Writing output in:          " << outStreamName << endl
-       << "Algorithm     : TRIBL, q = " << TRIBL_offset() << endl;
-    show_metric_info( os );
-    show_weight_info( os );
-    os << decay << endl;
+    if ( !Verbosity(SILENT) ){
+      if ( Verbosity(OPTIONS) )
+	ShowSettings( os );
+      os << endl << "Starting to test, Testfile: " << testStreamName << endl
+	 <<	"Writing output in:          " << outStreamName << endl
+	 << "Algorithm     : TRIBL, q = " << TRIBL_offset() << endl;
+      show_metric_info( os );
+      show_weight_info( os );
+      os << decay << endl;
+    }
   }
 
   bool TRIBL_Experiment::GetInstanceBase( istream& is ){
