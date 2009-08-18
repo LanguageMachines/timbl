@@ -63,7 +63,7 @@ namespace Common {
   ostream& operator << ( ostream& os, const Timer& T ){
     ldiv_t div = ldiv( T.myTime.tv_usec, 1000 );
     os << T.myTime.tv_sec << " seconds, " << div.quot << " milliseconds and "
-       << div.rem << " microseconds" << endl;
+       << div.rem << " microseconds";
     return os;
   }
 
