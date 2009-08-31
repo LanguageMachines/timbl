@@ -1,3 +1,470 @@
+2009-08-31 10:27  sloot
+
+	* [r2847] bootstrap: m4 dir is created when needed
+
+2009-08-31 10:15  sloot
+
+	* [r2846] m4: delete this please
+
+2009-08-25 14:44  sloot
+
+	* [r2834] AUTHORS: another contributor
+
+2009-08-18 12:26  
+
+	* [r2816] src/Common.cxx: leave endl to the caller!
+
+2009-08-18 09:10  
+
+	* [r2813] src/IGExperiment.cxx, src/TRIBLExperiments.cxx: honour
+	  SILENT again. Refactoring isn't easy
+
+2009-08-18 08:47  
+
+	* [r2812] src/TimblExperiment.cxx: not all good ideas are brilliant
+
+2009-08-17 11:01  
+
+	* [r2809] src/GetOptClass.cxx: oesp
+
+2009-08-11 09:06  
+
+	* [r2806] src/LOOExperiment.cxx: it's not only hard, but also
+	  confusing.
+
+2009-08-11 08:56  
+
+	* [r2804] src/LOOExperiment.cxx, src/TimblExperiment.cxx: small
+	  refactoring. it's hard ;{
+
+2009-08-10 14:42  
+
+	* [r2803] include/timbl/TimblExperiment.h, src/IGExperiment.cxx:
+	  hmm. we don't want to see metric ino for IG tree
+
+2009-08-10 14:32  
+
+	* [r2802] include/timbl/TimblExperiment.h, src/CVExperiment.cxx,
+	  src/IGExperiment.cxx, src/LOOExperiment.cxx,
+	  src/TRIBLExperiments.cxx, src/TimblExperiment.cxx: refactoring:
+	  working towards more stream-like tests
+
+2009-08-10 09:29  
+
+	* [r2801] src/IBprocs.cxx, src/IGExperiment.cxx,
+	  src/TRIBLExperiments.cxx, src/TimblExperiment.cxx: fixed typo at
+	  5 places
+
+2009-08-05 14:23  
+
+	* [r2799] include/timbl/TimblExperiment.h, src/CVExperiment.cxx,
+	  src/LOOExperiment.cxx, src/TimblAPI.cxx, src/TimblExperiment.cxx:
+	  started refactoring to make a stream interface more easy to do
+
+2009-08-05 13:38  
+
+	* [r2798] include/timbl/TimblAPI.h,
+	  include/timbl/TimblExperiment.h, src/TimblAPI.cxx,
+	  src/TimblExperiment.cxx: renamed matchedAtTerminal() to
+	  matchedAtLeaf()
+
+2009-08-05 10:36  
+
+	* [r2796] src/LOOExperiment.cxx, src/MBLClass.cxx,
+	  src/TimblExperiment.cxx: removed nonfunctional "-" filenames
+
+2009-08-05 09:34  
+
+	* [r2793] src/TimblAPI.cxx: layout
+
+2009-08-05 09:23  
+
+	* [r2792] include/timbl/IBtree.h, include/timbl/TimblAPI.h,
+	  include/timbl/TimblExperiment.h, src/IBtree.cxx,
+	  src/IGExperiment.cxx, src/TRIBLExperiments.cxx, src/TimblAPI.cxx,
+	  src/TimblExperiment.cxx: +vmd works now for all algorithms
+	  Added two methods to the API to get the result available:
+	  match_depth() to return the depth, and matchedAtTerminal() to see
+	  if it matched at a terminal node
+
+2009-08-04 16:07  
+
+	* [r2789] src/CommandLine.cxx: more clear now
+
+2009-08-04 14:47  
+
+	* [r2787] init/timbl.in: --logfile and --pidfile also here
+
+2009-08-04 14:09  
+
+	* [r2784] src/CommandLine.cxx, src/GetOptClass.cxx: 'long'
+	  commandline options need 2 hyphens now.
+	  so --silly=yes, --sloppy=true and so on.
+	  also values are better checked now.
+
+2009-07-22 15:16  
+
+	* [r2761] src/TimblExperiment.cxx: one line to much
+
+2009-07-22 15:13  
+
+	* [r2760] src/TimblExperiment.cxx: another small step for a man
+
+2009-07-22 14:13  
+
+	* [r2759] include/timbl/MBLClass.h,
+	  include/timbl/TimblExperiment.h, src/CVExperiment.cxx,
+	  src/MBLClass.cxx, src/TimblExperiment.cxx: refactor some stuff
+
+2009-07-20 13:30  
+
+	* [r2753] src/IGExperiment.cxx: outcommented timers
+
+2009-07-20 10:41  
+
+	* [r2749] src/StringOps.cxx: fixed error for empty strings
+
+2009-07-14 13:54  
+
+	* [r2744] include/timbl/Common.h, src/Common.cxx,
+	  src/IGExperiment.cxx: Timer seems a usefull thingy. So add it to
+	  Commons.
+
+2009-07-14 13:31  
+
+	* [r2743] src/IBtree.cxx: Bail out if we don't get what we want.
+
+2009-07-14 12:34  
+
+	* [r2742] include/timbl/TimblExperiment.h, src/IBtree.cxx,
+	  src/IGExperiment.cxx: simple attempt to speed up
+
+2009-07-09 16:38  
+
+	* [r2738] src/Instance.cxx: i hope this fixes the problems with not
+	  using Value Matrices
+
+2009-07-09 14:07  
+
+	* [r2729] src/Instance.cxx: o noes. It is really broken :{
+
+2009-07-09 13:43  
+
+	* [r2728] src/Instance.cxx: o no.
+	  stored matrices were ignored!
+
+2009-07-08 15:49  
+
+	* [r2727] src/IGExperiment.cxx: added extra timing code in IG tree
+	  building. if you don't want to see it, don't update ;)
+
+2009-07-08 15:48  
+
+	* [r2726] src/MBLClass.cxx: oesp
+
+2009-07-07 10:48  
+
+	* [r2723] include/timbl/Matrices.h, src/Instance.cxx,
+	  src/Timbl.cxx: nog wat gehak. Featurewaarden kunnen ook ','
+	  bevatten namelijk
+
+2009-07-07 09:31  
+
+	* [r2722] src/Timbl.cxx: - write matrices even without a testfile
+	  - typo
+
+2009-07-06 14:27  
+
+	* [r2721] src/Timbl.cxx: enabled storing and retrieving
+	  ValueMatrices using -matrixout=<name> and -matrixin=name
+
+2009-07-06 14:11  
+
+	* [r2720] include/timbl/Instance.h, src/Instance.cxx,
+	  src/MBLClass.cxx, src/TimblExperiment.cxx: writing and reading
+	  ValueMatrices seems to work now.
+
+2009-07-06 08:51  
+
+	* [r2719] src/MBLClass.cxx: two typos
+
+2009-07-02 07:47  
+
+	* [r2705] src/IGExperiment.cxx: yet another numb change to test
+	  'ci' mailing
+
+2009-07-02 07:24  
+
+	* [r2704] src/CVExperiment.cxx: new attempt to see if 'ci' forces
+	  mail
+
+2009-07-01 11:25  
+
+	* [r2703] src/IGExperiment.cxx: changhe to test mailing list
+
+2009-06-30 16:05  
+
+	* [r2702] include/timbl/Instance.h, include/timbl/MBLClass.h,
+	  include/timbl/Matrices.h, include/timbl/TimblExperiment.h,
+	  src/Instance.cxx, src/MBLClass.cxx, src/TimblAPI.cxx,
+	  src/TimblExperiment.cxx: started implementing write/read of VD
+	  matrices. Not quite done yet
+
+2009-06-30 08:38  
+
+	* [r2700] include/timbl/.cvsignore, include/timbl/GetOptClass.h,
+	  include/timbl/MBLClass.h, include/timbl/SocketBasics.h,
+	  src/CVExperiment.cxx, src/GetOptClass.cxx, src/IBprocs.cxx,
+	  src/IGExperiment.cxx, src/LOOExperiment.cxx, src/ServerProcs.cxx,
+	  src/SocketBasics.cxx, src/TRIBLExperiments.cxx, src/TimblAPI.cxx,
+	  src/TimblClient.cxx, src/TimblExperiment.cxx: Sockets in own
+	  namespace
+
+2009-06-30 08:02  
+
+	* [r2699] include/timbl/config.h: doesn't belong in SVN
+
+2009-06-29 15:34  
+
+	* [r2698] src/ServerProcs.cxx: oesp
+
+2009-06-29 15:25  
+
+	* [r2697] src/CVExperiment.cxx, src/IBprocs.cxx,
+	  src/LOOExperiment.cxx: fixed ./configure --enable-server=no
+
+2009-06-29 15:06  
+
+	* [r2696] include/timbl/SocketBasics.h, src/ServerProcs.cxx,
+	  src/SocketBasics.cxx: i think it works now for both with and
+	  withoy GETADDRINFO
+
+2009-06-24 16:51  
+
+	* [r2695] include/timbl/GetOptClass.h, include/timbl/MBLClass.h,
+	  include/timbl/SocketBasics.h, include/timbl/TimblExperiment.h,
+	  src/GetOptClass.cxx, src/MBLClass.cxx, src/ServerProcs.cxx,
+	  src/SocketBasics.cxx, src/Testers.cxx, src/TimblExperiment.cxx:
+	  on our way to a more OO socket handling. Not done for old (non
+	  getaddrinfo kind) unix variants
+
+2009-06-24 10:30  
+
+	* [r2694] src/Metrics.cxx: fixed dice (bug 29)
+
+2009-06-23 13:43  
+
+	* [r2691] src/Metrics.cxx: other dice calculation. still fails on
+	  unigrams
+
+2009-06-22 16:04  
+
+	* [r2687] configure.ac: revert to sane version number
+
+2009-06-22 15:56  
+
+	* [r2686] configure.ac, include/timbl/Makefile.am: ship needed
+	  header file with tarball
+
+2009-06-16 16:16  
+
+	* [r2666] include/timbl/TimblAPI.h, src/Timbl.cxx,
+	  src/TimblAPI.cxx: start to add new function to API for
+	  storing/retrieving ValueDifference Matrices
+
+2009-06-15 13:33  
+
+	* [r2664] src/Metrics.cxx: numb refactoring
+
+2009-06-15 13:24  
+
+	* [r2663] src/MBLClass.cxx: fixed memory leak
+
+2009-06-10 15:05  
+
+	* [r2652] src/Metrics.cxx: shorter
+
+2009-06-10 14:47  
+
+	* [r2651] src/Metrics.cxx: fix dixe metric for short words
+
+2009-06-10 14:47  
+
+	* [r2650] src/GetOptClass.cxx: forgotten case
+
+2009-06-10 13:30  
+
+	* [r2648] src/MBLClass.cxx: attempt to streamline metric setting
+
+2009-06-10 13:27  
+
+	* [r2647] src/GetOptClass.cxx: better text
+
+2009-06-10 12:56  
+
+	* [r2646] src/Instance.cxx: signal problem more expressive
+
+2009-06-09 08:35  
+
+	* [r2640] configure.ac: getting ready for release
+
+2009-06-08 15:52  
+
+	* [r2639] include/timbl/Testers.h, src/Testers.cxx: small step
+
+2009-06-08 15:41  
+
+	* [r2638] include/timbl/Instance.h, include/timbl/Testers.h,
+	  src/Instance.cxx, src/MBLClass.cxx, src/Testers.cxx: phew. leaner
+	  and meaner
+
+2009-06-08 14:16  
+
+	* [r2637] include/timbl/Metrics.h: hmm, some more slack
+
+2009-06-08 14:05  
+
+	* [r2636] include/timbl/Instance.h, include/timbl/Metrics.h,
+	  include/timbl/Testers.h, src/IBprocs.cxx, src/Instance.cxx,
+	  src/MBLClass.cxx, src/Metrics.cxx, src/Testers.cxx,
+	  src/TimblExperiment.cxx: more metric and testing reshuffling
+
+2009-06-02 15:49  
+
+	* [r2632] include/timbl/Testers.h, src/Metrics.cxx,
+	  src/Testers.cxx: next small step
+
+2009-06-02 14:48  
+
+	* [r2631] include/timbl/Instance.h, include/timbl/Metrics.h,
+	  include/timbl/Testers.h, src/Instance.cxx, src/Testers.cxx: some
+	  renaming
+
+2009-06-02 14:03  
+
+	* [r2629] include/timbl/BestArray.h, include/timbl/Instance.h,
+	  include/timbl/TimblExperiment.h, src/GetOptClass.cxx,
+	  src/IBprocs.cxx, src/IGExperiment.cxx, src/MBLClass.cxx,
+	  src/Testers.cxx: some cleanup
+
+2009-06-02 10:58  
+
+	* [r2628] include/timbl/Metrics.h, include/timbl/Testers.h,
+	  src/GetOptClass.cxx, src/IBprocs.cxx, src/Instance.cxx,
+	  src/MBLClass.cxx, src/Makefile.am, src/Metrics.cxx,
+	  src/Testers.cxx, src/TimblExperiment.cxx: split up Metrics and
+	  Testers
+
+2009-06-02 08:24  
+
+	* [r2627] src/TimblExperiment.cxx: removed IB2_HACK stuff. The new
+	  implementation is accepted (by me)
+
+2009-05-27 13:50  
+
+	* [r2623] include/timbl/Options.h, src/MBLClass.cxx: fixed some
+	  cornercases
+
+2009-05-27 13:49  
+
+	* [r2622] src/GetOptClass.cxx: ai. -silly and -sloppy were nog
+	  handled correctly. Changed interface.
+
+2009-05-27 13:48  
+
+	* [r2621] demos/api_test1.cxx: modified test, to get some results.
+
+2009-05-27 10:07  
+
+	* [r2620] src/TimblAPI.cxx: formatting
+
+2009-05-27 09:21  
+
+	* [r2619] demos/api_test1.cxx, include/timbl/Instance.h,
+	  src/GetOptClass.cxx, src/IGExperiment.cxx, src/Instance.cxx,
+	  src/MBLClass.cxx, src/TimblExperiment.cxx: cleanup Metric stuff
+
+2009-05-26 15:02  
+
+	* [r2616] src/Timbl.cxx: attempt to fix the last leaks
+
+2009-05-26 13:43  
+
+	* [r2615] include/timbl/MBLClass.h, include/timbl/Options.h,
+	  include/timbl/Types.h, src/GetOptClass.cxx, src/MBLClass.cxx,
+	  src/Testers.cxx, src/TimblExperiment.cxx, src/Types.cxx: removed
+	  DefaultOption stuff. metric options are handled more clearly now.
+
+2009-05-26 13:42  
+
+	* [r2614] include/timbl/TimblExperiment.h: added sanityCheck() to
+	  IGExperiment. could be usefull for others too
+
+2009-05-26 13:41  
+
+	* [r2613] src/IGExperiment.cxx: moved common code to one function.
+	  some more errors lead to a stop now, instead of changing
+	  parameters and resuming
+
+2009-05-25 15:03  
+
+	* [r2604] include/timbl/Instance.h, include/timbl/Testers.h,
+	  src/IBprocs.cxx, src/MBLClass.cxx, src/Testers.cxx,
+	  src/TimblExperiment.cxx: cleaning up Metrics stuff.
+
+2009-05-25 08:31  
+
+	* [r2603] include/timbl/Testers.h: hmpf
+
+2009-05-25 08:30  
+
+	* [r2602] include/timbl/Testers.h: make gcc4.1 happy
+
+2009-05-19 13:55  
+
+	* [r2599] src/Instance.cxx, src/Testers.cxx: better
+
+2009-05-19 12:27  
+
+	* [r2598] src/Instance.cxx: removed assertion
+
+2009-05-19 12:26  
+
+	* [r2597] src/Timbl.cxx: fixed bug 25
+
+2009-05-19 10:59  
+
+	* [r2595] src/Instance.cxx: oesp
+
+2009-05-19 09:53  
+
+	* [r2594] include/timbl/GetOptClass.h, include/timbl/IBtree.h,
+	  include/timbl/Instance.h, include/timbl/MBLClass.h,
+	  include/timbl/Testers.h, src/GetOptClass.cxx, src/IBtree.cxx,
+	  src/Instance.cxx, src/MBLClass.cxx, src/Testers.cxx,
+	  src/TimblExperiment.cxx: a lot of Metrics cleanup
+
+2009-05-13 14:52  
+
+	* [r2592] include/timbl/Instance.h, include/timbl/MBLClass.h,
+	  include/timbl/Testers.h, src/GetOptClass.cxx,
+	  src/IGExperiment.cxx, src/Instance.cxx, src/MBLClass.cxx,
+	  src/Testers.cxx, src/TimblExperiment.cxx: first step in factoring
+	  out Metrics.
+	  A lot to do!
+
+2009-04-14 13:39  
+
+	* [r2581] src/ServerProcs.cxx: now we make sure that logfile and
+	  pidfile (when used) are ABSOLUTE filenames
+
+2009-04-07 15:16  
+
+	* [r2577] ChangeLog, include/timbl/Instance.h,
+	  include/timbl/Testers.h, include/timbl/Types.h,
+	  src/GetOptClass.cxx, src/Instance.cxx, src/Testers.cxx,
+	  src/Types.cxx: first attempt to implement dice metric
+
 2009-04-06 09:05  
 
 	* [r2572] src/Timbl.cxx: removed confusing NS warning for
