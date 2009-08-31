@@ -38,6 +38,10 @@ aclocal=aclocal
 #   svn log --verbose > ChangeLog
 #}
 
+if test ! -d m4; then
+   mkdir m4
+fi
+
 $aclocal -I m4
 
 
