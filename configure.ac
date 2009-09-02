@@ -38,7 +38,6 @@ fi
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
 
-
 # when running tests, use CXX
 AC_LANG([C++])
 
@@ -65,16 +64,17 @@ fi
 
 
 # Checks for header files.
-AC_CHECK_HEADERS([unistd.h sys/types.h])
+AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h sys/socket.h sys/time.h sys/timeb.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
-AC_C_CONST
+AC_C_INLINE
 AC_TYPE_SIZE_T
+AC_TYPE_PID_T
 
 # Checks for library functions.
-AC_CHECK_FUNCS([getaddrinfo])
-
+AC_FUNC_MALLOC
+AC_CHECK_FUNCS([floor getaddrinfo gethostbyaddr gethostbyname gettimeofday inet_ntoa localtime_r memset pow rint socket sqrt strchr strerror])
 dnl
 dnl ----- Sockets
 checkBoth=0
@@ -87,7 +87,6 @@ if test "$checkBoth" = "1"; then
     LIBS="$LIBS -lsocket -lnsl"
     AC_CHECK_FUNC(accept, , [LIBS=$oldLibs])
 fi
-AC_CHECK_FUNC(gethostbyname, ,[AC_CHECK_LIB(nsl, main, [LIBS="$LIBS -lnsl"])])
 
 dnl ------ socklen_t
 dnl We check for socklen_t by making prototypes with the
