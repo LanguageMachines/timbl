@@ -43,15 +43,17 @@ namespace Sockets {
 
   class Socket {
   public: 
-    Socket(): valid(false), sock(-1){};
+  Socket(): mode(false),sock(-1){};
     virtual ~Socket();
-    bool isValid() const { return valid; };
-    std::string getMessage() const { return mess; };
-    int getSockId(){ return sock; };
+    bool isValid() const { return sock != -1 ; };
+    std::string getMessage() const;
+    int getSockId() const { return sock; }
     bool read( std::string& );
+    bool read( std::string&, unsigned int );
     bool write( const std::string& );
+    bool setNonBlocking( bool );
   protected:
-    bool valid;
+    bool mode;
     int sock;
     std::string mess;
 #ifdef HAVE_GETADDRINFO
@@ -69,7 +71,7 @@ namespace Sockets {
   class ServerSocket: public Socket {
   public:
     bool connect( const std::string& );
-    bool listen( unsigned int );
+    bool listen( unsigned int = 5 );
     bool accept( ServerSocket& );
     std::string getClientName() const { return clientName; };
   private:

@@ -33,6 +33,7 @@
 #include <cstdlib>
 #include <cerrno>
 #include <climits>
+#include <fcntl.h>
 
 #include "config.h"
 #include "timbl/Types.h"
@@ -46,7 +47,12 @@ namespace Sockets {
 #ifndef PTHREADS
   // define stubs
   
-  bool Socket::read( string& line ){
+  bool Socket::read( string& line ) {
+    cerr << "No Socket operations available." << endl;
+    return false;
+  }
+
+  bool Socket::read( string&, int ) {
     cerr << "No Socket operations available." << endl;
     return false;
   }
@@ -62,8 +68,8 @@ namespace Sockets {
     if ( sock >= 0 ) ::close(sock); 
   };
 
-  bool Socket::read( string& line ){
-    if ( !valid ){
+  bool Socket::read( string& line ) {
+    if ( !isValid() ){
       mess = "read: socket invalid";
       return false;
     }
@@ -96,8 +102,66 @@ namespace Sockets {
     }
   }
 
+  void milli_wait( int m_secs ){
+    struct timespec tv;
+    ldiv_t div = ldiv( m_secs, 1000 );
+    tv.tv_sec = div.quot;               // seconds
+    tv.tv_nsec = div.rem * 1000000;     // nanoseconds
+    //    cerr << "sleeping for " << div.quot 
+    //         << " seconds and " << div.rem << " milli seconds" << MINFO;
+    while ( nanosleep( &tv, &tv ) < 0 ){
+      //      cerr << "sleeping some more" << MINFO;
+    }
+  }
+
+  bool Socket::read( string& result, unsigned int timeout ) {
+    // a getline for nonblocking connections.
+    // retry for a few special cases until timeout reached.
+    // return false except when correctly terminated 
+    // ( meaning \n or an EOF after at least some input)
+    result = "";
+    bool oldMode = mode;
+    if ( !setNonBlocking(true) )
+      return false;
+    else {
+      char buf[5];
+      int count = 0;
+      while ( timeout > 0 ){
+	ssize_t res = ::read( sock, buf, 1 );
+	if ( res == 1 ){
+	  char c = buf[0];
+#ifdef DEBUG
+	  cerr << "-'" << c << "'-" << endl;
+#endif
+	  if ( c == '\n' ){
+	    return setNonBlocking( oldMode );
+	  }
+	  result += c;
+	}
+	else if ( res == EAGAIN || res == EWOULDBLOCK ){
+	  milli_wait(100);
+	  if ( ++count == 10 ){
+	    --timeout;
+	    count = 0;
+	  }
+	}
+	else if ( res == -1 && !result.empty() ){
+	  return setNonBlocking( oldMode );
+	}
+	else {
+	  setNonBlocking( oldMode );
+	  return false;
+	}
+      }
+      mess = "timed out";
+    }
+    setNonBlocking( oldMode );
+    return false;
+  }
+
+
   bool Socket::write( const string& line ){
-    if ( !valid ){
+    if ( !isValid() ){
       mess = "write: socket invalid";
       return false;
     }
@@ -124,13 +188,43 @@ namespace Sockets {
     return true;
   }
   
+  string Socket::getMessage() const{
+    string m;
+    if ( isValid() )
+      m = "socket " + Timbl::toString(sock);
+    else
+      m = "invalid socket ";
+    if ( !mess.empty() )
+      m += ": " + mess;
+    return mess; 
+  };
+
+  bool Socket::setNonBlocking ( const bool b ) {
+    int opts = fcntl( sock, F_GETFL );
+    if ( opts < 0 ) {
+      mess = "fctl failed";
+      return false;
+    }
+    else {
+      if ( b )
+	opts = ( opts | O_NONBLOCK );
+      else
+	opts = ( opts & ~O_NONBLOCK );
+      
+      if ( fcntl( sock, F_SETFL, opts ) < 0 ){
+	mess = "fctl failed";
+	return false;
+      }
+    }
+    mode = !b;
+    return true;
+  }
 
 #ifdef HAVE_GETADDRINFO
 
   bool ClientSocket::connect( const string& hostString,
 			      const string& portString ){
     sock = -1;
-    valid = false;
     struct addrinfo *res, *aip;
     memset( &hints, 0, sizeof(hints) );
     hints.ai_flags = PF_UNSPEC;
@@ -166,17 +260,14 @@ namespace Sockets {
 	  mess = string( "ClientSocket: Connection on ") + hostString + ":"
 	    + Timbl::toString(sock) + " failed (" + strerror(errno) + ")";
 	}
-	else
-	  valid = true;
       }
       freeaddrinfo( res ); // and delete all addr_info stuff
     }
-    return valid;
+    return isValid();
   }
 
   bool ServerSocket::connect( const string& port ){
     sock = -1;
-    valid = false;
 
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_flags    = AI_PASSIVE;
@@ -202,7 +293,6 @@ namespace Sockets {
 	    if ( setsockopt( sock, IPPROTO_TCP, TCP_NODELAY, 
 			     (void *)&val, sizeof(val) ) == 0 ){
 	      if ( bind( sock, res->ai_addr, res->ai_addrlen ) == 0 ){
-		valid = true;
 		break;
 	      }
 	    }
@@ -214,18 +304,16 @@ namespace Sockets {
       }
       freeaddrinfo( resSave );
     }
-    return valid;
+    return isValid();
   }
 
   bool ServerSocket::accept( ServerSocket& newSocket ){
-    newSocket.valid = false;
     newSocket.sock = -1;
     struct sockaddr_storage cli_addr;
     TIMBL_SOCKLEN_T clilen = sizeof(cli_addr);
     int newsock = ::accept( sock, (struct sockaddr *)&cli_addr, &clilen );
     if( newsock < 0 ){
       mess = string("server-accept failed: (") + strerror(errno) + ")";
-      return false;
     }
     else {
       char host_name[NI_MAXHOST];
@@ -251,9 +339,8 @@ namespace Sockets {
       }
       newSocket.sock = newsock;
       newSocket.clientName = name;
-      newSocket.valid = true;
-      return true;
     }
+    return newSocket.isValid();
   }
 
 #else
@@ -277,7 +364,6 @@ namespace Sockets {
   }
 
   bool ClientSocket::connect( const string& host, const string& portNum ){
-    valid = false;
     int port = stringTo<int>(portNum );
     if (port == -1) {
       mess = "ClientSocket connect: invalid port number";
@@ -308,15 +394,12 @@ namespace Sockets {
 	mess = string( "ClientSocket connect: ") + host + ":" + portNum +
 	  " failed (" + strerror( errno ) + ")";
       }
-      else
-	valid = true;
     }
-    return valid;
+    return isValid();
   }
   
   bool ServerSocket::connect( const string& port ){
     sock = -1;
-    valid = false;
     sock = socket( AF_INET, SOCK_STREAM, 0 );
     if ( sock < 0 ){
       mess = string("ServerSocket connect: socket failed (" )
@@ -339,15 +422,11 @@ namespace Sockets {
 	mess = string( "ServerSocket connect: bind failed (" )
 	  + strerror( errno ) + ")";
       }
-      else {
-	valid = true;
-      }
     }
-    return valid;
+    return isValid();
   }
 
   bool ServerSocket::accept( ServerSocket& newSocket ){
-    newSocket.valid = false;
     newSocket.sock = -1;
     struct sockaddr_storage cli_addr;
     TIMBL_SOCKLEN_T clilen = sizeof(cli_addr);
@@ -375,16 +454,15 @@ namespace Sockets {
       }
       newSocket.clientName = clientname;
       newSocket.sock = newsock;
-      newSocket.valid = true;
     }
-    return newSocket.valid;
+    return newSocket.isValid();
   }
 
 #endif 
 
   bool ServerSocket::listen( unsigned int num ){
     if ( ::listen( sock, num) < 0 ) {
-      // maximum of 5 pending requests
+      // maximum of num pending requests
       mess = string("server-listen failed: (") + strerror(errno) + ")";
       return false;
     }
