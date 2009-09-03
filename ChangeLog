@@ -1,3 +1,22 @@
+2009-09-03 13:36  sloot
+
+	* [r2882] NEWS, include/timbl/SocketBasics.h, src/SocketBasics.cxx:
+	  added non-blocking sockets; not tested yet (!)
+
+2009-09-02 16:26  sloot
+
+	* [r2879] src/ServerProcs.cxx: close std files only when a logfile
+	  is specified.
+	  So the daemon stays connected to the terminal!
+
+2009-09-02 14:05  sloot
+
+	* [r2872] configure.ac: cleanup
+
+2009-08-31 12:07  sloot
+
+	* [r2849] ., ChangeLog, NEWS: NEWS en properties
+
 2009-08-31 10:27  sloot
 
 	* [r2847] bootstrap: m4 dir is created when needed
