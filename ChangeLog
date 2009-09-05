@@ -1,3 +1,16 @@
+2009-09-05 06:32  joostvb
+
+	* [r2894] Makefile.am: do not install ChangeLog: it interferes bad
+	  with Debian packaging
+
+2009-09-05 06:32  joostvb
+
+	* [r2893] Makefile.am: tags
+
+2009-09-03 13:37  sloot
+
+	* [r2883] ChangeLog, configure.ac: ship it!
+
 2009-09-03 13:36  sloot
 
 	* [r2882] NEWS, include/timbl/SocketBasics.h, src/SocketBasics.cxx:
