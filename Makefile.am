@@ -1,5 +1,5 @@
 # $Id$
-# $URL: $
+# $URL$
 
 ACLOCAL_AMFLAGS =-I m4
 
