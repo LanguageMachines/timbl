@@ -56,11 +56,6 @@ namespace Sockets {
     bool mode;
     int sock;
     std::string mess;
-#ifdef HAVE_GETADDRINFO
-    struct addrinfo hints;
-#else
-    struct sockaddr_in address;
-#endif
   };
 
   class ClientSocket: public Socket {
