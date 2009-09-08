@@ -84,20 +84,22 @@ namespace Sockets {
     char last_read = 0;
     char *current_position = buf;
     long int bytes_read = -1;
-    while (last_read != 10) { // read 1 character at a time upto \lf
+    while ( last_read != 10 && total_count < TCP_BUFFER_SIZE ) { // read 1 character at a time upto \lf
       bytes_read = ::read( sock, &last_read, 1 );
       if ( bytes_read <= 0) {
 	// The other side may have closed unexpectedly 
 	break;
       }
-      if ( ( total_count < TCP_BUFFER_SIZE ) && 
-	   ( last_read != 10) && (last_read !=13) ) {
+      if ( ( last_read != 10 ) && ( last_read !=13 ) ) {
 	*current_position++ = last_read;
 	total_count++;
       }
     }
-    if ( bytes_read <= 0 ) {
-      mess = "read: failed before a newline was found";
+    if ( bytes_read < 0 ) {
+      mess = string("connection closed ") + strerror( bytes_read );
+      return false;
+    }
+    else if ( bytes_read == 0 ) {
       return false;
     }
     else {

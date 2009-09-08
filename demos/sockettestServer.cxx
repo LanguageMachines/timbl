@@ -59,7 +59,8 @@ void *do_child( void *arg ){
     mysock->write( answer );
     cerr << "Server: wrote()" << answer << endl;
   }
-  cerr << "Server result: " << mysock->getMessage() << endl;
+  if ( !mysock->getMessage().empty() )
+    cerr << "Server result: " << mysock->getMessage() << endl;
   delete mysock;
   return NULL;
 }
@@ -97,7 +98,8 @@ void *do_to_child( void *arg ){
     mysock->write( answer, timeOut );
     cerr << "ToServer: wrote()" << answer << endl;
   }
-  cerr << "Toserver result: " << mysock->getMessage() << endl;
+  if ( !mysock->getMessage().empty() )
+    cerr << "Toserver result: " << mysock->getMessage() << endl;
   delete mysock;
   return NULL;
 }
