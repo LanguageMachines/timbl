@@ -62,6 +62,12 @@ else
   CXXFLAGS="$CXXFLAGS -W"
 fi
 
+AX_OPENMP(
+  [AC_MSG_NOTICE( we have Open MP )
+   CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"],
+  [AC_MSG_NOTICE( We don't seem top have Open MP )] )
+
+AM_CONDITIONAL( WANT_OMP, test "$OPENMP_CXXFLAGS" != "" )
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h sys/socket.h sys/time.h sys/timeb.h unistd.h])
@@ -153,6 +159,7 @@ dnl
 AC_OUTPUT([
   Makefile
   timbl.pc
+  m4/Makefile
   src/Makefile
   docs/Makefile
   include/Makefile
