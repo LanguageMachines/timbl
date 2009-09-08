@@ -24,13 +24,16 @@
       Timbl@uvt.nl
 */
 
+#include <cstdlib>
 #include <string>
 #include <signal.h>
 #include <iostream>
+#include "timbl/Types.h"
 #include "timbl/SocketBasics.h"
 
 using namespace std;
 
+int globalTimeOut;
 //
 // a simple program to demonstrate and test the Timbl Socket interface
 //
@@ -38,7 +41,7 @@ using namespace std;
 const string lines[] = { "eerste regel", "tweede regel", "derde regel",
 			 "laatste regel", "" };
 
-bool createClient( const string& sock, int id ){
+bool runClient( const string& sock, int id ){
   cerr << "Starting Client " << id << " on localhost, port:" << sock << endl;
   Sockets::ClientSocket client;
   if ( client.connect( "localhost", sock) ){
@@ -76,15 +79,88 @@ bool createClient( const string& sock, int id ){
   return true;
 }
 
-int main(){
+int randomSecs(){
+  long int r = random();
+  ldiv_t dif = ldiv( r, 5 );
+  return abs(dif.rem);
+}
+
+bool runToClient( const string& sock, int id ){
+  cerr << "Starting Client " << id << " on localhost, port:" << sock << endl;
+  Sockets::ClientSocket client;
+  if ( client.connect( "localhost", sock) ){
+    client.setNonBlocking();
+    string resultLine;
+    int timeOut = globalTimeOut;
+    int snorr = randomSecs();
+    cerr << "client " << id << " sleeps " << snorr << " seconds" << endl;
+    sleep( snorr);
+    if ( client.read( resultLine, timeOut ) ){
+      cerr << "Client " << id << " read():\t\t\t\t" << resultLine << endl;
+      int i = 0;
+      string testLine = lines[i];
+      while ( !testLine.empty() ){
+	int snorr = randomSecs();
+	cerr << "client " << id << " sleeps " << snorr << " seconds" << endl;
+	sleep( snorr);
+	if ( client.write( testLine + "\n" ) ){
+	  cerr << "Client " << id << " wrote():\t\t\t\t" << testLine << endl;
+	  int snorr = randomSecs();
+	  cerr << "client " << id << " sleeps " << snorr << " seconds" << endl;
+	  sleep( snorr);
+	  if ( client.read( resultLine, timeOut ) ){
+	    if ( resultLine == "" ) 
+	      continue;
+	    cerr << "Client " << id << " read() \t\t\t\t" << resultLine << endl;
+	  }
+	  else {
+	    cerr << "read failed: "  + client.getMessage() << endl;
+	    return false;
+	  }
+	}
+	else {
+	  cerr << "write failed: "  + client.getMessage() << endl;
+	  return false;
+	}
+	testLine = lines[++i];
+      }
+      cerr << "all lines processed" << endl;
+    }
+    else {
+      cerr << "connection failed: " + client.getMessage() << endl;
+      return false;
+    }
+  }
+  return true;
+}
+
+int main( int argc, const char *argv[] ){
+  string port = "1234";
+  string tos = "0";
+  if ( argc > 1 )
+    port = argv[1];
+  if ( argc > 2 )
+    tos = argv[2];
+  int timeOut;
+  if ( !Timbl::stringTo<int>( tos, timeOut ) ){
+    cerr << "invalid timeout" << endl;
+    cerr << "usage: " << argv[0] << " <port> <timeout>" << endl;
+    return 1;
+  }
+  else
+    globalTimeOut = timeOut;
   int i;
 #pragma omp parallel for
-    for ( i=0; i < 10; ++i ){
-      cerr << "creating client: " << i+1 << endl;
-      if ( !createClient( "1234", i ) )
-	cerr << "creating client failed" << endl;
-      cerr << "Client "<< i+1 << " Done" << endl;
+  for ( i=0; i < 6; ++i ){
+    cerr << "creating client: " << i+1 << endl;
+    if ( globalTimeOut > 0 ){
+      if ( !runToClient( port, i+1 ) )
+	cerr << "runClient failed" << endl;
     }
+    else if ( !runClient( port, i+1 ) )
+      cerr << "runClient failed" << endl;
+    cerr << "Client "<< i+1 << " Done" << endl;
+  }
   cerr << "clientTest done" << endl;
   return 0;
 }

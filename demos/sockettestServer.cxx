@@ -27,6 +27,7 @@
 #include <string>
 #include <signal.h>
 #include <iostream>
+#include "timbl/Types.h"
 #include "timbl/SocketBasics.h"
 
 using namespace std;
@@ -35,7 +36,8 @@ using namespace std;
 // a simple program to demonstrate and test the Timbl Socket interface
 //
 
-// ***** This is the routine that is executed from a new thread *******
+int globalTimeOut = 0; // evil
+
 void *do_child( void *arg ){
   Sockets::Socket *mysock = (Sockets::Socket*)arg;
   // Greeting message for the client
@@ -56,10 +58,36 @@ void *do_child( void *arg ){
     mysock->write( answer );
     cerr << "Server: wrote()" << answer << endl;
   }
+  cerr << "Server result: " << mysock->getMessage() << endl;
   delete mysock;
   return NULL;
 }
 
+void *do_to_child( void *arg ){
+  Sockets::Socket *mysock = (Sockets::Socket*)arg;
+  // Greeting message for the client
+  //
+  //
+  int timeOut = globalTimeOut;
+  mysock->write( "Welcome to the Timbl socket tester.\n" );
+  // process the test material
+  //
+  char line[256];
+  sprintf( line, "ToServer: Thread %u, on Socket %d", 
+	   (unsigned int)pthread_self(),
+	   mysock->getSockId() );
+  cerr << line << ", started" << endl;
+  string buf;
+  while( mysock->read( buf, timeOut ) ){
+    cerr << "ToServer: read()" << buf << endl;
+    string answer = string( "echo: " ) + buf + "\n"; 
+    mysock->write( answer );
+    cerr << "ToServer: wrote()" << answer << endl;
+  }
+  cerr << "Toserver result: " << mysock->getMessage() << endl;
+  delete mysock;
+  return NULL;
+}
 
 bool startServer( const string& portString ){
   Sockets::ServerSocket server;
@@ -105,7 +133,12 @@ bool startServer( const string& portString ){
       // and release its socket handle)
       //
       pthread_t chld_thr;
-      pthread_create( &chld_thr, &attr, do_child, (void *)newSocket );
+      if ( globalTimeOut > 0 ){
+	newSocket->setNonBlocking();
+	pthread_create( &chld_thr, &attr, do_to_child, (void *)newSocket );
+      }
+      else
+	pthread_create( &chld_thr, &attr, do_child, (void *)newSocket );
     }
     // the server is now free to accept another socket request 
   }
@@ -113,8 +146,22 @@ bool startServer( const string& portString ){
   return true;
 }
 
-int main(){
-  if ( !startServer("1234") ){
+int main( int argc, const char *argv[] ){
+  string port = "1234";
+  string tos = "0";
+  if ( argc > 1 )
+    port = argv[1];
+  if ( argc > 2 )
+    tos = argv[2];
+  int timeOut;
+  if ( !Timbl::stringTo<int>( tos, timeOut ) ){
+    cerr << "invalid timeout" << endl;
+    cerr << "usage: " << argv[0] << " <port> <timeout>" << endl;
+    return 1;
+  }
+  else
+    globalTimeOut = timeOut;
+  if ( !startServer( port ) ){
     cerr << "creating server failed" << endl;
   }
   cerr << "Server DONE" << endl;
