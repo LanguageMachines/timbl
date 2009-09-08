@@ -126,8 +126,8 @@ namespace Sockets {
     // return false except when correctly terminated 
     // ( meaning \n or an EOF after at least some input)
     result = "";
-    bool oldMode = mode;
-    if ( !setNonBlocking(true) ){
+    if ( !nonBlocking ){
+      mess = "attempted timout red on a blocking socket";
       return false;
     }
     else {
@@ -144,28 +144,24 @@ namespace Sockets {
 	  cerr << "-'" << c << "'-" << endl;
 #endif
 	  if ( c == '\n' ){
-	    return setNonBlocking( oldMode );
+	    return true;
 	  }
 	  result += c;
 	}
-	else if ( res == EAGAIN || res == EWOULDBLOCK ){
+	else if ( res == -1 || res == EAGAIN || res == EWOULDBLOCK ){
 	  milli_wait(100);
 	  if ( ++count == 10 ){
 	    --timeout;
 	    count = 0;
 	  }
 	}
-	else if ( res == -1 && !result.empty() ){
-	  return setNonBlocking( oldMode );
-	}
 	else {
-	  setNonBlocking( oldMode );
+	  mess = strerror( res );
 	  return false;
 	}
       }
       mess = "timed out";
     }
-    setNonBlocking( oldMode );
     return false;
   }
 
@@ -209,7 +205,7 @@ namespace Sockets {
     return mess; 
   };
 
-  bool Socket::setNonBlocking ( const bool b ) {
+  bool Socket::setBlocking( ) {
     int opts = fcntl( sock, F_GETFL );
 #ifdef DEBUG
     cerr << "socket opts = " << opts << endl;
@@ -222,10 +218,7 @@ namespace Sockets {
       return false;
     }
     else {
-      if ( b )
-	opts = ( opts | O_NONBLOCK );
-      else
-	opts = ( opts & ~O_NONBLOCK );
+      opts = ( opts & ~O_NONBLOCK );
 #ifdef DEBUG
       cerr << "try to set socket opts = " << opts << endl;
 #endif
@@ -237,7 +230,39 @@ namespace Sockets {
 	return false;
       }
     }
-    mode = !b;
+    nonBlocking = false;
+#ifdef DEBUG
+    cerr << "setBlocking done" << endl;
+#endif
+    return true;
+  }
+
+  bool Socket::setNonBlocking() {
+    int opts = fcntl( sock, F_GETFL );
+#ifdef DEBUG
+    cerr << "socket opts = " << opts << endl;
+#endif
+    if ( opts < 0 ) {
+      mess = "fctl failed";
+#ifdef DEBUG
+    cerr << "fctl: " << mess << endl;
+#endif
+      return false;
+    }
+    else {
+      opts = ( opts | O_NONBLOCK );
+#ifdef DEBUG
+      cerr << "try to set socket opts = " << opts << endl;
+#endif
+      if ( fcntl( sock, F_SETFL, opts ) < 0 ){
+	mess = "fctl failed";
+#ifdef DEBUG
+	cerr << "fctl: " << mess << endl;
+#endif
+	return false;
+      }
+    }
+    nonBlocking = true;
 #ifdef DEBUG
     cerr << "setNonBlocking done" << endl;
 #endif

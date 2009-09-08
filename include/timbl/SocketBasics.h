@@ -43,7 +43,7 @@ namespace Sockets {
 
   class Socket {
   public: 
-  Socket(): mode(false),sock(-1){};
+  Socket(): nonBlocking(false),sock(-1){};
     virtual ~Socket();
     bool isValid() const { return sock != -1 ; };
     std::string getMessage() const;
@@ -51,9 +51,10 @@ namespace Sockets {
     bool read( std::string& );
     bool read( std::string&, unsigned int );
     bool write( const std::string& );
-    bool setNonBlocking( bool );
+    bool setNonBlocking();
+    bool setBlocking();
   protected:
-    bool mode;
+    bool nonBlocking;
     int sock;
     std::string mess;
   };
