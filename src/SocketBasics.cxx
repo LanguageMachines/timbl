@@ -102,15 +102,21 @@ namespace Sockets {
     }
   }
 
+  //#define DEBUG
+
   void milli_wait( int m_secs ){
     struct timespec tv;
     ldiv_t div = ldiv( m_secs, 1000 );
     tv.tv_sec = div.quot;               // seconds
     tv.tv_nsec = div.rem * 1000000;     // nanoseconds
-    //    cerr << "sleeping for " << div.quot 
-    //         << " seconds and " << div.rem << " milli seconds" << MINFO;
+#ifdef DEBUG
+    cerr << "sleeping for " << div.quot 
+	 << " seconds and " << div.rem << " milli seconds" << endl;
+#endif
     while ( nanosleep( &tv, &tv ) < 0 ){
-      //      cerr << "sleeping some more" << MINFO;
+#ifdef DEBUG
+      cerr << "sleeping some more" << endl;
+#endif
     }
   }
 
@@ -121,13 +127,17 @@ namespace Sockets {
     // ( meaning \n or an EOF after at least some input)
     result = "";
     bool oldMode = mode;
-    if ( !setNonBlocking(true) )
+    if ( !setNonBlocking(true) ){
       return false;
+    }
     else {
       char buf[5];
       int count = 0;
       while ( timeout > 0 ){
 	ssize_t res = ::read( sock, buf, 1 );
+#ifdef DEBUG
+	cerr << "read res = " << res  << " ( " << strerror(res) << ")" << endl;
+#endif
 	if ( res == 1 ){
 	  char c = buf[0];
 #ifdef DEBUG
@@ -201,8 +211,14 @@ namespace Sockets {
 
   bool Socket::setNonBlocking ( const bool b ) {
     int opts = fcntl( sock, F_GETFL );
+#ifdef DEBUG
+    cerr << "socket opts = " << opts << endl;
+#endif
     if ( opts < 0 ) {
       mess = "fctl failed";
+#ifdef DEBUG
+    cerr << "fctl: " << mess << endl;
+#endif
       return false;
     }
     else {
@@ -210,13 +226,21 @@ namespace Sockets {
 	opts = ( opts | O_NONBLOCK );
       else
 	opts = ( opts & ~O_NONBLOCK );
-      
+#ifdef DEBUG
+      cerr << "try to set socket opts = " << opts << endl;
+#endif
       if ( fcntl( sock, F_SETFL, opts ) < 0 ){
 	mess = "fctl failed";
+#ifdef DEBUG
+	cerr << "fctl: " << mess << endl;
+#endif
 	return false;
       }
     }
     mode = !b;
+#ifdef DEBUG
+    cerr << "setNonBlocking done" << endl;
+#endif
     return true;
   }
 
@@ -224,8 +248,8 @@ namespace Sockets {
 
   bool ClientSocket::connect( const string& hostString,
 			      const string& portString ){
-    sock = -1;
     struct addrinfo *res, *aip;
+    struct addrinfo hints;
     memset( &hints, 0, sizeof(hints) );
     hints.ai_flags = PF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
@@ -268,8 +292,8 @@ namespace Sockets {
 
   bool ServerSocket::connect( const string& port ){
     sock = -1;
-
-    memset(&hints, 0, sizeof(struct addrinfo));
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof(hints));
     hints.ai_flags    = AI_PASSIVE;
     hints.ai_family   = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
@@ -375,6 +399,7 @@ namespace Sockets {
       return false;
     }
     
+    struct sockaddr_in address;
     memset((char *) &address, 0, sizeof(address));
     address.sin_family = AF_INET;
     address.sin_port = htons(port);
