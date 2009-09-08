@@ -4,13 +4,18 @@
 AM_CPPFLAGS = -I@top_srcdir@/include
 
 noinst_PROGRAMS = api_test1 api_test2 api_test3 api_test4 api_test5 api_test6\
-	tse classify
+	tse classify sockettestServer sockettestClient
 
 LDADD = ../src/libTimbl.la
 
 tse_SOURCES = tse.cxx
 
 classify_SOURCES = classify.cxx
+
+sockettestClient_SOURCES = sockettestClient.cxx
+sockettestServer_SOURCES = sockettestServer.cxx
+sockettestClient_CXXFLAGS = -fopenmp
+sockettestClient_LDFLAGS = -fopenmp
 
 api_test1_SOURCES = api_test1.cxx
 
