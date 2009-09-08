@@ -25,6 +25,7 @@
 */
 
 #include <string>
+#include <cstdlib>
 #include <signal.h>
 #include <iostream>
 #include "timbl/Types.h"
@@ -63,13 +64,22 @@ void *do_child( void *arg ){
   return NULL;
 }
 
+int randomSecs(){
+  long int r = random();
+  ldiv_t dif = ldiv( r, 5 );
+  return abs(dif.rem);
+}
+
 void *do_to_child( void *arg ){
   Sockets::Socket *mysock = (Sockets::Socket*)arg;
   // Greeting message for the client
   //
   //
   int timeOut = globalTimeOut;
-  mysock->write( "Welcome to the Timbl socket tester.\n" );
+  int snorr = randomSecs();
+  cerr << "Server sleeps " << snorr << " seconds" << endl;
+  sleep( snorr);
+  mysock->write( "Welcome to the Timbl socket tester.\n", timeOut );
   // process the test material
   //
   char line[256];
@@ -81,7 +91,10 @@ void *do_to_child( void *arg ){
   while( mysock->read( buf, timeOut ) ){
     cerr << "ToServer: read()" << buf << endl;
     string answer = string( "echo: " ) + buf + "\n"; 
-    mysock->write( answer );
+    int snorr = randomSecs();
+    cerr << "Server sleeps " << snorr << " seconds" << endl;
+    sleep( snorr);
+    mysock->write( answer, timeOut );
     cerr << "ToServer: wrote()" << answer << endl;
   }
   cerr << "Toserver result: " << mysock->getMessage() << endl;

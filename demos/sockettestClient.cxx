@@ -103,7 +103,7 @@ bool runToClient( const string& sock, int id ){
 	int snorr = randomSecs();
 	cerr << "client " << id << " sleeps " << snorr << " seconds" << endl;
 	sleep( snorr);
-	if ( client.write( testLine + "\n" ) ){
+	if ( client.write( testLine + "\n", timeOut ) ){
 	  cerr << "Client " << id << " wrote():\t\t\t\t" << testLine << endl;
 	  int snorr = randomSecs();
 	  cerr << "client " << id << " sleeps " << snorr << " seconds" << endl;

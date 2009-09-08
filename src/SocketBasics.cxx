@@ -47,17 +47,22 @@ namespace Sockets {
 #ifndef PTHREADS
   // define stubs
   
-  bool Socket::read( string& line ) {
+  bool Socket::read( string& ) {
     cerr << "No Socket operations available." << endl;
     return false;
   }
 
-  bool Socket::read( string&, int ) {
+  bool Socket::read( string&, unsigned int ) {
     cerr << "No Socket operations available." << endl;
     return false;
   }
 
-  bool Socket::write( const string& line ){
+  bool Socket::write( const string& ){
+    cerr << "No Socket operations available." << endl;
+    return false;
+  }
+
+  bool Socket::write( const string&, unsigned int ){
     cerr << "No Socket operations available." << endl;
     return false;
   }
@@ -184,6 +189,42 @@ namespace Sockets {
 	  break;
 	bytes_sent += this_write;
 	str += this_write;
+      }
+      if ( bytes_sent < count ) {
+	mess = "write: failed to sent " + Timbl::toString(count - bytes_sent) +
+	  " bytes out of " + Timbl::toString(count);
+	return false;
+      }
+    }
+    return true;
+  }
+  
+  bool Socket::write( const string& line, unsigned int timeout ){
+    if ( !isValid() ){
+      mess = "write: socket invalid";
+      return false;
+    }
+    if ( !line.empty() ){
+      size_t bytes_sent = 0;
+      size_t count = line.length();
+      const char *str = line.c_str();
+      while ( timeout > 0 && bytes_sent < count ){
+	int res = ::write(sock, str, 1 );
+	if ( res == 1 ){
+	  ++bytes_sent;
+	  ++str;
+	}
+	else if ( res == EAGAIN || res == EWOULDBLOCK ){
+	  milli_wait(100);
+	  if ( ++count == 10 ){
+	    --timeout;
+	    count = 0;
+	  }
+	}
+	else {
+	  mess = strerror( res );
+	  return false;
+	}
       }
       if ( bytes_sent < count ) {
 	mess = "write: failed to sent " + Timbl::toString(count - bytes_sent) +

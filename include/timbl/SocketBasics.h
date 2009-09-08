@@ -51,6 +51,7 @@ namespace Sockets {
     bool read( std::string& );
     bool read( std::string&, unsigned int );
     bool write( const std::string& );
+    bool write( const std::string&, unsigned int );
     bool setNonBlocking();
     bool setBlocking();
   protected:
