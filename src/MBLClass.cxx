@@ -256,6 +256,7 @@ namespace Timbl {
       keep_distributions = m.keep_distributions;
       verbosity          = m.verbosity;
       do_exact_match     = m.do_exact_match;
+      tcp_socket         = 0;
       if ( m.GlobalMetric )
 	GlobalMetric     = getMetricClass( m.GlobalMetric->type() );
       UserOptions        = m.UserOptions;
