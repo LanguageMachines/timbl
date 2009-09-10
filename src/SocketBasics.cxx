@@ -134,7 +134,7 @@ namespace Sockets {
     // ( meaning \n or an EOF after at least some input)
     result = "";
     if ( !nonBlocking ){
-      mess = "attempted timout red on a blocking socket";
+      mess = "attempted timout read on a blocking socket";
       return false;
     }
     else {
