@@ -167,16 +167,65 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     }
     return go_on;
   }
- 
-  int ClassifyFromSocket( TimblExperiment *Exp ){ 
-    string Line, Command, Param;
+
+  bool classifyOneLine( TimblExperiment *Exp, const string& params ){
     double Distance;
+    string Distrib;
+    string Answer;
+    ServerSocket *sock = Exp->TcpSocket();
+    if ( Exp->Classify( params, Answer, Distrib, Distance ) ){
+      if ( Exp->ServerVerbosity() & CLIENTDEBUG )
+	*Log(Exp->my_log()) << sock->getSockId() << ": " 
+			    << params << " --> " 
+			    << Answer << " " << Distrib 
+			    << " " << Distance << endl;
+      bool go_on = sock->write( "CATEGORY {" ) &&
+	sock->write( Answer ) &&
+	sock->write( "}" );
+      if ( go_on ){
+	if ( Exp->Verbosity(DISTRIB) ){
+	  go_on = sock->write( " DISTRIBUTION " ) &&
+	    sock->write( Distrib );
+	}
+	if ( go_on ){
+	  if ( Exp->Verbosity(DISTANCE) ){
+	    go_on = sock->write( " DISTANCE {" ) &&
+	      sock->write( toString<double>(Distance) ) &&
+	      sock->write( "}" );
+	  }
+	  if ( go_on ){
+	    if ( Exp->Verbosity(NEAR_N) ){
+	      ostringstream tmp;
+	      tmp << " NEIGHBORS\n";
+	      Exp->showBestNeighbors( tmp );
+	      tmp << "ENDNEIGHBORS";
+	      go_on = sock->write( tmp.str() );
+	    }
+	  }
+	}
+      }
+      if ( go_on ){
+	go_on = sock->write( "\n" );
+      }
+      return go_on;
+    }
+    else {
+      if ( Exp->ServerVerbosity() & CLIENTDEBUG )
+	*Log(Exp->my_log()) << sock->getSockId()
+			    << ": Classify Failed on '" 
+			    << params << "'" << endl;
+      return false;
+    }
+  }
+  
+  int classicClassify( const string& firstLine, TimblExperiment *Exp ){ 
+    string Line = firstLine, Command, Param;
     int result = 0;
     bool go_on = true;
     ServerSocket *sock = Exp->TcpSocket();
     *Dbg(Exp->my_debug()) << "ClassifyFromSocket: " 
-			  << sock->getSockId() << endl;    
-    while ( go_on && sock->read( Line ) ){
+			  << sock->getSockId() << endl;
+    do {
       *Dbg(Exp->my_debug()) << "Line='" << Line << "'" << endl;
       Split( Line, Command, Param );
       switch ( check_command(Command) ){
@@ -190,54 +239,11 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	go_on = sock->write( "OK" ) && sock->write( " Closing\n" );
 	return result;
 	break;
-      case Classify:{
-	result++;
-	string SLine = Param;
-	string Distrib;
-	string Answer;
-	if ( Exp->Classify( SLine, Answer, Distrib, Distance ) ){
-	  if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	    *Log(Exp->my_log()) << sock->getSockId() << ": " 
-				<< SLine << " --> " 
-				<< Answer << " " << Distrib 
-				<< " " << Distance << endl;
-	  go_on = sock->write( "CATEGORY {" ) &&
-	    sock->write( Answer ) &&
-	    sock->write( "}" );
-	  if ( go_on ){
-	    if ( Exp->Verbosity(DISTRIB) ){
-	      go_on = sock->write( " DISTRIBUTION " ) &&
-		sock->write( Distrib );
-	    }
-	    if ( go_on ){
-	      if ( Exp->Verbosity(DISTANCE) ){
-		go_on = sock->write( " DISTANCE {" ) &&
-		  sock->write( toString<double>(Distance) ) &&
-		  sock->write( "}" );
-	      }
-	      if ( go_on ){
-		if ( Exp->Verbosity(NEAR_N) ){
-		  ostringstream tmp;
-		  tmp << " NEIGHBORS\n";
-		  Exp->showBestNeighbors( tmp );
-		  tmp << "ENDNEIGHBORS";
-		  go_on = sock->write( tmp.str() );
-		}
-	      }
-	    }
-	  }
-	  if ( go_on )
-	    go_on = sock->write( "\n" );
-	}
-	else {
-	  if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	    *Log(Exp->my_log()) << sock->getSockId()
-				<< ": Classify Failed on '" 
-				<< SLine << "'" << endl;
-	  
-	}
-      }
-      break;
+      case Classify:
+	if ( classifyOneLine( Exp, Line ) )
+	  result++;
+	go_on = true; // HACK?
+	break;
       case Comment:
 	go_on = sock->write( "SKIP " ) &&
 	  sock->write( Line ) &&
@@ -255,8 +261,89 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	break;
       }
     }
+    while ( go_on && sock->read( Line ) );
     return result;
   }
+
+#define IS_DIGIT(x) (((x) >= '0') && ((x) <= '9'))
+#define IS_HEX(x) ((IS_DIGIT(x)) || (((x) >= 'a') && ((x) <= 'f')) || \
+            (((x) >= 'A') && ((x) <= 'F')))
+
+
+  string urlDecode( const string& s ) {
+    int cc;
+    string result;
+    int len=s.size();
+    for (int i=0; i<len ; ++i ) {
+      cc=s[i];
+      if (cc == '+') {
+	result += ' ';
+      } 
+      else if ( cc == '%' &&
+		( i < len-2 &&
+		  ( IS_HEX(s[i+1]) ) &&
+		  ( IS_HEX(s[i+2]) ) ) ){
+	std::istringstream ss( "0x"+s.substr(i+1,2) );
+	int tmp;
+	ss >> std::showbase >> std::hex;
+	ss >> tmp;
+      result = result + (char)tmp;
+      i += 2;
+      }
+      else {
+	result += cc;
+      }
+    }
+    return result;
+  }
+  
+  int classifyHttp( const string& firstLine, TimblExperiment *Exp ){ 
+    *Log(Exp->my_log()) << "firstLine='" << firstLine << "'" << endl;
+    string::size_type spos = firstLine.find( "GET" );
+    if ( spos != string::npos ){
+      string::size_type epos = firstLine.find( " HTTP" );
+      string line = firstLine.substr( spos+3, epos - spos - 3 );
+      *Log(Exp->my_log()) << "Line='" << line << "'" << endl;
+      epos = line.find( "?" );
+      string basename, command;
+      if ( epos != string::npos ){
+ 	basename = line.substr( 0, epos );
+ 	command = line.substr( epos+1 );
+	epos = basename.find( "/" );
+	if ( epos != string::npos ){
+	  basename = basename.substr( epos+1 );
+	  epos = command.find( "=" );
+	  if ( epos != string::npos ){
+	    string params = command.substr( epos+1 );
+	    params = urlDecode(params);
+	    command = command.substr( 0, epos );
+	    *Log(Exp->my_log()) << "base='" << basename << "'" << endl;
+	    *Log(Exp->my_log()) << "command='" << command << "'" << endl;
+	    if ( command == "classify" ){
+	      if ( classifyOneLine( Exp, params ) )
+		return 1;
+	    }
+	  }
+	}
+      }
+    }
+    return 0;
+  }
+  
+  int ClassifyFromSocket( TimblExperiment *Exp ){ 
+    string Line;
+    ServerSocket *sock = Exp->TcpSocket();
+    if ( sock->read( Line ) ){
+      *Log(Exp->my_log()) << "FirstLine='" << Line << "'" << endl;
+      if ( Line.find( "HTTP" ) != string::npos )
+	return classifyHttp( Line, Exp );
+      else
+	return classicClassify( Line, Exp );
+    }
+    *Dbg( Exp->my_debug() ) << "nothing seen on socket" << endl;
+    return 0;
+  }
+
   
   void BrokenPipeChildFun( int Signal ){
     if ( Signal == SIGPIPE ){
@@ -264,15 +351,13 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     }
   }
 
-
-  void show_results(  ostream& os, time_t before, time_t after, int nw ){
+  void show_results(  ostream& os, Timer& timeDone, int nw ){
     os << "Thread " << (unsigned int)pthread_self() << ", terminated at: " 
-       << asctime( localtime( &after ) )
+       << Timer::now()
        << "Total time used in this thread: " 
-	   << after - before 
-       << " sec, " << nw << " instances processed " ;
-    if ( (after - before) > 0 )
-      os << " (" << nw/(after - before) << " instances/sec)";
+       << timeDone << ", " << nw << " instances processed " ;
+    if ( timeDone.secs() > 0 )
+      os << " (" << nw/timeDone.secs() << " instances/sec)";
     os << endl;
   }
 
@@ -295,15 +380,10 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     }
     else {
       pthread_mutex_unlock( &my_lock );
-      // Greeting message for the client
-      //
-      //
-      mysock->write( "Welcome to the Timbl server.\n" );
       // process the test material
       // and do the timing
       //
-      time_t timebefore, timeafter;
-      time( &timebefore );
+      Timer timeDone;
       // report connection to the server terminal
       //
       char line[256];
@@ -311,12 +391,11 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	       mysock->getSockId() );
       Exp->my_debug().message( line );
       *Log(Exp->my_log()) << line << ", started at: " 
-			  << asctime( localtime( &timebefore) ) << endl;  
-      
+			  << Timer::now() << endl;  
       signal( SIGPIPE, BrokenPipeChildFun );
+      timeDone.start();
       int nw = ClassifyFromSocket( Exp );
-      time( &timeafter );
-      show_results(  *Log(Exp->my_log()), timebefore, timeafter, nw );
+      show_results(  *Log(Exp->my_log()), timeDone, nw );
       //
       pthread_mutex_lock(&my_lock);
       // use a mutex to update and display the global service counter
