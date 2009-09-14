@@ -60,6 +60,12 @@ namespace Common {
     myTime.tv_usec = div.rem;
   }
 
+  string Timer::now() {
+    time_t now;
+    time( &now );
+    return asctime( localtime( &now ) );
+  }
+
   ostream& operator << ( ostream& os, const Timer& T ){
     ldiv_t div = ldiv( T.myTime.tv_usec, 1000 );
     os << T.myTime.tv_sec << " seconds, " << div.quot << " milliseconds and "

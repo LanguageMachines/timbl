@@ -76,6 +76,8 @@ namespace Common {
       gettimeofday( &startTime, 0 );
     };
     void stop();
+    unsigned int secs() { stop(); return myTime.tv_sec; };
+    static std::string now();
   private:
     timeval startTime;
     timeval myTime;
