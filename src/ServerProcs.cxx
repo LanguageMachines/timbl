@@ -344,10 +344,10 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     }
     else {
       // try oldfashioned 
+      sock->setBlocking();
       sock->write( "Welcome to the Timbl Server\n", 5 );
-      if ( sock->read( Line, 5 ) ){
+      if ( sock->read( Line ) ){
 	*Log(Exp->my_log()) << "FirstLine='" << Line << "'" << endl;
-	sock->setBlocking();
 	return classicClassify( Line, Exp );
       }
     }
