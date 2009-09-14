@@ -333,12 +333,23 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
   int ClassifyFromSocket( TimblExperiment *Exp ){ 
     string Line;
     ServerSocket *sock = Exp->TcpSocket();
-    if ( sock->read( Line ) ){
+    int timeout = 1;
+    sock->setNonBlocking();
+    if ( sock->read( Line, timeout ) ){
       *Log(Exp->my_log()) << "FirstLine='" << Line << "'" << endl;
       if ( Line.find( "HTTP" ) != string::npos )
 	return classifyHttp( Line, Exp );
       else
 	return classicClassify( Line, Exp );
+    }
+    else {
+      // try oldfashioned 
+      sock->write( "Welcome to the Timbl Server\n", 5 );
+      if ( sock->read( Line, 5 ) ){
+	*Log(Exp->my_log()) << "FirstLine='" << Line << "'" << endl;
+	sock->setBlocking();
+	return classicClassify( Line, Exp );
+      }
     }
     *Dbg( Exp->my_debug() ) << "nothing seen on socket" << endl;
     return 0;

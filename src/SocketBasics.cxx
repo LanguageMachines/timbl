@@ -109,7 +109,7 @@ namespace Sockets {
     }
   }
 
-  //#define DEBUG
+//#define DEBUG
 
   void milli_wait( int m_secs ){
     struct timespec tv;
