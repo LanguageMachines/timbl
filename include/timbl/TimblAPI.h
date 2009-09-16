@@ -72,8 +72,10 @@ namespace Timbl{
     TimblAPI( const std::string&,  const std::string& = "" );
     TimblAPI( const TimblAPI& );
     ~TimblAPI();
+    TimblAPI *cloneExp();
     bool Valid() const;
     bool StartServer( const int, const int=10 );
+    bool StartAdvancedServer( const int, const int=10 );
     bool Prepare( const std::string& = "" );
     bool CVprepare( const std::string& = "",
 		    Weighting = GR,
@@ -126,11 +128,13 @@ namespace Timbl{
     bool SetOptions( const std::string& );
     bool SetIndirectOptions( const TimblOpts&  );
     bool Set_Single_Threaded();
+    bool OptIsSet( VerbosityFlags ) const;
     Algorithm Algo() const;
     InputFormatType getInputFormat() const;
     static int Default_Max_Feats();
     bool initExperiment();
   private:
+    TimblAPI();
     TimblAPI& operator=( const TimblAPI& ); // so nobody may use them
     TimblExperiment *pimpl;
     bool i_am_fine;

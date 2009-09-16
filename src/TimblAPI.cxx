@@ -123,9 +123,20 @@ namespace Timbl {
     result->UseOptions( opt );
     return result;
   }
-  
+
   TimblAPI::TimblAPI( const TimblAPI& exp ):
     pimpl( exp.pimpl->splitChild() ), i_am_fine(true) {
+  }
+  
+  TimblAPI::TimblAPI( ):
+    pimpl( 0 ), i_am_fine(false) {
+  }
+  
+  TimblAPI *TimblAPI::cloneExp(){
+    TimblAPI *result = new TimblAPI();
+    result->pimpl = pimpl->CreateClient( 0 );
+    result->i_am_fine = result->pimpl != 0;
+    return result;
   }
   
   TimblAPI::TimblAPI( const TimblOpts *T_Opts,
@@ -662,10 +673,18 @@ namespace Timbl {
     return Valid() && pimpl->StartServer( port, max_c );
   }
   
+  bool TimblAPI::StartAdvancedServer( const int port, const int max_c ){
+    return Valid() && pimpl->StartAdvancedServer( port, max_c );
+  }
+  
   bool TimblAPI::Set_Single_Threaded(){
     return Valid() && pimpl->SetSingleThreaded();
   }
   
+  bool TimblAPI::OptIsSet( VerbosityFlags v ) const {
+    return Valid() && pimpl->Verbosity(v);
+  }
+
   string TimblAPI::VersionInfo( bool full ){
     return Common::VersionInfo( full );
   }
