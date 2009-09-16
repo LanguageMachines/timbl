@@ -100,6 +100,7 @@ namespace Timbl {
     outPath = "";
     logFile = "";
     pidFile = "";
+    serverConfigFile = "";
   }
   
   GetOptClass::GetOptClass( CL_Options& Opts ):
@@ -174,7 +175,8 @@ namespace Timbl {
     parent_socket( in.parent_socket ),
     outPath( in.outPath ),
     logFile( in.logFile ),
-    pidFile( in.pidFile )
+    pidFile( in.pidFile ),
+    serverConfigFile( in.serverConfigFile )
   {
   }
   
@@ -306,6 +308,9 @@ namespace Timbl {
 	    Exp->setPidFile( pidFile );
 	  else
 	    Info( "pidfile option useless (ignored)" );
+	}
+	if ( !serverConfigFile.empty() ){
+	  Exp->setServerConfigFile( serverConfigFile );
 	}
       }
       if ( estimate < 10 )
@@ -659,6 +664,7 @@ namespace Timbl {
 				   const int mode ){
     opt_changed = true;
     //    cerr << "options: " << opts << endl;
+    //    cerr << "mode: " << mode << endl;
     const char *q;
     list<CL_item>::iterator curr_opt;
     curr_opt = opts.Opts->begin();
@@ -718,43 +724,43 @@ namespace Timbl {
       };
       
       try {
-	//	cerr << "try " << option << endl;
-      switch (option) {
-      case 'a': 
-	if ( !stringTo<AlgorithmType>( myoptarg, local_algo ) ){
-	  Error( "illegal -a value: " + myoptarg );
-	  return false;
-	}
-	break;
-
-      case 'b':
-	bootstrap_lines = stringTo<int>( myoptarg );
-	if ( bootstrap_lines < 1 ){
-	  Error( "illegal value for -b option: " + myoptarg );
-	  return false;
-	}
-	break;
-	
-      case 'B':
-	if ( long_option == "Beam" ){
-	  if ( !stringTo<int>( myoptarg, BeamSize ) 
-	       || BeamSize <= 0 ){
-	    Error( "illegal value for -Beam option: " + myoptarg );
+	//       	cerr << "try " << option << endl;
+	switch (option) {
+	case 'a': 
+	  if ( !stringTo<AlgorithmType>( myoptarg, local_algo ) ){
+	    Error( "illegal -a value: " + myoptarg );
 	    return false;
 	  }
-	}
-	else if ( myoptarg.find("eam") != string::npos ){
-	  Error( "invalid option: Did you mean '--B" + myoptarg + "'?" );
-	  return false;
-	}
-	else {
-	  BinSize = stringTo<int>( myoptarg );
-	  if ( BinSize <= 1 ){
-	    Error( "illegal value for -B option: " + myoptarg );
+	  break;
+	  
+	case 'b':
+	  bootstrap_lines = stringTo<int>( myoptarg );
+	  if ( bootstrap_lines < 1 ){
+	    Error( "illegal value for -b option: " + myoptarg );
 	    return false;
 	  }
-	}
-	break;
+	  break;
+	  
+	case 'B':
+	  if ( long_option == "Beam" ){
+	    if ( !stringTo<int>( myoptarg, BeamSize ) 
+		 || BeamSize <= 0 ){
+	      Error( "illegal value for -Beam option: " + myoptarg );
+	      return false;
+	    }
+	  }
+	  else if ( myoptarg.find("eam") != string::npos ){
+	    Error( "invalid option: Did you mean '--B" + myoptarg + "'?" );
+	    return false;
+	  }
+	  else {
+	    BinSize = stringTo<int>( myoptarg );
+	    if ( BinSize <= 1 ){
+	      Error( "illegal value for -B option: " + myoptarg );
+	      return false;
+	    }
+	  }
+	  break;
 	
       case 'c':
 	clip_freq = stringTo<int>( myoptarg );
@@ -991,6 +997,9 @@ namespace Timbl {
 	    return false;
 	  }
 	  do_silly = ( up=="TRUE" || up=="YES" );
+	}
+	else if ( long_option == "serverconfig" ){
+	  serverConfigFile = myoptarg;
 	}
 	else if ( myoptarg.find("loppy") != string::npos 
 		  || myoptarg.find("illy") != string::npos ){
