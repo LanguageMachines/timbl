@@ -462,24 +462,21 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 						   << ", distance " << distance
 						 << endl;
 			  string result = "<?xml version=\"1.0\"?>\r\n";
-			  result += string("<classification><category>") 
+			  result += string("<classification>\r\n <category>") 
 			    + answer + "</category>\r\n";
 			  if ( api->OptIsSet(DISTRIB) ){
-			    result += string("<distribution>") +
+			    result += string(" <distribution>") +
 			      distrib + "</distribution>\r\n";
 			  }
 			  if ( api->OptIsSet(DISTANCE) ){
-			    result += string( "<distance>" ) 
-			      + toString<double>(distance) + "</distance>\r\n";
+			    result += string( " <distance>" ) 
+			      + toString<double>(distance) 
+			      + "</distance>\r\n";
 			  }
 			  if ( api->OptIsSet(NEAR_N) ){
-			    ostringstream tmp;
-			    tmp << "<neighbors>\r\n";
-			    api->ShowBestNeighbors( tmp );
-			    tmp << "</neighbors>\r\n";
-			    result += tmp.str();
+			    result += api->BestNeighborsToXML();
 			  }
-			  result += "</classification>\r\n";
+			  result += "</classification>";
 			  *Log(Mother->my_log()) << "RESULT:" << result << endl;
 			  mysock->write( result + "\r\n" );
 			  

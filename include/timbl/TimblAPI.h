@@ -104,6 +104,7 @@ namespace Timbl{
     bool Classify( const std::string&, std::string&, 
 		   std::string&, double& );
     bool ShowBestNeighbors( std::ostream& ) const;
+    std::string BestNeighborsToXML() const;
     size_t matchDepth() const;
     bool matchedAtLeaf() const;
     std::string ExpName() const;

@@ -54,6 +54,7 @@ namespace Timbl {
     double relativeWeight( unsigned int, const decayStruct& ) const;
     void initNeighborSet( neighborSet& ) const;
     void addToNeighborSet( neighborSet& , size_t ) const;
+    std::string toXML() const;
   private:
     bool _storeInstances;
     bool _showDi;

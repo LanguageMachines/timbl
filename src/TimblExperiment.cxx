@@ -1034,6 +1034,14 @@ namespace Timbl {
       return false;
   }
     
+  string TimblExperiment::bestNeighborsToXML() const {
+    if ( Verbosity( NEAR_N | ALL_K) ){
+      return bestArray.toXML();
+    }
+    else
+      return "";
+  }
+    
   void TimblExperiment::show_results( ostream& outfile, 
 				      const string& dString,
 				      const TargetValue *Best,

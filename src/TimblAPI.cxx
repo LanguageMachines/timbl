@@ -652,6 +652,13 @@ namespace Timbl {
   bool TimblAPI::ShowBestNeighbors( ostream& os ) const{
     return Valid() && pimpl->showBestNeighbors( os );
   }
+
+  string TimblAPI::BestNeighborsToXML() const {
+    if ( Valid() )
+      return pimpl->bestNeighborsToXML();
+    else
+      return "";
+  }
   
   bool TimblAPI::ShowWeights( ostream& os ) const{
     return Valid() && pimpl->ShowWeights( os );
