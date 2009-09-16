@@ -233,7 +233,11 @@ namespace Timbl {
 		  toString(algorithm) );
     }
     *result = *this;
-    string line = "Client on socket: " + toString<int>( socket->getSockId() );
+    string line;
+    if ( socket != 0 )
+      line = "Client on socket: " + toString<int>( socket->getSockId() );
+    else
+      line = "Client without socket.";
 #ifdef USE_LOGSTREAMS
     result->myerr->message( line );
     result->mydebug->message( line );
@@ -319,10 +323,63 @@ namespace Timbl {
     }
   }
   
+  bool TimblExperiment::fillServerConfig(){
+    ifstream is( serverConfigFile.c_str() );
+    if ( !is ){
+      Error( "problem reading " + serverConfigFile );
+      return false;
+    }
+    else {
+      string line;
+      while ( getline( is, line ) ){
+	if ( line.empty() || line[0] == '#' )
+	  continue;
+	string::size_type ispos = line.find('=');
+	if ( ispos == string::npos ){
+	  Error( "invalid entry in: " + serverConfigFile );
+	  Error( "offending line: '" + line + "'" );
+	  return false;
+	}
+	else {
+	  string base = line.substr(0,ispos);
+	  string rest = line.substr( ispos+1 );
+	  if ( !rest.empty() ){
+	    string::size_type spos = 0;
+	    if ( rest[0] == '"' )
+	      spos = 1;
+	    string::size_type epos = rest.length()-1;
+	    if ( rest[epos] == '"' ) 
+	      --epos;
+	    serverConfig[base] = rest.substr( spos, epos );
+	  }
+	}
+      }
+      return true;
+    }
+  }
+  
+  bool TimblExperiment::StartAdvancedServer( const int port, const int max_c ){
+    if ( ConfirmOptions() ){
+      if ( fillServerConfig() ){
+	map<string,string>::const_iterator it = serverConfig.begin();
+	while( it != serverConfig.end() ){
+	  ++it;
+	}
+	max_conn = max_c;
+	RunAdvancedServers( this, port );
+      }
+      Error( "not implemented yet" );
+    }
+    else {
+      Error( "invalid options" );
+    }
+    return false;
+  }
+  
   bool TimblExperiment::StartServer( const int port, const int max_c ){
     initExperiment( true );
-    RunServer( this, port );
     max_conn = max_c;
+    RunServer( this, port );
     return true;
   }
   

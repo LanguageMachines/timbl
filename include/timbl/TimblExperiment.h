@@ -68,6 +68,7 @@ namespace Timbl {
   class TimblExperiment: public MBLClass {
     friend class TimblAPI;
     friend void RunServer( TimblExperiment *, int );
+    friend void RunAdvancedServers( TimblExperiment *, int );
   public:
     virtual ~TimblExperiment();
     virtual bool Learn( const std::string& = "" );
@@ -95,12 +96,15 @@ namespace Timbl {
     bool WriteInstanceBaseLevels( const std::string&, unsigned int );
     bool WriteNamesFile( const std::string& ) const;
     bool StartServer( const int, const int );
+    bool fillServerConfig();
+    bool StartAdvancedServer( const int, const int );
     bool SetSingleThreaded();
     int Estimate() const { return estimate; };
     void Estimate( int e ){ estimate = e; };
     void setOutPath( const std::string& s ){ outPath = s; };
     void setLogFile( const std::string& s ){ logFile = s; };
     void setPidFile( const std::string& s ){ pidFile = s; };
+    void setServerConfigFile( const std::string& s ){ serverConfigFile = s; };
     TimblExperiment *CreateClient( ServerSocket* ) const;
     TimblExperiment *splitChild() const;
     VerbosityFlags ServerVerbosity() { return get_s_verbosity(); };
@@ -209,6 +213,7 @@ namespace Timbl {
     std::string CurrentDataFile;
     std::string logFile;
     std::string pidFile;
+    std::string serverConfigFile;
     std::string WFileName;
     std::string outPath;
     std::string testStreamName;
@@ -221,7 +226,7 @@ namespace Timbl {
     resultStore bestResult;
     size_t match_depth;
     bool last_leaf;
-    
+    std::map<std::string, std::string> serverConfig;
   private:
     TimblExperiment( const TimblExperiment& );
     TimblExperiment& operator=( const TimblExperiment& );

@@ -50,6 +50,7 @@ bool Do_LOO = false;
 bool Do_NS = false;
 bool Do_Indirect = false;
 bool Do_Server = false;
+bool Do_Advanced_Server = false;
 int ServerPort = -1;
 int Max_Connections = 10;
 bool Do_Save_Perc = false;
@@ -109,7 +110,7 @@ inline void usage_full(void){
   cerr << "-w f:n    : read Weight n from file 'f'" << endl;
   cerr << "-b n      : number of lines used for bootstrapping (IB2 only)" 
        << endl;
-  cerr << "-Diversify: rescale weight (see docs)" << endl;
+  cerr << "--Diversify: rescale weight (see docs)" << endl;
   cerr << "-d val    : weight neighbors as function of their distance:" 
        << endl;
   cerr << "     Z      : equal weights to all (default)" << endl;
@@ -145,6 +146,7 @@ inline void usage_full(void){
   cerr << "-i f      : read the InstanceBase from file 'f' "
        << "(skips phase 1 & 2 )"
        << endl;
+  cerr << "--matrixin=<f> read ValueDifference Matrices from file 'f'" << endl;
   cerr << "-u f      : read value_class probabilities from file 'f'" 
        << endl;
   cerr << "-P d      : read data using path 'd'" << endl;
@@ -153,8 +155,9 @@ inline void usage_full(void){
   cerr << "-T n      : use input field 'n' as the target. (default is: the last field)" << endl;
   cerr << "Output options:" << endl;
   cerr << "-e n      : estimate time until n patterns tested" << endl;
-  cerr << "-Beam=<n> : limit +v db output to n highest-vote classes" << endl;
+  cerr << "--Beam=<n> : limit +v db output to n highest-vote classes" << endl;
   cerr << "-I f      : dump the InstanceBase in file 'f'" << endl;
+  cerr << "--matrixout=<f> store ValueDifference Matrices in file 'f'" << endl;
   cerr << "-X f      : dump the InstanceBase as XML in file 'f'" << endl;
   cerr << "-n f      : create names file 'f'" << endl;
   cerr << "-p n      : show progress every n lines (default p = 100,000)" 
@@ -193,8 +196,9 @@ inline void usage_full(void){
   cerr << "-O d      : save output using path 'd'" << endl;
   cerr << "Server options" << endl;
   cerr << "-S <port> : run as a server on <port>" << endl;
-  cerr << "-pidfile=<f> store pid in file <f>" << endl; 
-  cerr << "-logfile=<f> log server activity in file <f>" << endl; 
+  cerr << "--pidfile=<f> store pid in file <f>" << endl; 
+  cerr << "--logfile=<f> log server activity in file <f>" << endl; 
+  cerr << "--serverconfig=<f> read server settings from file <f>" << endl; 
   cerr << "Internal representation options:" << endl;
   cerr << "-B n      : number of bins used for discretization of numeric " 
        << "feature values" << endl;
@@ -349,10 +353,22 @@ void Preset_Values( TimblOpts& Opts ){
   }
   Opts.Add( 'v', "F", true );
   Opts.Add( 'v', "S", false );
+  if ( Opts.Find( "serverconfig", value, mood ) ){
+    if ( Do_LOO || Do_CV || Do_Indirect ){
+      cerr << "Cannot run as a server when -t option is also specified." 
+	   << endl;
+      exit(3);
+    }
+    else {
+      Do_Server = true;
+      Do_Advanced_Server = true;
+    }
+  }
   if ( Opts.Find( 'S', value, mood ) ){
     if ( Do_LOO || Do_CV || Do_Indirect ){
-      cerr << "Cannot run as a server when -t option is also specified.\n" 
-	   << "(-S option will be ignored!)" << endl;
+      cerr << "Cannot run as a server when -t option is also specified." 
+	   << endl;
+      exit(3);
     }
     else {
       Do_Server = true;
@@ -751,38 +767,43 @@ int main(int argc, char *argv[]){
       delete Run;
     }
     else if ( Do_Server ){
-      // Special case:   running a Server
-      if ( !checkInputFile( TreeInFile ) ||
-	   !checkInputFile( dataFile ) ||
-	   !checkInputFile( WgtInFile ) ||
-	   !checkInputFile( MatrixInFile ) ||
-	   !checkInputFile( ProbInFile ) ||
-	   !checkOutputFile( ProbOutFile ) ){
-	delete Run;
-	return 3;
-      }
-      if ( TreeInFile != "" ){
-	if ( !Run->GetInstanceBase( TreeInFile ) ){
-	  return 3;
-	}
+      if ( Do_Advanced_Server ){
+	Run->StartAdvancedServer( ServerPort, Max_Connections );
       }
       else {
-	if ( !Run->Learn( dataFile ) ){
-	  return 3;
+	// Special case:   running a Server
+	if ( !checkInputFile( TreeInFile ) ||
+	     !checkInputFile( dataFile ) ||
+	     !checkInputFile( WgtInFile ) ||
+	     !checkInputFile( MatrixInFile ) ||
+	     !checkInputFile( ProbInFile ) ||
+	     !checkOutputFile( ProbOutFile ) ){
+	  delete Run;
+	return 3;
 	}
+	if ( TreeInFile != "" ){
+	  if ( !Run->GetInstanceBase( TreeInFile ) ){
+	    return 3;
+	  }
+	}
+	else {
+	  if ( !Run->Learn( dataFile ) ){
+	    return 3;
+	  }
+	}
+	if ( WgtInFile != "" ) {
+	  Run->GetWeights( WgtInFile, WgtType );
+	}
+	if ( ProbOutFile != "" )
+	  Run->WriteArrays( ProbOutFile );
+	if ( ProbInFile != "" )
+	  Run->GetArrays( ProbInFile );
+	if ( MatrixInFile != "" ) {
+	  Run->GetMatrices( MatrixInFile );
+	}
+	Run->StartServer( ServerPort, Max_Connections );
+	return 0;
       }
-      if ( WgtInFile != "" ) {
-	Run->GetWeights( WgtInFile, WgtType );
-      }
-      if ( ProbOutFile != "" )
-	Run->WriteArrays( ProbOutFile );
-      if ( ProbInFile != "" )
-	Run->GetArrays( ProbInFile );
-      if ( MatrixInFile != "" ) {
-	Run->GetMatrices( MatrixInFile );
-      }
-      Run->StartServer( ServerPort, Max_Connections );
-      return 0;
     }
     else {
       bool do_test = false;

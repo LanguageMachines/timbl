@@ -60,6 +60,7 @@ typedef std::ostream LogStream;
 #include "timbl/MBLClass.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
+#include "timbl/TimblAPI.h"
 #include "timbl/ServerProcs.h"
 
 using namespace std;
@@ -297,61 +298,14 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     return result;
   }
   
-  int classifyHttp( const string& firstLine, TimblExperiment *Exp ){ 
-    *Log(Exp->my_log()) << "firstLine='" << firstLine << "'" << endl;
-    string::size_type spos = firstLine.find( "GET" );
-    if ( spos != string::npos ){
-      string::size_type epos = firstLine.find( " HTTP" );
-      string line = firstLine.substr( spos+3, epos - spos - 3 );
-      *Log(Exp->my_log()) << "Line='" << line << "'" << endl;
-      epos = line.find( "?" );
-      string basename, command;
-      if ( epos != string::npos ){
- 	basename = line.substr( 0, epos );
- 	command = line.substr( epos+1 );
-	epos = basename.find( "/" );
-	if ( epos != string::npos ){
-	  basename = basename.substr( epos+1 );
-	  epos = command.find( "=" );
-	  if ( epos != string::npos ){
-	    string params = command.substr( epos+1 );
-	    params = urlDecode(params);
-	    command = command.substr( 0, epos );
-	    *Log(Exp->my_log()) << "base='" << basename << "'" << endl;
-	    *Log(Exp->my_log()) << "command='" << command << "'" << endl;
-	    if ( command == "classify" ){
-	      if ( classifyOneLine( Exp, params ) )
-		return 1;
-	    }
-	  }
-	}
-      }
-    }
-    return 0;
-  }
-  
   int ClassifyFromSocket( TimblExperiment *Exp ){ 
     string Line;
     ServerSocket *sock = Exp->TcpSocket();
-    int timeout = 1;
-    sock->setNonBlocking();
-    if ( sock->read( Line, timeout ) ){
+    sock->write( "Welcome to the Timbl Server\n", 5 );
+    if ( sock->read( Line ) ){
       *Log(Exp->my_log()) << "FirstLine='" << Line << "'" << endl;
-      if ( Line.find( "HTTP" ) != string::npos )
-	return classifyHttp( Line, Exp );
-      else
-	return classicClassify( Line, Exp );
+      return classicClassify( Line, Exp );
     }
-    else {
-      // try oldfashioned 
-      sock->setBlocking();
-      sock->write( "Welcome to the Timbl Server\n", 5 );
-      if ( sock->read( Line ) ){
-	*Log(Exp->my_log()) << "FirstLine='" << Line << "'" << endl;
-	return classicClassify( Line, Exp );
-      }
-    }
-    *Dbg( Exp->my_debug() ) << "nothing seen on socket" << endl;
     return 0;
   }
 
@@ -415,6 +369,149 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       // close the socket and exit this thread
       //
       delete Exp;
+    }
+    return NULL;
+  }
+
+
+  struct childArgs{
+    TimblExperiment *Exp;
+    ServerSocket *socket;
+    map<string, TimblAPI*> *experiments;
+  };
+
+  // ***** This is the routine that is executed from a new thread *******
+  void *do_chld2( void *arg ){
+    childArgs *args = (childArgs *)arg;
+    TimblExperiment *Mother = args->Exp;
+    ServerSocket *mysock = args->socket;
+    map<string, TimblAPI*> *experiments = args->experiments;
+    static int service_count=0;
+
+    static pthread_mutex_t my_lock = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_lock(&my_lock);
+    // use a mutex to update the global service counter
+    service_count++;
+    if ( service_count > Mother->Max_Connections() ){
+      mysock->write( "Maximum connections exceeded\n" );
+      mysock->write( "try again later...\n" );
+      pthread_mutex_unlock( &my_lock );
+      cerr << "Thread " << (unsigned int)pthread_self() << " refused " << endl;
+    }
+    else {
+      pthread_mutex_unlock( &my_lock );
+      // process the test material
+      // and do the timing
+      //
+      Timer timeDone;
+      // report connection to the server terminal
+      //
+      char line[256];
+      sprintf( line, "Thread %u, on Socket %d", (unsigned int)pthread_self(),
+	       mysock->getSockId() );
+      Mother->my_debug().message( line );
+      *Log(Mother->my_log()) << line << ", started at: " 
+			     << Timer::now() << endl;  
+      signal( SIGPIPE, BrokenPipeChildFun );
+      timeDone.start();
+      string Line;
+      int timeout = 1;
+      int nw=0;
+      mysock->setNonBlocking();
+      if ( mysock->read( Line, timeout ) ){
+	///	*Log(Mother->my_debug()) << "FirstLine='" << Line << "'" << endl;
+	if ( Line.find( "HTTP" ) != string::npos ){
+	  // skip HTTP header
+	  string tmp;
+	  while ( (mysock->read( tmp, 1 ), !tmp.empty()) ){
+	    //	    cerr << "skip: read:'" << tmp << "'" << endl;;
+	  }
+	  string::size_type spos = Line.find( "GET" );
+	  if ( spos != string::npos ){
+	    string::size_type epos = Line.find( " HTTP" );
+	    string line = Line.substr( spos+3, epos - spos - 3 );
+	    //	    *Log(Mother->my_debug()) << "Line='" << line << "'" << endl;
+	    epos = line.find( "?" );
+	    string basename, command;
+	    if ( epos != string::npos ){
+	      basename = line.substr( 0, epos );
+	      command = line.substr( epos+1 );
+	      epos = basename.find( "/" );
+	      if ( epos != string::npos ){
+		basename = basename.substr( epos+1 );
+		epos = command.find( "=" );
+		if ( epos != string::npos ){
+		  string params = command.substr( epos+1 );
+		  params = urlDecode(params);
+		  command = command.substr( 0, epos );
+		  //		  *Log(Mother->my_debug()) << "base='" << basename << "'" << endl;
+		  //		  *Log(Mother->my_debug()) << "command='" << command << "'" << endl;
+		  map<string,TimblAPI*>::const_iterator it= experiments->find(basename);
+		  if ( it != experiments->end() ){
+		    TimblAPI *api = it->second->cloneExp();
+		    // cloneExp doesn't set the Exp socket. is that a problem?
+		    if ( api ){
+		      if ( command == "classify" ){
+			string distrib, answer; 
+			double distance;
+			*Log(Mother->my_debug()) << "Classify(" << params << ")" << endl;
+			if ( api->Classify( params, answer, distrib, distance ) ){
+			  
+			  *Log(Mother->my_debug()) << "resultaat: " << answer 
+						   << ", distrib: " << distrib
+						   << ", distance " << distance
+						 << endl;
+			  string result = "<?xml version=\"1.0\"?>\r\n";
+			  result += string("<classification><category>") 
+			    + answer + "</category>\r\n";
+			  if ( api->OptIsSet(DISTRIB) ){
+			    result += string("<distribution>") +
+			      distrib + "</distribution>\r\n";
+			  }
+			  if ( api->OptIsSet(DISTANCE) ){
+			    result += string( "<distance>" ) 
+			      + toString<double>(distance) + "</distance>\r\n";
+			  }
+			  if ( api->OptIsSet(NEAR_N) ){
+			    ostringstream tmp;
+			    tmp << "<neighbors>\r\n";
+			    api->ShowBestNeighbors( tmp );
+			    tmp << "</neighbors>\r\n";
+			    result += tmp.str();
+			  }
+			  result += "</classification>\r\n";
+			  *Log(Mother->my_log()) << "RESULT:" << result << endl;
+			  mysock->write( result + "\r\n" );
+			  
+			  ++nw;
+			}
+			else {
+			  *Log(Mother->my_log()) << "FAILED" << endl;
+			}
+		      }
+		    }
+		  }
+		  else {
+		    *Log(Mother->my_log()) << "invalid BASE! '" << basename 
+					   << "'" << endl;
+		    mysock->write( "invalid basename: '" + basename + "'\n", 5 );
+		  }
+		  mysock->write( "\r\n" );
+		}
+	      }
+	    } 
+	  }
+	}
+      }
+      show_results(  *Log(Mother->my_log()), timeDone, nw );
+      //
+      pthread_mutex_lock(&my_lock);
+      // use a mutex to update and display the global service counter
+      *Log(Mother->my_log()) << "Socket Total = " << --service_count << endl;
+      pthread_mutex_unlock(&my_lock);
+      // close the socket and exit this thread
+      delete mysock;
+      //
     }
     return NULL;
   }
@@ -534,6 +631,160 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	*Dbg(Mother->my_debug()) << " Na Create Client " << endl;
 	*Dbg(Chld->my_debug()) << "voor pthread_create " << endl;
 	pthread_create( &chld_thr, &attr, do_chld, (void *)Chld );
+      }
+      // the server is now free to accept another socket request 
+    }
+    pthread_attr_destroy(&attr); 
+  }
+  
+  void RunAdvancedServers( TimblExperiment *Mother, int TCP_PORT ){
+    string logFile =  Mother->logFile;
+    string pidFile =  Mother->pidFile;
+    if ( !pidFile.empty() ){
+      // check validity of pidfile
+      if ( pidFile[0] != '/' ) // make sure the path is absolute
+	pidFile = '/' + pidFile;
+      unlink( pidFile.c_str() ) ;
+      ofstream pid_file( pidFile.c_str() ) ;
+      if ( !pid_file ){
+	*Log(Mother->my_err())<< "unable to create pidfile:"<< pidFile << endl;
+	*Log(Mother->my_err())<< "TimblServer NOT Started" << endl;
+	exit(1);
+      }
+    }
+    if ( !logFile.empty() ){
+      if ( logFile[0] != '/' ) // make sure the path is absolute
+	logFile = '/' + logFile;
+      ostream *tmp = new ofstream( logFile.c_str() );
+      if ( tmp && tmp->good() ){
+	*Log(Mother->my_err()) << "switching logging to file " 
+			       << logFile << endl;
+	Mother->my_log().associate( *tmp );
+	Mother->my_err().associate( *tmp );
+	*Log(Mother->my_log())  << "Started logging " << endl;	
+	*Log(Mother->my_log())  << "Server verbosity " << toString<VerbosityFlags>( Mother->ServerVerbosity()) << endl;	
+      }
+      else {
+	*Log(Mother->my_err()) << "unable to create logfile: " << logFile << endl;
+	*Log(Mother->my_err()) << "not started" << endl;
+	exit(1);
+      }
+    }
+
+    map<string, TimblAPI*> experiments;
+    map<string,string>::const_iterator it = Mother->serverConfig.begin();
+    while ( it != Mother->serverConfig.end() ){
+      TimblOpts opts( it->second );
+      string treeName;
+      string trainName;
+      bool mood;
+      if ( opts.Find( 'f', trainName, mood ) )
+	opts.Delete( 'f' );
+      else if ( opts.Find( 'i', treeName, mood ) )
+	opts.Delete( 'i' );
+      if ( !( treeName.empty() && trainName.empty() ) ){
+	TimblAPI *run = new TimblAPI( &opts, it->first );
+	bool result = false;
+	if ( run && run->Valid() ){
+	  if ( treeName.empty() ){
+	    //	    cerr << "trainName = " << trainName << endl;
+	    result = run->Learn( trainName );
+	  }
+	  else {
+	    //	    cerr << "treeName = " << treeName << endl;
+	    result = run->GetInstanceBase( treeName );
+	  }
+	}
+	if ( result ){
+	  experiments[it->first] = run;
+	  cerr << "started experiment " << it->first 
+	       << " with parameters: " << it->second << endl;
+	}
+	else {
+	  cerr << "FAILED to start experiment " << it->first 
+	       << " with parameters: " << it->second << endl;
+	}
+      }
+      else {
+	cerr << "missing '-i' or '-f' optiion in serverconfig file" << endl;
+      }
+      ++it;
+    }
+    int start = daemon( 0, logFile.empty() );
+
+    if ( start < 0 ){
+      cerr << "failed to daemonize error= " << strerror(errno) << endl;
+      exit(1);
+    };
+    if ( !pidFile.empty() ){
+      // we have a liftoff!
+      // signal it to the world
+      ofstream pid_file( pidFile.c_str() ) ;
+      if ( !pid_file ){
+	*Log(Mother->my_err())<< "unable to create pidfile:"<< pidFile << endl;
+	*Log(Mother->my_err())<< "TimblServer NOT Started" << endl;
+	exit(1);
+      }
+      else {
+	pid_t pid = getpid();
+	pid_file << pid << endl;
+      }
+    }
+    // set the attributes 
+    pthread_attr_t attr;
+    if ( pthread_attr_init(&attr) ||
+	 pthread_attr_setdetachstate( &attr, PTHREAD_CREATE_DETACHED ) ){
+      *Log(Mother->my_err()) << "Threads: couldn't set attributes" << endl;
+      exit(0);
+    }
+    *Log(Mother->my_log()) << "Starting Server on port:" << TCP_PORT << endl;
+
+    pthread_t chld_thr;
+
+    ServerSocket server;
+    string portString = toString<int>(TCP_PORT);
+    if ( !server.connect( portString ) ){
+      *Log(Mother->my_err()) << "failed to start Server: " 
+			     << server.getMessage() << endl;
+      exit(0);
+    }
+
+    if ( !server.listen( 5 ) ) {
+      // maximum of 5 pending requests
+      *Log(Mother->my_err()) << server.getMessage() << endl;
+      exit(0);
+    }
+    
+    int failcount = 0;
+    while( true ){ // waiting for connections loop
+      signal( SIGPIPE, SIG_IGN );
+      ServerSocket *newSocket = new ServerSocket();
+      if ( !server.accept( *newSocket ) ){
+	*Log(Mother->my_err()) << server.getMessage() << endl;
+	if ( ++failcount > 20 ){
+	  *Log(Mother->my_err()) << "accept failcount >20 " << endl;
+	  *Log(Mother->my_err()) << "server stopped." << endl;
+	  exit(EXIT_FAILURE);
+	}
+	else {
+	  continue;  
+	}
+      }
+      else {
+	failcount = 0;
+	*Log(Mother->my_log()) << "Accepting Connection #" 
+			       << newSocket->getSockId()
+			       << " from remote host: " 
+			       << newSocket->getClientName() << endl;
+	// create a new thread to process the incoming request 
+	// (The thread will terminate itself when done processing
+	// and release its socket handle)
+	//
+	childArgs args;
+	args.Exp = Mother;
+	args.socket = newSocket;
+	args.experiments = &experiments;
+	pthread_create( &chld_thr, &attr, do_chld2, (void *)&args );
       }
       // the server is now free to accept another socket request 
     }

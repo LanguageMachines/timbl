@@ -109,7 +109,7 @@ namespace Sockets {
     }
   }
 
-//#define DEBUG
+  //#define DEBUG
 
   void milli_wait( int m_secs ){
     struct timespec tv;
@@ -153,6 +153,9 @@ namespace Sockets {
 	  if ( c == '\n' ){
 	    return true;
 	  }
+	  if ( c == '\r' ){
+	    continue;
+	  }
 	  result += c;
 	}
 	else if ( res == -1 || res == EAGAIN || res == EWOULDBLOCK ){
@@ -186,6 +189,9 @@ namespace Sockets {
       while ( bytes_sent < count ){
 	do {
 	  this_write = ::write(sock, str, count - bytes_sent);
+#ifdef DEBUG
+	  cerr << "write res = " << this_write  << " ( " << strerror(this_write) << ")" << endl;
+#endif
 	} while ( (this_write < 0) && (errno == EINTR) );
 	if (this_write <= 0)
 	  break;
