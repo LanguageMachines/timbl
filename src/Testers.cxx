@@ -178,14 +178,25 @@ namespace Timbl{
     size_t i;
     size_t TrueF;
     for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
+#ifdef DBGTEST
+      cerr << "feature " << TrueF << " (perm=" << permutation[TrueF] 
+	   << ")" << endl;
+#endif
       double result = metricTest[permutation[TrueF]]->test( (*FV)[TrueF],
 							    G[i],
 							    permFeatures[TrueF] );
       distances[i+1] = distances[i] + result;
       if ( distances[i+1] > Threshold ){
+#ifdef DBGTEST
+	cerr << "threshold reached at " << i << " distance=" 
+	     << distances[i+1] << endl;
+#endif
 	return i;
       }
     }
+#ifdef DBGTEST
+    	cerr << "threshold reached at end, distance=" << distances[effSize] << endl;
+#endif
     return effSize;
   }
 
