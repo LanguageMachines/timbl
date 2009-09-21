@@ -257,9 +257,9 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
   int ClassifyFromSocket( TimblExperiment *Exp ){ 
     string Line;
     ServerSocket *sock = Exp->TcpSocket();
-    sock->write( "Welcome to the Timbl Server\n", 5 );
+    sock->write( "Welcome to the Timbl Server.\n", 5 );
     if ( sock->read( Line ) ){
-      *Log(Exp->my_log()) << "FirstLine='" << Line << "'" << endl;
+      //      *Log(Exp->my_log()) << "FirstLine='" << Line << "'" << endl;
       string Command, Param;
       int result = 0;
       bool go_on = true;
@@ -280,7 +280,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	  return result;
 	  break;
 	case Classify:
-	  if ( classifyOneLine( Exp, Line ) )
+	  if ( classifyOneLine( Exp, Param ) )
 	    result++;
 	  go_on = true; // HACK?
 	  break;
