@@ -82,7 +82,10 @@ namespace Timbl {
     *Log(Tmp->my_err()) << "Server Mode not available" << endl;
     return NULL;
   }
-  void RunServer( TimblExperiment *Mother, int ){
+  void RunClassicServer( TimblExperiment *Mother, int ){
+    *Log(Mother->my_err()) << "Server Mode not available" << endl;
+  }
+  void RunHttpServer( TimblExperiment *Mother, int ){
     *Log(Mother->my_err()) << "Server Mode not available" << endl;
   }
   void RunClient( istream&, ostream&, 
@@ -219,53 +222,6 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     }
   }
   
-  int classicClassify( const string& firstLine, TimblExperiment *Exp ){ 
-    string Line = firstLine, Command, Param;
-    int result = 0;
-    bool go_on = true;
-    ServerSocket *sock = Exp->TcpSocket();
-    *Dbg(Exp->my_debug()) << "ClassifyFromSocket: " 
-			  << sock->getSockId() << endl;
-    do {
-      *Dbg(Exp->my_debug()) << "Line='" << Line << "'" << endl;
-      Split( Line, Command, Param );
-      switch ( check_command(Command) ){
-      case Set:
-	go_on = do_command( Param, Exp );
-	break;
-      case Query:
-	go_on = Exp->ShowSettings( *Log(Exp->my_log()) );
-	break;
-      case Exit:
-	go_on = sock->write( "OK" ) && sock->write( " Closing\n" );
-	return result;
-	break;
-      case Classify:
-	if ( classifyOneLine( Exp, Line ) )
-	  result++;
-	go_on = true; // HACK?
-	break;
-      case Comment:
-	go_on = sock->write( "SKIP " ) &&
-	  sock->write( Line ) &&
-	  sock->write( "\n" );
-	break;
-      default:
-	if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	  *Log(Exp->my_log()) << sock->getSockId() << ": Don't understand '" 
-			      << Line << "'" << endl;
-	go_on = sock->write( "ERROR { Illegal instruction:'" ) &&
-	  sock->write( Command ) &&
-	  sock->write( "' in line:" ) &&
-	  sock->write( Line ) &&
-	  sock->write( "}\n" );
-	break;
-      }
-    }
-    while ( go_on && sock->read( Line ) );
-    return result;
-  }
-
 #define IS_DIGIT(x) (((x) >= '0') && ((x) <= '9'))
 #define IS_HEX(x) ((IS_DIGIT(x)) || (((x) >= 'a') && ((x) <= 'f')) || \
             (((x) >= 'A') && ((x) <= 'F')))
@@ -304,11 +260,52 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     sock->write( "Welcome to the Timbl Server\n", 5 );
     if ( sock->read( Line ) ){
       *Log(Exp->my_log()) << "FirstLine='" << Line << "'" << endl;
-      return classicClassify( Line, Exp );
+      string Command, Param;
+      int result = 0;
+      bool go_on = true;
+      *Dbg(Exp->my_debug()) << "ClassifyFromSocket: " 
+			    << sock->getSockId() << endl;
+      do {
+	*Dbg(Exp->my_debug()) << "Line='" << Line << "'" << endl;
+	Split( Line, Command, Param );
+	switch ( check_command(Command) ){
+	case Set:
+	  go_on = do_command( Param, Exp );
+	  break;
+	case Query:
+	  go_on = Exp->ShowSettings( *Log(Exp->my_log()) );
+	  break;
+	case Exit:
+	  go_on = sock->write( "OK" ) && sock->write( " Closing\n" );
+	  return result;
+	  break;
+	case Classify:
+	  if ( classifyOneLine( Exp, Line ) )
+	    result++;
+	  go_on = true; // HACK?
+	  break;
+	case Comment:
+	  go_on = sock->write( "SKIP " ) &&
+	    sock->write( Line ) &&
+	    sock->write( "\n" );
+	  break;
+	default:
+	  if ( Exp->ServerVerbosity() & CLIENTDEBUG )
+	    *Log(Exp->my_log()) << sock->getSockId() << ": Don't understand '" 
+				<< Line << "'" << endl;
+	  go_on = sock->write( "ERROR { Illegal instruction:'" ) &&
+	    sock->write( Command ) &&
+	    sock->write( "' in line:" ) &&
+	    sock->write( Line ) &&
+	    sock->write( "}\n" );
+	  break;
+	}
+      }
+      while ( go_on && sock->read( Line ) );
+      return result;
     }
     return 0;
   }
-
   
   void BrokenPipeChildFun( int Signal ){
     if ( Signal == SIGPIPE ){
@@ -381,7 +378,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
   };
 
   // ***** This is the routine that is executed from a new thread *******
-  void *do_chld2( void *arg ){
+  void *httpChild( void *arg ){
     childArgs *args = (childArgs *)arg;
     TimblExperiment *Mother = args->Exp;
     ServerSocket *mysock = args->socket;
@@ -519,7 +516,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     }
   }
   
-  void RunServer( TimblExperiment *Mother, int TCP_PORT ){
+  void RunClassicServer( TimblExperiment *Mother, int TCP_PORT ){
     string logFile =  Mother->logFile;
     string pidFile =  Mother->pidFile;
     if ( !pidFile.empty() ){
@@ -634,7 +631,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     pthread_attr_destroy(&attr); 
   }
   
-  void RunAdvancedServers( TimblExperiment *Mother, int TCP_PORT ){
+  void RunHttpServer( TimblExperiment *Mother, int TCP_PORT ){
     string logFile =  Mother->logFile;
     string pidFile =  Mother->pidFile;
     if ( !pidFile.empty() ){
@@ -781,7 +778,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	args.Exp = Mother;
 	args.socket = newSocket;
 	args.experiments = &experiments;
-	pthread_create( &chld_thr, &attr, do_chld2, (void *)&args );
+	pthread_create( &chld_thr, &attr, httpChild, (void *)&args );
       }
       // the server is now free to accept another socket request 
     }

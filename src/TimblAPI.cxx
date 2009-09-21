@@ -677,11 +677,11 @@ namespace Timbl {
   }
   
   bool TimblAPI::StartServer( const int port, const int max_c ){
-    return Valid() && pimpl->StartServer( port, max_c );
+    return Valid() && pimpl->StartClassicServer( port, max_c );
   }
   
-  bool TimblAPI::StartAdvancedServer( const int port, const int max_c ){
-    return Valid() && pimpl->StartAdvancedServer( port, max_c );
+  bool TimblAPI::StartHttpServer( const int port, const int max_c ){
+    return Valid() && pimpl->StartHttpServer( port, max_c );
   }
   
   bool TimblAPI::Set_Single_Threaded(){

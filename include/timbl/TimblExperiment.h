@@ -67,8 +67,8 @@ namespace Timbl {
   
   class TimblExperiment: public MBLClass {
     friend class TimblAPI;
-    friend void RunServer( TimblExperiment *, int );
-    friend void RunAdvancedServers( TimblExperiment *, int );
+    friend void RunClassicServer( TimblExperiment *, int );
+    friend void RunHttpServer( TimblExperiment *, int );
   public:
     virtual ~TimblExperiment();
     virtual bool Learn( const std::string& = "" );
@@ -95,9 +95,9 @@ namespace Timbl {
     bool WriteInstanceBaseXml( const std::string& );
     bool WriteInstanceBaseLevels( const std::string&, unsigned int );
     bool WriteNamesFile( const std::string& ) const;
-    bool StartServer( const int, const int );
+    bool StartClassicServer( const int, const int );
     bool fillServerConfig();
-    bool StartAdvancedServer( const int, const int );
+    bool StartHttpServer( const int, const int );
     bool SetSingleThreaded();
     int Estimate() const { return estimate; };
     void Estimate( int e ){ estimate = e; };

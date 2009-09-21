@@ -50,7 +50,7 @@ bool Do_LOO = false;
 bool Do_NS = false;
 bool Do_Indirect = false;
 bool Do_Server = false;
-bool Do_Advanced_Server = false;
+bool Do_Http_Server = false;
 int ServerPort = -1;
 int Max_Connections = 10;
 bool Do_Save_Perc = false;
@@ -361,7 +361,7 @@ void Preset_Values( TimblOpts& Opts ){
     }
     else {
       Do_Server = true;
-      Do_Advanced_Server = true;
+      Do_Http_Server = true;
     }
   }
   if ( Opts.Find( 'S', value, mood ) ){
@@ -767,8 +767,8 @@ int main(int argc, char *argv[]){
       delete Run;
     }
     else if ( Do_Server ){
-      if ( Do_Advanced_Server ){
-	Run->StartAdvancedServer( ServerPort, Max_Connections );
+      if ( Do_Http_Server ){
+	Run->StartHttpServer( ServerPort, Max_Connections );
       }
       else {
 	// Special case:   running a Server

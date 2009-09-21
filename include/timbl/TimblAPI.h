@@ -75,7 +75,7 @@ namespace Timbl{
     TimblAPI *cloneExp();
     bool Valid() const;
     bool StartServer( const int, const int=10 );
-    bool StartAdvancedServer( const int, const int=10 );
+    bool StartHttpServer( const int, const int=10 );
     bool Prepare( const std::string& = "" );
     bool CVprepare( const std::string& = "",
 		    Weighting = GR,

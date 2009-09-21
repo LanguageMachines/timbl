@@ -358,7 +358,7 @@ namespace Timbl {
     }
   }
   
-  bool TimblExperiment::StartAdvancedServer( const int port, const int max_c ){
+  bool TimblExperiment::StartHttpServer( const int port, const int max_c ){
     if ( ConfirmOptions() ){
       if ( fillServerConfig() ){
 	map<string,string>::const_iterator it = serverConfig.begin();
@@ -366,9 +366,8 @@ namespace Timbl {
 	  ++it;
 	}
 	max_conn = max_c;
-	RunAdvancedServers( this, port );
+	RunHttpServer( this, port );
       }
-      Error( "not implemented yet" );
     }
     else {
       Error( "invalid options" );
@@ -376,10 +375,10 @@ namespace Timbl {
     return false;
   }
   
-  bool TimblExperiment::StartServer( const int port, const int max_c ){
+  bool TimblExperiment::StartClassicServer( const int port, const int max_c ){
     initExperiment( true );
     max_conn = max_c;
-    RunServer( this, port );
+    RunClassicServer( this, port );
     return true;
   }
   
