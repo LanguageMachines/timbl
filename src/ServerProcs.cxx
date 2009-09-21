@@ -317,7 +317,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
   }
 
   void show_results(  ostream& os, Timer& timeDone, int nw ){
-    os << "Thread " << (unsigned int)pthread_self() << ", terminated at: " 
+    os << "Thread " << (uintptr_t)pthread_self() << ", terminated at: " 
        << Timer::now()
        << "Total time used in this thread: " 
        << timeDone << ", " << nw << " instances processed " ;
@@ -341,7 +341,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       mysock->write( "Maximum connections exceeded\n" );
       mysock->write( "try again later...\n" );
       pthread_mutex_unlock( &my_lock );
-      cerr << "Thread " << (unsigned int)pthread_self() << " refused " << endl;
+      cerr << "Thread " << (uintptr_t)pthread_self() << " refused " << endl;
     }
     else {
       pthread_mutex_unlock( &my_lock );
@@ -352,7 +352,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       // report connection to the server terminal
       //
       char line[256];
-      sprintf( line, "Thread %u, on Socket %d", (unsigned int)pthread_self(),
+      sprintf( line, "Thread %lu, on Socket %d", (uintptr_t)pthread_self(),
 	       mysock->getSockId() );
       Exp->my_debug().message( line );
       *Log(Exp->my_log()) << line << ", started at: " 
@@ -396,7 +396,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       mysock->write( "Maximum connections exceeded\n" );
       mysock->write( "try again later...\n" );
       pthread_mutex_unlock( &my_lock );
-      cerr << "Thread " << (unsigned int)pthread_self() << " refused " << endl;
+      cerr << "Thread " << (uintptr_t)pthread_self() << " refused " << endl;
     }
     else {
       pthread_mutex_unlock( &my_lock );
@@ -407,7 +407,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       // report connection to the server terminal
       //
       char line[256];
-      sprintf( line, "Thread %u, on Socket %d", (unsigned int)pthread_self(),
+      sprintf( line, "Thread %lu, on Socket %d", (uintptr_t)pthread_self(),
 	       mysock->getSockId() );
       Mother->my_debug().message( line );
       *Log(Mother->my_log()) << line << ", started at: " 
