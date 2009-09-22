@@ -37,6 +37,7 @@
 
 #include "config.h"
 #include "timbl/Types.h"
+#include "timbl/Common.h"
 #include "timbl/SocketBasics.h"
 
 using namespace std;
@@ -111,22 +112,6 @@ namespace Sockets {
 
   //#define DEBUG
 
-  void milli_wait( int m_secs ){
-    struct timespec tv;
-    ldiv_t div = ldiv( m_secs, 1000 );
-    tv.tv_sec = div.quot;               // seconds
-    tv.tv_nsec = div.rem * 1000000;     // nanoseconds
-#ifdef DEBUG
-    cerr << "sleeping for " << div.quot 
-	 << " seconds and " << div.rem << " milli seconds" << endl;
-#endif
-    while ( nanosleep( &tv, &tv ) < 0 ){
-#ifdef DEBUG
-      cerr << "sleeping some more" << endl;
-#endif
-    }
-  }
-
   bool Socket::read( string& result, unsigned int timeout ) {
     // a getline for nonblocking connections.
     // retry for a few special cases until timeout reached.
@@ -159,7 +144,7 @@ namespace Sockets {
 	  result += c;
 	}
 	else if ( res == -1 || res == EAGAIN || res == EWOULDBLOCK ){
-	  milli_wait(100);
+	  Common::milli_wait(100);
 	  if ( ++count == 10 ){
 	    --timeout;
 	    count = 0;
@@ -223,7 +208,7 @@ namespace Sockets {
 	  ++str;
 	}
 	else if ( res == EAGAIN || res == EWOULDBLOCK ){
-	  milli_wait(100);
+	  Common::milli_wait(100);
 	  if ( ++count == 10 ){
 	    --timeout;
 	    count = 0;

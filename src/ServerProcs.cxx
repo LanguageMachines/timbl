@@ -57,6 +57,7 @@ typedef std::ostream LogStream;
 #include "timbl/Statistics.h"
 #include "timbl/BestArray.h"
 #include "timbl/SocketBasics.h"
+#include "timbl/FdStream.h"
 #include "timbl/MBLClass.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
@@ -372,16 +373,19 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 
 
   struct childArgs{
-    TimblExperiment *Exp;
-    ServerSocket *socket;
+    TimblExperiment *Mother;
+    Socket *socket;
     map<string, TimblAPI*> *experiments;
   };
 
   // ***** This is the routine that is executed from a new thread *******
   void *httpChild( void *arg ){
     childArgs *args = (childArgs *)arg;
-    TimblExperiment *Mother = args->Exp;
-    ServerSocket *mysock = args->socket;
+    TimblExperiment *Mother = args->Mother;
+    args->socket->setNonBlocking();
+    int sockId = args->socket->getSockId(); 
+    fdistream is(sockId);
+    fdostream os(sockId);
     map<string, TimblAPI*> *experiments = args->experiments;
     static int service_count=0;
 
@@ -390,10 +394,11 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     // use a mutex to update the global service counter
     service_count++;
     if ( service_count > Mother->Max_Connections() ){
-      mysock->write( "Maximum connections exceeded\n" );
-      mysock->write( "try again later...\n" );
+      os << "Maximum connections exceeded." << endl;
+      os << "try again later..." << endl;
       pthread_mutex_unlock( &my_lock );
-      cerr << "Thread " << (uintptr_t)pthread_self() << " refused " << endl;
+      *Log(Mother->my_log()) << "Thread " << (uintptr_t)pthread_self()
+			     << " refused " << endl;
     }
     else {
       pthread_mutex_unlock( &my_lock );
@@ -405,7 +410,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       //
       char line[256];
       sprintf( line, "Thread %lu, on Socket %d", (uintptr_t)pthread_self(),
-	       mysock->getSockId() );
+	       sockId );
       Mother->my_debug().message( line );
       *Log(Mother->my_log()) << line << ", started at: " 
 			     << Timer::now() << endl;  
@@ -414,13 +419,13 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       string Line;
       int timeout = 1;
       int nw=0;
-      mysock->setNonBlocking();
-      if ( mysock->read( Line, timeout ) ){
+      if ( nb_getline( is, Line, timeout ) ){
 	///	*Log(Mother->my_debug()) << "FirstLine='" << Line << "'" << endl;
 	if ( Line.find( "HTTP" ) != string::npos ){
 	  // skip HTTP header
 	  string tmp;
-	  while ( (mysock->read( tmp, 1 ), !tmp.empty()) ){
+	  timeout = 1;
+	  while ( ( nb_getline( is, tmp, timeout ), !tmp.empty()) ){
 	    //	    cerr << "skip: read:'" << tmp << "'" << endl;;
 	  }
 	  string::size_type spos = Line.find( "GET" );
@@ -441,8 +446,8 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 		  string params = command.substr( epos+1 );
 		  params = urlDecode(params);
 		  command = command.substr( 0, epos );
-		  //		  *Log(Mother->my_debug()) << "base='" << basename << "'" << endl;
-		  //		  *Log(Mother->my_debug()) << "command='" << command << "'" << endl;
+		  *Log(Mother->my_debug()) << "base='" << basename << "'" << endl;
+		  *Log(Mother->my_debug()) << "command='" << command << "'" << endl;
 		  map<string,TimblAPI*>::const_iterator it= experiments->find(basename);
 		  if ( it != experiments->end() ){
 		    TimblAPI *api = it->second->cloneExp();
@@ -475,22 +480,34 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 			  }
 			  result += "</classification>";
 			  *Log(Mother->my_log()) << "RESULT:" << result << endl;
-			  mysock->write( result + "\r\n" );
+			  os << result << "\r" << endl;
 			  
 			  ++nw;
 			}
 			else {
-			  *Log(Mother->my_log()) << "FAILED" << endl;
+			  *Log(Mother->my_log()) << "classification failed"
+						 << endl;
 			}
 		      }
+		      else if ( command == "show" ){
+			if ( params == "settings" ){
+			  api->ShowSettings( os );
+			}
+			else if ( params == "weights" ){
+			  api->ShowWeights( os );
+			}
+		      }
+		      else
+			*Log(Mother->my_log()) << "unknown command: "
+					       << command << endl;
 		    }
 		  }
 		  else {
 		    *Log(Mother->my_log()) << "invalid BASE! '" << basename 
 					   << "'" << endl;
-		    mysock->write( "invalid basename: '" + basename + "'\n", 5 );
+		    os << "invalid basename: '" << basename << "'" << endl;
 		  }
-		  mysock->write( "\r\n" );
+		  os << endl;
 		}
 	      }
 	    } 
@@ -499,12 +516,14 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       }
       show_results(  *Log(Mother->my_log()), timeDone, nw );
       //
+      // close the socket and exit this thread
+      *Log(Mother->my_log()) << "delete socket " << sockId;
+      delete args->socket;
       pthread_mutex_lock(&my_lock);
       // use a mutex to update and display the global service counter
       *Log(Mother->my_log()) << "Socket Total = " << --service_count << endl;
       pthread_mutex_unlock(&my_lock);
-      // close the socket and exit this thread
-      delete mysock;
+      os.flush();
       //
     }
     return NULL;
@@ -776,7 +795,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	// and release its socket handle)
 	//
 	childArgs args;
-	args.Exp = Mother;
+	args.Mother = Mother;
 	args.socket = newSocket;
 	args.experiments = &experiments;
 	pthread_create( &chld_thr, &attr, httpChild, (void *)&args );

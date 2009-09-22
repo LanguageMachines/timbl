@@ -393,7 +393,7 @@ namespace Timbl {
   
   bool MBLClass::ShowOptions( ostream& os ) const{
     bool result = true;
-    if ( is_copy ){
+    if ( is_copy && tcp_socket != 0 ){
       result = tcp_socket->write( "STATUS\n" );
     }
     else
@@ -403,7 +403,7 @@ namespace Timbl {
       ostringstream tmp;
       Options.Show_Options( tmp );
       string tmp_s = tmp.str();
-      if ( is_copy )
+      if ( is_copy && tcp_socket != 0 )
 	result = tcp_socket->write( tmp_s ) &&
 	  tcp_socket->write( "ENDSTATUS\n" );
       else
@@ -414,7 +414,7 @@ namespace Timbl {
   
   bool MBLClass::ShowSettings( ostream& os ) const{
     bool result = true;
-    if ( is_copy ){
+    if ( is_copy && tcp_socket != 0 ){
       result = tcp_socket->write( "STATUS\n" );
     }
     else
@@ -423,7 +423,7 @@ namespace Timbl {
       ostringstream tmp;
       Options.Show_Settings( tmp );
       string tmp_s = tmp.str();
-      if ( is_copy )
+      if ( is_copy && tcp_socket != 0 )
 	result = tcp_socket->write( tmp_s ) &&
 	  tcp_socket->write( "ENDSTATUS\n" );
       else

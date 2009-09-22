@@ -228,6 +228,7 @@ namespace Timbl {
     size_t match_depth;
     bool last_leaf;
     std::map<std::string, std::string> serverConfig;
+
   private:
     TimblExperiment( const TimblExperiment& );
     TimblExperiment& operator=( const TimblExperiment& );

@@ -83,6 +83,7 @@ namespace Common {
     timeval myTime;
   };
 
+  void milli_wait( int );
   
 }
 #endif
