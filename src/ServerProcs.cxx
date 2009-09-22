@@ -515,15 +515,15 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	}
       }
       show_results(  *Log(Mother->my_log()), timeDone, nw );
+      os.flush();
       //
       // close the socket and exit this thread
-      *Log(Mother->my_log()) << "delete socket " << sockId;
       delete args->socket;
+      delete args;
       pthread_mutex_lock(&my_lock);
       // use a mutex to update and display the global service counter
       *Log(Mother->my_log()) << "Socket Total = " << --service_count << endl;
       pthread_mutex_unlock(&my_lock);
-      os.flush();
       //
     }
     return NULL;
@@ -794,11 +794,11 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	// (The thread will terminate itself when done processing
 	// and release its socket handle)
 	//
-	childArgs args;
-	args.Mother = Mother;
-	args.socket = newSocket;
-	args.experiments = &experiments;
-	pthread_create( &chld_thr, &attr, httpChild, (void *)&args );
+	childArgs *args = new childArgs();
+	args->Mother = Mother;
+	args->socket = newSocket;
+	args->experiments = &experiments;
+	pthread_create( &chld_thr, &attr, httpChild, (void *)args );
       }
       // the server is now free to accept another socket request 
     }
