@@ -94,6 +94,7 @@ inline void usage_full(void){
        << endl;
   cerr << "     D: Dot product. (Global only. numeric features implied)" 
        << endl;
+  cerr << "     DC: Dice Coefficient" << endl;
   cerr << "     O: weighted Overlap (default)" << endl;
   cerr << "     L: Levenshtein distance" << endl;
   cerr << "     M: Modified value difference" << endl;
