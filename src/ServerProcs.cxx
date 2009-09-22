@@ -690,6 +690,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	  }
 	}
 	if ( result ){
+	  run->initExperiment();
 	  experiments[it->first] = run;
 	  cerr << "started experiment " << it->first 
 	       << " with parameters: " << it->second << endl;
