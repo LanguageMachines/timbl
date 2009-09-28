@@ -71,6 +71,7 @@ typedef std::ostream LogStream;
 #include "timbl/CommandLine.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
+#include "timbl/XMLtools.h"
 #include "timbl/ServerProcs.h"
 
 namespace Timbl {
@@ -1033,12 +1034,12 @@ namespace Timbl {
       return false;
   }
     
-  string TimblExperiment::bestNeighborsToXML() const {
+  xmlNode *TimblExperiment::bestNeighborsToXML() const {
     if ( Verbosity( NEAR_N | ALL_K) ){
       return bestArray.toXML();
     }
     else
-      return "";
+      return 0;
   }
     
   void TimblExperiment::show_results( ostream& outfile, 
@@ -1893,7 +1894,7 @@ namespace Timbl {
 	  Warning( "unable to write an Instance Base, nothing learned yet" );
 	}
 	else {
-	  InstanceBase->IBtoXML( os );
+	  InstanceBase->toXML( os );
 	}
       }
     }

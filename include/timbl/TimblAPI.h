@@ -37,6 +37,7 @@
 #include "Tree.h"
 #include "Instance.h"
 #include "neighborSet.h"
+#include "XMLtools.h"
 
 namespace Timbl{
   class TimblExperiment;
@@ -104,7 +105,7 @@ namespace Timbl{
     bool Classify( const std::string&, std::string&, 
 		   std::string&, double& );
     bool ShowBestNeighbors( std::ostream& ) const;
-    std::string BestNeighborsToXML() const;
+    xmlNode *BestNeighborsToXML() const;
     size_t matchDepth() const;
     bool matchedAtLeaf() const;
     std::string ExpName() const;

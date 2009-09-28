@@ -69,6 +69,10 @@ AX_OPENMP(
 
 AM_CONDITIONAL( WANT_OMP, test "$OPENMP_CXXFLAGS" != "" )
 
+PKG_CHECK_MODULES([XML2], [libxml-2.0 >= 2.6.16] )
+CXXFLAGS="$CXXFLAGS $XML2_CFLAGS"
+LIBS="$LIBS $XML2_LIBS"
+
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h sys/socket.h sys/time.h sys/timeb.h unistd.h])
 

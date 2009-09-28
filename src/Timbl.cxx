@@ -865,8 +865,8 @@ int main(int argc, char *argv[]){
 	      if ( levelTreeOutFile != "" )
 		Run->WriteInstanceBaseLevels( levelTreeOutFile, 
 					      levelTreeLevel );
-	      if ( XOutFile != "" )
-		Run->WriteInstanceBaseXml( XOutFile );
+	      //	      if ( XOutFile != "" )
+	      //		Run->WriteInstanceBaseXml( XOutFile );
 	    }
 	    else 
 	      do_test = false; // no testing because of problems

@@ -62,6 +62,7 @@ typedef std::ostream LogStream;
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
 #include "timbl/TimblAPI.h"
+#include "timbl/XMLtools.h"
 #include "timbl/ServerProcs.h"
 
 using namespace std;
@@ -463,25 +464,21 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 						   << ", distrib: " << distrib
 						   << ", distance " << distance
 						 << endl;
-			  string result = "<?xml version=\"1.0\"?>\r\n";
-			  result += string("<classification>\r\n <category>") 
-			    + answer + "</category>\r\n";
+			  XmlDoc doc( "classification" );
+			  xmlNode *root = doc.getRoot();
+			  XmlNewChild( root, "category", answer );
 			  if ( api->OptIsSet(DISTRIB) ){
-			    result += string(" <distribution>") +
-			      distrib + "</distribution>\r\n";
+			    XmlNewChild( root, "distribution", distrib );
 			  }
 			  if ( api->OptIsSet(DISTANCE) ){
-			    result += string( " <distance>" ) 
-			      + toString<double>(distance) 
-			      + "</distance>\r\n";
+			    XmlNewChild( root, "distance",
+					 toString<double>(distance) );
 			  }
-			  if ( api->OptIsSet(NEAR_N) ){
-			    result += api->BestNeighborsToXML();
-			  }
-			  result += "</classification>";
-			  *Log(Mother->my_log()) << "RESULT:" << result << endl;
-			  os << result << "\r" << endl;
-			  
+ 			  if ( api->OptIsSet(NEAR_N) ){
+			    xmlNode *nb = api->BestNeighborsToXML();
+			    XmlAddChild( root, nb );
+ 			  }
+			  os << doc << endl;
 			  ++nw;
 			}
 			else {

@@ -39,6 +39,7 @@
 #include "timbl/Tree.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
+#include "timbl/XMLtools.h"
 #include "timbl/IBtree.h"
 
 using namespace std;
@@ -258,16 +259,22 @@ namespace Timbl {
     PersistentDistributions = temp_persist;
   }
   
-  string to_node( const FeatureValue *fv ){
-    return "<feature>" + encode(fv->Name()) + "</feature>";
+  xmlNode *to_node( const FeatureValue *fv ){
+    xmlNode *result = XmlNewNode( "feature" );
+    XmlAddContent( result, encode(fv->Name()) );
+    return result;
   }
 
-  string to_node( const TargetValue *tv ){
-    return "<target>" + encode(tv->Name()) + "</target>";
+  xmlNode *to_node( const TargetValue *tv ){
+    xmlNode *result = XmlNewNode( "target" );
+    XmlAddContent( result, encode(tv->Name()) );
+    return result;
   }
 
-  string to_node( const ValueDistribution *d ){
-    return "<distribution>"+d->ToEncodedString()+"</distribution>";
+  xmlNode *to_node( const ValueDistribution *d ){
+    xmlNode *result = XmlNewNode( "distribution" );
+    XmlAddContent( result, d->ToEncodedString() );
+    return result;
   }
   
   string spaces( int id ){
@@ -287,43 +294,42 @@ namespace Timbl {
     return cnt;
   }
 
-  void write_xml( ostream& os, IBtree *pnt, int id ) {
-    string ind = spaces(id);
+  xmlNode *to_xml( IBtree *pnt ) {
+    xmlNode *nodes = XmlNewNode( "nodes" );
     int cnt = count_next( pnt );
-    os << ind << "<nodes nodecount=\"" << cnt << "\">" << endl;
+    XmlSetAttribute( nodes, "nodecount", toString( cnt ) );
     while ( pnt ){
-      os << ind << " <node>" << endl;
+      xmlNode *node = XmlNewChild( nodes, "node" );
       if ( pnt->FValue )
-	os << ind << "  " << to_node( pnt->FValue ) << endl;
+	XmlAddChild( node, to_node( pnt->FValue ) );
       if ( pnt->TValue )
-	os << ind << "  " << to_node( pnt->TValue ) << endl;
+	XmlAddChild( node, to_node( pnt->TValue ) );
       if ( pnt->link ){
 	if ( pnt->link->FValue )
-	  write_xml( os, pnt->link, id+3 );
+	  XmlAddChild( node, to_xml(pnt->link) );
 	else if ( pnt->link->TDistribution )
-	  os << ind << "  " << to_node( pnt->link->TDistribution ) << endl;
+	  XmlAddChild( node, to_node( pnt->link->TDistribution ) );
       }
       else if ( pnt->TDistribution )
-	os << ind << "  " << to_node( pnt->TDistribution ) << endl;
-      os << ind << " </node>" << endl;
+	XmlAddChild( node, to_node( pnt->TDistribution ) );
       pnt = pnt->next;
     }
-    os << ind << "</nodes>" << endl;
+    return nodes;
   }
 
-  void InstanceBase_base::IBtoXML( ostream &os )  {
+  void InstanceBase_base::toXML( ostream &os )  {
     // save an IBtree for later use.
-    os << "<?xml version=\"1.0\"  encoding=\"UTF-8\" ?>" << endl;
-    os << "<!-- Version " << Version << "\n#\n -->"  << endl;
+    XmlDoc doc( "root" );
+    xmlNode *root = doc.getRoot();
+    XmlAddChild( root, XmlNewComment( "Version " + toString(Version) ) );
     bool dummy;
-    os << "<root>" << endl;
-    os << to_node( TopTarget( dummy ) ) << endl;
+    XmlAddChild( root, to_node( TopTarget( dummy ) ) );
     if ( PersistentDistributions )
-      os << to_node( TopDistribution ) << endl;
+      XmlAddChild( root, to_node( TopDistribution ) );
     IBtree *pnt = InstBase;
-    int indent = 1;
-    write_xml( os, pnt, indent );
-    os << "</root>" << endl;
+    xmlNode *tree = to_xml( pnt );
+    XmlAddChild( root, tree );
+    os << doc << endl;
   }  
   
   string toString( const vector<FeatureValue*> vec ){

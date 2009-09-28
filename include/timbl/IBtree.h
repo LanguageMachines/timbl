@@ -26,6 +26,8 @@
 #ifndef IBtree_H
 #define IBtree_H
 
+#include "timbl/XMLtools.h"
+
 namespace Timbl {
   using Hash::StringHash;
 
@@ -49,7 +51,7 @@ namespace Timbl {
     friend class TRIBL2_InstanceBase;
     friend std::ostream &operator<<( std::ostream&, const IBtree& );
     friend std::ostream &operator<<( std::ostream&, const IBtree * );
-    friend void write_xml( std::ostream& os, IBtree *pnt, int id );
+    friend xmlNode *to_xml( IBtree *pnt );
     friend int count_next( const IBtree * );
   public:
     const TargetValue* targetValue() const { return TValue; };
@@ -125,7 +127,7 @@ namespace Timbl {
     virtual InstanceBase_base *Clone() const = 0;
     void Save( std::ostream &, bool=false );
     void Save( std::ostream &, StringHash *, StringHash *, bool=false );
-    void IBtoXML( std::ostream& );
+    void toXML( std::ostream& );
     void printStatsTree( std::ostream&, unsigned int startLevel );
     virtual bool ReadIB( std::istream&, std::vector<Feature *>&, 
 			 Target *, int );

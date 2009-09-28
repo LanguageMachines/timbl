@@ -26,6 +26,7 @@
 #ifndef BESTARRAY_H
 #define BESTARRAY_H
 
+#include "timbl/XMLtools.h"
 #include "timbl/neighborSet.h"
 
 namespace Timbl {
@@ -54,7 +55,7 @@ namespace Timbl {
     double relativeWeight( unsigned int, const decayStruct& ) const;
     void initNeighborSet( neighborSet& ) const;
     void addToNeighborSet( neighborSet& , size_t ) const;
-    std::string toXML() const;
+    xmlNode *toXML() const;
   private:
     bool _storeInstances;
     bool _showDi;

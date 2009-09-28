@@ -653,13 +653,13 @@ namespace Timbl {
     return Valid() && pimpl->showBestNeighbors( os );
   }
 
-  string TimblAPI::BestNeighborsToXML() const {
+  xmlNode *TimblAPI::BestNeighborsToXML() const {
     if ( Valid() )
       return pimpl->bestNeighborsToXML();
     else
-      return "";
+      return 0;
   }
-  
+
   bool TimblAPI::ShowWeights( ostream& os ) const{
     return Valid() && pimpl->ShowWeights( os );
   }

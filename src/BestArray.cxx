@@ -35,6 +35,7 @@
 #include "timbl/Tree.h"
 #include "timbl/Instance.h"
 #include "timbl/neighborSet.h"
+#include "timbl/XMLtools.h"
 #include "timbl/BestArray.h"
 
 namespace Timbl {
@@ -212,49 +213,44 @@ namespace Timbl {
 		  bestArray[n-1]->aggregateDist );
   }
 
-  string BestArray::toXML() const {
-    string result = "<neighborset>";
+  xmlNode *BestArray::toXML() const {
+    xmlNode *top = XmlNewNode( "neighborset" );
     for ( unsigned int k = 0; k < size; ++k ) {
       BestRec *best = bestArray[k];
       if ( _storeInstances ){
 	size_t totalBests = best->totalBests();
 	if ( totalBests == 0 )
 	  break; // TRIBL algorithms do this!
-	result += string("<neighbors k=\"") + toString(k+1) +
-	  "\" total=\"" + toString(totalBests) + "\" distance=\""
-	  + toString( best->bestDistance ) + "\"";
+	xmlNode *nbs = XmlNewChild( top, "neighbors" );
+	XmlSetAttribute( nbs, "k", toString(k+1) );
+	XmlSetAttribute( nbs, "total", toString(totalBests) );
+	XmlSetAttribute( nbs, "distance", toString( best->bestDistance ) );
 	if ( maxBests < totalBests )
-	  result += " limited=\"" + toString( maxBests ) + "\"";
-	result += ">";
+	  XmlSetAttribute( nbs, "limited", toString( maxBests ) );
 	for ( unsigned int m=0; m < best->bestInstances.size(); ++m ){
-	  result += string("<neighbor><instance>") + best->bestInstances[m]
-	    + "</instance>";
+	  xmlNode *nb = XmlNewChild( nbs, "neighbor" );
+	  XmlNewChild( nb, "instance", best->bestInstances[m] );
 	  if ( _showDb )
-	    result += "<distribution>"
-	      + best->bestDistributions[m]->DistToString()
-	      + "</distribution>";
-	  result += "</neighbor>";
+	    XmlNewChild( nb, "distribution", 
+			 best->bestDistributions[m]->DistToString() );
 	}
-	result += "</neighbors>";
       }
       else { 
 	if ( best->aggregateDist.ZeroDist() )
 	  break;
-	result += string("<neighbors k=\"") + toString(k+1) + "\">";
+	xmlNode *nbs = XmlNewChild( top, "neighbors" );
+	XmlSetAttribute( nbs, "k", toString(k+1) );
 	if ( _showDb ){
-	  result += "<distribution>"
-	    + best->aggregateDist.DistToString()
-	    + "</distribution>";
+	  XmlNewChild( nbs, "distribution", 
+		       best->aggregateDist.DistToString() );
 	}
 	if ( _showDi ){
-	  result += "<distance>" + toString(best->bestDistance)
-	    + "</distance>";
+	  XmlNewChild( nbs, "distance", 
+		       toString(best->bestDistance) );
 	}
-	result += "</neighbors>";
       }
     }
-    result += "</neighborset>";
-    return result;
+    return top;
   }
 
   ostream& operator<< ( ostream& os, const BestArray& bA ){

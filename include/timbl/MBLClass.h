@@ -32,7 +32,6 @@ namespace Timbl {
 
   class InstanceBase_base;
   class TesterClass;
-  class metricTester;
   class Chopper;
 
   class MBLClass {
