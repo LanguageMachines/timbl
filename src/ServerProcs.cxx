@@ -375,8 +375,8 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 
   struct childArgs{
     TimblExperiment *Mother;
-    Socket *socket;
-    map<string, TimblAPI*> *experiments;
+    ServerSocket *socket;
+    map<string, TimblExperiment*> *experiments;
   };
 
   // ***** This is the routine that is executed from a new thread *******
@@ -387,7 +387,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     int sockId = args->socket->getSockId(); 
     fdistream is(sockId);
     fdostream os(sockId);
-    map<string, TimblAPI*> *experiments = args->experiments;
+    map<string, TimblExperiment*> *experiments = args->experiments;
     static int service_count=0;
 
     static pthread_mutex_t my_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -435,26 +435,92 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	    string line = Line.substr( spos+3, epos - spos - 3 );
 	    //	    *Log(Mother->my_debug()) << "Line='" << line << "'" << endl;
 	    epos = line.find( "?" );
-	    string basename, command;
+	    string basename;
 	    if ( epos != string::npos ){
 	      basename = line.substr( 0, epos );
-	      command = line.substr( epos+1 );
+	      string qstring = line.substr( epos+1 );
 	      epos = basename.find( "/" );
 	      if ( epos != string::npos ){
 		basename = basename.substr( epos+1 );
-		epos = command.find( "=" );
-		if ( epos != string::npos ){
-		  string params = command.substr( epos+1 );
-		  params = urlDecode(params);
-		  command = command.substr( 0, epos );
-		  *Log(Mother->my_debug()) << "base='" << basename << "'" << endl;
-		  *Log(Mother->my_debug()) << "command='" << command << "'" << endl;
-		  map<string,TimblAPI*>::const_iterator it= experiments->find(basename);
-		  if ( it != experiments->end() ){
-		    TimblAPI *api = it->second->cloneExp();
-		    // cloneExp doesn't set the Exp socket. is that a problem?
-		    if ( api ){
-		      if ( command == "classify" ){
+		map<string,TimblExperiment*>::const_iterator it= experiments->find(basename);
+		if ( it != experiments->end() ){
+		  TimblExperiment *api = it->second->CreateClient( args->socket );
+		  if ( api ){
+		    XmlDoc doc( "TiMblResult" );
+		    xmlNode *root = doc.getRoot();
+		    XmlSetAttribute( root, "algorithm", toString(api->Algorithm()) );
+		    vector<string> avs;
+		    int avNum = split_at( qstring, avs, "&" );
+		    if ( avNum > 0 ){
+		      multimap<string,string> acts;
+		      for ( int i=0; i < avNum; ++i ){
+			vector<string> parts;
+			int num = split_at( avs[i], parts, "=" );
+			if ( num == 2 ){
+			  acts.insert( make_pair(parts[0], parts[1]) );
+			}
+			else if ( num > 2 ){
+			  string tmp = parts[1];
+			  for( int i=2; i < num; ++i )
+			    tmp += string("=")+parts[i];
+			  acts.insert( make_pair(parts[0], tmp ) );
+			}
+			else {
+			  *Log(Mother->my_log()) << "unknown word in query "
+						 << avs[i] << endl;
+			}
+		      }
+		      typedef multimap<string,string>::const_iterator mmit;
+		      pair<mmit,mmit> range = acts.equal_range( "set" );
+		      mmit it = range.first;
+		      while ( it != range.second ){
+			if ( api->SetOptions( it->second ) ){
+			  *Log(Mother->my_log()) << "set :" << it->second << endl;
+			  if ( !api->ConfirmOptions() ){
+			    os << "set " << it->second << " failed" << endl;
+			  }
+			}
+			else {
+			  *Log(Mother->my_log()) << ": Don't understand set='" 
+						 << it->second << "'" << endl;
+			  os << ": Don't understand set='" 
+			     << it->second << "'" << endl;
+			}
+			++it;
+		      }
+		      range = acts.equal_range( "show" );
+		      it = range.first;
+		      while ( it != range.second ){
+			if ( it->second == "settings" ){
+			  xmlNode *tmp = api->settingsToXML();
+			  XmlAddChild( root, tmp );
+			}
+			else if ( it->second == "weights" ){
+			  xmlNode *tmp = api->weightsToXML();
+			  XmlAddChild( root, tmp );
+			}
+			else 
+			  *Log(Mother->my_log()) << "don't know how to SHOW: " << it->second << endl;
+			
+			++it;
+		      }
+		      range = acts.equal_range( "classify" );
+		      it = range.first;
+		      while ( it != range.second ){
+			string params = it->second;
+			params = urlDecode(params);
+			int len = params.length();
+			if ( len > 2 ){
+			  *Log(Mother->my_debug()) << "params=" << params << endl;
+			  *Log(Mother->my_debug()) << "params[0]='" << params[0] << "'" << endl;
+			  *Log(Mother->my_debug()) << "params[len-1]='" << params[len-1] << "'" << endl;
+			  
+			  if ( ( params[0] == '"' && params[len-1] == '"' )
+			       || ( params[0] == '\'' && params[len-1] == '\'' ) )
+			    params = params.substr( 1, len-2 );
+			}
+			*Log(Mother->my_debug()) << "base='" << basename << "'" << endl;
+			*Log(Mother->my_debug()) << "command='classify'" << endl;
 			string distrib, answer; 
 			double distance;
 			*Log(Mother->my_debug()) << "Classify(" << params << ")" << endl;
@@ -463,41 +529,31 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 			  *Log(Mother->my_debug()) << "resultaat: " << answer 
 						   << ", distrib: " << distrib
 						   << ", distance " << distance
-						 << endl;
-			  XmlDoc doc( "classification" );
-			  xmlNode *root = doc.getRoot();
-			  XmlNewChild( root, "category", answer );
-			  if ( api->OptIsSet(DISTRIB) ){
-			    XmlNewChild( root, "distribution", distrib );
+						   << endl;
+			  
+			  xmlNode *cl = XmlNewChild( root, "classification" );
+			  XmlNewChild( cl, "input", params );
+			  XmlNewChild( cl, "category", answer );
+			  if ( api->Verbosity(DISTRIB) ){
+			    XmlNewChild( cl, "distribution", distrib );
 			  }
-			  if ( api->OptIsSet(DISTANCE) ){
-			    XmlNewChild( root, "distance",
+			  if ( api->Verbosity(DISTANCE) ){
+			    XmlNewChild( cl, "distance",
 					 toString<double>(distance) );
 			  }
- 			  if ( api->OptIsSet(NEAR_N) ){
-			    xmlNode *nb = api->BestNeighborsToXML();
-			    XmlAddChild( root, nb );
- 			  }
-			  os << doc << endl;
-			  ++nw;
+			  if ( api->Verbosity(NEAR_N) ){
+			    xmlNode *nb = api->bestNeighborsToXML();
+			    XmlAddChild( cl, nb );
+			  }
 			}
 			else {
 			  *Log(Mother->my_log()) << "classification failed"
 						 << endl;
 			}
+			++it;
 		      }
-		      else if ( command == "show" ){
-			if ( params == "settings" ){
-			  api->ShowSettings( os );
-			}
-			else if ( params == "weights" ){
-			  api->ShowWeights( os );
-			}
-		      }
-		      else
-			*Log(Mother->my_log()) << "unknown command: "
-					       << command << endl;
 		    }
+		    os << doc << endl;
 		  }
 		  else {
 		    *Log(Mother->my_log()) << "invalid BASE! '" << basename 
@@ -681,7 +737,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       }
     }
 
-    map<string, TimblAPI*> experiments;
+    map<string, TimblExperiment*> experiments;
     map<string,string>::const_iterator it = Mother->serverConfig.begin();
     while ( it != Mother->serverConfig.end() ){
       TimblOpts opts( it->second );
@@ -707,7 +763,8 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	}
 	if ( result ){
 	  run->initExperiment();
-	  experiments[it->first] = run;
+	  experiments[it->first] = run->grabAndDisconnectExp();
+	  delete run;
 	  cerr << "started experiment " << it->first 
 	       << " with parameters: " << it->second << endl;
 	}
@@ -717,7 +774,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	}
       }
       else {
-	cerr << "missing '-i' or '-f' optiion in serverconfig file" << endl;
+	cerr << "missing '-i' or '-f' option in serverconfig file" << endl;
       }
       ++it;
     }

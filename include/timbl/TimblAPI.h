@@ -37,7 +37,6 @@
 #include "Tree.h"
 #include "Instance.h"
 #include "neighborSet.h"
-#include "XMLtools.h"
 
 namespace Timbl{
   class TimblExperiment;
@@ -68,15 +67,22 @@ namespace Timbl{
   };
   
   class TimblAPI {
+    friend class TimblExperiment;
   public:
     TimblAPI( const TimblOpts *, const std::string& = "" );
     TimblAPI( const std::string&,  const std::string& = "" );
     TimblAPI( const TimblAPI& );
     ~TimblAPI();
-    TimblAPI *cloneExp();
     bool Valid() const;
     bool StartServer( const int, const int=10 );
     bool StartHttpServer( const int, const int=10 );
+    TimblExperiment *grabAndDisconnectExp(){
+      TimblExperiment *res = 0;
+      if ( Valid() )
+	res = pimpl;
+      pimpl = 0;
+      return res;
+    }
     bool Prepare( const std::string& = "" );
     bool CVprepare( const std::string& = "",
 		    Weighting = GR,
@@ -105,7 +111,6 @@ namespace Timbl{
     bool Classify( const std::string&, std::string&, 
 		   std::string&, double& );
     bool ShowBestNeighbors( std::ostream& ) const;
-    xmlNode *BestNeighborsToXML() const;
     size_t matchDepth() const;
     bool matchedAtLeaf() const;
     std::string ExpName() const;
@@ -130,7 +135,6 @@ namespace Timbl{
     bool SetOptions( const std::string& );
     bool SetIndirectOptions( const TimblOpts&  );
     bool Set_Single_Threaded();
-    bool OptIsSet( VerbosityFlags ) const;
     Algorithm Algo() const;
     InputFormatType getInputFormat() const;
     static int Default_Max_Feats();

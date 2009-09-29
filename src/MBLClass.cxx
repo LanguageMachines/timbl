@@ -26,9 +26,9 @@
 #include <vector>
 #include <set>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <limits>
-#include <sstream>
 #include <iomanip>
 #include <typeinfo>
 
@@ -165,6 +165,7 @@ namespace Timbl {
   bool MBLClass::SetOption( const string& line ){ 
     bool result = false;
     if ( !ExpInvalid() ){
+      //      Info( "set Option:" + line ); 
       enum SetOptRes opt_res = Options.SetOption( line );
       switch ( opt_res ){
       case Opt_OK: // OK
@@ -481,7 +482,24 @@ namespace Timbl {
   }
   
 #endif // PTHREADS
-  
+
+  xmlNode *MBLClass::settingsToXml() const{
+    ostringstream tmp;
+    Options.Show_Settings( tmp );
+    vector<string> lines;
+    int num = split_at( tmp.str(), lines, "\n" );
+    xmlNode *result = XmlNewNode("settings");
+    for ( int i=0; i < num; ++i ){
+      vector<string> parts;
+      if ( split_at( lines[i], parts, ":" ) ==2 ){
+	string tag = compress( parts[0] );
+	string val = compress( parts[1] );
+	XmlNewChild( result, tag, val );
+      }
+    }
+    return result;
+  }
+
   bool MBLClass::ShowWeights( ostream &os ) const {
     if ( ExpInvalid() )
       return false;

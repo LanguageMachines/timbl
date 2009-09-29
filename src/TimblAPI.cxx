@@ -132,13 +132,6 @@ namespace Timbl {
     pimpl( 0 ), i_am_fine(false) {
   }
   
-  TimblAPI *TimblAPI::cloneExp(){
-    TimblAPI *result = new TimblAPI();
-    result->pimpl = pimpl->CreateClient( 0 );
-    result->i_am_fine = result->pimpl != 0;
-    return result;
-  }
-  
   TimblAPI::TimblAPI( const TimblOpts *T_Opts,
 		      const string& name ):
     pimpl(), i_am_fine(false) {
@@ -653,13 +646,6 @@ namespace Timbl {
     return Valid() && pimpl->showBestNeighbors( os );
   }
 
-  xmlNode *TimblAPI::BestNeighborsToXML() const {
-    if ( Valid() )
-      return pimpl->bestNeighborsToXML();
-    else
-      return 0;
-  }
-
   bool TimblAPI::ShowWeights( ostream& os ) const{
     return Valid() && pimpl->ShowWeights( os );
   }
@@ -688,10 +674,6 @@ namespace Timbl {
     return Valid() && pimpl->SetSingleThreaded();
   }
   
-  bool TimblAPI::OptIsSet( VerbosityFlags v ) const {
-    return Valid() && pimpl->Verbosity(v);
-  }
-
   string TimblAPI::VersionInfo( bool full ){
     return Common::VersionInfo( full );
   }

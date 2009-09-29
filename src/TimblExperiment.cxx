@@ -1739,6 +1739,25 @@ namespace Timbl {
 	     MBLClass::ShowSettings( os ) );
   }
 
+  xmlNode *TimblExperiment::settingsToXML(){
+    if ( ConfirmOptions() )
+      return MBLClass::settingsToXml( );
+    else
+      return 0;
+  }
+
+  xmlNode *TimblExperiment::weightsToXML(){
+    xmlNode *result = XmlNewNode( "currentWeights" );
+    XmlSetAttribute( result, "weighting", toString( CurrentWeighting() ) );
+    vector<double> wghts;
+    GetCurrentWeights( wghts );
+    for ( unsigned int i=0; i < wghts.size(); ++i ){
+      xmlNode *n = XmlNewChild( result, "feature", toString(wghts[i]) );
+      XmlSetAttribute( n, "index", toString(i+1) );
+    }
+    return result;
+  }
+
   bool TimblExperiment::WriteArrays( const std::string& FileName ){
     ofstream out( FileName.c_str(), ios::out | ios::trunc );
     if ( !out ) {

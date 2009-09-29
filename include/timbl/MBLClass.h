@@ -26,6 +26,8 @@
 #ifndef MBLCLASS_H
 #define MBLCLASS_H
 
+typedef struct _xmlNode xmlNode;
+
 namespace Timbl {
   using namespace Common;
   using namespace Sockets;
@@ -38,6 +40,8 @@ namespace Timbl {
   public:
     bool SetOption( const std::string& );
     bool ShowSettings( std::ostream& ) const;
+    xmlNode *settingsToXml() const;
+    bool ShowWeights( std::ostream& ) const;
     LogStream& my_err() const { return *myerr; };
     LogStream& my_log() const { return *mylog; };
     LogStream& my_debug() const { return *mydebug; };
@@ -60,7 +64,6 @@ namespace Timbl {
     bool ShowOptions( std::ostream& ) const;
     void writePermutation( std::ostream& ) const;
     void LearningInfo( std::ostream& );
-    bool ShowWeights( std::ostream& ) const;
     MBLClass( const std::string& = "" );
     virtual ~MBLClass();
     void InitClass( const size_t );

@@ -125,8 +125,10 @@ namespace Timbl {
     bool SaveWeights( const std::string& );
     bool GetWeights( const std::string&, WeightType );
     bool GetCurrentWeights( std::vector<double>& );
+    xmlNode *weightsToXML();
     bool ShowOptions( std::ostream& );
     bool ShowSettings( std::ostream& );
+    xmlNode *settingsToXML();
     bool showBestNeighbors( std::ostream& ) const;
     xmlNode *bestNeighborsToXML() const;
     bool showStatistics( std::ostream& ) const;
