@@ -674,14 +674,46 @@ namespace Timbl {
     chi_square(0.0),
     shared_variance(0.0),
     matrix_clip_freq(10),
-    n_dot_j(NULL),
-    n_i_dot(NULL),
+    n_dot_j( 0 ),
+    n_i_dot( 0 ),
     n_min (0.0),
     n_max (0.0),
     SaveSize(0),
     SaveNum(0),
     weight(0.0)
   {}
+
+  Feature::Feature( const Feature& in ): BaseFeatTargClass( in ){
+    *this = in;
+  }
+  
+  Feature& Feature::operator=( const Feature& in ){
+    if ( this != &in ){
+      metric_matrix = 0;
+      metric = 0;
+      //      setMetricType( in.getMetricType() );
+      ignore = in.ignore;
+      numeric = in.numeric;
+      vcpb_read = in.vcpb_read;
+      PrestoreStatus = ps_undef;
+      Prestored_metric = UnknownMetric;
+      entropy = in.entropy;
+      info_gain = in.info_gain;
+      split_info = in.split_info;
+      gain_ratio = in.gain_ratio;
+      chi_square = in.chi_square;
+      shared_variance = in.shared_variance;
+      matrix_clip_freq = in.matrix_clip_freq;
+      n_dot_j = in.n_dot_j;
+      n_i_dot = in.n_i_dot;
+      n_min = in.n_min;
+      n_max = in.n_max;
+      SaveSize = in.SaveSize;
+      SaveNum = in.SaveNum;
+      weight = in.weight;
+    }
+    return *this;
+  }
   
   void Feature::InitSparseArrays(){
     // Loop over all values.
@@ -1343,6 +1375,14 @@ namespace Timbl {
     TokenTree( T ){
   }
   
+  BaseFeatTargClass::BaseFeatTargClass( const BaseFeatTargClass& in ):
+    CurSize( in.CurSize ),
+    Increment( in.Increment ),
+    TokenTree( in.TokenTree ){
+    ValuesArray = in.ValuesArray;
+    ValuesMap = in.ValuesMap;
+  }
+  
   BaseFeatTargClass::~BaseFeatTargClass(){
     VCarrtype::iterator it = ValuesArray.begin();
     while ( it != ValuesArray.end() ){
@@ -1434,7 +1474,7 @@ namespace Timbl {
   void Feature::SharedVarianceStatistics( Target *Targ, int eff_cnt ){
     size_t NumInst = Targ->TotalValues();
     int NumCats = Targ->EffectiveValues();
-    int k = min( NumCats, eff_cnt ) - 1 ;
+    int k = min( NumCats, eff_cnt ) - 1;
     if ( k == 0 || NumInst == 0 )
       shared_variance = 0;
     else
@@ -1456,7 +1496,9 @@ namespace Timbl {
       metric = getMetricClass(M); 
       return true;
     }
-    return false;
+    else {
+      return false;
+    }
   };
   
   MetricType Feature::getMetricType() const { return metric->type(); };

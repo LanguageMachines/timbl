@@ -446,6 +446,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 		if ( it != experiments->end() ){
 		  TimblExperiment *api = it->second->CreateClient( args->socket );
 		  if ( api ){
+		    api->setExpName(string("exp-")+toString(sockId) );
 		    XmlDoc doc( "TiMblResult" );
 		    xmlNode *root = doc.getRoot();
 		    XmlSetAttribute( root, "algorithm", toString(api->Algorithm()) );

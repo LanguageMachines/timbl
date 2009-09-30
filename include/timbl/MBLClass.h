@@ -49,6 +49,8 @@ namespace Timbl {
       return verbosity & v; };
     void SetVerbosityFlag( VerbosityFlags v ) { verbosity |= v; };
     void ResetVerbosityFlag( VerbosityFlags v ) { verbosity &= ~v; };
+    bool MBLInit() const { return MBL_init; };
+    void MBLInit( bool b ) { MBL_init = b; };
   protected:
     enum PhaseValue { TrainWords, LearnWords, TestWords, TrainLearnWords };
     friend std::ostream& operator<< ( std::ostream&, const PhaseValue& );
@@ -125,8 +127,6 @@ namespace Timbl {
     ServerSocket *Socket() const { return tcp_socket; };
     int Progress() const { return progress; };
     void Progress( int p ){ progress =  p; };
-    bool MBLInit() const { return MBL_init; };
-    void MBLInit( bool b ) { MBL_init = b; };
     Target   *Targets;
     std::vector<Feature *> Features;
     std::vector<Feature *> PermFeatures;

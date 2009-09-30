@@ -294,30 +294,33 @@ namespace Timbl {
 	if ( Verbosity(ADVANCED_STATS) )
 	  confusionInfo = new ConfusionMatrix( Targets->ValuesArray.size() );
 	initDecay();
-	if ( !is_copy ){
-	  calculate_fv_entropy( true );
-	  if ( ib2_offset != 0 ){
-	    // invalidate MVDM matrices, they might be changing in size
-	    for ( size_t j=0; j < NumOfFeatures(); ++j ){
-	      if ( !Features[j]->Ignore() ){
-		Features[j]->delete_matrix();
-	      }
+	calculate_fv_entropy( true );
+	if ( ib2_offset != 0 ){
+	  //
+	  // isn't this obsolete for the new IB2 implementation?
+	  //
+	  // invalidate MVDM matrices, they might be changing in size
+	  for ( size_t j=0; j < NumOfFeatures(); ++j ){
+	    if ( !Features[j]->Ignore() ){
+	      Features[j]->delete_matrix();
 	    }
 	  }
-	  if ( initProbabilityArrays( all_vd ) )
-	    calculatePrestored();
-	  else {
-	    Error( string("not enough memory for Probability Arrays")
-		   + "' in (" 
-		   + __FILE__  + "," + toString(__LINE__) + ")\n"
-		   + "ABORTING now" );
-	    throw std::bad_alloc();
-	  }
+	}
+	if ( initProbabilityArrays( all_vd ) )
+	  calculatePrestored();
+	else {
+	  Error( string("not enough memory for Probability Arrays")
+		 + "' in (" 
+		 + __FILE__  + "," + toString(__LINE__) + ")\n"
+		 + "ABORTING now" );
+	  throw std::bad_alloc();
+	}
+	if (!is_copy ){
 	  InitWeights();
 	  if ( do_diversify )
 	    diverseWeights();
-	  srand( random_seed );
 	}
+	srand( random_seed );
 	initTesters();
 	MBL_init = true;
       }

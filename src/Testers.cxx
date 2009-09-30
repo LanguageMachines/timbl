@@ -129,6 +129,9 @@ namespace Timbl{
 			    const vector<size_t>& perm ):
     _size(feat.size()), features(feat), permutation(perm) {
     permFeatures.resize(_size,0);
+#ifdef DBGTEST
+    cerr << "created TesterClass(" << _size << ")" << endl;
+#endif
     for ( size_t j=0; j < _size; ++j ){
       permFeatures[j] = feat[perm[j]];
     }
@@ -138,6 +141,9 @@ namespace Timbl{
   void TesterClass::init( const Instance& inst,
 			  size_t effective, 
 			  size_t offset ){
+#ifdef DBGTEST
+    cerr << "tester Initialized!" << endl;
+#endif
     effSize = effective-offset;
     offSet = offset;
     FV = &inst.FV;
@@ -161,14 +167,29 @@ namespace Timbl{
     for ( size_t i=0; i < _size; ++i ){
       delete metricTest[i];
       metricTest[i] = 0;
+#ifdef DBGTEST
+      cerr << "set metric[" << i+1 << "]=" << toString(features[i]->getMetricType()) << endl;
+#endif
       if ( features[i]->Ignore() )
 	continue;
-      if ( features[i]->isStorableMetric() )
+      if ( features[i]->isStorableMetric() ){
+#ifdef DBGTEST
+	cerr << "created  valueDiffTestFunction " << endl;
+#endif
  	metricTest[i] = new valueDiffTestFunction( mvdmThreshold );
-      else if ( features[i]->isNumerical() )
+      }
+      else if ( features[i]->isNumerical() ){
+#ifdef DBGTEST
+	cerr << "created numericOverlapTestFunction " << endl;
+#endif
 	metricTest[i] = new numericOverlapTestFunction();
-      else
+      }
+      else {
+#ifdef DBGTEST
+	cerr << "created overlapFunction " << endl;
+#endif
 	metricTest[i] = new overlapTestFunction();
+      }
     }
   }  
 

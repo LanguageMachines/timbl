@@ -217,8 +217,8 @@ namespace Timbl {
     int CurSize;
     int Increment;
     StringHash *TokenTree;
-  private:
     BaseFeatTargClass( const BaseFeatTargClass& );
+  private:
     BaseFeatTargClass& operator=( const BaseFeatTargClass& );
   };
   
@@ -238,6 +238,7 @@ namespace Timbl {
   class metricClass;
 
   class Feature: public BaseFeatTargClass {
+    friend class MBLClass;
   public:
     Feature( int a, int b, StringHash *T );
     ~Feature();

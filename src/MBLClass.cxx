@@ -279,6 +279,10 @@ namespace Timbl {
       decay = 0;
       Features  = m.Features;
       PermFeatures = m.PermFeatures;
+      for ( unsigned int i=0; i < Features.size(); ++i ){
+	Features[i] = new Feature( *m.Features[i] );
+	PermFeatures[i] = new Feature( *m.PermFeatures[i] );
+      }
       Targets   = m.Targets;
       err_count = 0;
       MBL_init = false;
@@ -311,9 +315,6 @@ namespace Timbl {
     CurrInst.clear();
     if ( !is_copy ){
       delete InstanceBase;
-      for ( unsigned int i=0; i < Features.size(); ++i ){
-	delete Features[i];
-      }
       delete Targets;
       delete TargetStrings;
       delete FeatureStrings;
@@ -323,6 +324,10 @@ namespace Timbl {
     }
     else {
       InstanceBase->CleanPartition( false );
+      for ( unsigned int i=0; i < Features.size(); ++i ){
+	delete Features[i];
+	delete PermFeatures[i];
+      }
     }
     delete tcp_socket;
     delete GlobalMetric;
@@ -946,10 +951,10 @@ namespace Timbl {
     For mvd metric.
   */
   void MBLClass::calculatePrestored(){
-    for ( size_t j = tribl_offset; j < effective_feats; ++j ) {
-      if ( !PermFeatures[j]->Ignore() && 
-	   PermFeatures[j]->isStorableMetric() ){
-	PermFeatures[j]->store_matrix( mvd_threshold );
+    for ( size_t j = 0; j < num_of_features; ++j ) {
+      if ( !Features[j]->Ignore() && 
+	   Features[j]->isStorableMetric() ){
+	Features[j]->store_matrix( mvd_threshold );
       }
     } // j
     if ( Verbosity(VD_MATRIX) ) 
