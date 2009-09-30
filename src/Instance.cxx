@@ -1372,7 +1372,8 @@ namespace Timbl {
   BaseFeatTargClass::BaseFeatTargClass( int Size, int Inc, StringHash *T ):
     CurSize( Size ),
     Increment( Inc ),
-    TokenTree( T ){
+    TokenTree( T ),
+    is_copy(false){
   }
   
   BaseFeatTargClass::BaseFeatTargClass( const BaseFeatTargClass& in ):
@@ -1381,13 +1382,16 @@ namespace Timbl {
     TokenTree( in.TokenTree ){
     ValuesArray = in.ValuesArray;
     ValuesMap = in.ValuesMap;
+    is_copy = true;
   }
   
   BaseFeatTargClass::~BaseFeatTargClass(){
-    VCarrtype::iterator it = ValuesArray.begin();
-    while ( it != ValuesArray.end() ){
-      delete *it;
-      ++it;
+    if ( !is_copy ){
+      VCarrtype::iterator it = ValuesArray.begin();
+      while ( it != ValuesArray.end() ){
+	delete *it;
+	++it;
+      }
     }
   }
   

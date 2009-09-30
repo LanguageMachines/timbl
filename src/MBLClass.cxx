@@ -324,10 +324,10 @@ namespace Timbl {
     }
     else {
       InstanceBase->CleanPartition( false );
-      for ( unsigned int i=0; i < Features.size(); ++i ){
-	delete Features[i];
-	delete PermFeatures[i];
-      }
+//       for ( unsigned int i=0; i < Features.size(); ++i ){
+// 	delete Features[i];
+// 	delete PermFeatures[i];
+//       }
     }
     delete tcp_socket;
     delete GlobalMetric;

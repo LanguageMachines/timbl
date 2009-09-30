@@ -217,6 +217,7 @@ namespace Timbl {
     int CurSize;
     int Increment;
     StringHash *TokenTree;
+    bool is_copy;
     BaseFeatTargClass( const BaseFeatTargClass& );
   private:
     BaseFeatTargClass& operator=( const BaseFeatTargClass& );
