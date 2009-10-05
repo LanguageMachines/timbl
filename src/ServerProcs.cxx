@@ -558,6 +558,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 		    cerr << "THE DOCUMENT for sending!" << endl << tmp << endl;
 		    int timeout=10;
 		    nb_putline( os, tmp , timeout );
+		    delete api;
 		  }
 		  else {
 		    *Log(Mother->my_log()) << "invalid BASE! '" << basename 

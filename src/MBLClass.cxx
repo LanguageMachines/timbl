@@ -318,6 +318,7 @@ namespace Timbl {
       delete Targets;
       delete TargetStrings;
       delete FeatureStrings;
+      delete tcp_socket;
     }
     else if ( is_synced ){
       delete InstanceBase;
@@ -331,7 +332,6 @@ namespace Timbl {
 	delete PermFeatures[i];
       }
     }
-    delete tcp_socket;
     delete GlobalMetric;
     delete tester;
     delete decay;
