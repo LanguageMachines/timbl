@@ -160,6 +160,9 @@ namespace Timbl{
 				  const vector<size_t>& perm,
 				  int mvdmThreshold ): 
     TesterClass( feat, perm ){
+#ifdef DBGTEST
+    cerr << "create a tester with treshold = " << mvdmThreshold << endl;
+#endif
     metricTest = new metricTestFunction*[_size];
     for ( size_t j=0; j < _size; ++j ){
       metricTest[j] = 0;

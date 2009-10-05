@@ -13,11 +13,11 @@ XmlDoc::~XmlDoc(){
   xmlFreeDoc( the_doc );
 }
 
-string XmlDoc::toString() const {
+const string XmlDoc::toString() const {
   xmlChar *buf; 
   int size;
   xmlDocDumpMemory( the_doc, &buf, &size );
-  string result = string( (const char *)buf, size );
+  const string result = string( (const char *)buf, size );
   xmlFree( buf );
   return result;
 }

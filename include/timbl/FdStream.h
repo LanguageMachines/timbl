@@ -67,5 +67,5 @@ class fdistream: public std::istream {
 };
 
 bool nb_getline( std::istream&, std::string&, int& );
-bool nb_putline( std::ostream&, std::string&, int& );
+bool nb_putline( std::ostream&, const std::string&, int& );
 #endif

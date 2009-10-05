@@ -951,12 +951,18 @@ namespace Timbl {
     For mvd metric.
   */
   void MBLClass::calculatePrestored(){
-    for ( size_t j = 0; j < num_of_features; ++j ) {
-      if ( !Features[j]->Ignore() && 
-	   Features[j]->isStorableMetric() ){
-	Features[j]->store_matrix( mvd_threshold );
+    for ( size_t j = tribl_offset; j < effective_feats; ++j ) {
+      if ( !PermFeatures[j]->Ignore() && 
+	   PermFeatures[j]->isStorableMetric() ){
+	PermFeatures[j]->store_matrix( mvd_threshold );
       }
-    } // j
+    }
+    //    for ( size_t j = 0; j < num_of_features; ++j ) {
+    //      if ( !Features[j]->Ignore() && 
+    //	   Features[j]->isStorableMetric() ){
+    //	Features[j]->store_matrix( mvd_threshold );
+    //      }
+    //    } // j
     if ( Verbosity(VD_MATRIX) ) 
       for ( size_t i = 0; i < num_of_features; ++i )
 	if ( !Features[i]->Ignore() ){

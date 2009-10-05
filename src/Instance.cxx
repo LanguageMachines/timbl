@@ -1067,14 +1067,18 @@ namespace Timbl {
   double Feature::fvDistance( FeatureValue *F, FeatureValue *G, 
 			      size_t limit ) const {
     bool dummy;
-    if ( F == G )
-      return 0.0;
-    else if ( metric->isStorable() && matrixPresent( dummy )&&
-	      F->ValFreq() >= matrix_clip_freq &&
-	      G->ValFreq() >= matrix_clip_freq )
-      return metric_matrix->Extract( F, G );
-    else
-      return metric->distance( F, G, limit );
+    double result = 0.0;
+    if ( F != G ){
+      if ( metric->isStorable() && matrixPresent( dummy )&&
+	   F->ValFreq() >= matrix_clip_freq &&
+	   G->ValFreq() >= matrix_clip_freq ){
+	result = metric_matrix->Extract( F, G );
+      }
+      else {
+	result = metric->distance( F, G, limit );
+      }
+    }
+    return result;
   }
   
   ostream& operator<<(ostream& os, const ValueDistribution& vd ) {

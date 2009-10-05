@@ -23,7 +23,7 @@ class XmlDoc {
   void setRoot( xmlNode* );
   xmlNode *getRoot() const;
   xmlNode *MakeRoot( const std::string& );
-  std::string toString() const;
+  const std::string toString() const;
  private:
   xmlDoc *the_doc;
 };

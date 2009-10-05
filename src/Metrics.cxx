@@ -44,6 +44,8 @@ using namespace std;
 using Common::Epsilon;
 using Common::Log2;
 
+//#define METRIC_DEBUG
+
 namespace Timbl{
 
   double lv_distance( const string& source, const string& target ){
@@ -297,6 +299,11 @@ namespace Timbl{
     if ( G != F ){
       if ( F->ValFreq() < limit ||
 	   G->ValFreq() < limit ){
+#ifdef METRIC_DEBUG
+	cerr << "result = 1.0 vanwege F.valFreq=" <<  F->ValFreq()
+	     << " en G.valFreq()=" << G ->ValFreq() 
+	     << " met limiet= " << limit << endl;
+#endif
 	result = 1.0;
       }
       else {
@@ -307,29 +314,19 @@ namespace Timbl{
   }
 
   double LevenshteinMetric::distance( FeatureValue *F, FeatureValue *G, 
-				      size_t limit ) const {
+				      size_t ) const {
     double result = 0.0;
     if ( G != F ){
-      if ( F->ValFreq() < limit ||
-	   G->ValFreq() < limit ){
-	result = 1.0;
-      }
-      else
-	result = lv_distance( F->Name(), G->Name() );
+      result = lv_distance( F->Name(), G->Name() );
     }
     return result;
   }  
 
   double DiceMetric::distance( FeatureValue *F, FeatureValue *G, 
-			       size_t limit ) const {
+			       size_t ) const {
     double result = 0.0;
     if ( G != F ){
-      if ( F->ValFreq() < limit ||
-	   G->ValFreq() < limit ){
-	result = 1.0;
-      }
-      else
-	result = dc_distance( F->Name(), G->Name() );
+      result = dc_distance( F->Name(), G->Name() );
     }
     return result;
   }
@@ -340,6 +337,11 @@ namespace Timbl{
     if ( G != F ){
       if ( F->ValFreq() < limit ||
 	   G->ValFreq() < limit ){
+#ifdef METRIC_DEBUG
+	cerr << "result = 1.0 vanwege F.valFreq=" <<  F->ValFreq()
+	     << " en G.valFreq()=" << G ->ValFreq() 
+	     << " met limiet= " << limit << endl;
+#endif
 	result = 1.0;
       }
       else
