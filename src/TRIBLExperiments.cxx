@@ -248,6 +248,7 @@ namespace Timbl {
 	    Res = Res2;
 	  }
 	  else {
+	    delete ResultDist2;
 	    bestResult.addDisposable( ResultDist1 );
 	  }
 	}

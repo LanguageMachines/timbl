@@ -318,7 +318,6 @@ namespace Timbl {
       delete Targets;
       delete TargetStrings;
       delete FeatureStrings;
-      delete tcp_socket;
     }
     else if ( is_synced ){
       delete InstanceBase;
@@ -336,6 +335,7 @@ namespace Timbl {
     delete tester;
     delete decay;
     delete ChopInput;
+    delete tcp_socket;
 #ifndef USE_LOGSTREAMS
 #else
     delete mylog;
