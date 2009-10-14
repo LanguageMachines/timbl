@@ -318,12 +318,16 @@ namespace Timbl {
       delete Targets;
       delete TargetStrings;
       delete FeatureStrings;
-    }
-    else if ( is_synced ){
-      delete InstanceBase;
+      delete tcp_socket;
     }
     else {
-      InstanceBase->CleanPartition( false );
+      tcp_socket = 0;
+      if ( is_synced ){
+	delete InstanceBase;
+      }
+      else {
+	InstanceBase->CleanPartition( false );
+      }
     }
     for ( unsigned int i=0; i < Features.size(); ++i ){
       delete Features[i];
@@ -335,7 +339,6 @@ namespace Timbl {
     delete tester;
     delete decay;
     delete ChopInput;
-    delete tcp_socket;
 #ifndef USE_LOGSTREAMS
 #else
     delete mylog;

@@ -366,7 +366,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       *Log(Exp->my_log()) << "Socket Total = " << --service_count << endl;
       pthread_mutex_unlock(&my_lock);
       // close the socket and exit this thread
-      //
+      delete mysock;
       delete Exp;
     }
     return NULL;

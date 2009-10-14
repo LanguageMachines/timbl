@@ -221,6 +221,7 @@ namespace Timbl {
   }
   
   TimblExperiment *TimblExperiment::CreateClient( ServerSocket *socket ) const {
+    assert( socket != 0 );
     TimblExperiment *result = 0;
     switch ( Algorithm() ){
     case IB1_a:
@@ -234,11 +235,7 @@ namespace Timbl {
 		  toString(algorithm) );
     }
     *result = *this;
-    string line;
-    if ( socket != 0 )
-      line = "Client on socket: " + toString<int>( socket->getSockId() );
-    else
-      line = "Client without socket.";
+    string line = "Client on socket: " + toString<int>( socket->getSockId() );
 #ifdef USE_LOGSTREAMS
     result->myerr->message( line );
     result->mydebug->message( line );
