@@ -475,15 +475,18 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 		      pair<mmit,mmit> range = acts.equal_range( "set" );
 		      mmit it = range.first;
 		      while ( it != range.second ){
-			if ( api->SetOptions( it->second ) ){
-			  *Log(Mother->my_log()) << "set :" << it->second << endl;
+			string opt = it->second;
+			if ( !opt.empty() && opt[0] != '-' && opt[0] != '+' )
+			  opt = string("-") + opt;
+			*Log(Mother->my_log()) << "set :" << opt << endl;
+			if ( api->SetOptions( opt ) ){
 			  if ( !api->ConfirmOptions() ){
-			    os << "set " << it->second << " failed" << endl;
+			    os << "set " << opt << " failed" << endl;
 			  }
 			}
 			else {
 			  *Log(Mother->my_log()) << ": Don't understand set='" 
-						 << it->second << "'" << endl;
+						 << opt << "'" << endl;
 			  os << ": Don't understand set='" 
 			     << it->second << "'" << endl;
 			}
