@@ -268,6 +268,14 @@ namespace Timbl {
 	  if (!Exp->SetOption( optline ))
 	    return false;
 	}
+	if ( local_weight != Unknown_w ){
+	  optline = "WEIGHTING: " + toString(local_weight);
+	  Exp->SetOption( optline );
+	}
+	if ( do_all_weights ){
+	  optline = "ALL_WEIGHTS: true";
+	  Exp->SetOption( optline );
+	}
 	optline = "MAXBESTS: " + toString<int>(maxbests);
 	Exp->SetOption( optline );
 	if ( BinSize > 0 ){
@@ -371,14 +379,6 @@ namespace Timbl {
       }
       optline = "GLOBAL_METRIC: " + toString(local_metric);
       Exp->SetOption( optline );
-      if ( local_weight != Unknown_w ){
-	optline = "WEIGHTING: " + toString(local_weight);
-	Exp->SetOption( optline );
-      }
-      if ( do_all_weights ){
-	optline = "ALL_WEIGHTS: true";
-	Exp->SetOption( optline );
-      }
       if ( bootstrap_lines > 0 ){
 	optline = "IB2_OFFSET: " + toString<int>(bootstrap_lines);
 	Exp->SetOption( optline );
