@@ -180,7 +180,7 @@ inline void usage_full(void){
   cerr << "      di: add distance to output file" << endl;
   cerr << "      db: add distribution of best matched to output file" 
        << endl;
-  cerr << "      md: add matching depth to output file (-a1 only)" << endl;
+  cerr << "      md: add matching depth to output file." << endl;
   cerr << "      k:  add a summary for all k neigbors to output file"
        << " (sets -x)" << endl;
   cerr << "      n:  add nearest neigbors to output file (sets -x)"
