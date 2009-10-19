@@ -31,6 +31,6 @@ int main(){
   My_Experiment.ShowSettings( std::cout );
   My_Experiment.Learn( "dimin.train" );  
   My_Experiment.Test( "dimin.test", "my_first_test.out" );  
-  My_Experiment.SetOptions( "-w2 -mM" );
+  My_Experiment.SetOptions( "-mM" );
   My_Experiment.Test( "dimin.test", "my_first_test.out" );  
 }
