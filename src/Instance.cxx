@@ -1381,6 +1381,7 @@ namespace Timbl {
   }
   
   BaseFeatTargClass::BaseFeatTargClass( const BaseFeatTargClass& in ):
+    MsgClass( in ),
     CurSize( in.CurSize ),
     Increment( in.Increment ),
     TokenTree( in.TokenTree ){
