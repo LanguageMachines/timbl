@@ -870,6 +870,8 @@ namespace Timbl {
 	  Progress( 10000 );
       }
       curtime = localtime(&Time);
+      if ( exp_name != "" )
+	os  << "-" << exp_name << "-";
       os << "Tested: ";
       os.width(6);
       os.setf(ios::right, ios::adjustfield);
@@ -1226,7 +1228,10 @@ namespace Timbl {
       }
       else {
 	outStream.close();
-	outStream.open( OutFileName.c_str(), ios::out | ios::trunc );
+	// first we check if the outFile is writable.
+	// We don't write it though, because we don't want to have
+	// it mangled when checkTestFile fails
+	outStream.open( OutFileName.c_str(), ios::app );
 	if ( !outStream ) {
 	  Error( "can't open: " + OutFileName );
 	}
@@ -1234,6 +1239,8 @@ namespace Timbl {
 	  testStreamName = InFileName;
 	  outStreamName = OutFileName;
 	  if ( checkTestFile() ){
+	    outStream.close();
+	    outStream.open( OutFileName.c_str(), ios::out | ios::trunc );
 	    return true;
 	  }
 	}
