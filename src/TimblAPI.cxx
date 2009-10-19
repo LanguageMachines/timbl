@@ -161,11 +161,6 @@ namespace Timbl {
       else {
 	pimpl = Create_Pimpl( IB1_a, name, OptPars );
       }
-      if ( pimpl )
-	if ( !pimpl->ConfirmOptions() ){
-	  delete pimpl;
-	  pimpl = NULL;
-	}
     }
     i_am_fine = (pimpl != NULL);
   }
