@@ -930,6 +930,8 @@ namespace Timbl {
 	  Progress( 10000 );
       }
       curtime = localtime(&Time);
+      if ( exp_name != "" )
+	os  << "-" << exp_name << "-";
       os << "Learning:  ";
       os.width(6);
       os.setf(ios::right, ios::adjustfield);
