@@ -331,7 +331,7 @@ namespace Timbl {
     }
     for ( unsigned int i=0; i < Features.size(); ++i ){
       delete Features[i];
-      if ( is_copy ){
+      if ( is_copy && !is_synced ){
 	delete PermFeatures[i];
       }
     }
