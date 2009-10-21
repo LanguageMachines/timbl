@@ -1,6 +1,14 @@
-6.2.0-pre2 - 2009-09-XX
+6.1.99.0.20091021.2 - 2009-10-21
 
-- FIXME
+- Another snapshot from SVN.
+
+6.1.99.0.20091021.1 - 2009-10-21
+
+- Another snapshot from SVN.  (By mistake, aka 6.2.0).
+
+6.2.0.pre3 - 2009-10-05
+
+- Another snapshot from SVN.
 
 6.2.0-pre1 - 2009-09-03
 
@@ -16,3 +24,6 @@
 	    Packaging seems to be fine now.
 2007-10-01: Ko vd Sloot
 	    first packaging attempt
+
+# $Id$
+# $URL$

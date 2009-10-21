@@ -1,3 +1,8 @@
+2009-09-05 06:36  joostvb
+
+	* [r2895] ChangeLog, NEWS, configure.ac: prepare next svn snapshot,
+	  fix typo in version numbers in NEWS
+
 2009-09-05 06:32  joostvb
 
 	* [r2894] Makefile.am: do not install ChangeLog: it interferes bad
