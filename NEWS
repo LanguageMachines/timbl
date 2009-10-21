@@ -1,8 +1,8 @@
 6.1.99.0.20091021.2 - 2009-10-21
 
-- Another snapshot from SVN.
+- Another snapshot from SVN.  Now needs libxml2 for building.
 
-6.1.99.0.20091021.1 - 2009-10-21
+6.1.99.0.20091021.1 - 2009-10-14
 
 - Another snapshot from SVN.  (By mistake, aka 6.2.0).
 
