@@ -716,25 +716,27 @@ namespace Timbl {
   }
   
   void Feature::InitSparseArrays(){
-    // Loop over all values.
-    //
-    VCarrtype::const_iterator it = ValuesArray.begin();
-    while ( it != ValuesArray.end() ){
-      FeatureValue *FV = (FeatureValue*)*it;
-      size_t freq = FV->ValFreq();
-      FV->ValueClassProb->Clear();
-      if ( freq > 0 ){
-	// Loop over all present classes.
-	//
-	ValueDistribution::dist_iterator It = FV->TargetDist.begin();
-	while ( It != FV->TargetDist.end() ){
-	  FV->ValueClassProb->Assign( It->second->Index(), 
-				      It->second->Freq()/(double)freq );
-	  ++It;
+    if ( !is_copy ){
+      // Loop over all values.
+      //
+      VCarrtype::const_iterator it = ValuesArray.begin();
+      while ( it != ValuesArray.end() ){
+	FeatureValue *FV = (FeatureValue*)*it;
+	size_t freq = FV->ValFreq();
+	FV->ValueClassProb->Clear();
+	if ( freq > 0 ){
+	  // Loop over all present classes.
+	  //
+	  ValueDistribution::dist_iterator It = FV->TargetDist.begin();
+	  while ( It != FV->TargetDist.end() ){
+	    FV->ValueClassProb->Assign( It->second->Index(), 
+					It->second->Freq()/(double)freq );
+	    ++It;
+	  }
 	}
-      }
-      ++it;
-    } 
+	++it;
+      } 
+    }
   }
 
   struct D_D {
