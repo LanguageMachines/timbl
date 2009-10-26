@@ -26,6 +26,7 @@
 
 #include <string>
 #include <cstdlib>
+#include <cstdio>
 #include <signal.h>
 #include <iostream>
 #include "timbl/Types.h"

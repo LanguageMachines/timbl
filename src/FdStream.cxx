@@ -25,6 +25,7 @@
 */
 
 #include <cstring>
+#include <cstdio>
 #include <cerrno>
 #include <csignal>
 #include <iostream>
