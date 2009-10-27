@@ -1400,6 +1400,7 @@ namespace Timbl {
 	++it;
       }
     }
+    ValuesMap.clear();
   }
   
   TargetValue *Target::Lookup( const string& str ) const {
@@ -1418,11 +1419,13 @@ namespace Timbl {
   }
 
   Feature::~Feature(){
-    delete_matrix();
-    if ( n_dot_j ) {
-      delete [] n_dot_j;
-      delete [] n_i_dot;
+    if ( !is_copy ){
+      if ( n_dot_j ) {
+	delete [] n_dot_j;
+	delete [] n_i_dot;
+      }
     }
+    delete_matrix();
     delete metric; 
   }
 
