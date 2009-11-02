@@ -737,8 +737,8 @@ int main(int argc, char *argv[]){
     cerr << "TiMBL " << TimblAPI::VersionInfo()
 	 << " (c) ILK 1998 - 2009.\n" 
 	 << "Tilburg Memory Based Learner\n"
-	 << "Induction of Linguistic Knowledge Research Group\n"
-	 << "Tilburg University / University of Antwerp" << endl;
+	 << "Induction of Linguistic Knowledge Research Group, Tilburg University\n"
+	 << "CLiPS Computational Linguistics Group, University of Antwerp" << endl;
     time(&Time);
     curtime = localtime(&Time);
     cerr << asctime(curtime) << endl;
