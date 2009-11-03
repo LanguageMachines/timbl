@@ -65,7 +65,7 @@ fi
 AX_OPENMP(
   [AC_MSG_NOTICE( we have Open MP )
    CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"],
-  [AC_MSG_NOTICE( We don't seem top have Open MP )] )
+  [AC_MSG_NOTICE( We don't seem to have Open MP )] )
 
 AM_CONDITIONAL( WANT_OMP, test "$OPENMP_CXXFLAGS" != "" )
 
