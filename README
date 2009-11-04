@@ -1,4 +1,4 @@
-Timbl 6.1.3 (c) ILK/CNTS 1998-2008
+Timbl 6.2.0 (c) ILK/CLiPS 1998-2009
 
 Tilburg Memory Based Learner
 
@@ -10,16 +10,16 @@ This is an extension to the sixth main release of Timbl.
 While this is NOT a Beta version it may still contain some bugs or
 behave not exactly as documented or expected. Comments and
 bug-reports are welcome at: Timbl@uvt.nl. Updates and more info
-may be found on our website: http://ilk.uvt.nl/ .
+may be found on http://ilk.uvt.nl/timbl .
 
-Timbl is distributed under the GNU Public Licence (see the file COPYING)
+Timbl is distributed under the GNU Public Licence (see the file COPYING).
 
 
 This software has been tested on:
 - Sparc platform running Solaris 2.8
 - Intel platform running several versions of Linux
 - Windows platform using Cygwin
-- MAC platform running OS X 10.4
+- MAC platform running OS X 10.5
 - MIPS-SGI platform running IRIX 6.5
 
 Compilers:
@@ -28,11 +28,11 @@ Compilers:
 - IBM XL C++ compiler version 8.0
 
 Contents of this distribution:
-- sources
+- Sources
 - Licensing information ( COPYING )
 - Installation instructions ( INSTALL )
 - Build system based om Gnu Autotools
-- example data files ( in the demos directory )
-- documentation ( in the docs directory )
+- Example data files ( in the demos directory )
+- Documentation ( in the docs directory )
 
 
