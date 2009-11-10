@@ -30,11 +30,11 @@ typedef struct _xmlNode xmlNode;
 
 namespace Timbl {
   using namespace Common;
-  using namespace Sockets;
 
   class InstanceBase_base;
   class TesterClass;
   class Chopper;
+  using Sockets::ServerSocket;
 
   class MBLClass {
   public:
@@ -126,7 +126,7 @@ namespace Timbl {
     void Error( const std::string& ) const;
     void FatalError( const std::string& ) const;
     size_t MaxFeats() const { return MaxFeatures; };
-    bool connectToSocket( ServerSocket& );
+    bool connectToSocket( ServerSocket * );
     int Progress() const { return progress; };
     void Progress( int p ){ progress =  p; };
     Target   *Targets;

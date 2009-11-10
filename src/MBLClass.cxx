@@ -63,6 +63,8 @@ typedef std::ostream LogStream;
 #include "timbl/Testers.h"
 #include "timbl/Metrics.h"
 #include "timbl/Choppers.h"
+#include "timbl/SocketBasics.h"
+
 #include "timbl/MBLClass.h"
 
 using namespace std;
@@ -459,17 +461,17 @@ namespace Timbl {
     return true;
   }
   
-  bool MBLClass::connectToSocket( ServerSocket& socket ){
-    if ( socket.isValid() ){
+  bool MBLClass::connectToSocket( ServerSocket *socket ){
+    if ( socket && socket->isValid() ){
       if ( sock_is || sock_os ){
 	throw( logic_error( "connectToSocket:: already connected!" ) );
       }
       else {
-	int id = socket.getSockId();
+	int id = socket->getSockId();
 	sock_is = new fdistream( id );
 	sock_os = new fdostream( id );
 	if ( sock_is && sock_os && sock_is->good() && sock_os->good() ){
-	  tcp_socket = &socket;
+	  tcp_socket = socket;
 	  return true;
 	}
 	else 

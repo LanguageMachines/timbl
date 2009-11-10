@@ -38,7 +38,6 @@
 typedef std::ostream LogStream;
 #endif
 
-#include "timbl/SocketBasics.h"
 #include "timbl/Common.h"
 #include "timbl/StringOps.h"
 #include "timbl/Types.h"
@@ -48,6 +47,7 @@ typedef std::ostream LogStream;
 #include "timbl/Metrics.h"
 #include "timbl/CommandLine.h"
 #include "timbl/GetOptClass.h"
+#include "timbl/SocketBasics.h"
 #include "timbl/TimblExperiment.h"
 
 using namespace std;
@@ -114,7 +114,7 @@ namespace Timbl {
     opt_init( false ),
     opt_changed( false ),
     N_present( false ),
-    parent_socket( 0 ) {
+    parent_socket_os( 0 ) {
     int MaxF = DEFAULT_MAX_FEATS;
     bool the_mood;
     string optie;
@@ -172,7 +172,7 @@ namespace Timbl {
     do_server( in.do_server ),
     do_diversify( in.do_diversify ),
     metricsArray( in.metricsArray ),
-    parent_socket( in.parent_socket ),
+    parent_socket_os( in.parent_socket_os ),
     outPath( in.outPath ),
     logFile( in.logFile ),
     pidFile( in.pidFile ),
@@ -180,18 +180,16 @@ namespace Timbl {
   {
   }
   
-  GetOptClass *GetOptClass::Clone( Sockets::ServerSocket *sock ) const{
+  GetOptClass *GetOptClass::Clone( ostream *sock_os ) const{
     GetOptClass *result = new GetOptClass(*this);
-    result->parent_socket = sock;
+    result->parent_socket_os = sock_os;
     return result;
   }
   
 #ifdef PTHREADS
   void GetOptClass::Error( const string& out_line ) const {
-    if ( parent_socket )
-      parent_socket->write( "ERROR { " ) &&
-	parent_socket->write( out_line ) &&
-	parent_socket->write( " }\n" );
+    if ( parent_socket_os )
+      *parent_socket_os << "ERROR { " << out_line << " }" << endl;
     else {
       cerr << "Error:" << out_line << endl;
     }

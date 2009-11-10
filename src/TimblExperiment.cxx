@@ -240,10 +240,10 @@ namespace Timbl {
     result->myerr->message( line );
     result->mydebug->message( line );
 #endif
+    result->connectToSocket( socket );
     if ( OptParams ){
-      result->OptParams = OptParams->Clone( socket );
+      result->OptParams = OptParams->Clone( result->sock_os );
     }
-    result->connectToSocket( *socket );
     result->WFileName = WFileName;
     result->CurrentDataFile = CurrentDataFile;
     *Dbg(mydebug) << "created a new Client" << endl;
