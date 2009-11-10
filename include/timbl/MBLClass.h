@@ -39,7 +39,6 @@ namespace Timbl {
   class MBLClass {
   public:
     bool SetOption( const std::string& );
-    bool ShowSettingsSocket() const;
     xmlNode *settingsToXml() const;
     bool ShowWeights( std::ostream& ) const;
     LogStream& my_err() const { return *myerr; };

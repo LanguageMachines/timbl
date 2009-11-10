@@ -447,13 +447,6 @@ namespace Timbl {
     return true;
   }
  
-  bool MBLClass::ShowSettingsSocket() const{
-    *sock_os << "STATUS" << endl;
-    Options.Show_Settings( *sock_os );
-    *sock_os << "ENDSTATUS" << endl;
-    return sock_os->good();
-  }
-
   bool MBLClass::ShowSettings( ostream& os ) const{
     os << "Current Experiment Settings :" << endl;
     Options.Show_Settings( os );

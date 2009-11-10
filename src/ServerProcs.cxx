@@ -71,7 +71,7 @@ using namespace Sockets;
 namespace Timbl {
 
 #ifndef PTHREADS
-  bool do_command( const string&, TimblExperiment *Exp ){
+  bool doSet( const string&, TimblExperiment *Exp ){
     *Log(Exp->my_err()) << "Server Mode not available" << endl;
     return false;
   }
@@ -79,7 +79,7 @@ namespace Timbl {
     *Log(Exp->my_err()) << "Server Mode not available" << endl;
     return -1;
   }
-  void *do_chld( void *arg ){
+  void *socketChild( void *arg ){
     TimblExperiment *Tmp = (TimblExperiment*)arg;
     *Log(Tmp->my_err()) << "Server Mode not available" << endl;
     return NULL;
@@ -154,16 +154,13 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     return line.find( "NEIGHBORS" ) != string::npos;
   }
   
-  bool do_command( const string& Line, TimblExperiment *Exp ){
-    bool go_on = true;
+  bool doSet( const string& Line, TimblExperiment *Exp ){
     if ( Exp->SetOptions( Line ) ){
       if ( Exp->ServerVerbosity() & CLIENTDEBUG )
 	*Log(Exp->my_log()) << Exp->TcpSocket()->getSockId()
 			    << ": Command :" << Line << endl;
       if ( Exp->ConfirmOptions() )
-	go_on = Exp->TcpSocket()->write( "OK\n" );
-      else {
-      }
+	*Exp->sock_os << "OK" << endl;
     }
     else {
       if ( Exp->ServerVerbosity() & CLIENTDEBUG )
@@ -171,7 +168,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 			    << ": Don't understand '" 
 			    << Line << "'" << endl;
     }
-    return go_on;
+    return true;
   }
 
   bool classifyOneLine( TimblExperiment *Exp, const string& params ){
@@ -179,41 +176,34 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     string Distrib;
     string Answer;
     ServerSocket *sock = Exp->TcpSocket();
+    ostream *os = Exp->sock_os;
     if ( Exp->Classify( params, Answer, Distrib, Distance ) ){
       if ( Exp->ServerVerbosity() & CLIENTDEBUG )
 	*Log(Exp->my_log()) << sock->getSockId() << ": " 
 			    << params << " --> " 
 			    << Answer << " " << Distrib 
 			    << " " << Distance << endl;
-      bool go_on = sock->write( "CATEGORY {" ) &&
-	sock->write( Answer ) &&
-	sock->write( "}" );
-      if ( go_on ){
+      *os << "CATEGORY {" << Answer << "}";
+      if ( os->good() ){
 	if ( Exp->Verbosity(DISTRIB) ){
-	  go_on = sock->write( " DISTRIBUTION " ) &&
-	    sock->write( Distrib );
+	  *os << " DISTRIBUTION " <<Distrib;
 	}
-	if ( go_on ){
+	if ( os->good() ){
 	  if ( Exp->Verbosity(DISTANCE) ){
-	    go_on = sock->write( " DISTANCE {" ) &&
-	      sock->write( toString<double>(Distance) ) &&
-	      sock->write( "}" );
+	    *os << " DISTANCE {" << Distance << "}";
 	  }
-	  if ( go_on ){
+	  if ( os->good() ){
 	    if ( Exp->Verbosity(NEAR_N) ){
-	      ostringstream tmp;
-	      tmp << " NEIGHBORS\n";
-	      Exp->showBestNeighbors( tmp );
-	      tmp << "ENDNEIGHBORS";
-	      go_on = sock->write( tmp.str() );
+	      *os << " NEIGHBORS" << endl;
+	      Exp->showBestNeighbors( *os );
+	      *os << "ENDNEIGHBORS";
 	    }
 	  }
 	}
       }
-      if ( go_on ){
-	go_on = sock->write( "\n" );
-      }
-      return go_on;
+      if ( os->good() )
+	*os << endl;
+      return os->good();
     }
     else {
       if ( Exp->ServerVerbosity() & CLIENTDEBUG )
@@ -256,29 +246,33 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     return result;
   }
   
-  int ClassifyFromSocket( TimblExperiment *Exp ){ 
+  int runFromSocket( TimblExperiment *Exp ){ 
     string Line;
     ServerSocket *sock = Exp->TcpSocket();
-    sock->write( "Welcome to the Timbl Server.\n", 5 );
-    if ( sock->read( Line ) ){
+    ostream *os = Exp->sock_os;
+    istream *is = Exp->sock_is;
+    *os << "Welcome to the Timbl Server." << endl;
+    if ( getline( *is, Line ) ){
       //      *Log(Exp->my_log()) << "FirstLine='" << Line << "'" << endl;
       string Command, Param;
       int result = 0;
       bool go_on = true;
-      *Dbg(Exp->my_debug()) << "ClassifyFromSocket: " 
+      *Dbg(Exp->my_debug()) << "running FromSocket: " 
 			    << sock->getSockId() << endl;
       do {
 	*Dbg(Exp->my_debug()) << "Line='" << Line << "'" << endl;
 	Split( Line, Command, Param );
 	switch ( check_command(Command) ){
 	case Set:
-	  go_on = do_command( Param, Exp );
+	  go_on = doSet( Param, Exp );
 	  break;
 	case Query:
-	  go_on = Exp->ShowSettingsSocket();
+	  *os << "STATUS" << endl;
+	  Exp->ShowSettings( *os );
+	  *os << "ENDSTATUS" << endl;
 	  break;
 	case Exit:
-	  go_on = sock->write( "OK" ) && sock->write( " Closing\n" );
+	  *os << "OK Closing" << endl;
 	  return result;
 	  break;
 	case Classify:
@@ -287,23 +281,18 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	  go_on = true; // HACK?
 	  break;
 	case Comment:
-	  go_on = sock->write( "SKIP " ) &&
-	    sock->write( Line ) &&
-	    sock->write( "\n" );
+	  *os << "SKIP '" << Line << "'" << endl;
 	  break;
 	default:
 	  if ( Exp->ServerVerbosity() & CLIENTDEBUG )
 	    *Log(Exp->my_log()) << sock->getSockId() << ": Don't understand '" 
 				<< Line << "'" << endl;
-	  go_on = sock->write( "ERROR { Illegal instruction:'" ) &&
-	    sock->write( Command ) &&
-	    sock->write( "' in line:" ) &&
-	    sock->write( Line ) &&
-	    sock->write( "}\n" );
+	  *os << "ERROR { Illegal instruction:'" << Command << "' in line:" 
+	      << Line << "}" << endl;
 	  break;
 	}
       }
-      while ( go_on && sock->read( Line ) );
+      while ( go_on && getline( *is, Line ) );
       return result;
     }
     return 0;
@@ -327,7 +316,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 
 
   // ***** This is the routine that is executed from a new thread *******
-  void *do_chld( void *arg ){
+  void *socketChild( void *arg ){
     TimblExperiment *Exp = (TimblExperiment*)arg;
     ServerSocket *mysock = Exp->TcpSocket();
     static int service_count=0;
@@ -337,8 +326,8 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     // use a mutex to update the global service counter
     service_count++;
     if ( service_count > Exp->Max_Connections() ){
-      mysock->write( "Maximum connections exceeded\n" );
-      mysock->write( "try again later...\n" );
+      *Exp->sock_os << "Maximum connections exceeded." << endl;
+      *Exp->sock_os << "try again later..." << endl;
       pthread_mutex_unlock( &my_lock );
       cerr << "Thread " << (uintptr_t)pthread_self() << " refused " << endl;
     }
@@ -358,7 +347,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 			  << Timer::now() << endl;  
       signal( SIGPIPE, BrokenPipeChildFun );
       timeDone.start();
-      int nw = ClassifyFromSocket( Exp );
+      int nw = runFromSocket( Exp );
       show_results(  *Log(Exp->my_log()), timeDone, nw );
       //
       pthread_mutex_lock(&my_lock);
@@ -704,7 +693,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	TimblExperiment *Chld = Mother->CreateClient( newSocket );
 	*Dbg(Mother->my_debug()) << " Na Create Client " << endl;
 	*Dbg(Chld->my_debug()) << "voor pthread_create " << endl;
-	pthread_create( &chld_thr, &attr, do_chld, (void *)Chld );
+	pthread_create( &chld_thr, &attr, socketChild, (void *)Chld );
       }
       // the server is now free to accept another socket request 
     }

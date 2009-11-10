@@ -233,6 +233,7 @@ namespace Timbl {
     default:
       FatalError( "You may not Create Clients for Special cases like " + 
 		  toString(algorithm) );
+      return 0;
     }
     *result = *this;
     string line = "Client on socket: " + toString<int>( socket->getSockId() );
@@ -240,7 +241,10 @@ namespace Timbl {
     result->myerr->message( line );
     result->mydebug->message( line );
 #endif
-    result->connectToSocket( socket );
+    if ( !result->connectToSocket( socket ) ){
+      FatalError( "unable to create working client" );
+      return 0;
+    }
     if ( OptParams ){
       result->OptParams = OptParams->Clone( result->sock_os );
     }
