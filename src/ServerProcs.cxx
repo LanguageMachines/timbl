@@ -100,7 +100,8 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 
 #include <pthread.h>
 
-  enum CommandType { UnknownCommand, Classify, Query, Set, Exit, Comment };
+  enum CommandType { UnknownCommand, Classify, Base, 
+		     Query, Set, Exit, Comment };
   enum CodeType { UnknownCode, Result, Error, OK, Skip,
 		  Neighbors, EndNeighbors, Status, EndStatus };
   
@@ -120,6 +121,8 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       result = Classify;
     else if ( compare_nocase_n( com, "QUERY" ) )
       result = Query;
+    else if ( compare_nocase_n( com, "BASE") )
+      result = Base;
     else if ( compare_nocase_n( com, "SET") )
       result = Set;
     else if ( compare_nocase_n( com, "EXIT" ) )
@@ -261,33 +264,65 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
   int runFromSocket( childArgs *args ){ 
     string Line;
     ServerSocket *sock = args->socket;
-    *Dbg(args->Mother->my_debug()) << " Voor Create Client " << endl;
-    TimblExperiment *Chld = args->Mother->CreateClient( sock );
-    *Dbg(args->Mother->my_debug()) << " Na Create Client " << endl;
-    // report connection to the server terminal
-    //
-    char line[256];
-    sprintf( line, "Thread %lu, on Socket %d", (uintptr_t)pthread_self(),
-	     args->socket->getSockId() );
-    Chld->my_debug().message( line );
-    *Log(Chld->my_log()) << line << ", started at: " 
-			 << Timer::now() << endl;  
+    int sockId = sock->getSockId();
+    TimblExperiment *Chld = 0;
     signal( SIGPIPE, BrokenPipeChildFun );
 
-    ostream *os = Chld->sock_os;
-    istream *is = Chld->sock_is;
+    ostream *os = new fdostream( sockId );
+    istream *is = new fdistream( sockId );
+    string baseName;
+    if ( args->experiments->empty() ){
+      baseName == "default";
+      *Dbg(args->Mother->my_debug()) << " Voor Create Default Client " << endl;
+      Chld = args->Mother->CreateClient( sock );
+      *Dbg(args->Mother->my_debug()) << " Na Create Client " << endl;
+      // report connection to the server terminal
+      //
+      char line[256];
+      sprintf( line, "Thread %lu, on Socket %d", (uintptr_t)pthread_self(),
+	       sockId );
+      Chld->my_debug().message( line );
+      *Log(Chld->my_log()) << line << ", started at: " 
+			   << Timer::now() << endl;  
+    }
     *os << "Welcome to the Timbl Server." << endl;
     if ( getline( *is, Line ) ){
       //      *Log(Chld->my_log()) << "FirstLine='" << Line << "'" << endl;
       string Command, Param;
       int result = 0;
       bool go_on = true;
-      *Dbg(Chld->my_debug()) << "running FromSocket: " 
-			    << sock->getSockId() << endl;
+      *Dbg(Chld->my_debug()) << "running FromSocket: " << sockId << endl;
+      
       do {
 	*Dbg(Chld->my_debug()) << "Line='" << Line << "'" << endl;
 	Split( Line, Command, Param );
 	switch ( check_command(Command) ){
+	case Base:{
+	  map<string,TimblExperiment*>::const_iterator it 
+	    = args->experiments->find(Param);
+	  if ( it != args->experiments->end() ){
+	    baseName = Param;
+	    if ( Chld )
+	      delete Chld;
+	    *Dbg(args->Mother->my_debug()) 
+	      << " Voor Create Default Client " << endl;
+	    Chld = it->second->CreateClient( sock );
+	    Chld->setExpName(string("exp-")+toString(sockId) );
+	    *Dbg(args->Mother->my_debug()) << " Na Create Client " << endl;
+	    // report connection to the server terminal
+	    //
+	    char line[256];
+	    sprintf( line, "Thread %lu, on Socket %d", 
+		     (uintptr_t)pthread_self(), sockId );
+	    Chld->my_debug().message( line );
+	    *Log(Chld->my_log()) << line << ", started at: " 
+				 << Timer::now() << endl;  
+	  }
+	  else {
+	    *os << "ERROR { Unknown basename: " << Param << "}" << endl;
+	  }
+	}
+	  break;
 	case Set:
 	  go_on = doSet( Param, Chld );
 	  break;
@@ -310,7 +345,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	  break;
 	default:
 	  if ( Chld->ServerVerbosity() & CLIENTDEBUG )
-	    *Log(Chld->my_log()) << sock->getSockId() << ": Don't understand '" 
+	    *Log(Chld->my_log()) << sockId << ": Don't understand '" 
 				 << Line << "'" << endl;
 	  *os << "ERROR { Illegal instruction:'" << Command << "' in line:" 
 	      << Line << "}" << endl;
@@ -410,7 +445,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       int timeout = 1;
       int nw=0;
       if ( nb_getline( is, Line, timeout ) ){
-	///	*Log(Mother->my_debug()) << "FirstLine='" << Line << "'" << endl;
+	*Log(Mother->my_debug()) << "FirstLine='" << Line << "'" << endl;
 	if ( Line.find( "HTTP" ) != string::npos ){
 	  // skip HTTP header
 	  string tmp;
@@ -422,7 +457,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	  if ( spos != string::npos ){
 	    string::size_type epos = Line.find( " HTTP" );
 	    string line = Line.substr( spos+3, epos - spos - 3 );
-	    //	    *Log(Mother->my_debug()) << "Line='" << line << "'" << endl;
+	    *Log(Mother->my_debug()) << "Line='" << line << "'" << endl;
 	    epos = line.find( "?" );
 	    string basename;
 	    if ( epos != string::npos ){
@@ -552,13 +587,13 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 		    nb_putline( os, tmp , timeout );
 		    delete api;
 		  }
-		  else {
-		    *Log(Mother->my_log()) << "invalid BASE! '" << basename 
-					   << "'" << endl;
-		    os << "invalid basename: '" << basename << "'" << endl;
-		  }
-		  os << endl;
 		}
+		else {
+		  *Log(Mother->my_log()) << "invalid BASE! '" << basename 
+					 << "'" << endl;
+		  os << "invalid basename: '" << basename << "'" << endl;
+		}
+		os << endl;
 	      }
 	    } 
 	  }
@@ -585,8 +620,8 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     }
   }
 
-  void startExperimentsFromConfig( map<std::string, std::string> serverConfig,
-				   map<string, TimblExperiment*> experiments ){
+  void startExperimentsFromConfig( map<std::string, std::string>& serverConfig,
+				   map<string, TimblExperiment*>& experiments ){
     map<string,string>::const_iterator it = serverConfig.begin();
     while ( it != serverConfig.end() ){
       TimblOpts opts( it->second );

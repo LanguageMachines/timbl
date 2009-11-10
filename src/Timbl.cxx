@@ -50,6 +50,7 @@ bool Do_LOO = false;
 bool Do_NS = false;
 bool Do_Indirect = false;
 bool Do_Server = false;
+bool Do_Socket_Server = false;
 bool Do_Http_Server = false;
 int ServerPort = -1;
 int Max_Connections = 10;
@@ -355,14 +356,20 @@ void Preset_Values( TimblOpts& Opts ){
   Opts.Add( 'v', "F", true );
   Opts.Add( 'v', "S", false );
   if ( Opts.Find( "serverconfig", value, mood ) ){
+    Do_Server = true;
     if ( Do_LOO || Do_CV || Do_Indirect ){
       cerr << "Cannot run as a server when -t option is also specified." 
 	   << endl;
       exit(3);
     }
     else {
-      Do_Server = true;
-      Do_Http_Server = true;
+//       Do_Socket_Server = true;
+//       if ( Opts.Find( "Http", value, mood ) && mood == false ){
+// 	Opts.Delete( "Http" );
+// 	Do_Http_Server = false;
+//       }
+//       else
+ 	Do_Http_Server = true;
     }
   }
   if ( Opts.Find( 'S', value, mood ) ){
@@ -770,6 +777,9 @@ int main(int argc, char *argv[]){
     else if ( Do_Server ){
       if ( Do_Http_Server ){
 	Run->StartHttpServer( ServerPort, Max_Connections );
+      }
+      else if ( Do_Socket_Server ){
+	Run->StartSocketServer( ServerPort, Max_Connections );
       }
       else {
 	// Special case:   running a Server

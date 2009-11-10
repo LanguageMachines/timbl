@@ -70,6 +70,7 @@ namespace Timbl {
     friend class TimblAPI;
     friend void RunClassicServer( TimblExperiment *, int );
     friend void RunHttpServer( TimblExperiment *, int );
+    friend void RunSocketServer( TimblExperiment *, int );
   public:
     virtual ~TimblExperiment();
     virtual bool Learn( const std::string& = "" );
@@ -98,6 +99,7 @@ namespace Timbl {
     bool WriteNamesFile( const std::string& ) const;
     bool StartClassicServer( const int, const int );
     bool fillServerConfig();
+    bool StartSocketServer( const int, const int );
     bool StartHttpServer( const int, const int );
     bool SetSingleThreaded();
     int Estimate() const { return estimate; };

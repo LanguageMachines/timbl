@@ -380,6 +380,23 @@ namespace Timbl {
     return false;
   }
   
+  bool TimblExperiment::StartSocketServer( const int port, const int max_c ){
+    if ( ConfirmOptions() ){
+      if ( fillServerConfig() ){
+	map<string,string>::const_iterator it = serverConfig.begin();
+	while( it != serverConfig.end() ){
+	  ++it;
+	}
+	max_conn = max_c;
+	RunClassicServer( this, port );
+      }
+    }
+    else {
+      Error( "invalid options" );
+    }
+    return false;
+  }
+  
   bool TimblExperiment::StartClassicServer( const int port, const int max_c ){
     initExperiment( true );
     max_conn = max_c;
