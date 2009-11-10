@@ -246,29 +246,54 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     return result;
   }
   
-  int runFromSocket( TimblExperiment *Exp ){ 
+  void BrokenPipeChildFun( int Signal ){
+    if ( Signal == SIGPIPE ){
+      signal( SIGPIPE, BrokenPipeChildFun );
+    }
+  }
+
+  struct childArgs{
+    TimblExperiment *Mother;
+    ServerSocket *socket;
+    map<string, TimblExperiment*> *experiments;
+  };
+
+  int runFromSocket( childArgs *args ){ 
     string Line;
-    ServerSocket *sock = Exp->TcpSocket();
-    ostream *os = Exp->sock_os;
-    istream *is = Exp->sock_is;
+    ServerSocket *sock = args->socket;
+    *Dbg(args->Mother->my_debug()) << " Voor Create Client " << endl;
+    TimblExperiment *Chld = args->Mother->CreateClient( sock );
+    *Dbg(args->Mother->my_debug()) << " Na Create Client " << endl;
+    // report connection to the server terminal
+    //
+    char line[256];
+    sprintf( line, "Thread %lu, on Socket %d", (uintptr_t)pthread_self(),
+	     args->socket->getSockId() );
+    Chld->my_debug().message( line );
+    *Log(Chld->my_log()) << line << ", started at: " 
+			 << Timer::now() << endl;  
+    signal( SIGPIPE, BrokenPipeChildFun );
+
+    ostream *os = Chld->sock_os;
+    istream *is = Chld->sock_is;
     *os << "Welcome to the Timbl Server." << endl;
     if ( getline( *is, Line ) ){
-      //      *Log(Exp->my_log()) << "FirstLine='" << Line << "'" << endl;
+      //      *Log(Chld->my_log()) << "FirstLine='" << Line << "'" << endl;
       string Command, Param;
       int result = 0;
       bool go_on = true;
-      *Dbg(Exp->my_debug()) << "running FromSocket: " 
+      *Dbg(Chld->my_debug()) << "running FromSocket: " 
 			    << sock->getSockId() << endl;
       do {
-	*Dbg(Exp->my_debug()) << "Line='" << Line << "'" << endl;
+	*Dbg(Chld->my_debug()) << "Line='" << Line << "'" << endl;
 	Split( Line, Command, Param );
 	switch ( check_command(Command) ){
 	case Set:
-	  go_on = doSet( Param, Exp );
+	  go_on = doSet( Param, Chld );
 	  break;
 	case Query:
 	  *os << "STATUS" << endl;
-	  Exp->ShowSettings( *os );
+	  Chld->ShowSettings( *os );
 	  *os << "ENDSTATUS" << endl;
 	  break;
 	case Exit:
@@ -276,7 +301,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	  return result;
 	  break;
 	case Classify:
-	  if ( classifyOneLine( Exp, Param ) )
+	  if ( classifyOneLine( Chld, Param ) )
 	    result++;
 	  go_on = true; // HACK?
 	  break;
@@ -284,9 +309,9 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	  *os << "SKIP '" << Line << "'" << endl;
 	  break;
 	default:
-	  if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	    *Log(Exp->my_log()) << sock->getSockId() << ": Don't understand '" 
-				<< Line << "'" << endl;
+	  if ( Chld->ServerVerbosity() & CLIENTDEBUG )
+	    *Log(Chld->my_log()) << sock->getSockId() << ": Don't understand '" 
+				 << Line << "'" << endl;
 	  *os << "ERROR { Illegal instruction:'" << Command << "' in line:" 
 	      << Line << "}" << endl;
 	  break;
@@ -298,12 +323,6 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     return 0;
   }
   
-  void BrokenPipeChildFun( int Signal ){
-    if ( Signal == SIGPIPE ){
-      signal( SIGPIPE, BrokenPipeChildFun );
-    }
-  }
-
   void show_results(  ostream& os, Timer& timeDone, int nw ){
     os << "Thread " << (uintptr_t)pthread_self() << ", terminated at: " 
        << Timer::now()
@@ -317,56 +336,37 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 
   // ***** This is the routine that is executed from a new thread *******
   void *socketChild( void *arg ){
-    TimblExperiment *Exp = (TimblExperiment*)arg;
-    ServerSocket *mysock = Exp->TcpSocket();
+    childArgs *args = (childArgs *)arg;
+    TimblExperiment *Mother = args->Mother;
     static int service_count=0;
 
     static pthread_mutex_t my_lock = PTHREAD_MUTEX_INITIALIZER;
     pthread_mutex_lock(&my_lock);
     // use a mutex to update the global service counter
     service_count++;
-    if ( service_count > Exp->Max_Connections() ){
-      *Exp->sock_os << "Maximum connections exceeded." << endl;
-      *Exp->sock_os << "try again later..." << endl;
+    if ( service_count > Mother->Max_Connections() ){
+      *Mother->sock_os << "Maximum connections exceeded." << endl;
+      *Mother->sock_os << "try again later..." << endl;
       pthread_mutex_unlock( &my_lock );
       cerr << "Thread " << (uintptr_t)pthread_self() << " refused " << endl;
     }
     else {
       pthread_mutex_unlock( &my_lock );
-      // process the test material
-      // and do the timing
-      //
       Timer timeDone;
-      // report connection to the server terminal
-      //
-      char line[256];
-      sprintf( line, "Thread %lu, on Socket %d", (uintptr_t)pthread_self(),
-	       mysock->getSockId() );
-      Exp->my_debug().message( line );
-      *Log(Exp->my_log()) << line << ", started at: " 
-			  << Timer::now() << endl;  
-      signal( SIGPIPE, BrokenPipeChildFun );
       timeDone.start();
-      int nw = runFromSocket( Exp );
-      show_results(  *Log(Exp->my_log()), timeDone, nw );
+      int nw = runFromSocket( args );
+      show_results( *Log(Mother->my_log()), timeDone, nw );
       //
       pthread_mutex_lock(&my_lock);
       // use a mutex to update and display the global service counter
-      *Log(Exp->my_log()) << "Socket Total = " << --service_count << endl;
+      *Log(Mother->my_log()) << "Socket Total = " << --service_count << endl;
       pthread_mutex_unlock(&my_lock);
       // close the socket and exit this thread
-      delete mysock;
-      delete Exp;
+      delete args->socket;
+      delete args;
     }
     return NULL;
   }
-
-
-  struct childArgs{
-    TimblExperiment *Mother;
-    ServerSocket *socket;
-    map<string, TimblExperiment*> *experiments;
-  };
 
   // ***** This is the routine that is executed from a new thread *******
   void *httpChild( void *arg ){
@@ -584,7 +584,51 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       signal( SIGPIPE, SIG_IGN );
     }
   }
-  
+
+  void startExperimentsFromConfig( map<std::string, std::string> serverConfig,
+				   map<string, TimblExperiment*> experiments ){
+    map<string,string>::const_iterator it = serverConfig.begin();
+    while ( it != serverConfig.end() ){
+      TimblOpts opts( it->second );
+      string treeName;
+      string trainName;
+      bool mood;
+      if ( opts.Find( 'f', trainName, mood ) )
+	opts.Delete( 'f' );
+      else if ( opts.Find( 'i', treeName, mood ) )
+	opts.Delete( 'i' );
+      if ( !( treeName.empty() && trainName.empty() ) ){
+	TimblAPI *run = new TimblAPI( &opts, it->first );
+	bool result = false;
+	if ( run && run->Valid() ){
+	  if ( treeName.empty() ){
+	    //	    cerr << "trainName = " << trainName << endl;
+	    result = run->Learn( trainName );
+	  }
+	  else {
+	    //	    cerr << "treeName = " << treeName << endl;
+	    result = run->GetInstanceBase( treeName );
+	  }
+	}
+	if ( result ){
+	  run->initExperiment();
+	  experiments[it->first] = run->grabAndDisconnectExp();
+	  delete run;
+	  cerr << "started experiment " << it->first 
+	       << " with parameters: " << it->second << endl;
+	}
+	else {
+	  cerr << "FAILED to start experiment " << it->first 
+	       << " with parameters: " << it->second << endl;
+	}
+      }
+      else {
+	cerr << "missing '-i' or '-f' option in serverconfig file" << endl;
+      }
+      ++it;
+    }
+  }
+
   void RunClassicServer( TimblExperiment *Mother, int TCP_PORT ){
     string logFile =  Mother->logFile;
     string pidFile =  Mother->pidFile;
@@ -618,6 +662,9 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	exit(1);
       }
     }
+
+    map<string, TimblExperiment*> experiments;
+    startExperimentsFromConfig( Mother->serverConfig, experiments );
 
     int start = daemon( 0, logFile.empty() );
 
@@ -689,11 +736,12 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	// (The thread will terminate itself when done processing
 	// and release its socket handle)
 	//
-	*Dbg(Mother->my_debug()) << " Voor Create Client " << endl;
-	TimblExperiment *Chld = Mother->CreateClient( newSocket );
-	*Dbg(Mother->my_debug()) << " Na Create Client " << endl;
-	*Dbg(Chld->my_debug()) << "voor pthread_create " << endl;
-	pthread_create( &chld_thr, &attr, socketChild, (void *)Chld );
+	childArgs *args = new childArgs();
+	args->Mother = Mother;
+	args->socket = newSocket;
+	args->experiments = &experiments;
+	*Dbg(Mother->my_debug()) << "voor pthread_create " << endl;
+	pthread_create( &chld_thr, &attr, socketChild, (void *)args );
       }
       // the server is now free to accept another socket request 
     }
@@ -735,46 +783,8 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     }
 
     map<string, TimblExperiment*> experiments;
-    map<string,string>::const_iterator it = Mother->serverConfig.begin();
-    while ( it != Mother->serverConfig.end() ){
-      TimblOpts opts( it->second );
-      string treeName;
-      string trainName;
-      bool mood;
-      if ( opts.Find( 'f', trainName, mood ) )
-	opts.Delete( 'f' );
-      else if ( opts.Find( 'i', treeName, mood ) )
-	opts.Delete( 'i' );
-      if ( !( treeName.empty() && trainName.empty() ) ){
-	TimblAPI *run = new TimblAPI( &opts, it->first );
-	bool result = false;
-	if ( run && run->Valid() ){
-	  if ( treeName.empty() ){
-	    //	    cerr << "trainName = " << trainName << endl;
-	    result = run->Learn( trainName );
-	  }
-	  else {
-	    //	    cerr << "treeName = " << treeName << endl;
-	    result = run->GetInstanceBase( treeName );
-	  }
-	}
-	if ( result ){
-	  run->initExperiment();
-	  experiments[it->first] = run->grabAndDisconnectExp();
-	  delete run;
-	  cerr << "started experiment " << it->first 
-	       << " with parameters: " << it->second << endl;
-	}
-	else {
-	  cerr << "FAILED to start experiment " << it->first 
-	       << " with parameters: " << it->second << endl;
-	}
-      }
-      else {
-	cerr << "missing '-i' or '-f' option in serverconfig file" << endl;
-      }
-      ++it;
-    }
+    startExperimentsFromConfig( Mother->serverConfig, experiments );
+    
     int start = daemon( 0, logFile.empty() );
 
     if ( start < 0 ){
