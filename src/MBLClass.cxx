@@ -50,6 +50,7 @@
 #include "timbl/Tree.h"
 #include "timbl/Instance.h"
 #include "timbl/IBtree.h"
+#include "timbl/FdStream.h"
 #ifdef USE_LOGSTREAMS
 #include "timbl/LogStream.h"
 #else
@@ -193,6 +194,8 @@ namespace Timbl {
     is_copy = false;
     is_synced = false;
     tcp_socket = 0;
+    sock_is = 0;
+    sock_os = 0;
     Targets   = NULL;
     err_count = 0;
     MBL_init = false;
@@ -258,6 +261,8 @@ namespace Timbl {
       verbosity          = m.verbosity;
       do_exact_match     = m.do_exact_match;
       tcp_socket         = 0;
+      sock_is            = 0;
+      sock_os            = 0;
       if ( m.GlobalMetric )
 	GlobalMetric     = getMetricClass( m.GlobalMetric->type() );
       UserOptions        = m.UserOptions;
@@ -310,7 +315,7 @@ namespace Timbl {
     }
     return *this;
   }
-
+  
   MBLClass::~MBLClass(){
     CurrInst.clear();
     if ( !is_copy ){
@@ -335,6 +340,8 @@ namespace Timbl {
 	delete PermFeatures[i];
       }
     }
+    delete sock_is;
+    delete sock_os;
     delete GlobalMetric;
     delete tester;
     delete decay;
@@ -346,7 +353,7 @@ namespace Timbl {
     delete mydebug;
 #endif
   }
-
+  
 #ifdef PTHREADS
   
   void MBLClass::Info( const string& out_line ) const {
@@ -355,13 +362,11 @@ namespace Timbl {
       *Log(mylog) << "-" << exp_name << "-" << out_line << endl;
     else
       *Log(mylog) << out_line << endl;
- }
+  }
   
   void MBLClass::Warning( const string& out_line ) const {
-    if ( tcp_socket )
-      tcp_socket->write( "ERROR { " ) &&
-	tcp_socket->write( out_line ) &&
-	tcp_socket->write( " }\n" );
+    if ( sock_os )
+      *sock_os << "ERROR { " << out_line << " }" << endl;
     else {
       if ( exp_name != "" )
 	*Log(myerr) << "Warning:-" << exp_name << "-" << out_line << endl;
@@ -371,10 +376,8 @@ namespace Timbl {
   }
   
   void MBLClass::Error( const string& out_line ) const {
-    if ( tcp_socket )
-      tcp_socket->write( "ERROR { " ) &&
-	tcp_socket->write( out_line ) &&
-	tcp_socket->write( " }\n" );
+    if ( sock_os )
+      *sock_os << "ERROR { " << out_line << " }"  << endl;
     else {
       if ( exp_name != "" )
 	*Log(myerr) << "Error:-" << exp_name << "-" << out_line << endl;
@@ -385,10 +388,8 @@ namespace Timbl {
   }
   
   void MBLClass::FatalError( const string& out_line ) const {
-    if ( tcp_socket )
-      tcp_socket->write( "ERROR { " ) &&
-	tcp_socket->write( out_line ) &&
-	tcp_socket->write( " }\n" );
+    if ( sock_os )
+      *sock_os << "ERROR { " << out_line << " }" << endl;
     else {
       if ( exp_name != "" )
 	*Log(myerr) << "-" << exp_name << "-";
@@ -401,50 +402,8 @@ namespace Timbl {
       throw( "Stopped" );
     }
   }
-  
-  bool MBLClass::ShowOptions( ostream& os ) const{
-    bool result = true;
-    if ( is_copy && tcp_socket != 0 ){
-      result = tcp_socket->write( "STATUS\n" );
-    }
-    else
-      os << "Possible Experiment Settings (current value between []):" 
-	 << endl;
-    if ( result ){
-      ostringstream tmp;
-      Options.Show_Options( tmp );
-      string tmp_s = tmp.str();
-      if ( is_copy && tcp_socket != 0 )
-	result = tcp_socket->write( tmp_s ) &&
-	  tcp_socket->write( "ENDSTATUS\n" );
-      else
-	os << tmp_s << endl;
-    }
-    return result;
-  }
-  
-  bool MBLClass::ShowSettings( ostream& os ) const{
-    bool result = true;
-    if ( is_copy && tcp_socket != 0 ){
-      result = tcp_socket->write( "STATUS\n" );
-    }
-    else
-      os << "Current Experiment Settings :" << endl;
-    if ( result ){
-      ostringstream tmp;
-      Options.Show_Settings( tmp );
-      string tmp_s = tmp.str();
-      if ( is_copy && tcp_socket != 0 )
-	result = tcp_socket->write( tmp_s ) &&
-	  tcp_socket->write( "ENDSTATUS\n" );
-      else
-	os << tmp_s << endl;
-    }
-    return result;
-  }
-  
-#else
-  
+    
+#else  
   
   void MBLClass::Info( const string& out_line ) const {
     if ( exp_name != "" )
@@ -477,6 +436,8 @@ namespace Timbl {
     throw( "Stopped" );
   }
   
+#endif // PTHREADS
+  
   bool MBLClass::ShowOptions( ostream& os ) const {
     os << "Possible Experiment Settings (current value between []):" << endl;
     Options.Show_Options( os );
@@ -484,15 +445,40 @@ namespace Timbl {
     return true;
   }
  
-  bool MBLClass::ShowSettings( ostream& os ) const {
+  bool MBLClass::ShowSettingsSocket() const{
+    *sock_os << "STATUS" << endl;
+    Options.Show_Settings( *sock_os );
+    *sock_os << "ENDSTATUS" << endl;
+    return sock_os->good();
+  }
+
+  bool MBLClass::ShowSettings( ostream& os ) const{
     os << "Current Experiment Settings :" << endl;
     Options.Show_Settings( os );
     os << endl;
     return true;
   }
   
-#endif // PTHREADS
-
+  bool MBLClass::connectToSocket( ServerSocket& socket ){
+    if ( socket.isValid() ){
+      if ( sock_is || sock_os ){
+	throw( logic_error( "connectToSocket:: already connected!" ) );
+      }
+      else {
+	int id = socket.getSockId();
+	sock_is = new fdistream( id );
+	sock_os = new fdostream( id );
+	if ( sock_is && sock_os && sock_is->good() && sock_os->good() ){
+	  tcp_socket = &socket;
+	  return true;
+	}
+	else 
+	  FatalError( "connecting streams to socket failed" );
+      }
+    }
+    return false;
+  }  
+  
   xmlNode *MBLClass::settingsToXml() const{
     ostringstream tmp;
     Options.Show_Settings( tmp );

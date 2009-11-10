@@ -243,7 +243,7 @@ namespace Timbl {
     if ( OptParams ){
       result->OptParams = OptParams->Clone( socket );
     }
-    result->Socket( socket );
+    result->connectToSocket( *socket );
     result->WFileName = WFileName;
     result->CurrentDataFile = CurrentDataFile;
     *Dbg(mydebug) << "created a new Client" << endl;

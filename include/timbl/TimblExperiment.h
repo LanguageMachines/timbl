@@ -109,7 +109,7 @@ namespace Timbl {
     TimblExperiment *CreateClient( ServerSocket* ) const;
     TimblExperiment *splitChild() const;
     VerbosityFlags ServerVerbosity() { return get_s_verbosity(); };
-    ServerSocket *TcpSocket() const { return Socket(); };
+    ServerSocket *TcpSocket() const { return tcp_socket; };
     int Max_Connections() const { return max_conn; };
     bool SetOptions( int, const char ** );
     bool SetOptions( const std::string& );

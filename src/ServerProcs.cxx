@@ -275,7 +275,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	  go_on = do_command( Param, Exp );
 	  break;
 	case Query:
-	  go_on = Exp->ShowSettings( *Log(Exp->my_log()) );
+	  go_on = Exp->ShowSettingsSocket();
 	  break;
 	case Exit:
 	  go_on = sock->write( "OK" ) && sock->write( " Closing\n" );

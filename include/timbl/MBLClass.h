@@ -39,7 +39,7 @@ namespace Timbl {
   class MBLClass {
   public:
     bool SetOption( const std::string& );
-    bool ShowSettings( std::ostream& ) const;
+    bool ShowSettingsSocket() const;
     xmlNode *settingsToXml() const;
     bool ShowWeights( std::ostream& ) const;
     LogStream& my_err() const { return *myerr; };
@@ -51,6 +51,8 @@ namespace Timbl {
     void ResetVerbosityFlag( VerbosityFlags v ) { verbosity &= ~v; };
     bool MBLInit() const { return MBL_init; };
     void MBLInit( bool b ) { MBL_init = b; };
+    std::istream *sock_is;
+    std::ostream *sock_os;
   protected:
     enum PhaseValue { TrainWords, LearnWords, TestWords, TrainLearnWords };
     friend std::ostream& operator<< ( std::ostream&, const PhaseValue& );
@@ -64,6 +66,7 @@ namespace Timbl {
     bool readWeights( std::istream&, WeightType );
     bool writeNamesFile( std::ostream& ) const;
     bool ShowOptions( std::ostream& ) const;
+    bool ShowSettings( std::ostream& ) const;
     void writePermutation( std::ostream& ) const;
     void LearningInfo( std::ostream& );
     MBLClass( const std::string& = "" );
@@ -123,8 +126,7 @@ namespace Timbl {
     void Error( const std::string& ) const;
     void FatalError( const std::string& ) const;
     size_t MaxFeats() const { return MaxFeatures; };
-    void Socket( ServerSocket *so ){ tcp_socket = so ; };
-    ServerSocket *Socket() const { return tcp_socket; };
+    bool connectToSocket( ServerSocket& );
     int Progress() const { return progress; };
     void Progress( int p ){ progress =  p; };
     Target   *Targets;
@@ -190,6 +192,7 @@ namespace Timbl {
     void initTesters();
     Chopper *ChopInput;
     int F_length;
+    ServerSocket *tcp_socket;
   private:
     size_t MaxFeatures;
     std::vector<MetricType> UserOptions;
@@ -203,7 +206,6 @@ namespace Timbl {
     size_t effective_feats;
     int clip_factor;
     int Bin_Size;
-    ServerSocket *tcp_socket;
     int progress;
     size_t tribl_offset;
     unsigned igThreshold;
