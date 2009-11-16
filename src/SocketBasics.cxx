@@ -41,6 +41,7 @@
 #include "timbl/SocketBasics.h"
 
 using namespace std;
+using namespace Timbl;
 
 namespace Sockets {
   const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers
