@@ -75,8 +75,7 @@ namespace Timbl{
     ~TimblAPI();
     bool Valid() const;
     bool StartServer( const int, const int=10 );
-    bool StartSocketServer( const int, const int=10 );
-    bool StartHttpServer( const int, const int=10 );
+    bool StartMultiServer( const std::string& );
     TimblExperiment *grabAndDisconnectExp(){
       TimblExperiment *res = 0;
       if ( Valid() )

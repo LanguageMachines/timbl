@@ -271,6 +271,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     ostream *os = new fdostream( sockId );
     istream *is = new fdistream( sockId );
     string baseName;
+    *os << "Welcome to the Timbl Server." << endl;
     if ( args->experiments->empty() ){
       baseName == "default";
       *Dbg(args->Mother->my_debug()) << " Voor Create Default Client " << endl;
@@ -285,16 +286,27 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       *Log(Chld->my_log()) << line << ", started at: " 
 			   << Timer::now() << endl;  
     }
-    *os << "Welcome to the Timbl Server." << endl;
+    else {
+      *os << "available bases: ";
+      map<string,TimblExperiment*>::const_iterator it = args->experiments->begin();
+      while ( it != args->experiments->end() ){
+	*os << it->first << " ";
+	++it;
+      }
+      *os << endl;
+    }
     if ( getline( *is, Line ) ){
-      //      *Log(Chld->my_log()) << "FirstLine='" << Line << "'" << endl;
+      *Dbg(args->Mother->my_log()) << "FirstLine='" << Line << "'" << endl;
       string Command, Param;
       int result = 0;
       bool go_on = true;
-      *Dbg(Chld->my_debug()) << "running FromSocket: " << sockId << endl;
+      *Dbg(args->Mother->my_debug()) << "running FromSocket: " << sockId << endl;
       
       do {
-	*Dbg(Chld->my_debug()) << "Line='" << Line << "'" << endl;
+	string::size_type pos = Line.find('\r');
+	if ( pos != string::npos )
+	  Line.erase(pos,1);
+	*Dbg(args->Mother->my_debug()) << "Line='" << Line << "'" << endl;
 	Split( Line, Command, Param );
 	switch ( check_command(Command) ){
 	case Base:{
@@ -302,6 +314,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	    = args->experiments->find(Param);
 	  if ( it != args->experiments->end() ){
 	    baseName = Param;
+	    *os << "selected base: '" << Param << "'" << endl;
 	    if ( Chld )
 	      delete Chld;
 	    *Dbg(args->Mother->my_debug()) 
@@ -324,35 +337,52 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	}
 	  break;
 	case Set:
-	  go_on = doSet( Param, Chld );
+	  if ( !Chld )
+	    *os << "you haven't selected a base yet!" << endl;
+	  else
+	    go_on = doSet( Param, Chld );
 	  break;
 	case Query:
-	  *os << "STATUS" << endl;
-	  Chld->ShowSettings( *os );
-	  *os << "ENDSTATUS" << endl;
+	  if ( !Chld )
+	    *os << "you haven't selected a base yet!" << endl;
+	  else {
+	    *os << "STATUS" << endl;
+	    Chld->ShowSettings( *os );
+	    *os << "ENDSTATUS" << endl;
+	  }
 	  break;
 	case Exit:
 	  *os << "OK Closing" << endl;
+	  delete Chld;
+	  delete is;
+	  delete os;
 	  return result;
 	  break;
 	case Classify:
-	  if ( classifyOneLine( Chld, Param ) )
-	    result++;
-	  go_on = true; // HACK?
+	  if ( !Chld )
+	    *os << "you haven't selected a base yet!" << endl;
+	  else {
+	    if ( classifyOneLine( Chld, Param ) )
+	      result++;
+	    go_on = true; // HACK?
+	  }
 	  break;
 	case Comment:
 	  *os << "SKIP '" << Line << "'" << endl;
 	  break;
 	default:
 	  if ( Chld->ServerVerbosity() & CLIENTDEBUG )
-	    *Log(Chld->my_log()) << sockId << ": Don't understand '" 
-				 << Line << "'" << endl;
+	    *Log(args->Mother->my_log()) << sockId << ": Don't understand '" 
+					 << Line << "'" << endl;
 	  *os << "ERROR { Illegal instruction:'" << Command << "' in line:" 
 	      << Line << "}" << endl;
 	  break;
 	}
       }
       while ( go_on && getline( *is, Line ) );
+      delete Chld;
+      delete is;
+      delete os;
       return result;
     }
     return 0;

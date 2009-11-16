@@ -50,8 +50,7 @@ bool Do_LOO = false;
 bool Do_NS = false;
 bool Do_Indirect = false;
 bool Do_Server = false;
-bool Do_Socket_Server = false;
-bool Do_Http_Server = false;
+bool Do_Multi_Server = false;
 int ServerPort = -1;
 int Max_Connections = 10;
 bool Do_Save_Perc = false;
@@ -61,6 +60,7 @@ string O_Path = "";
 string Q_value = "";
 string dataFile = "";
 string TestFile = "";
+string ServerConfigFile = "";
 string OutputFile = "";
 string PercFile = "";
 string MatrixInFile = "";
@@ -356,26 +356,23 @@ void Preset_Values( TimblOpts& Opts ){
   Opts.Add( 'v', "F", true );
   Opts.Add( 'v', "S", false );
   if ( Opts.Find( "serverconfig", value, mood ) ){
-    Do_Server = true;
     if ( Do_LOO || Do_CV || Do_Indirect ){
       cerr << "Cannot run as a server when -t option is also specified." 
 	   << endl;
       exit(3);
     }
-    else {
-//       Do_Socket_Server = true;
-//       if ( Opts.Find( "Http", value, mood ) && mood == false ){
-// 	Opts.Delete( "Http" );
-// 	Do_Http_Server = false;
-//       }
-//       else
- 	Do_Http_Server = true;
-    }
+    ServerConfigFile = correct_path( value, I_Path, true );
+    Opts.Delete( "serverconfig" );
+    Do_Multi_Server = true;
   }
   if ( Opts.Find( 'S', value, mood ) ){
     if ( Do_LOO || Do_CV || Do_Indirect ){
       cerr << "Cannot run as a server when -t option is also specified." 
 	   << endl;
+      exit(3);
+    }
+    else if ( Do_Multi_Server ){
+      cerr << "options -S conflicts with option --serverconfig" << endl;
       exit(3);
     }
     else {
@@ -388,6 +385,14 @@ void Preset_Values( TimblOpts& Opts ){
     }
   }
   if ( Opts.Find( 'C', value, mood ) ){
+    if ( Do_Multi_Server ){
+      cerr << "-C must be specified in the severconfigfile" << endl;
+      exit(3);
+    }
+    if ( !Do_Server ){
+      cerr << "-C option invalid without -S" << endl;
+      exit(3);
+    }
     Max_Connections = stringTo<int>( value );
     if ( Max_Connections < 1 || Max_Connections > 1000 ){
       cerr << "-C options, max number of connection invalid: " 
@@ -764,7 +769,7 @@ int main(int argc, char *argv[]){
       usage();
       return 3;
     }
-    if ( !Do_Server )
+    if ( !Do_Server  && !Do_Multi_Server )
       Run->Set_Single_Threaded();
     Default_Output_Names( Opts );
     if ( Do_CV ){
@@ -775,46 +780,45 @@ int main(int argc, char *argv[]){
       delete Run;
     }
     else if ( Do_Server ){
-      if ( Do_Http_Server ){
-	Run->StartHttpServer( ServerPort, Max_Connections );
+      // Special case:   running a classic Server
+      if ( !checkInputFile( TreeInFile ) ||
+	   !checkInputFile( dataFile ) ||
+	   !checkInputFile( WgtInFile ) ||
+	   !checkInputFile( MatrixInFile ) ||
+	   !checkInputFile( ProbInFile ) ||
+	   !checkOutputFile( ProbOutFile ) ){
+	delete Run;
+	return 3;
       }
-      else if ( Do_Socket_Server ){
-	Run->StartSocketServer( ServerPort, Max_Connections );
+      if ( TreeInFile != "" ){
+	if ( !Run->GetInstanceBase( TreeInFile ) ){
+	  return 3;
+	}
       }
       else {
-	// Special case:   running a Server
-	if ( !checkInputFile( TreeInFile ) ||
-	     !checkInputFile( dataFile ) ||
-	     !checkInputFile( WgtInFile ) ||
-	     !checkInputFile( MatrixInFile ) ||
-	     !checkInputFile( ProbInFile ) ||
-	     !checkOutputFile( ProbOutFile ) ){
-	  delete Run;
-	return 3;
+	if ( !Run->Learn( dataFile ) ){
+	  return 3;
 	}
-	if ( TreeInFile != "" ){
-	  if ( !Run->GetInstanceBase( TreeInFile ) ){
-	    return 3;
-	  }
-	}
-	else {
-	  if ( !Run->Learn( dataFile ) ){
-	    return 3;
-	  }
-	}
-	if ( WgtInFile != "" ) {
-	  Run->GetWeights( WgtInFile, WgtType );
-	}
-	if ( ProbOutFile != "" )
-	  Run->WriteArrays( ProbOutFile );
-	if ( ProbInFile != "" )
-	  Run->GetArrays( ProbInFile );
-	if ( MatrixInFile != "" ) {
-	  Run->GetMatrices( MatrixInFile );
-	}
-	Run->StartServer( ServerPort, Max_Connections );
-	return 0;
       }
+      if ( WgtInFile != "" ) {
+	Run->GetWeights( WgtInFile, WgtType );
+      }
+      if ( ProbOutFile != "" )
+	Run->WriteArrays( ProbOutFile );
+      if ( ProbInFile != "" )
+	Run->GetArrays( ProbInFile );
+      if ( MatrixInFile != "" ) {
+	Run->GetMatrices( MatrixInFile );
+      }
+      Run->StartServer( ServerPort, Max_Connections );
+      return 0;
+    }
+    else if ( Do_Multi_Server ){
+      if ( !checkInputFile( ServerConfigFile ) ){
+	delete Run;
+	return 3;
+      }
+      Run->StartMultiServer( ServerConfigFile );
     }
     else {
       bool do_test = false;

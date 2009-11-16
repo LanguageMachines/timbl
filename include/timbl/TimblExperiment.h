@@ -98,9 +98,8 @@ namespace Timbl {
     bool WriteInstanceBaseLevels( const std::string&, unsigned int );
     bool WriteNamesFile( const std::string& ) const;
     bool StartClassicServer( const int, const int );
-    bool fillServerConfig();
-    bool StartSocketServer( const int, const int );
-    bool StartHttpServer( const int, const int );
+    bool fillServerConfig( const std::string& );
+    bool StartMultiServer( const std::string& );
     bool SetSingleThreaded();
     int Estimate() const { return estimate; };
     void Estimate( int e ){ estimate = e; };
@@ -240,6 +239,8 @@ namespace Timbl {
     TimblExperiment& operator=( const TimblExperiment& );
     int estimate;
     int max_conn;
+    int serverPort;
+    std::string serverProtocol;
     const TargetValue *classifyString( const std::string& , double& );
   }; 
   

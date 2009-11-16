@@ -328,7 +328,10 @@ namespace Timbl {
     }
   }
   
-  bool TimblExperiment::fillServerConfig(){
+  bool TimblExperiment::fillServerConfig( const string& serverConfigFile ){
+    max_conn = 25;
+    serverPort = -1;
+    serverProtocol = "http";
     ifstream is( serverConfigFile.c_str() );
     if ( !is ){
       Error( "problem reading " + serverConfigFile );
@@ -349,29 +352,60 @@ namespace Timbl {
 	  string base = line.substr(0,ispos);
 	  string rest = line.substr( ispos+1 );
 	  if ( !rest.empty() ){
-	    string::size_type spos = 0;
-	    if ( rest[0] == '"' )
-	      spos = 1;
-	    string::size_type epos = rest.length()-1;
-	    if ( rest[epos] == '"' ) 
-	      --epos;
-	    serverConfig[base] = rest.substr( spos, epos );
+	    string tmp = base;
+	    lowercase(tmp);
+	    if ( tmp == "maxconn" ){
+	      if ( !stringTo( rest, max_conn ) ){
+		Error( "invalid value for maxconn" );
+		return false;
+	      }
+	    }
+	    else if ( tmp == "port" ){
+	      if ( !stringTo( rest, serverPort ) ){
+		Error( "invalid value for port" );
+		return false;
+	      }
+	    }
+	    else if ( tmp == "protocol" ){
+	      string protocol = rest;
+	      lowercase( protocol );
+	      if ( protocol != "http" && protocol != "tcp" ){
+		Error( "invalid protocol" );
+		return false;
+	      }
+	      serverProtocol = protocol;
+	    }
+	    else {
+	      string::size_type spos = 0;
+	      if ( rest[0] == '"' )
+		spos = 1;
+	      string::size_type epos = rest.length()-1;
+	      if ( rest[epos] == '"' ) 
+		--epos;
+	      serverConfig[base] = rest.substr( spos, epos );
+	    }
 	  }
 	}
       }
-      return true;
+      if ( serverPort < 0 ){
+	Error( "missing 'port=' entry in config file" );
+	return false;
+      }
+      else
+	return true;
     }
   }
   
-  bool TimblExperiment::StartHttpServer( const int port, const int max_c ){
+  bool TimblExperiment::StartMultiServer( const string& config ){
     if ( ConfirmOptions() ){
-      if ( fillServerConfig() ){
-	map<string,string>::const_iterator it = serverConfig.begin();
-	while( it != serverConfig.end() ){
-	  ++it;
-	}
-	max_conn = max_c;
-	RunHttpServer( this, port );
+      if ( fillServerConfig( config ) ){
+	if ( serverProtocol == "http" )
+	  RunHttpServer( this, serverPort );
+	else
+	  RunClassicServer( this, serverPort );
+      }
+      else {
+	Error( "invalid serverconfig" );
       }
     }
     else {
@@ -379,24 +413,7 @@ namespace Timbl {
     }
     return false;
   }
-  
-  bool TimblExperiment::StartSocketServer( const int port, const int max_c ){
-    if ( ConfirmOptions() ){
-      if ( fillServerConfig() ){
-	map<string,string>::const_iterator it = serverConfig.begin();
-	while( it != serverConfig.end() ){
-	  ++it;
-	}
-	max_conn = max_c;
-	RunClassicServer( this, port );
-      }
-    }
-    else {
-      Error( "invalid options" );
-    }
-    return false;
-  }
-  
+      
   bool TimblExperiment::StartClassicServer( const int port, const int max_c ){
     initExperiment( true );
     max_conn = max_c;
