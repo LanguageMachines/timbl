@@ -91,7 +91,7 @@ namespace Timbl {
     *Log(Mother->my_err()) << "Server Mode not available" << endl;
   }
   void RunClient( istream&, ostream&, 
-		  const string&, const string&, bool ){
+		  const string&, const string&, bool, const string& ){
     cerr << "Client Mode not available" << endl;
   }
 #else // PTHREADS
@@ -102,7 +102,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 
   enum CommandType { UnknownCommand, Classify, Base, 
 		     Query, Set, Exit, Comment };
-  enum CodeType { UnknownCode, Result, Error, OK, Skip,
+  enum CodeType { UnknownCode, Result, Error, OK, Echo, Skip,
 		  Neighbors, EndNeighbors, Status, EndStatus };
   
   inline void Split( const string& line, string& com, string& rest ){
@@ -140,6 +140,10 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       result = Error;
     else if ( compare_nocase( com, "OK" ) )
       result = OK;
+    else if ( compare_nocase( com, "AVAILABLE" ) )
+      result = Echo;
+    else if ( compare_nocase( com, "SELECTED" ) )
+      result = Echo;
     else if ( compare_nocase( com, "SKIP" ) )
       result = Skip;
     else if ( compare_nocase( com, "NEIGHBORS" ) )
@@ -933,7 +937,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
   
   void RunClient( istream& Input, ostream& Output, 
 		  const string& NODE, const string& TCP_PORT, 
-		  bool classify_mode ){
+		  bool classify_mode, const string& base ){
     bool Stop_C_Flag = false;
     cout << "Starting Client on node:" << NODE << ", port:" 
 	 << TCP_PORT << endl;
@@ -944,6 +948,9 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       if ( client.read( ResultLine ) ){
 	cout << ResultLine << endl;
 	cout << "Start entering commands please:" << endl;
+	if ( !base.empty() ){
+	  client.write( "base " + base + "\n" );
+	}
 	while( !Stop_C_Flag &&
 	       getline( Input, TestLine ) ){ 
 	  if ( classify_mode )
@@ -956,6 +963,9 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	      switch ( get_code( Code ) ){
 	      case OK:
 		Output << "OK" << endl;
+		break;
+	      case Echo:
+		Output << ResultLine << endl;
 		break;
 	      case Skip:
 		Output << "Skipped " << Rest << endl;
@@ -988,6 +998,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 		break;
 	      default:
 		Output << "Server is confused?? " << ResultLine << endl;
+		Output << "Code was '" << Code << "'" << endl;
 		break;
 	      }
 	    }

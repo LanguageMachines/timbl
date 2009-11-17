@@ -73,6 +73,7 @@ int main(int argc, char *argv[] ){
   ifstream input_file;
   ofstream output_file;
   bool c_mode = false;
+  string base;
   if ( argc > 3 ){
     if ( (input_file.open( argv[3], ios::in ), !input_file.good() ) ){
       cerr << argv[0] << " - couldn't open inputfile " << argv[3] << endl;
@@ -89,13 +90,15 @@ int main(int argc, char *argv[] ){
       Output = &output_file;
       if ( argc > 5 )
 	c_mode = compare_nocase_n( "BATCH", argv[5] );
+      if ( argc > 6 )
+	base = argv[6];
     }
   }
   else if ( argc < 3 ){
     usage( argv[0] );
     exit(1);
   }
-  RunClient( *Input, *Output, argv[1], argv[2], c_mode );
+  RunClient( *Input, *Output, argv[1], argv[2], c_mode, base );
   exit(0);
 }
 

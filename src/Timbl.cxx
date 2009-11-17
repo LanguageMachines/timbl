@@ -384,6 +384,12 @@ void Preset_Values( TimblOpts& Opts ){
       }
     }
   }
+  else {
+    if ( Do_Multi_Server ){
+      Opts.Add( 'S', "0", true );
+      // hack to signal GetOptClass that we are going into server mode
+    }
+  }
   if ( Opts.Find( 'C', value, mood ) ){
     if ( Do_Multi_Server ){
       cerr << "-C must be specified in the severconfigfile" << endl;

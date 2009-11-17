@@ -29,6 +29,7 @@
 namespace Timbl {
   void RunServer( Timbl::TimblExperiment *Mother, int TCP_PORT );
   void RunClient( std::istream&, std::ostream&, 
-		  const std::string&, const std::string&, bool );
+		  const std::string&, const std::string&, bool,
+		  const std::string& );
 }
 #endif
