@@ -392,16 +392,6 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     return 0;
   }
   
-  void show_results(  ostream& os, Timer& timeDone, int nw ){
-    os << "Thread " << (uintptr_t)pthread_self() << ", terminated at: " 
-       << Timer::now()
-       << "Total time used in this thread: " 
-       << timeDone << ", " << nw << " instances processed " ;
-    if ( timeDone.secs() > 0 )
-      os << " (" << nw/timeDone.secs() << " instances/sec)";
-    os << endl;
-  }
-
 
   // ***** This is the routine that is executed from a new thread *******
   void *socketChild( void *arg ){
@@ -424,7 +414,15 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
       Timer timeDone;
       timeDone.start();
       int nw = runFromSocket( args );
-      show_results( *Log(Mother->my_log()), timeDone, nw );
+      *Log(Mother->my_log()) << "Thread " << (uintptr_t)pthread_self() 
+			     << ", terminated at: " << Timer::now()
+			     << "Total time used in this thread: " 
+			     << timeDone << ", " << nw 
+			     << " instances processed ";
+      if ( timeDone.secs() > 0 && nw > 0 )
+	*Log(Mother->my_log()) << " (" << nw/timeDone.secs() 
+			       << " instances/sec)";
+      *Log(Mother->my_log()) << endl;
       //
       pthread_mutex_lock(&my_lock);
       // use a mutex to update and display the global service counter
@@ -462,24 +460,18 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     else {
       pthread_mutex_unlock( &my_lock );
       // process the test material
-      // and do the timing
-      //
-      Timer timeDone;
       // report connection to the server terminal
       //
-      char line[256];
-      sprintf( line, "Thread %lu, on Socket %d", (uintptr_t)pthread_self(),
+      char logLine[256];
+      sprintf( logLine, "Thread %lu, on Socket %d", (uintptr_t)pthread_self(),
 	       sockId );
-      Mother->my_debug().message( line );
-      *Log(Mother->my_log()) << line << ", started at: " 
+      *Log(Mother->my_log()) << logLine << ", started at: " 
 			     << Timer::now() << endl;  
       signal( SIGPIPE, BrokenPipeChildFun );
-      timeDone.start();
       string Line;
       int timeout = 1;
-      int nw=0;
       if ( nb_getline( is, Line, timeout ) ){
-	*Log(Mother->my_debug()) << "FirstLine='" << Line << "'" << endl;
+	*Dbg(Mother->my_debug()) << "FirstLine='" << Line << "'" << endl;
 	if ( Line.find( "HTTP" ) != string::npos ){
 	  // skip HTTP header
 	  string tmp;
@@ -491,7 +483,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	  if ( spos != string::npos ){
 	    string::size_type epos = Line.find( " HTTP" );
 	    string line = Line.substr( spos+3, epos - spos - 3 );
-	    *Log(Mother->my_debug()) << "Line='" << line << "'" << endl;
+	    *Dbg(Mother->my_debug()) << "Line='" << line << "'" << endl;
 	    epos = line.find( "?" );
 	    string basename;
 	    if ( epos != string::npos ){
@@ -504,7 +496,14 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 		if ( it != experiments->end() ){
 		  TimblExperiment *api = it->second->CreateClient( args->socket );
 		  if ( api ){
-		    api->setExpName(string("exp-")+toString(sockId) );
+		    string name = string("exp-")+toString(sockId);
+		    api->setExpName( name );
+		    LogStream LS( &Mother->my_log() );
+		    LogStream DS( &Mother->my_debug() );
+		    DS.message(logLine);
+		    LS.message(logLine);
+		    DS.setstamp( StampBoth );
+		    LS.setstamp( StampBoth );
 		    XmlDoc doc( "TiMblResult" );
 		    xmlNode *root = doc.getRoot();
 		    XmlSetAttribute( root, "algorithm", toString(api->Algorithm()) );
@@ -525,8 +524,8 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 			  acts.insert( make_pair(parts[0], tmp ) );
 			}
 			else {
-			  *Log(Mother->my_log()) << "unknown word in query "
-						 << avs[i] << endl;
+			  LS << "unknown word in query "
+			     << avs[i] << endl;
 			}
 		      }
 		      typedef multimap<string,string>::const_iterator mmit;
@@ -536,15 +535,16 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 			string opt = it->second;
 			if ( !opt.empty() && opt[0] != '-' && opt[0] != '+' )
 			  opt = string("-") + opt;
-			*Log(Mother->my_log()) << "set :" << opt << endl;
+			if ( Mother->ServerVerbosity() & CLIENTDEBUG )
+			  DS << "set :" << opt << endl;
 			if ( api->SetOptions( opt ) ){
 			  if ( !api->ConfirmOptions() ){
 			    os << "set " << opt << " failed" << endl;
 			  }
 			}
 			else {
-			  *Log(Mother->my_log()) << ": Don't understand set='" 
-						 << opt << "'" << endl;
+			  LS << ": Don't understand set='" 
+			     << opt << "'" << endl;
 			  os << ": Don't understand set='" 
 			     << it->second << "'" << endl;
 			}
@@ -562,7 +562,8 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 			  XmlAddChild( root, tmp );
 			}
 			else 
-			  *Log(Mother->my_log()) << "don't know how to SHOW: " << it->second << endl;
+			  LS << "don't know how to SHOW: " 
+			     << it->second << endl;
 			
 			++it;
 		      }
@@ -573,25 +574,32 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 			params = urlDecode(params);
 			int len = params.length();
 			if ( len > 2 ){
-			  *Log(Mother->my_debug()) << "params=" << params << endl;
-			  *Log(Mother->my_debug()) << "params[0]='" << params[0] << "'" << endl;
-			  *Log(Mother->my_debug()) << "params[len-1]='" << params[len-1] << "'" << endl;
+			  DS << "params=" << params << endl
+			     << "params[0]='" 
+			     << params[0] << "'" << endl
+			     << "params[len-1]='" 
+			     << params[len-1] << "'" 
+			     << endl;
 			  
 			  if ( ( params[0] == '"' && params[len-1] == '"' )
 			       || ( params[0] == '\'' && params[len-1] == '\'' ) )
 			    params = params.substr( 1, len-2 );
 			}
-			*Log(Mother->my_debug()) << "base='" << basename << "'" << endl;
-			*Log(Mother->my_debug()) << "command='classify'" << endl;
+			DS << "base='" << basename << "'"
+			   << endl
+			   << "command='classify'" 
+			   << endl;
 			string distrib, answer; 
 			double distance;
-			*Log(Mother->my_debug()) << "Classify(" << params << ")" << endl;
+			if ( Mother->ServerVerbosity() & CLIENTDEBUG )
+			  LS << "Classify(" << params << ")" << endl;
 			if ( api->Classify( params, answer, distrib, distance ) ){
 			  
-			  *Log(Mother->my_debug()) << "resultaat: " << answer 
-						   << ", distrib: " << distrib
-						   << ", distance " << distance
-						   << endl;
+			  if ( Mother->ServerVerbosity() & CLIENTDEBUG )
+			    LS << "resultaat: " << answer 
+			       << ", distrib: " << distrib
+			       << ", distance " << distance
+			       << endl;
 			  
 			  xmlNode *cl = XmlNewChild( root, "classification" );
 			  XmlNewChild( cl, "input", params );
@@ -609,21 +617,20 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 			  }
 			}
 			else {
-			  *Log(Mother->my_log()) << "classification failed"
-						 << endl;
+			  DS << "classification failed" << endl;
 			}
 			++it;
 		      }
 		    }
 		    string tmp = doc.toString();
-		    cerr << "THE DOCUMENT for sending!" << endl << tmp << endl;
+		    // cerr << "THE DOCUMENT for sending!" << endl << tmp << endl;
 		    int timeout=10;
 		    nb_putline( os, tmp , timeout );
 		    delete api;
 		  }
 		}
 		else {
-		  *Log(Mother->my_log()) << "invalid BASE! '" << basename 
+		  *Dbg(Mother->my_log()) << "invalid BASE! '" << basename 
 					 << "'" << endl;
 		  os << "invalid basename: '" << basename << "'" << endl;
 		}
@@ -633,7 +640,9 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	  }
 	}
       }
-      show_results(  *Log(Mother->my_log()), timeDone, nw );
+      
+      *Log(Mother->my_log()) << "Thread " << (uintptr_t)pthread_self() 
+			     << ", terminated at: " << Timer::now() << endl;
       os.flush();
       //
       // close the socket and exit this thread
