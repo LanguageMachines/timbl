@@ -653,6 +653,16 @@ namespace Timbl {
     return Valid() && pimpl->ShowSettings( os );
   }
   
+  bool TimblAPI::ShowIBInfo( ostream& os ) const{
+    if ( Valid() ){
+      pimpl->IBInfo( os );
+      return true;
+    }
+    else
+      return false;
+	
+  }
+  
   bool TimblAPI::ShowStatistics( ostream& os ) const{
     return Valid() && pimpl->showStatistics( os );
   }
