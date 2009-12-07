@@ -1,6 +1,8 @@
-6.2.0.99.1 - 2009-11-DD
+6.2.1 - 2009-11-30
 
-- FIXME
+- Fixed compilation problem on Cygwin
+- Added functions to API
+- Improved server functionality (undocumented yet)
 
 6.2.0 - 2009-11-03
 
