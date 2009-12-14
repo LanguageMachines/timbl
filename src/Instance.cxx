@@ -892,7 +892,7 @@ namespace Timbl {
     // Info. gain.
     //
     info_gain = DBentropy - entropy;
-    if ( info_gain < 0.0 ){
+    if ( info_gain < 0.0 )
       info_gain = 0.0;
     // And the split. info.
     //
