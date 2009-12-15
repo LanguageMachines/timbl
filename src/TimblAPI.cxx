@@ -468,6 +468,18 @@ namespace Timbl {
     return false;
   }
   
+  const Instance *TimblAPI::lastHandledInstance() const {
+    if ( Valid() )
+      return &pimpl->CurrInst;
+    return 0;
+  }
+
+  const Target *TimblAPI::myTargets() const{
+    if ( Valid() )
+      return pimpl->Targets;
+    return 0;    
+  }
+
   bool TimblAPI::Classify( const string& s, string& d ){
     return Valid() && pimpl->Classify( s, d );
   }
