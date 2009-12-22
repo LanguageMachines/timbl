@@ -49,8 +49,8 @@ void *do_child( void *arg ){
   // process the test material
   //
   char line[256];
-  sprintf( line, "Server: Thread %u, on Socket %d", 
-	   (unsigned int)pthread_self(),
+  sprintf( line, "Server: Thread %lu, on Socket %d", 
+	   (uintptr_t)pthread_self(),
 	   mysock->getSockId() );
   cerr << line << ", started" << endl;
   string buf;
@@ -85,8 +85,8 @@ void *do_to_child( void *arg ){
   // process the test material
   //
   char line[256];
-  sprintf( line, "ToServer: Thread %u, on Socket %d", 
-	   (unsigned int)pthread_self(),
+  sprintf( line, "ToServer: Thread %lu, on Socket %d", 
+	   (uintptr_t)pthread_self(),
 	   mysock->getSockId() );
   cerr << line << ", started" << endl;
   string buf;
