@@ -176,11 +176,11 @@ namespace Timbl {
     const neighborSet *NB_Classify( const std::string& );
     
     bool LocalTest( const Instance& , std::ostream& );    
+    virtual void initExperiment( bool = false );
     
   protected:
     TimblExperiment( const AlgorithmType, const std::string& = "" );
     virtual TimblExperiment *clone() const = 0;
-    virtual void initExperiment( bool = false );
     virtual bool checkLine( const std::string& );
     virtual const TargetValue *LocalClassify( const Instance& , 
 					      double&,
@@ -296,9 +296,9 @@ namespace Timbl {
 	       const std::string& );
     AlgorithmType Algorithm() const { return LOO_a; };
     bool ReadInstanceBase( const std::string& );
+    void initExperiment( bool = false );
   protected:
     bool checkTestFile( );
-    void initExperiment( bool = false );
     void showTestingInfo( std::ostream& );
   };
   
@@ -387,12 +387,12 @@ namespace Timbl {
     void InitInstanceBase();
     bool WriteInstanceBase( const std::string& );
     bool ReadInstanceBase( const std::string& );
+    void initExperiment( bool = false );
   protected:
     TimblExperiment *clone() const { 
       return new IG_Experiment( MaxFeats(), "", false ); };
     bool checkTestFile();
     void showTestingInfo( std::ostream& );
-    void initExperiment( bool = false );
     bool checkLine( const std::string& );
     bool sanityCheck() const;
     const TargetValue *LocalClassify( const Instance&,

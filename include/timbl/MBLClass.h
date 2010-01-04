@@ -50,6 +50,16 @@ namespace Timbl {
     void ResetVerbosityFlag( VerbosityFlags v ) { verbosity &= ~v; };
     bool MBLInit() const { return MBL_init; };
     void MBLInit( bool b ) { MBL_init = b; };
+    bool ExpInvalid() const { 
+      if ( err_count > 0 ){
+	InvalidMessage();
+	return true;
+      }
+      else
+	return false;
+    };
+    WeightType CurrentWeighting() const { return Weighting; };
+    InputFormatType InputFormat() const { return input_format; };
     std::istream *sock_is;
     std::ostream *sock_os;
   protected:
@@ -95,14 +105,6 @@ namespace Timbl {
 		       size_t = 0 );
     void show_org_input( std::ostream & ) const;
     const ValueDistribution *ExactMatch( const Instance& ) const;
-    bool ExpInvalid() const { 
-      if ( err_count > 0 ){
-	InvalidMessage();
-	return true;
-      }
-      else
-	return false;
-    };
     void fillNeighborSet( neighborSet& ) const;
     void addToNeighborSet( neighborSet& ns, size_t n ) const;
     double getBestDistance() const;
@@ -136,7 +138,6 @@ namespace Timbl {
     LogStream *mylog;
     LogStream *myerr;
     LogStream *mydebug;
-    InputFormatType InputFormat() const { return input_format; };
     size_t TRIBL_offset() const { return tribl_offset; };
     unsigned int igOffset() const { return igThreshold; };
     unsigned int IB2_offset() const { return ib2_offset; };
@@ -151,7 +152,6 @@ namespace Timbl {
     bool KeepDistributions() const { return keep_distributions; };
     void KeepDistributions( bool f ){ keep_distributions = f; };
 
-    WeightType CurrentWeighting() const { return Weighting; };
     bool IsClone() const { return is_copy; };
     void default_order();
     void set_order(void);

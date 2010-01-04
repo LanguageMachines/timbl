@@ -60,6 +60,7 @@ namespace Timbl{
     bool Delete( char );
     bool Delete( const char * );
     bool Delete( const std::string& );
+    CL_Options *getPimpl()const { return pimpl; };
   private:
     CL_Options *pimpl;
     TimblOpts( const TimblOpts& );

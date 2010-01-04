@@ -3,12 +3,13 @@
 
 AM_CPPFLAGS = -I@top_srcdir@/include
 
-bin_PROGRAMS = Timbl TimblClient
+bin_PROGRAMS = Timbl TimblClient TimblServer
 
 LDADD = libTimbl.la
 
 Timbl_SOURCES = Timbl.cxx
 TimblClient_SOURCES = TimblClient.cxx
+server_SOURCES = server.cxx
 
 lib_LTLIBRARIES = libTimbl.la
 libTimbl_la_LDFLAGS= -version-info 2:0:0
@@ -19,4 +20,5 @@ libTimbl_la_SOURCES = CommandLine.cxx Common.cxx XMLtools.cxx\
 	SocketBasics.cxx StringOps.cxx TimblAPI.cxx Choppers.cxx\
 	TimblExperiment.cxx IGExperiment.cxx Metrics.cxx Testers.cxx \
 	TRIBLExperiments.cxx LOOExperiment.cxx CVExperiment.cxx \
-	Tree.cxx Types.cxx neighborSet.cxx Statistics.cxx BestArray.cxx
+	Tree.cxx Types.cxx neighborSet.cxx Statistics.cxx BestArray.cxx \
+	ServerBase.cxx	TimblServerAPI.cxx
