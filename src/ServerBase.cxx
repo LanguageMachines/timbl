@@ -119,7 +119,8 @@ namespace Timbl {
       maxConn = maxC;
     Info( "Starting a classic server on port " + toString( serverPort ) );
     if ( exp && exp->ConfirmOptions() ){
-      RunClassicServer( exp, serverPort );
+      exp->initExperiment( true );
+      RunClassicServer( this );
     }
     else {
       Error( "invalid options" );
@@ -130,10 +131,14 @@ namespace Timbl {
   bool TimblServer::startMultiServer( const string& config ){
     if ( exp && exp->ConfirmOptions() ){
       if ( getConfig( config ) ){
-	if ( serverProtocol == "http" )
-	  RunHttpServer( exp, serverPort );
-	else
-	  RunClassicServer( exp, serverPort );
+	if ( serverProtocol == "http" ){
+	  Info( "Starting a HTTP server on port " + toString( serverPort ) );
+	  RunHttpServer( this );
+	}
+	else {
+	  Info( "Starting a TCP server on port " + toString( serverPort ) );
+	  RunClassicServer( this );
+	}
       }
       else {
 	Error( "invalid serverconfig" );

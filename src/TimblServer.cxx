@@ -507,7 +507,10 @@ int main(int argc, char *argv[]){
 	delete Run;
 	return 3;
       }
-      Run->StartMultiServer( ServerConfigFile );
+      cerr << "voor StartMultiServer met config=" << ServerConfigFile << endl;
+      if ( !Run->StartMultiServer( ServerConfigFile ) ){
+	cerr << "starting a MultiServer failed" << endl;
+      }
     }
     else {
     }

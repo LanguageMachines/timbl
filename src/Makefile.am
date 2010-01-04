@@ -9,7 +9,7 @@ LDADD = libTimbl.la
 
 Timbl_SOURCES = Timbl.cxx
 TimblClient_SOURCES = TimblClient.cxx
-server_SOURCES = server.cxx
+TiblServer_SOURCES = TimblServer.cxx
 
 lib_LTLIBRARIES = libTimbl.la
 libTimbl_la_LDFLAGS= -version-info 2:0:0

@@ -64,6 +64,7 @@ typedef std::ostream LogStream;
 #include "timbl/TimblAPI.h"
 #include "timbl/XMLtools.h"
 #include "timbl/ServerProcs.h"
+#include "timbl/ServerBase.h"
 
 using namespace std;
 using namespace Sockets;
@@ -826,6 +827,125 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     pthread_attr_destroy(&attr); 
   }
   
+  void RunClassicServer( TimblServer *Mother ){
+    string logFile =  Mother->logFile;
+    string pidFile =  Mother->pidFile;
+    if ( !pidFile.empty() ){
+      // check validity of pidfile
+      if ( pidFile[0] != '/' ) // make sure the path is absolute
+	pidFile = '/' + pidFile;
+      unlink( pidFile.c_str() ) ;
+      ofstream pid_file( pidFile.c_str() ) ;
+      if ( !pid_file ){
+	*Log(Mother->exp->my_err())<< "unable to create pidfile:"<< pidFile << endl;
+	*Log(Mother->exp->my_err())<< "TimblServer NOT Started" << endl;
+	exit(1);
+      }
+    }
+    if ( !logFile.empty() ){
+      if ( logFile[0] != '/' ) // make sure the path is absolute
+	logFile = '/' + logFile;
+      ostream *tmp = new ofstream( logFile.c_str() );
+      if ( tmp && tmp->good() ){
+	*Log(Mother->exp->my_err()) << "switching logging to file " 
+			       << logFile << endl;
+	Mother->exp->my_log().associate( *tmp );
+	Mother->exp->my_err().associate( *tmp );
+	*Log(Mother->exp->my_log())  << "Started logging " << endl;	
+	*Log(Mother->exp->my_log())  << "Server verbosity " << toString<VerbosityFlags>( Mother->exp->ServerVerbosity()) << endl;	
+      }
+      else {
+	*Log(Mother->exp->my_err()) << "unable to create logfile: " << logFile << endl;
+	*Log(Mother->exp->my_err()) << "not started" << endl;
+	exit(1);
+      }
+    }
+
+    map<string, TimblExperiment*> experiments;
+    startExperimentsFromConfig( Mother->serverConfig, experiments );
+    cerr << "created " << experiments.size() << " experiments!" << endl;
+    int start = daemon( 0, logFile.empty() );
+
+    if ( start < 0 ){
+      cerr << "failed to daemonize error= " << strerror(errno) << endl;
+      exit(1);
+    };
+    if ( !pidFile.empty() ){
+      // we have a liftoff!
+      // signal it to the world
+      ofstream pid_file( pidFile.c_str() ) ;
+      if ( !pid_file ){
+	*Log(Mother->exp->my_err())<< "unable to create pidfile:"<< pidFile << endl;
+	*Log(Mother->exp->my_err())<< "TimblServer NOT Started" << endl;
+	exit(1);
+      }
+      else {
+	pid_t pid = getpid();
+	pid_file << pid << endl;
+      }
+    }
+    // set the attributes 
+    pthread_attr_t attr;
+    if ( pthread_attr_init(&attr) ||
+	 pthread_attr_setdetachstate( &attr, PTHREAD_CREATE_DETACHED ) ){
+      *Log(Mother->exp->my_err()) << "Threads: couldn't set attributes" << endl;
+      exit(0);
+    }
+    *Log(Mother->exp->my_log()) << "Starting Server on port:" << Mother->serverPort << endl;
+
+    pthread_t chld_thr;
+
+    ServerSocket server;
+    string portString = toString<int>(Mother->serverPort);
+    if ( !server.connect( portString ) ){
+      *Log(Mother->exp->my_err()) << "failed to start Server: " 
+			     << server.getMessage() << endl;
+      exit(0);
+    }
+
+    if ( !server.listen( 5 ) ) {
+      // maximum of 5 pending requests
+      *Log(Mother->exp->my_err()) << server.getMessage() << endl;
+      exit(0);
+    }
+    
+    int failcount = 0;
+    while( true ){ // waiting for connections loop
+      signal( SIGPIPE, SIG_IGN );
+      ServerSocket *newSocket = new ServerSocket();
+      if ( !server.accept( *newSocket ) ){
+	*Log(Mother->exp->my_err()) << server.getMessage() << endl;
+	if ( ++failcount > 20 ){
+	  *Log(Mother->exp->my_err()) << "accept failcount >20 " << endl;
+	  *Log(Mother->exp->my_err()) << "server stopped." << endl;
+	  exit(EXIT_FAILURE);
+	}
+	else {
+	  continue;  
+	}
+      }
+      else {
+	failcount = 0;
+	*Log(Mother->exp->my_log()) << "Accepting Connection #" 
+			       << newSocket->getSockId()
+			       << " from remote host: " 
+			       << newSocket->getClientName() << endl;
+	// create a new thread to process the incoming request 
+	// (The thread will terminate itself when done processing
+	// and release its socket handle)
+	//
+	childArgs *args = new childArgs();
+	args->Mother = Mother->exp;
+	args->socket = newSocket;
+	args->experiments = &experiments;
+	*Dbg(Mother->exp->my_debug()) << "voor pthread_create " << endl;
+	pthread_create( &chld_thr, &attr, socketChild, (void *)args );
+      }
+      // the server is now free to accept another socket request 
+    }
+    pthread_attr_destroy(&attr); 
+  }
+  
   void RunHttpServer( TimblExperiment *Mother, int TCP_PORT ){
     string logFile =  Mother->logFile;
     string pidFile =  Mother->pidFile;
@@ -935,6 +1055,124 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	//
 	childArgs *args = new childArgs();
 	args->Mother = Mother;
+	args->socket = newSocket;
+	args->experiments = &experiments;
+	pthread_create( &chld_thr, &attr, httpChild, (void *)args );
+      }
+      // the server is now free to accept another socket request 
+    }
+    pthread_attr_destroy(&attr); 
+  }
+  
+  void RunHttpServer( TimblServer *Mother ){
+    string logFile =  Mother->logFile;
+    string pidFile =  Mother->pidFile;
+    if ( !pidFile.empty() ){
+      // check validity of pidfile
+      if ( pidFile[0] != '/' ) // make sure the path is absolute
+	pidFile = '/' + pidFile;
+      unlink( pidFile.c_str() ) ;
+      ofstream pid_file( pidFile.c_str() ) ;
+      if ( !pid_file ){
+	*Log(Mother->exp->my_err())<< "unable to create pidfile:"<< pidFile << endl;
+	*Log(Mother->exp->my_err())<< "TimblServer NOT Started" << endl;
+	exit(1);
+      }
+    }
+    if ( !logFile.empty() ){
+      if ( logFile[0] != '/' ) // make sure the path is absolute
+	logFile = '/' + logFile;
+      ostream *tmp = new ofstream( logFile.c_str() );
+      if ( tmp && tmp->good() ){
+	*Log(Mother->exp->my_err()) << "switching logging to file " 
+			       << logFile << endl;
+	Mother->exp->my_log().associate( *tmp );
+	Mother->exp->my_err().associate( *tmp );
+	*Log(Mother->exp->my_log())  << "Started logging " << endl;	
+	*Log(Mother->exp->my_log())  << "Server verbosity " << toString<VerbosityFlags>( Mother->exp->ServerVerbosity()) << endl;	
+      }
+      else {
+	*Log(Mother->exp->my_err()) << "unable to create logfile: " << logFile << endl;
+	*Log(Mother->exp->my_err()) << "not started" << endl;
+	exit(1);
+      }
+    }
+
+    map<string, TimblExperiment*> experiments;
+    startExperimentsFromConfig( Mother->serverConfig, experiments );
+    
+    int start = daemon( 0, logFile.empty() );
+
+    if ( start < 0 ){
+      cerr << "failed to daemonize error= " << strerror(errno) << endl;
+      exit(1);
+    };
+    if ( !pidFile.empty() ){
+      // we have a liftoff!
+      // signal it to the world
+      ofstream pid_file( pidFile.c_str() ) ;
+      if ( !pid_file ){
+	*Log(Mother->exp->my_err())<< "unable to create pidfile:"<< pidFile << endl;
+	*Log(Mother->exp->my_err())<< "TimblServer NOT Started" << endl;
+	exit(1);
+      }
+      else {
+	pid_t pid = getpid();
+	pid_file << pid << endl;
+      }
+    }
+    // set the attributes 
+    pthread_attr_t attr;
+    if ( pthread_attr_init(&attr) ||
+	 pthread_attr_setdetachstate( &attr, PTHREAD_CREATE_DETACHED ) ){
+      *Log(Mother->exp->my_err()) << "Threads: couldn't set attributes" << endl;
+      exit(0);
+    }
+    *Log(Mother->exp->my_log()) << "Starting Server on port:" << Mother->serverPort << endl;
+
+    pthread_t chld_thr;
+
+    ServerSocket server;
+    string portString = toString<int>(Mother->serverPort);
+    if ( !server.connect( portString ) ){
+      *Log(Mother->exp->my_err()) << "failed to start Server: " 
+			     << server.getMessage() << endl;
+      exit(0);
+    }
+
+    if ( !server.listen( 5 ) ) {
+      // maximum of 5 pending requests
+      *Log(Mother->exp->my_err()) << server.getMessage() << endl;
+      exit(0);
+    }
+    
+    int failcount = 0;
+    while( true ){ // waiting for connections loop
+      signal( SIGPIPE, SIG_IGN );
+      ServerSocket *newSocket = new ServerSocket();
+      if ( !server.accept( *newSocket ) ){
+	*Log(Mother->exp->my_err()) << server.getMessage() << endl;
+	if ( ++failcount > 20 ){
+	  *Log(Mother->exp->my_err()) << "accept failcount >20 " << endl;
+	  *Log(Mother->exp->my_err()) << "server stopped." << endl;
+	  exit(EXIT_FAILURE);
+	}
+	else {
+	  continue;  
+	}
+      }
+      else {
+	failcount = 0;
+	*Log(Mother->exp->my_log()) << "Accepting Connection #" 
+			       << newSocket->getSockId()
+			       << " from remote host: " 
+			       << newSocket->getClientName() << endl;
+	// create a new thread to process the incoming request 
+	// (The thread will terminate itself when done processing
+	// and release its socket handle)
+	//
+	childArgs *args = new childArgs();
+	args->Mother = Mother->exp;
 	args->socket = newSocket;
 	args->experiments = &experiments;
 	pthread_create( &chld_thr, &attr, httpChild, (void *)args );

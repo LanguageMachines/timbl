@@ -35,9 +35,9 @@ namespace Timbl {
     friend class TimblServerAPI;
     friend TimblServer *CreateServerPimpl( AlgorithmType, const std::string&,
 					   GetOptClass * );
-    friend void RunClassicServer( TimblExperiment *, int );
-    friend void RunHttpServer( TimblExperiment *, int );
-    friend void RunSocketServer( TimblExperiment *, int );
+    friend void RunClassicServer( TimblServer * );
+    friend void RunHttpServer( TimblServer * );
+    friend void RunSocketServer( TimblServer * );
   protected:
     TimblServer();
     bool getConfig( const std::string& );
