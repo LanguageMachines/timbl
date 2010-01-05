@@ -55,19 +55,15 @@ bool Do_Multi_Server = false;
 int ServerPort = -1;
 int Max_Connections = 10;
 
-string I_Path = "";
-string Q_value = "";
-string dataFile = "";
-string TestFile = "";
-string ServerConfigFile = "";
-string PercFile = "";
-string MatrixInFile = "";
-string TreeInFile = "";
-int levelTreeLevel = 0;
-string WgtInFile = "";
+string I_Path;
+string Q_value;
+string dataFile;
+string ServerConfigFile;
+string MatrixInFile;
+string TreeInFile;
+string WgtInFile;
 Weighting WgtType = UNKNOWN_W;
-string ProbInFile = "";
-string NamesFile = "";
+string ProbInFile;
 
 inline void usage_full(void){
   cerr << "usage: TimblServer -f data-file {-t test-file} [options]" << endl;
@@ -364,25 +360,17 @@ bool next_test( string& line ){
 }
 
 bool get_file_names( TimblOpts& Opts ){
-  TestFile = "";
-  PercFile = "";
   MatrixInFile = "";
   TreeInFile = "";
-  levelTreeLevel = 0;
   WgtInFile = "";
   WgtType = UNKNOWN_W;
   ProbInFile = "";
-  NamesFile = "";
   string value;
   bool mood;
   if ( Opts.Find( 'P', value, mood ) ||
        Opts.Find( 'f', value, mood ) ){
     cerr << "illegal option, value = " << value << endl;
     return false;
-  }
-  else if ( Opts.Find( 't', value, mood ) ){
-    TestFile = correct_path( value, I_Path, true );
-    Opts.Delete( 't' );
   }
   if ( Opts.Find( "matrixin", value, mood ) ){
     MatrixInFile = correct_path( value, I_Path, true );
@@ -496,7 +484,6 @@ int main(int argc, char *argv[]){
       if ( MatrixInFile != "" ) {
 	Run->GetMatrices( MatrixInFile );
       }
-      cerr << "voor Startserver met port=" << ServerPort << endl;
       if ( Run->StartServer( ServerPort, Max_Connections ) )
 	return 0;
       else
@@ -507,7 +494,6 @@ int main(int argc, char *argv[]){
 	delete Run;
 	return 3;
       }
-      cerr << "voor StartMultiServer met config=" << ServerConfigFile << endl;
       if ( !Run->StartMultiServer( ServerConfigFile ) ){
 	cerr << "starting a MultiServer failed" << endl;
       }

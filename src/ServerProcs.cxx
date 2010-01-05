@@ -860,10 +860,12 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	exit(1);
       }
     }
+    else
+      cerr << "NO logFile" << endl;
+
 
     map<string, TimblExperiment*> experiments;
     startExperimentsFromConfig( Mother->serverConfig, experiments );
-    cerr << "created " << experiments.size() << " experiments!" << endl;
     int start = daemon( 0, logFile.empty() );
 
     if ( start < 0 ){

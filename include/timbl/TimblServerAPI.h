@@ -48,8 +48,7 @@ namespace Timbl{
     friend class TimblServer;
     friend class TimblExperiment;
   public:
-    TimblServerAPI( const TimblOpts *, const std::string& = "" );
-    TimblServerAPI( const std::string&,  const std::string& = "" );
+    TimblServerAPI( TimblOpts * );
     TimblServerAPI( const TimblAPI& );
     ~TimblServerAPI();
     bool Valid() const;

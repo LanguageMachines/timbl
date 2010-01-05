@@ -32,6 +32,7 @@
 #include "timbl/SocketBasics.h"
 #include "timbl/LogStream.h"
 #include "timbl/Options.h"
+#include "timbl/GetOptClass.h"
 #include "timbl/ServerBase.h"
 
 using namespace std;
@@ -151,29 +152,40 @@ namespace Timbl {
   }
       
 
-  IB1_Server::IB1_Server( const size_t N, 
-			  const std::string& s,
-			  const bool init ) {
-    exp =  new IB1_Experiment( N,s,init );
+  IB1_Server::IB1_Server( GetOptClass *opt ){
+    exp = new IB1_Experiment( opt->MaxFeatures() );
+    if (exp ){
+      exp->UseOptions( opt );
+      logFile = opt->getLogFile();
+      pidFile = opt->getPidFile();
+    }
   }
-  
-  IG_Server::IG_Server( const size_t N, 
-			const std::string& s,
-			const bool ){
-    exp = new IG_Experiment( N,s );
-    }
 
-  
-  TRIBL_Server::TRIBL_Server( const size_t N, 
-			      const std::string& s,
-			      const bool init ) {
-    exp = new TRIBL_Experiment( N,s,init);
+  IG_Server::IG_Server( GetOptClass *opt ){
+    exp = new IG_Experiment( opt->MaxFeatures() );
+    if (exp ){
+      exp->UseOptions( opt );
+      logFile = opt->getLogFile();
+      pidFile = opt->getPidFile();
     }
-    
-  TRIBL2_Server::TRIBL2_Server( const size_t N, 
-				const std::string& s,
-				const bool init ){
-    exp = new TRIBL2_Experiment( N,s,init);
+  }
+
+  TRIBL_Server::TRIBL_Server( GetOptClass *opt ){
+    exp = new TRIBL_Experiment( opt->MaxFeatures() );
+    if (exp ){
+      exp->UseOptions( opt );
+      logFile = opt->getLogFile();
+      pidFile = opt->getPidFile();
+    }
+  }
+
+  TRIBL2_Server::TRIBL2_Server( GetOptClass *opt ){
+    exp = new TRIBL2_Experiment( opt->MaxFeatures() );
+    if (exp ){
+      exp->UseOptions( opt );
+      logFile = opt->getLogFile();
+      pidFile = opt->getPidFile();
+    }
   }
 
 }

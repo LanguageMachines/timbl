@@ -44,7 +44,8 @@ namespace Timbl {
     bool definitive_options( TimblExperiment * );
     AlgorithmType Algo() const { return local_algo; };
     int MaxFeatures() const { return MaxFeats; };
-    
+    std::string getLogFile() const { return logFile; };
+    std::string getPidFile() const { return pidFile; };
   private:  
     AlgorithmType local_algo;
     MetricType local_metric;

@@ -48,28 +48,26 @@ using namespace std;
 #include "timbl/TimblExperiment.h"
 namespace Timbl {
   
-  TimblServer *CreateServerPimpl( AlgorithmType algo, const string& ex_name,
-				  GetOptClass *opt ){
+  TimblServer *CreateServerPimpl( AlgorithmType algo, GetOptClass *opt ){
     TimblServer *result = NULL;
     switch ( algo ){
     case IB1_a:
-      result = new IB1_Server( opt->MaxFeatures(), ex_name );
+      result = new IB1_Server( opt );
       break;
     case IGTREE_a:
-      result = new IG_Server( opt->MaxFeatures(), ex_name );
+      result = new IG_Server( opt );
       break;
     case TRIBL_a:
-      result = new TRIBL_Server( opt->MaxFeatures(), ex_name );
+      result = new TRIBL_Server( opt );
       break;
     case TRIBL2_a:
-      result = new TRIBL2_Server( opt->MaxFeatures(), ex_name );
+      result = new TRIBL2_Server( opt );
       break;
     default:
       cerr << "wrong algorithm to create TimblServerAPI" << endl;
       return NULL;
     }
     if ( result->exp ){
-      result->exp->UseOptions( opt );
       return result;
     }
     else {
@@ -82,34 +80,21 @@ namespace Timbl {
     pimpl( 0 ), i_am_fine(false) {
   }
   
-  TimblServerAPI::TimblServerAPI( const TimblOpts *T_Opts,
-				  const string& name ):
+  TimblServerAPI::TimblServerAPI( TimblOpts *T_Opts ):
     pimpl(), i_am_fine(false) {
     if ( T_Opts ){
+      string logFile;
+      string pidFile;
+      string value;
+      bool mood;
       GetOptClass *OptPars = new GetOptClass( *T_Opts->getPimpl() );
       if ( !OptPars->parse_options( *T_Opts->getPimpl() ) )
 	delete OptPars;
       else if ( OptPars->Algo() != Unknown_a ){
-	pimpl = CreateServerPimpl( OptPars->Algo(), name, OptPars );
+	pimpl = CreateServerPimpl( OptPars->Algo(), OptPars );
       }
       else {
-	pimpl = CreateServerPimpl( IB1_a, name, OptPars );
-      }
-    }
-    i_am_fine = (pimpl != NULL);
-  }
-  
-  TimblServerAPI::TimblServerAPI( const string& pars, 
-				  const string& name ):
-    pimpl(), i_am_fine(false){
-    CL_Options Opts( pars );
-    GetOptClass *OptPars = new GetOptClass( Opts );
-    if ( OptPars->parse_options( Opts ) ){
-      if ( OptPars->Algo() != Unknown_a ){
-	pimpl = CreateServerPimpl( OptPars->Algo(), name, OptPars );
-      }
-      else {
-	pimpl = CreateServerPimpl( IB1_a, name, OptPars );
+	pimpl = CreateServerPimpl( IB1_a, OptPars );
       }
     }
     i_am_fine = (pimpl != NULL);

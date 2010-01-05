@@ -33,8 +33,7 @@ namespace Timbl {
 
   class TimblServer : public MsgClass {
     friend class TimblServerAPI;
-    friend TimblServer *CreateServerPimpl( AlgorithmType, const std::string&,
-					   GetOptClass * );
+    friend TimblServer *CreateServerPimpl( AlgorithmType, GetOptClass * );
     friend void RunClassicServer( TimblServer * );
     friend void RunHttpServer( TimblServer * );
     friend void RunSocketServer( TimblServer * );
@@ -45,8 +44,6 @@ namespace Timbl {
     bool startMultiServer( const std::string& );
     bool SetSingleThreaded();
     void setOutPath( const std::string& s ){ outPath = s; };
-    void setLogFile( const std::string& s ){ logFile = s; };
-    void setPidFile( const std::string& s ){ pidFile = s; };
     void setServerConfigFile( const std::string& s ){ serverConfigFile = s; };
     TimblExperiment *CreateClient( ServerSocket* ) const;
     TimblExperiment *splitChild() const;
@@ -54,13 +51,13 @@ namespace Timbl {
     ServerSocket *TcpSocket() const { return tcp_socket; };
     int Max_Connections() const { return maxConn; };
     TimblExperiment *exp;
+    std::string logFile;
+    std::string pidFile;
   private:
     int maxConn;
     int serverPort;
     ServerSocket *tcp_socket;
     std::string outPath;
-    std::string logFile;
-    std::string pidFile;
     std::string serverProtocol;
     std::string serverConfigFile;
     std::map<std::string, std::string> serverConfig;
@@ -68,28 +65,22 @@ namespace Timbl {
 
   class IB1_Server: public TimblServer {
   public:
-    IB1_Server( const size_t N = DEFAULT_MAX_FEATS, 
-		const std::string& s= "",
-		const bool init = true );
+    IB1_Server( GetOptClass * );
   };
   
   class IG_Server: public TimblServer {
   public:
-    IG_Server( size_t N, const std::string& s="", const bool init = true );
+    IG_Server( GetOptClass * );
   };
  
   class TRIBL_Server: public TimblServer {
   public:
-    TRIBL_Server( const size_t N = DEFAULT_MAX_FEATS, 
-		  const std::string& s = "",
-		  const bool init = true );
+    TRIBL_Server( GetOptClass * );
   };
   
   class TRIBL2_Server: public TimblServer {
   public:
-    TRIBL2_Server( const size_t N = DEFAULT_MAX_FEATS, 
-		   const std::string& s = "",
-		   const bool init = true ); 
+    TRIBL2_Server( GetOptClass * );
   };
 
 }
