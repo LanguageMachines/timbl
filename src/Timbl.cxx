@@ -49,10 +49,6 @@ bool Do_CV = false;
 bool Do_LOO = false;
 bool Do_NS = false;
 bool Do_Indirect = false;
-bool Do_Server = false;
-bool Do_Multi_Server = false;
-int ServerPort = -1;
-int Max_Connections = 10;
 bool Do_Save_Perc = false;
 
 string I_Path = "";
@@ -60,7 +56,6 @@ string O_Path = "";
 string Q_value = "";
 string dataFile = "";
 string TestFile = "";
-string ServerConfigFile = "";
 string OutputFile = "";
 string PercFile = "";
 string MatrixInFile = "";
@@ -196,11 +191,6 @@ inline void usage_full(void){
   cerr << "+% or -%  : do or don't save test result (%) to file" << endl;
   cerr << "-o s      : use s as output filename" << endl;
   cerr << "-O d      : save output using path 'd'" << endl;
-  cerr << "Server options" << endl;
-  cerr << "-S <port> : run as a server on <port>" << endl;
-  cerr << "--pidfile=<f> store pid in file <f>" << endl; 
-  cerr << "--logfile=<f> log server activity in file <f>" << endl; 
-  cerr << "--serverconfig=<f> read server settings from file <f>" << endl; 
   cerr << "Internal representation options:" << endl;
   cerr << "-B n      : number of bins used for discretization of numeric " 
        << "feature values" << endl;
@@ -301,6 +291,11 @@ void Preset_Values( TimblOpts& Opts ){
     cerr << "TiMBL " << TimblAPI::VersionInfo( true ) << endl;
     exit(1);
   }
+  if ( Opts.Find( 'S', value, mood ) ){
+    cerr << "Server mode is no longer available in Timbl" << endl;
+    cerr << "Please use the 'TimblServer' command instead." << endl;
+    exit(1);
+  }
   if ( Opts.Find( 'a', value, mood ) ){
     // the user gave an algorithm
     if ( !string_to( value, algorithm ) ){
@@ -355,57 +350,6 @@ void Preset_Values( TimblOpts& Opts ){
   }
   Opts.Add( 'v', "F", true );
   Opts.Add( 'v', "S", false );
-  if ( Opts.Find( "serverconfig", value, mood ) ){
-    if ( Do_LOO || Do_CV || Do_Indirect ){
-      cerr << "Cannot run as a server when -t option is also specified." 
-	   << endl;
-      exit(3);
-    }
-    ServerConfigFile = correct_path( value, I_Path, true );
-    Opts.Delete( "serverconfig" );
-    Do_Multi_Server = true;
-  }
-  if ( Opts.Find( 'S', value, mood ) ){
-    if ( Do_LOO || Do_CV || Do_Indirect ){
-      cerr << "Cannot run as a server when -t option is also specified." 
-	   << endl;
-      exit(3);
-    }
-    else if ( Do_Multi_Server ){
-      cerr << "options -S conflicts with option --serverconfig" << endl;
-      exit(3);
-    }
-    else {
-      Do_Server = true;
-      ServerPort = stringTo<int>( value );
-      if ( ServerPort < 1 || ServerPort > 100000 ){
-	cerr << "-S option, portnumber invalid: " << ServerPort << endl;
-	exit(3);
-      }
-    }
-  }
-  else {
-    if ( Do_Multi_Server ){
-      Opts.Add( 'S', "0", true );
-      // hack to signal GetOptClass that we are going into server mode
-    }
-  }
-  if ( Opts.Find( 'C', value, mood ) ){
-    if ( Do_Multi_Server ){
-      cerr << "-C must be specified in the severconfigfile" << endl;
-      exit(3);
-    }
-    if ( !Do_Server ){
-      cerr << "-C option invalid without -S" << endl;
-      exit(3);
-    }
-    Max_Connections = stringTo<int>( value );
-    if ( Max_Connections < 1 || Max_Connections > 1000 ){
-      cerr << "-C options, max number of connection invalid: " 
-	   << Max_Connections << endl;
-    }
-    Opts.Delete( 'C' );
-  }
   Weighting W = GR;
   // default Weighting = GainRatio
   if ( Opts.Find( 'w', value, mood ) ){
@@ -775,8 +719,7 @@ int main(int argc, char *argv[]){
       usage();
       return 3;
     }
-    if ( !Do_Server  && !Do_Multi_Server )
-      Run->Set_Single_Threaded();
+    Run->Set_Single_Threaded();
     Default_Output_Names( Opts );
     if ( Do_CV ){
       if ( checkInputFile( TestFile ) ){
@@ -784,47 +727,6 @@ int main(int argc, char *argv[]){
 	Run->Test( TestFile, "" );
       }
       delete Run;
-    }
-    else if ( Do_Server ){
-      // Special case:   running a classic Server
-      if ( !checkInputFile( TreeInFile ) ||
-	   !checkInputFile( dataFile ) ||
-	   !checkInputFile( WgtInFile ) ||
-	   !checkInputFile( MatrixInFile ) ||
-	   !checkInputFile( ProbInFile ) ||
-	   !checkOutputFile( ProbOutFile ) ){
-	delete Run;
-	return 3;
-      }
-      if ( TreeInFile != "" ){
-	if ( !Run->GetInstanceBase( TreeInFile ) ){
-	  return 3;
-	}
-      }
-      else {
-	if ( !Run->Learn( dataFile ) ){
-	  return 3;
-	}
-      }
-      if ( WgtInFile != "" ) {
-	Run->GetWeights( WgtInFile, WgtType );
-      }
-      if ( ProbOutFile != "" )
-	Run->WriteArrays( ProbOutFile );
-      if ( ProbInFile != "" )
-	Run->GetArrays( ProbInFile );
-      if ( MatrixInFile != "" ) {
-	Run->GetMatrices( MatrixInFile );
-      }
-      Run->StartServer( ServerPort, Max_Connections );
-      return 0;
-    }
-    else if ( Do_Multi_Server ){
-      if ( !checkInputFile( ServerConfigFile ) ){
-	delete Run;
-	return 3;
-      }
-      Run->StartMultiServer( ServerConfigFile );
     }
     else {
       bool do_test = false;

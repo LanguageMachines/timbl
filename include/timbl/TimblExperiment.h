@@ -68,9 +68,6 @@ namespace Timbl {
   
   class TimblExperiment: public MBLClass {
     friend class TimblAPI;
-    friend void RunClassicServer( TimblExperiment *, int );
-    friend void RunHttpServer( TimblExperiment *, int );
-    friend void RunSocketServer( TimblExperiment *, int );
   public:
     virtual ~TimblExperiment();
     virtual bool Learn( const std::string& = "" );
@@ -97,16 +94,10 @@ namespace Timbl {
     bool WriteInstanceBaseXml( const std::string& );
     bool WriteInstanceBaseLevels( const std::string&, unsigned int );
     bool WriteNamesFile( const std::string& ) const;
-    bool StartClassicServer( const int, const int );
-    bool fillServerConfig( const std::string& );
-    bool StartMultiServer( const std::string& );
     bool SetSingleThreaded();
     int Estimate() const { return estimate; };
     void Estimate( int e ){ estimate = e; };
     void setOutPath( const std::string& s ){ outPath = s; };
-    void setLogFile( const std::string& s ){ logFile = s; };
-    void setPidFile( const std::string& s ){ pidFile = s; };
-    void setServerConfigFile( const std::string& s ){ serverConfigFile = s; };
     TimblExperiment *CreateClient( ServerSocket* ) const;
     TimblExperiment *splitChild() const;
     VerbosityFlags ServerVerbosity() { return get_s_verbosity(); };

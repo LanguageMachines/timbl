@@ -87,7 +87,6 @@ namespace Timbl {
     bool do_all_weights;
     bool do_sloppy_loo;
     bool do_silly;
-    bool do_server;
     bool do_diversify;
     std::vector<MetricType>metricsArray;
     std::ostream *parent_socket_os;
@@ -95,7 +94,6 @@ namespace Timbl {
     std::string outPath;
     std::string logFile;
     std::string pidFile;
-    std::string serverConfigFile;
     void Error( const std::string& ) const;
     inline bool parse_range( std::string&, 
 			     std::string::iterator&,

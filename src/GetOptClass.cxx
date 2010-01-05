@@ -85,7 +85,6 @@ namespace Timbl {
     do_all_weights = false;
     do_sloppy_loo = false;
     do_silly = false;
-    do_server = false;
     do_diversify = false;
     if ( MaxFeats == -1 ){
       MaxFeats = Max;
@@ -100,7 +99,6 @@ namespace Timbl {
     outPath = "";
     logFile = "";
     pidFile = "";
-    serverConfigFile = "";
   }
   
   GetOptClass::GetOptClass( CL_Options& Opts ):
@@ -169,14 +167,12 @@ namespace Timbl {
     do_all_weights( false ),
     do_sloppy_loo( false ),
     do_silly( in.do_silly ),
-    do_server( in.do_server ),
     do_diversify( in.do_diversify ),
     metricsArray( in.metricsArray ),
     parent_socket_os( in.parent_socket_os ),
     outPath( in.outPath ),
     logFile( in.logFile ),
-    pidFile( in.pidFile ),
-    serverConfigFile( in.serverConfigFile )
+    pidFile( in.pidFile )
   {
   }
   
@@ -302,21 +298,6 @@ namespace Timbl {
 	}
 	if ( !outPath.empty() ){
 	  Exp->setOutPath( outPath );
-	}
-	if ( !logFile.empty() ){
-	  if ( do_server )
-	    Exp->setLogFile( logFile );
-	  else
-	    Info( "logfile option useless (ignored)" );	  
-	}
-	if ( !pidFile.empty() ){
-	  if ( do_server )
-	    Exp->setPidFile( pidFile );
-	  else
-	    Info( "pidfile option useless (ignored)" );
-	}
-	if ( !serverConfigFile.empty() ){
-	  Exp->setServerConfigFile( serverConfigFile );
 	}
       }
       if ( estimate < 10 )
@@ -996,9 +977,6 @@ namespace Timbl {
 	  }
 	  do_silly = ( up=="TRUE" || up=="YES" );
 	}
-	else if ( long_option == "serverconfig" ){
-	  serverConfigFile = myoptarg;
-	}
 	else if ( myoptarg.find("loppy") != string::npos 
 		  || myoptarg.find("illy") != string::npos ){
 	  Error( "invalid option: Did you mean '--s" + myoptarg + "'?" );
@@ -1017,10 +995,6 @@ namespace Timbl {
 	    }
 	  }
 	}
-	break;
-	
-      case 'S':
-	do_server = true;
 	break;
 	
       case 't':

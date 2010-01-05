@@ -83,10 +83,6 @@ namespace Timbl {
   TimblServerAPI::TimblServerAPI( TimblOpts *T_Opts ):
     pimpl(), i_am_fine(false) {
     if ( T_Opts ){
-      string logFile;
-      string pidFile;
-      string value;
-      bool mood;
       GetOptClass *OptPars = new GetOptClass( *T_Opts->getPimpl() );
       if ( !OptPars->parse_options( *T_Opts->getPimpl() ) )
 	delete OptPars;

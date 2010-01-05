@@ -11,8 +11,9 @@ Timbl_SOURCES = Timbl.cxx
 TimblClient_SOURCES = TimblClient.cxx
 TimblServer_SOURCES = TimblServer.cxx
 
-lib_LTLIBRARIES = libTimbl.la
+lib_LTLIBRARIES = libTimbl.la libTimblServer.la
 libTimbl_la_LDFLAGS= -version-info 2:0:0
+libTimblServer_la_LDFLAGS= -version-info 2:0:0
 
 libTimbl_la_SOURCES = CommandLine.cxx Common.cxx XMLtools.cxx\
 	GetOptClass.cxx IBtree.cxx IBprocs.cxx Instance.cxx LogBuffer.cxx \
@@ -21,4 +22,7 @@ libTimbl_la_SOURCES = CommandLine.cxx Common.cxx XMLtools.cxx\
 	TimblExperiment.cxx IGExperiment.cxx Metrics.cxx Testers.cxx \
 	TRIBLExperiments.cxx LOOExperiment.cxx CVExperiment.cxx \
 	Tree.cxx Types.cxx neighborSet.cxx Statistics.cxx BestArray.cxx \
-	ServerBase.cxx	TimblServerAPI.cxx
+	ServerBase.cxx TimblServerAPI.cxx
+
+libTimblServer_la_SOURCES = 
+	SocketBasics.cxx ServerBase.cxx	TimblServerAPI.cxx

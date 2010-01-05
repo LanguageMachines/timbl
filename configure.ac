@@ -4,7 +4,7 @@
 # $URL $
 
 AC_PREREQ(2.59)
-AC_INIT([Timbl], [6.2.1.1], [timbl@uvt.nl])
+AC_INIT([Timbl], [6.2.1.2], [timbl@uvt.nl])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_MACRO_DIR([m4])
@@ -164,6 +164,7 @@ dnl
 AC_OUTPUT([
   Makefile
   timbl.pc
+  timblserver.pc
   m4/Makefile
   src/Makefile
   docs/Makefile

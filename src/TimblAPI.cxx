@@ -679,12 +679,12 @@ namespace Timbl {
     return Valid() && pimpl->showStatistics( os );
   }
   
-  bool TimblAPI::StartServer( const int port, const int max_c ){
-    return Valid() && pimpl->StartClassicServer( port, max_c );
+  bool TimblAPI::StartServer( const int , const int ){
+    return false;
   }
   
-  bool TimblAPI::StartMultiServer( const string& config ){
-    return Valid() && pimpl->StartMultiServer( config );
+  bool TimblAPI::StartMultiServer( const string& ){
+    return false;
   }
   
   bool TimblAPI::Set_Single_Threaded(){
