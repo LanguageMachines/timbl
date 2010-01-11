@@ -34,7 +34,6 @@ namespace Timbl {
   class InstanceBase_base;
   class TesterClass;
   class Chopper;
-  using Sockets::ServerSocket;
 
   class MBLClass {
   public:
@@ -127,7 +126,7 @@ namespace Timbl {
     void Error( const std::string& ) const;
     void FatalError( const std::string& ) const;
     size_t MaxFeats() const { return MaxFeatures; };
-    bool connectToSocket( ServerSocket * );
+    bool connectToSocket( int );
     int Progress() const { return progress; };
     void Progress( int p ){ progress =  p; };
     Target   *Targets;
@@ -191,7 +190,7 @@ namespace Timbl {
     void initTesters();
     Chopper *ChopInput;
     int F_length;
-    ServerSocket *tcp_socket;
+    int socketId;
   private:
     size_t MaxFeatures;
     std::vector<MetricType> UserOptions;

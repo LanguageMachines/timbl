@@ -66,13 +66,11 @@ typedef std::ostream LogStream;
 #define Dbg(X) (X)
 #endif
 
-#include "timbl/SocketBasics.h"
 #include "timbl/MBLClass.h"
 #include "timbl/CommandLine.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
 #include "timbl/XMLtools.h"
-#include "timbl/ServerProcs.h"
 
 namespace Timbl {
   using namespace std;
@@ -220,8 +218,7 @@ namespace Timbl {
     return *this;
   }
   
-  TimblExperiment *TimblExperiment::CreateClient( ServerSocket *socket ) const {
-    assert( socket != 0 );
+  TimblExperiment *TimblExperiment::CreateClient( int id ) const {
     TimblExperiment *result = 0;
     switch ( Algorithm() ){
     case IB1_a:
@@ -236,12 +233,12 @@ namespace Timbl {
       return 0;
     }
     *result = *this;
-    string line = "Client on socket: " + toString<int>( socket->getSockId() );
+    string line = "Client on socket: " + toString<int>( id );
 #ifdef USE_LOGSTREAMS
     result->myerr->message( line );
     result->mydebug->message( line );
 #endif
-    if ( !result->connectToSocket( socket ) ){
+    if ( !result->connectToSocket( id ) ){
       FatalError( "unable to create working client" );
       return 0;
     }

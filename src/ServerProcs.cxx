@@ -56,13 +56,13 @@ typedef std::ostream LogStream;
 #include "timbl/neighborSet.h"
 #include "timbl/Statistics.h"
 #include "timbl/BestArray.h"
-#include "timbl/SocketBasics.h"
 #include "timbl/FdStream.h"
 #include "timbl/MBLClass.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
 #include "timbl/TimblAPI.h"
 #include "timbl/XMLtools.h"
+#include "timbl/SocketBasics.h"
 #include "timbl/ServerProcs.h"
 #include "timbl/ServerBase.h"
 
@@ -165,14 +165,14 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
   bool doSet( const string& Line, TimblExperiment *Exp ){
     if ( Exp->SetOptions( Line ) ){
       if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	*Log(Exp->my_log()) << Exp->TcpSocket()->getSockId()
+	*Log(Exp->my_log()) << Exp->tcpSocketId()
 			    << ": Command :" << Line << endl;
       if ( Exp->ConfirmOptions() )
 	*Exp->sock_os << "OK" << endl;
     }
     else {
       if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	*Log(Exp->my_log()) << Exp->TcpSocket()->getSockId()
+	*Log(Exp->my_log()) << Exp->tcpSocketId()
 			    << ": Don't understand '" 
 			    << Line << "'" << endl;
     }
@@ -183,11 +183,11 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     double Distance;
     string Distrib;
     string Answer;
-    ServerSocket *sock = Exp->TcpSocket();
+    int sock = Exp->tcpSocketId();
     ostream *os = Exp->sock_os;
     if ( Exp->Classify( params, Answer, Distrib, Distance ) ){
       if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	*Log(Exp->my_log()) << sock->getSockId() << ": " 
+	*Log(Exp->my_log()) << sock << ": " 
 			    << params << " --> " 
 			    << Answer << " " << Distrib 
 			    << " " << Distance << endl;
@@ -215,7 +215,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     }
     else {
       if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	*Log(Exp->my_log()) << sock->getSockId()
+	*Log(Exp->my_log()) << sock
 			    << ": Classify Failed on '" 
 			    << params << "'" << endl;
       return false;
@@ -280,7 +280,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     if ( args->experiments->empty() ){
       baseName == "default";
       *Dbg(args->Mother->my_debug()) << " Voor Create Default Client " << endl;
-      Chld = args->Mother->CreateClient( sock );
+      Chld = args->Mother->CreateClient( sockId );
       *Dbg(args->Mother->my_debug()) << " Na Create Client " << endl;
       // report connection to the server terminal
       //
@@ -324,7 +324,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 	      delete Chld;
 	    *Dbg(args->Mother->my_debug()) 
 	      << " Voor Create Default Client " << endl;
-	    Chld = it->second->CreateClient( sock );
+	    Chld = it->second->CreateClient( sockId );
 	    Chld->setExpName(string("exp-")+toString(sockId) );
 	    *Dbg(args->Mother->my_debug()) << " Na Create Client " << endl;
 	    // report connection to the server terminal
@@ -495,7 +495,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 		basename = basename.substr( epos+1 );
 		map<string,TimblExperiment*>::const_iterator it= experiments->find(basename);
 		if ( it != experiments->end() ){
-		  TimblExperiment *api = it->second->CreateClient( args->socket );
+		  TimblExperiment *api = it->second->CreateClient( args->socket->getSockId() );
 		  if ( api ){
 		    string name = string("exp-")+toString(sockId);
 		    api->setExpName( name );

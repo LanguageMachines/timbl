@@ -98,10 +98,10 @@ namespace Timbl {
     int Estimate() const { return estimate; };
     void Estimate( int e ){ estimate = e; };
     void setOutPath( const std::string& s ){ outPath = s; };
-    TimblExperiment *CreateClient( ServerSocket* ) const;
+    TimblExperiment *CreateClient( int  ) const;
     TimblExperiment *splitChild() const;
     VerbosityFlags ServerVerbosity() { return get_s_verbosity(); };
-    ServerSocket *TcpSocket() const { return tcp_socket; };
+    int tcpSocketId() const { return socketId; };
     int Max_Connections() const { return max_conn; };
     bool SetOptions( int, const char ** );
     bool SetOptions( const std::string& );

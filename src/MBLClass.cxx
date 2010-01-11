@@ -58,12 +58,10 @@ typedef std::ostream LogStream;
 #define Log(X) (X)
 #define Dbg(X) (X)
 #endif
-#include "timbl/SocketBasics.h"
 #include "timbl/BestArray.h"
 #include "timbl/Testers.h"
 #include "timbl/Metrics.h"
 #include "timbl/Choppers.h"
-#include "timbl/SocketBasics.h"
 
 #include "timbl/MBLClass.h"
 
@@ -195,7 +193,7 @@ namespace Timbl {
     GlobalMetric = 0;
     is_copy = false;
     is_synced = false;
-    tcp_socket = 0;
+    socketId = -1;
     sock_is = 0;
     sock_os = 0;
     Targets   = NULL;
@@ -262,7 +260,7 @@ namespace Timbl {
       keep_distributions = m.keep_distributions;
       verbosity          = m.verbosity;
       do_exact_match     = m.do_exact_match;
-      tcp_socket         = 0;
+      socketId           = -1;
       sock_is            = 0;
       sock_os            = 0;
       if ( m.GlobalMetric )
@@ -325,10 +323,8 @@ namespace Timbl {
       delete Targets;
       delete TargetStrings;
       delete FeatureStrings;
-      delete tcp_socket;
     }
     else {
-      tcp_socket = 0;
       if ( is_synced ){
 	delete InstanceBase;
       }
@@ -454,22 +450,19 @@ namespace Timbl {
     return true;
   }
   
-  bool MBLClass::connectToSocket( ServerSocket *socket ){
-    if ( socket && socket->isValid() ){
-      if ( sock_is || sock_os ){
-	throw( logic_error( "connectToSocket:: already connected!" ) );
+  bool MBLClass::connectToSocket( int id ){
+    if ( sock_is || sock_os ){
+      throw( logic_error( "connectToSocket:: already connected!" ) );
+    }
+    else {
+      sock_is = new fdistream( id );
+      sock_os = new fdostream( id );
+      if ( sock_is && sock_os && sock_is->good() && sock_os->good() ){
+	socketId = id;
+	return true;
       }
-      else {
-	int id = socket->getSockId();
-	sock_is = new fdistream( id );
-	sock_os = new fdostream( id );
-	if ( sock_is && sock_os && sock_is->good() && sock_os->good() ){
-	  tcp_socket = socket;
-	  return true;
-	}
-	else 
-	  FatalError( "connecting streams to socket failed" );
-      }
+      else 
+	FatalError( "connecting streams to socket failed" );
     }
     return false;
   }  

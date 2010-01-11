@@ -47,7 +47,6 @@ typedef std::ostream LogStream;
 #include "timbl/Metrics.h"
 #include "timbl/CommandLine.h"
 #include "timbl/GetOptClass.h"
-#include "timbl/SocketBasics.h"
 #include "timbl/TimblExperiment.h"
 
 using namespace std;

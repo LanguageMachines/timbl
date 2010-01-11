@@ -46,7 +46,6 @@ typedef std::ostream LogStream;
 #endif
 #include "timbl/Options.h"
 #include "timbl/BestArray.h"
-#include "timbl/SocketBasics.h"
 #include "timbl/MBLClass.h"
 #include "timbl/Metrics.h"
 
