@@ -276,7 +276,7 @@ const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
     ostream *os = new fdostream( sockId );
     istream *is = new fdistream( sockId );
     string baseName;
-    *os << "Welcome to the Timbl Server." << endl;
+    *os << "Welcome to the Timbl server." << endl;
     if ( args->experiments->empty() ){
       baseName == "default";
       *Dbg(args->Mother->my_debug()) << " Voor Create Default Client " << endl;
