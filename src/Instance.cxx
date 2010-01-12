@@ -48,10 +48,6 @@
 #include "timbl/Instance.h"
 #include "timbl/Metrics.h"
 
-#ifdef PTHREADS
-#include <pthread.h>
-#endif
-
 using namespace std;
 
 namespace Timbl {

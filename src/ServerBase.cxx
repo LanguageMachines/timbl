@@ -165,6 +165,7 @@ namespace Timbl {
   struct childArgs{
     TimblExperiment *Mother;
     Sockets::ServerSocket *socket;
+    int maxC;
     map<string, TimblExperiment*> *experiments;
   };
 
@@ -207,15 +208,13 @@ namespace Timbl {
   bool doSet( const string& Line, TimblExperiment *Exp ){
     if ( Exp->SetOptions( Line ) ){
       if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	*Log(Exp->my_log()) << Exp->tcpSocketId()
-			    << ": Command :" << Line << endl;
+	*Log(Exp->my_log()) << ": Command :" << Line << endl;
       if ( Exp->ConfirmOptions() )
 	*Exp->sock_os << "OK" << endl;
     }
     else {
       if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	*Log(Exp->my_log()) << Exp->tcpSocketId()
-			    << ": Don't understand '" 
+	*Log(Exp->my_log()) << ": Don't understand '" 
 			    << Line << "'" << endl;
     }
     return true;
@@ -225,12 +224,10 @@ namespace Timbl {
     double Distance;
     string Distrib;
     string Answer;
-    int sock = Exp->tcpSocketId();
     ostream *os = Exp->sock_os;
     if ( Exp->Classify( params, Answer, Distrib, Distance ) ){
       if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	*Log(Exp->my_log()) << sock << ": " 
-			    << params << " --> " 
+	*Log(Exp->my_log()) << params << " --> " 
 			    << Answer << " " << Distrib 
 			    << " " << Distance << endl;
       *os << "CATEGORY {" << Answer << "}";
@@ -257,8 +254,7 @@ namespace Timbl {
     }
     else {
       if ( Exp->ServerVerbosity() & CLIENTDEBUG )
-	*Log(Exp->my_log()) << sock
-			    << ": Classify Failed on '" 
+	*Log(Exp->my_log()) << ": Classify Failed on '" 
 			    << params << "'" << endl;
       return false;
     }
@@ -403,7 +399,7 @@ namespace Timbl {
     pthread_mutex_lock(&my_lock);
     // use a mutex to update the global service counter
     service_count++;
-    if ( service_count > Mother->Max_Connections() ){
+    if ( service_count > args->maxC ){
       *Mother->sock_os << "Maximum connections exceeded." << endl;
       *Mother->sock_os << "try again later..." << endl;
       pthread_mutex_unlock( &my_lock );
@@ -545,6 +541,7 @@ namespace Timbl {
 	childArgs *args = new childArgs();
 	args->Mother = exp;
 	args->socket = newSocket;
+	args->maxC   = maxConn;
 	args->experiments = &experiments;
 	*Dbg(exp->my_debug()) << "voor pthread_create " << endl;
 	pthread_create( &chld_thr, &attr, socketChild, (void *)args );
@@ -601,7 +598,7 @@ namespace Timbl {
     pthread_mutex_lock(&my_lock);
     // use a mutex to update the global service counter
     service_count++;
-    if ( service_count > Mother->Max_Connections() ){
+    if ( service_count > args->maxC ){
       os << "Maximum connections exceeded." << endl;
       os << "try again later..." << endl;
       pthread_mutex_unlock( &my_lock );
@@ -916,6 +913,7 @@ namespace Timbl {
 	childArgs *args = new childArgs();
 	args->Mother = exp;
 	args->socket = newSocket;
+	args->maxC   = maxConn;
 	args->experiments = &experiments;
 	pthread_create( &chld_thr, &attr, httpChild, (void *)args );
       }

@@ -190,7 +190,6 @@ namespace Timbl {
     void initTesters();
     Chopper *ChopInput;
     int F_length;
-    int socketId;
   private:
     size_t MaxFeatures;
     std::vector<MetricType> UserOptions;

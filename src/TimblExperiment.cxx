@@ -191,8 +191,7 @@ namespace Timbl {
     confusionInfo( 0 ),
     match_depth(-1),
     last_leaf(true),
-    estimate( 0 ),
-    max_conn( 10 )
+    estimate( 0 )
   {
     Weighting = GR_w;
   }
@@ -211,7 +210,6 @@ namespace Timbl {
       CurrentDataFile = in.CurrentDataFile;
       WFileName = in.WFileName;
       estimate = in.estimate;
-      max_conn = in.max_conn;
       Weighting = in.Weighting;
       confusionInfo = 0;
     }

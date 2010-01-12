@@ -39,16 +39,12 @@ namespace Timbl {
     bool getConfig( const std::string& );
     bool startClassicServer( int, int=0 );
     bool startMultiServer( const std::string& );
-    bool SetSingleThreaded();
-    void setOutPath( const std::string& s ){ outPath = s; };
-    void setServerConfigFile( const std::string& s ){ serverConfigFile = s; };
     void RunClassicServer();
     void RunHttpServer();
     TimblExperiment *CreateClient( Sockets::ServerSocket* ) const;
     TimblExperiment *splitChild() const;
     //    VerbosityFlags ServerVerbosity() { return exp->get_s_verbosity(); };
     Sockets::ServerSocket *TcpSocket() const { return tcp_socket; };
-    int Max_Connections() const { return maxConn; };
     TimblExperiment *exp;
     std::string logFile;
     std::string pidFile;
@@ -56,7 +52,6 @@ namespace Timbl {
     int maxConn;
     int serverPort;
     Sockets::ServerSocket *tcp_socket;
-    std::string outPath;
     std::string serverProtocol;
     std::string serverConfigFile;
     std::map<std::string, std::string> serverConfig;

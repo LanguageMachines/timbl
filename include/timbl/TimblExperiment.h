@@ -101,8 +101,6 @@ namespace Timbl {
     TimblExperiment *CreateClient( int  ) const;
     TimblExperiment *splitChild() const;
     VerbosityFlags ServerVerbosity() { return get_s_verbosity(); };
-    int tcpSocketId() const { return socketId; };
-    int Max_Connections() const { return max_conn; };
     bool SetOptions( int, const char ** );
     bool SetOptions( const std::string& );
     bool SetOptions( const CL_Options&  );
@@ -208,9 +206,6 @@ namespace Timbl {
     GetOptClass *OptParams;
     AlgorithmType algorithm;
     std::string CurrentDataFile;
-    std::string logFile;
-    std::string pidFile;
-    std::string serverConfigFile;
     std::string WFileName;
     std::string outPath;
     std::string testStreamName;
@@ -223,15 +218,11 @@ namespace Timbl {
     resultStore bestResult;
     size_t match_depth;
     bool last_leaf;
-    std::map<std::string, std::string> serverConfig;
 
   private:
     TimblExperiment( const TimblExperiment& );
     TimblExperiment& operator=( const TimblExperiment& );
     int estimate;
-    int max_conn;
-    int serverPort;
-    std::string serverProtocol;
     const TargetValue *classifyString( const std::string& , double& );
   }; 
 

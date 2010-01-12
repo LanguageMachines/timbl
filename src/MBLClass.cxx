@@ -193,7 +193,6 @@ namespace Timbl {
     GlobalMetric = 0;
     is_copy = false;
     is_synced = false;
-    socketId = -1;
     sock_is = 0;
     sock_os = 0;
     Targets   = NULL;
@@ -260,7 +259,6 @@ namespace Timbl {
       keep_distributions = m.keep_distributions;
       verbosity          = m.verbosity;
       do_exact_match     = m.do_exact_match;
-      socketId           = -1;
       sock_is            = 0;
       sock_os            = 0;
       if ( m.GlobalMetric )
@@ -352,7 +350,6 @@ namespace Timbl {
 #endif
   }
   
-#ifdef PTHREADS
   
   void MBLClass::Info( const string& out_line ) const {
     // Info NEVER to socket !
@@ -401,41 +398,6 @@ namespace Timbl {
     }
   }
     
-#else  
-  
-  void MBLClass::Info( const string& out_line ) const {
-    if ( exp_name != "" )
-      *Log(mylog) << "-" << exp_name << "-" << out_line << endl;
-    else
-      *Log(mylog) << out_line << endl;
-  }
-  
-  void MBLClass::Warning( const string& out_line ) const {
-    if ( exp_name != "" )
-      *Log(myerr) << "Warning:-" << exp_name << "-" << out_line << endl;
-    else 
-      *Log(myerr) << "Warning:" << out_line << endl;
-  }
-  
-  void MBLClass::Error( const string& out_line ) const {
-    if ( exp_name != "" )
-      *Log(myerr) << "Error:-" << exp_name << "-" << out_line << endl;
-    else
-      *Log(myerr) << "Error:" << out_line << endl;
-    err_count++;
-  }
-  
-  void MBLClass::FatalError( const string& out_line ) const {
-    if ( exp_name != "" )
-      *Log(myerr) << "Error:-" << exp_name << "-" << out_line
-		  << "stopped" << endl;
-    else 
-      *Log(myerr) << "Error:-" << out_line << "stopped" << endl;
-    throw( "Stopped" );
-  }
-  
-#endif // PTHREADS
-  
   bool MBLClass::ShowOptions( ostream& os ) const {
     os << "Possible Experiment Settings (current value between []):" << endl;
     Options.Show_Options( os );
@@ -458,7 +420,6 @@ namespace Timbl {
       sock_is = new fdistream( id );
       sock_os = new fdostream( id );
       if ( sock_is && sock_os && sock_is->good() && sock_os->good() ){
-	socketId = id;
 	return true;
       }
       else 
