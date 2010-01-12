@@ -34,9 +34,6 @@ namespace Timbl {
   class TimblServer : public MsgClass {
     friend class TimblServerAPI;
     friend TimblServer *CreateServerPimpl( AlgorithmType, GetOptClass * );
-    friend void RunClassicServer( TimblServer * );
-    friend void RunHttpServer( TimblServer * );
-    friend void RunSocketServer( TimblServer * );
   protected:
     TimblServer();
     bool getConfig( const std::string& );
@@ -45,6 +42,8 @@ namespace Timbl {
     bool SetSingleThreaded();
     void setOutPath( const std::string& s ){ outPath = s; };
     void setServerConfigFile( const std::string& s ){ serverConfigFile = s; };
+    void RunClassicServer();
+    void RunHttpServer();
     TimblExperiment *CreateClient( Sockets::ServerSocket* ) const;
     TimblExperiment *splitChild() const;
     //    VerbosityFlags ServerVerbosity() { return exp->get_s_verbosity(); };
