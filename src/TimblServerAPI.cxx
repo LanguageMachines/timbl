@@ -68,6 +68,8 @@ namespace Timbl {
       return NULL;
     }
     if ( result->exp ){
+      if ( opt->getVerbosity() & CLIENTDEBUG )
+	result->setDebug(true);
       return result;
     }
     else {

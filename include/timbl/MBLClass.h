@@ -59,6 +59,7 @@ namespace Timbl {
     };
     WeightType CurrentWeighting() const { return Weighting; };
     InputFormatType InputFormat() const { return input_format; };
+    bool connectToSocket( int );
     std::istream *sock_is;
     std::ostream *sock_os;
   protected:
@@ -126,7 +127,6 @@ namespace Timbl {
     void Error( const std::string& ) const;
     void FatalError( const std::string& ) const;
     size_t MaxFeats() const { return MaxFeatures; };
-    bool connectToSocket( int );
     int Progress() const { return progress; };
     void Progress( int p ){ progress =  p; };
     Target   *Targets;

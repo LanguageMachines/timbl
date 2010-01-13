@@ -70,6 +70,8 @@ namespace Timbl {
     friend class TimblAPI;
   public:
     virtual ~TimblExperiment();
+    virtual TimblExperiment *clone() const = 0;
+    TimblExperiment& operator=( const TimblExperiment& );
     virtual bool Learn( const std::string& = "" );
     virtual bool Prepare( const std::string& = "" );
     virtual bool CVprepare( const std::string& = "",
@@ -107,7 +109,8 @@ namespace Timbl {
     bool IndirectOptions( const CL_Options&  );
     bool ConfirmOptions();
     bool DefaultOptions();
-    void UseOptions( GetOptClass * );
+    GetOptClass *getOptParams() const { return OptParams; };
+    void setOptParams( GetOptClass *op ) { OptParams = op; };
     bool WriteArrays( const std::string& );
     bool GetArrays( const std::string& );
     bool WriteMatrices( const std::string& );
@@ -169,7 +172,6 @@ namespace Timbl {
     
   protected:
     TimblExperiment( const AlgorithmType, const std::string& = "" );
-    virtual TimblExperiment *clone() const = 0;
     virtual bool checkLine( const std::string& );
     virtual const TargetValue *LocalClassify( const Instance& , 
 					      double&,
@@ -221,7 +223,6 @@ namespace Timbl {
 
   private:
     TimblExperiment( const TimblExperiment& );
-    TimblExperiment& operator=( const TimblExperiment& );
     int estimate;
     const TargetValue *classifyString( const std::string& , double& );
   }; 

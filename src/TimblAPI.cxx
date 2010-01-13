@@ -119,7 +119,7 @@ namespace Timbl {
       cerr << "wrong algorithm to create TimblAPI" << endl;
       return NULL;
     }
-    result->UseOptions( opt );
+    result->setOptParams( opt );
     return result;
   }
 

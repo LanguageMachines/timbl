@@ -216,40 +216,6 @@ namespace Timbl {
     return *this;
   }
   
-  TimblExperiment *TimblExperiment::CreateClient( int id ) const {
-    TimblExperiment *result = 0;
-    switch ( Algorithm() ){
-    case IB1_a:
-    case TRIBL_a: 
-    case TRIBL2_a: 
-    case IGTREE_a: 
-      result = clone();
-      break;
-    default:
-      FatalError( "You may not Create Clients for Special cases like " + 
-		  toString(algorithm) );
-      return 0;
-    }
-    *result = *this;
-    string line = "Client on socket: " + toString<int>( id );
-#ifdef USE_LOGSTREAMS
-    result->myerr->message( line );
-    result->mydebug->message( line );
-#endif
-    if ( !result->connectToSocket( id ) ){
-      FatalError( "unable to create working client" );
-      return 0;
-    }
-    if ( OptParams ){
-      result->OptParams = OptParams->Clone( result->sock_os );
-    }
-    result->WFileName = WFileName;
-    result->CurrentDataFile = CurrentDataFile;
-    *Dbg(mydebug) << "created a new Client" << endl;
-    *Dbg(result->mydebug) <<  "I am the new client" << endl;
-    return result;
-  }
-  
   TimblExperiment *TimblExperiment::splitChild( ) const {
     TimblExperiment *result = 0;
     switch ( Algorithm() ){
@@ -1637,10 +1603,6 @@ namespace Timbl {
     return result;
   }
   
-  void TimblExperiment::UseOptions( GetOptClass *gec ){
-    OptParams = gec;
-  }
-
   bool TimblExperiment::SetOptions( int i, const char **argv ){
     CL_Options *Opts = new CL_Options( i, argv );
     bool result = SetOptions( *Opts  );

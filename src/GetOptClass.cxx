@@ -88,7 +88,7 @@ namespace Timbl {
     if ( MaxFeats == -1 ){
       MaxFeats = Max;
       LocalInputFormat = UnknownInputFormat; // InputFormat and verbosity
-      MyVerbosity = NO_VERB;   // are not reset!
+      myVerbosity = NO_VERB;   // are not reset!
     }
     target_pos = -1;
     metricsArray.resize(MaxFeats+1);
@@ -107,7 +107,7 @@ namespace Timbl {
     f_length( 0 ),
     threshold( -1 ),
     igThreshold( -1 ),
-    MyVerbosity( NO_VERB ),
+    myVerbosity( NO_VERB ),
     opt_init( false ),
     opt_changed( false ),
     N_present( false ),
@@ -151,7 +151,7 @@ namespace Timbl {
     seed( in.seed ),
     threshold( in.threshold ),
     igThreshold( in.igThreshold ),
-    MyVerbosity( in.MyVerbosity ),
+    myVerbosity( in.myVerbosity ),
     opt_init( in.opt_init ),
     opt_changed( in.opt_changed ),
     do_exact( in.do_exact ), 
@@ -303,29 +303,29 @@ namespace Timbl {
 	Exp->Estimate( 0 );
       else
 	Exp->Estimate( estimate );
-      if ( MyVerbosity & DISTRIB ){
+      if ( myVerbosity & DISTRIB ){
 	if ( !keep_distributions && local_algo == IGTREE_a ){
-	  MyVerbosity &= ~DISTRIB;
+	  myVerbosity &= ~DISTRIB;
 	  Info( "Ignoring option +vdb, while +D is missing!" );
 	}
       }
-      if ( MyVerbosity & ALL_K ){
+      if ( myVerbosity & ALL_K ){
 	if ( local_algo == IGTREE_a ){
 	  Info( "Ignoring option +vk, impossible with IGtree algorithm" );
 	}
-	else if ( !(MyVerbosity & DISTRIB) ){
+	else if ( !(myVerbosity & DISTRIB) ){
 	  Info( "setting option +vdb while +vk is also set" );
-	  MyVerbosity |= DISTRIB;
+	  myVerbosity |= DISTRIB;
 	}
       }
-      if ( MyVerbosity & NEAR_N ){
+      if ( myVerbosity & NEAR_N ){
 	if ( local_algo == IGTREE_a ){
 	  Info( "Ignoring option +vn, impossible with IGtree algorithm" );
 	}
       }
-      if ( MyVerbosity & CONF_MATRIX ||
-	   MyVerbosity & CLASS_STATS )
-	MyVerbosity |= ADVANCED_STATS;
+      if ( myVerbosity & CONF_MATRIX ||
+	   myVerbosity & CLASS_STATS )
+	myVerbosity |= ADVANCED_STATS;
       if ( do_exact )
 	Exp->SetOption(  "EXACT_MATCH: true" );
       else
@@ -386,7 +386,7 @@ namespace Timbl {
 		  optline = "PROGRESS: " + toString<int>(local_progress);
 		  if ( Exp->SetOption( optline ) ){
 		    optline = "VERBOSITY: " + 
-		      toString(MyVerbosity);
+		      toString(myVerbosity);
 		    if ( Exp->SetOption( optline ) ){
 		      for ( size_t i=0; i < metricsArray.size(); ++i ){
 			if ( !first ){
@@ -1038,13 +1038,13 @@ namespace Timbl {
 	    return false;
 	  else if ( Flag > 0 )
 	    if ( mood ){
-	      MyVerbosity |= Flag;
+	      myVerbosity |= Flag;
 	    }
 	    else {
-	      MyVerbosity &= ~Flag;
+	      myVerbosity &= ~Flag;
 	    }
 	  else
-	    MyVerbosity = NO_VERB;
+	    myVerbosity = NO_VERB;
 	}
       }
 	break;

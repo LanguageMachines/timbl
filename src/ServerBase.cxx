@@ -43,7 +43,7 @@ using namespace std;
 
 namespace Timbl {
 
-  TimblServer::TimblServer(){
+  TimblServer::TimblServer(): myLog("TimblServer"){
     maxConn = 25;
     serverPort = -1;
     exp = 0;
@@ -118,6 +118,25 @@ namespace Timbl {
     }
   }
 
+  TimblExperiment *createClient( const TimblExperiment *exp,
+				 Sockets::ServerSocket *sock ) {
+    int id = sock->getSockId();
+    TimblExperiment *result = exp->clone();
+    *result = *exp;
+    string line = "Client on socket: " + toString<int>( id );
+    if ( !result->connectToSocket( id ) ){
+      cerr << "unable to create working client" << endl;
+      return 0;
+    }
+    if ( exp->getOptParams() ){
+      result->setOptParams( exp->getOptParams()->Clone( result->sock_os ) );
+    }
+    //    *Dbg(mydebug) << "created a new Client" << endl;
+    //    *Dbg(result->mydebug) <<  "I am the new client" << endl;
+    result->setExpName(string("exp-")+toString( sock->getSockId() ) );
+    return result;
+  }
+
   void startExperimentsFromConfig( map<std::string, std::string>& serverConfig,
 				   map<string, TimblExperiment*>& experiments ){
     map<string,string>::const_iterator it = serverConfig.begin();
@@ -163,7 +182,7 @@ namespace Timbl {
   }
 
   struct childArgs{
-    TimblExperiment *Mother;
+    TimblServer *Mother;
     Sockets::ServerSocket *socket;
     int maxC;
     map<string, TimblExperiment*> *experiments;
@@ -274,9 +293,9 @@ namespace Timbl {
     *os << "Welcome to the Timbl server." << endl;
     if ( args->experiments->empty() ){
       baseName == "default";
-      *Dbg(args->Mother->my_debug()) << " Voor Create Default Client " << endl;
-      Chld = args->Mother->CreateClient( sockId );
-      *Dbg(args->Mother->my_debug()) << " Na Create Client " << endl;
+      *Dbg(args->Mother->myLog) << " Voor Create Default Client " << endl;
+      Chld = createClient( args->Mother->theExp(), sock );
+      *Dbg(args->Mother->myLog) << " Na Create Client " << endl;
       // report connection to the server terminal
       //
       char line[256];
@@ -296,17 +315,17 @@ namespace Timbl {
       *os << endl;
     }
     if ( getline( *is, Line ) ){
-      *Dbg(args->Mother->my_log()) << "FirstLine='" << Line << "'" << endl;
+      *Dbg(args->Mother->myLog) << "FirstLine='" << Line << "'" << endl;
       string Command, Param;
       int result = 0;
       bool go_on = true;
-      *Dbg(args->Mother->my_debug()) << "running FromSocket: " << sockId << endl;
+      *Dbg(args->Mother->myLog) << "running FromSocket: " << sockId << endl;
       
       do {
 	string::size_type pos = Line.find('\r');
 	if ( pos != string::npos )
 	  Line.erase(pos,1);
-	*Dbg(args->Mother->my_debug()) << "Line='" << Line << "'" << endl;
+	*Dbg(args->Mother->myLog) << "Line='" << Line << "'" << endl;
 	Split( Line, Command, Param );
 	switch ( check_command(Command) ){
 	case Base:{
@@ -317,11 +336,10 @@ namespace Timbl {
 	    *os << "selected base: '" << Param << "'" << endl;
 	    if ( Chld )
 	      delete Chld;
-	    *Dbg(args->Mother->my_debug()) 
+	    *Dbg(args->Mother->myLog) 
 	      << " Voor Create Default Client " << endl;
-	    Chld = it->second->CreateClient( sockId );
-	    Chld->setExpName(string("exp-")+toString(sockId) );
-	    *Dbg(args->Mother->my_debug()) << " Na Create Client " << endl;
+	    Chld = createClient( it->second, sock );
+	    *Dbg(args->Mother->myLog) << " Na Create Client " << endl;
 	    // report connection to the server terminal
 	    //
 	    char line[256];
@@ -372,8 +390,8 @@ namespace Timbl {
 	  break;
 	default:
 	  if ( Chld->ServerVerbosity() & CLIENTDEBUG )
-	    *Log(args->Mother->my_log()) << sockId << ": Don't understand '" 
-					 << Line << "'" << endl;
+	    *Log(args->Mother->myLog) << sockId << ": Don't understand '" 
+				      << Line << "'" << endl;
 	  *os << "ERROR { Illegal instruction:'" << Command << "' in line:" 
 	      << Line << "}" << endl;
 	  break;
@@ -392,7 +410,7 @@ namespace Timbl {
   // ***** This is the routine that is executed from a new TCP thread *******
   void *socketChild( void *arg ){
     childArgs *args = (childArgs *)arg;
-    TimblExperiment *Mother = args->Mother;
+    TimblServer *Mother = args->Mother;
     static int service_count=0;
 
     static pthread_mutex_t my_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -400,8 +418,8 @@ namespace Timbl {
     // use a mutex to update the global service counter
     service_count++;
     if ( service_count > args->maxC ){
-      *Mother->sock_os << "Maximum connections exceeded." << endl;
-      *Mother->sock_os << "try again later..." << endl;
+      *Mother->theExp()->sock_os << "Maximum connections exceeded." << endl;
+      *Mother->theExp()->sock_os << "try again later..." << endl;
       pthread_mutex_unlock( &my_lock );
       cerr << "Thread " << (uintptr_t)pthread_self() << " refused " << endl;
     }
@@ -410,19 +428,19 @@ namespace Timbl {
       Timer timeDone;
       timeDone.start();
       int nw = runFromSocket( args );
-      *Log(Mother->my_log()) << "Thread " << (uintptr_t)pthread_self() 
+      *Log(Mother->myLog) << "Thread " << (uintptr_t)pthread_self() 
 			     << ", terminated at: " << Timer::now()
 			     << "Total time used in this thread: " 
 			     << timeDone << ", " << nw 
 			     << " instances processed ";
       if ( timeDone.secs() > 0 && nw > 0 )
-	*Log(Mother->my_log()) << " (" << nw/timeDone.secs() 
+	*Log(Mother->myLog) << " (" << nw/timeDone.secs() 
 			       << " instances/sec)";
-      *Log(Mother->my_log()) << endl;
+      *Log(Mother->myLog) << endl;
       //
       pthread_mutex_lock(&my_lock);
       // use a mutex to update and display the global service counter
-      *Log(Mother->my_log()) << "Socket Total = " << --service_count << endl;
+      *Log(Mother->myLog) << "Socket Total = " << --service_count << endl;
       pthread_mutex_unlock(&my_lock);
       // close the socket and exit this thread
       delete args->socket;
@@ -439,8 +457,8 @@ namespace Timbl {
       unlink( pidFile.c_str() ) ;
       ofstream pid_file( pidFile.c_str() ) ;
       if ( !pid_file ){
-	*Log(exp->my_err())<< "unable to create pidfile:"<< pidFile << endl;
-	*Log(exp->my_err())<< "TimblServer NOT Started" << endl;
+	*Log(myLog)<< "unable to create pidfile:"<< pidFile << endl;
+	*Log(myLog)<< "TimblServer NOT Started" << endl;
 	exit(1);
       }
     }
@@ -449,16 +467,15 @@ namespace Timbl {
 	logFile = '/' + logFile;
       ostream *tmp = new ofstream( logFile.c_str() );
       if ( tmp && tmp->good() ){
-	*Log(exp->my_err()) << "switching logging to file " 
+	*Log(myLog) << "switching logging to file " 
 			       << logFile << endl;
-	exp->my_log().associate( *tmp );
-	exp->my_err().associate( *tmp );
-	*Log(exp->my_log())  << "Started logging " << endl;	
-	*Log(exp->my_log())  << "Server verbosity " << toString<VerbosityFlags>(exp->ServerVerbosity()) << endl;	
+	myLog.associate( *tmp );
+	*Log(myLog)  << "Started logging " << endl;	
+	*Log(myLog)  << "debugging is " << (doDebug()?"on":"off") << endl;	
       }
       else {
-	*Log(exp->my_err()) << "unable to create logfile: " << logFile << endl;
-	*Log(exp->my_err()) << "not started" << endl;
+	*Log(myLog) << "unable to create logfile: " << logFile << endl;
+	*Log(myLog) << "not started" << endl;
 	exit(1);
       }
     }
@@ -479,8 +496,8 @@ namespace Timbl {
       // signal it to the world
       ofstream pid_file( pidFile.c_str() ) ;
       if ( !pid_file ){
-	*Log(exp->my_err())<< "unable to create pidfile:"<< pidFile << endl;
-	*Log(exp->my_err())<< "TimblServer NOT Started" << endl;
+	*Log(myLog)<< "unable to create pidfile:"<< pidFile << endl;
+	*Log(myLog)<< "TimblServer NOT Started" << endl;
 	exit(1);
       }
       else {
@@ -492,24 +509,24 @@ namespace Timbl {
     pthread_attr_t attr;
     if ( pthread_attr_init(&attr) ||
 	 pthread_attr_setdetachstate( &attr, PTHREAD_CREATE_DETACHED ) ){
-      *Log(exp->my_err()) << "Threads: couldn't set attributes" << endl;
+      *Log(myLog) << "Threads: couldn't set attributes" << endl;
       exit(0);
     }
-    *Log(exp->my_log()) << "Starting Server on port:" << serverPort << endl;
+    *Log(myLog) << "Starting Server on port:" << serverPort << endl;
 
     pthread_t chld_thr;
 
     Sockets::ServerSocket server;
     string portString = toString<int>(serverPort);
     if ( !server.connect( portString ) ){
-      *Log(exp->my_err()) << "failed to start Server: " 
+      *Log(myLog) << "failed to start Server: " 
 			  << server.getMessage() << endl;
       exit(0);
     }
 
     if ( !server.listen( 5 ) ) {
       // maximum of 5 pending requests
-      *Log(exp->my_err()) << server.getMessage() << endl;
+      *Log(myLog) << server.getMessage() << endl;
       exit(0);
     }
     
@@ -518,10 +535,10 @@ namespace Timbl {
       signal( SIGPIPE, SIG_IGN );
       Sockets::ServerSocket *newSocket = new Sockets::ServerSocket();
       if ( !server.accept( *newSocket ) ){
-	*Log(exp->my_err()) << server.getMessage() << endl;
+	*Log(myLog) << server.getMessage() << endl;
 	if ( ++failcount > 20 ){
-	  *Log(exp->my_err()) << "accept failcount >20 " << endl;
-	  *Log(exp->my_err()) << "server stopped." << endl;
+	  *Log(myLog) << "accept failcount >20 " << endl;
+	  *Log(myLog) << "server stopped." << endl;
 	  exit(EXIT_FAILURE);
 	}
 	else {
@@ -530,20 +547,20 @@ namespace Timbl {
       }
       else {
 	failcount = 0;
-	*Log(exp->my_log()) << "Accepting Connection #" 
-			    << newSocket->getSockId()
-			    << " from remote host: " 
-			    << newSocket->getClientName() << endl;
+	*Log(myLog) << "Accepting Connection #" 
+		    << newSocket->getSockId()
+		    << " from remote host: " 
+		    << newSocket->getClientName() << endl;
 	// create a new thread to process the incoming request 
 	// (The thread will terminate itself when done processing
 	// and release its socket handle)
 	//
 	childArgs *args = new childArgs();
-	args->Mother = exp;
+	args->Mother = this;
 	args->socket = newSocket;
 	args->maxC   = maxConn;
 	args->experiments = &experiments;
-	*Dbg(exp->my_debug()) << "voor pthread_create " << endl;
+	*Dbg(myLog) << "voor pthread_create " << endl;
 	pthread_create( &chld_thr, &attr, socketChild, (void *)args );
       }
       // the server is now free to accept another socket request 
@@ -586,7 +603,7 @@ namespace Timbl {
   // ***** This is the routine that is executed from a new HTTP thread *******
   void *httpChild( void *arg ){
     childArgs *args = (childArgs *)arg;
-    TimblExperiment *Mother = args->Mother;
+    TimblServer *Mother = args->Mother;
     args->socket->setNonBlocking();
     int sockId = args->socket->getSockId(); 
     fdistream is(sockId);
@@ -602,8 +619,8 @@ namespace Timbl {
       os << "Maximum connections exceeded." << endl;
       os << "try again later..." << endl;
       pthread_mutex_unlock( &my_lock );
-      *Log(Mother->my_log()) << "Thread " << (uintptr_t)pthread_self()
-			     << " refused " << endl;
+      *Log(Mother->myLog) << "Thread " << (uintptr_t)pthread_self()
+			  << " refused " << endl;
     }
     else {
       pthread_mutex_unlock( &my_lock );
@@ -613,13 +630,13 @@ namespace Timbl {
       char logLine[256];
       sprintf( logLine, "Thread %lu, on Socket %d", (uintptr_t)pthread_self(),
 	       sockId );
-      *Log(Mother->my_log()) << logLine << ", started at: " 
+      *Log(Mother->myLog) << logLine << ", started at: " 
 			     << Timer::now() << endl;  
       signal( SIGPIPE, BrokenPipeChildFun );
       string Line;
       int timeout = 1;
       if ( nb_getline( is, Line, timeout ) ){
-	*Dbg(Mother->my_debug()) << "FirstLine='" << Line << "'" << endl;
+	*Dbg(Mother->myLog) << "FirstLine='" << Line << "'" << endl;
 	if ( Line.find( "HTTP" ) != string::npos ){
 	  // skip HTTP header
 	  string tmp;
@@ -631,7 +648,7 @@ namespace Timbl {
 	  if ( spos != string::npos ){
 	    string::size_type epos = Line.find( " HTTP" );
 	    string line = Line.substr( spos+3, epos - spos - 3 );
-	    *Dbg(Mother->my_debug()) << "Line='" << line << "'" << endl;
+	    *Dbg(Mother->myLog) << "Line='" << line << "'" << endl;
 	    epos = line.find( "?" );
 	    string basename;
 	    if ( epos != string::npos ){
@@ -642,12 +659,10 @@ namespace Timbl {
 		basename = basename.substr( epos+1 );
 		map<string,TimblExperiment*>::const_iterator it= experiments->find(basename);
 		if ( it != experiments->end() ){
-		  TimblExperiment *api = it->second->CreateClient( args->socket->getSockId() );
+		  TimblExperiment *api = createClient( it->second, args->socket );
 		  if ( api ){
-		    string name = string("exp-")+toString(sockId);
-		    api->setExpName( name );
-		    LogStream LS( &Mother->my_log() );
-		    LogStream DS( &Mother->my_debug() );
+		    LogStream LS( &Mother->myLog );
+		    LogStream DS( &Mother->myLog );
 		    DS.message(logLine);
 		    LS.message(logLine);
 		    DS.setstamp( StampBoth );
@@ -683,7 +698,7 @@ namespace Timbl {
 			string opt = it->second;
 			if ( !opt.empty() && opt[0] != '-' && opt[0] != '+' )
 			  opt = string("-") + opt;
-			if ( Mother->ServerVerbosity() & CLIENTDEBUG )
+			if ( Mother->doDebug() )
 			  DS << "set :" << opt << endl;
 			if ( api->SetOptions( opt ) ){
 			  if ( !api->ConfirmOptions() ){
@@ -739,11 +754,11 @@ namespace Timbl {
 			   << endl;
 			string distrib, answer; 
 			double distance;
-			if ( Mother->ServerVerbosity() & CLIENTDEBUG )
+			if ( Mother->doDebug() )
 			  LS << "Classify(" << params << ")" << endl;
 			if ( api->Classify( params, answer, distrib, distance ) ){
 			  
-			  if ( Mother->ServerVerbosity() & CLIENTDEBUG )
+			  if ( Mother->doDebug() )
 			    LS << "resultaat: " << answer 
 			       << ", distrib: " << distrib
 			       << ", distance " << distance
@@ -778,7 +793,7 @@ namespace Timbl {
 		  }
 		}
 		else {
-		  *Dbg(Mother->my_log()) << "invalid BASE! '" << basename 
+		  *Dbg(Mother->myLog) << "invalid BASE! '" << basename 
 					 << "'" << endl;
 		  os << "invalid basename: '" << basename << "'" << endl;
 		}
@@ -789,7 +804,7 @@ namespace Timbl {
 	}
       }
       
-      *Log(Mother->my_log()) << "Thread " << (uintptr_t)pthread_self() 
+      *Log(Mother->myLog) << "Thread " << (uintptr_t)pthread_self() 
 			     << ", terminated at: " << Timer::now() << endl;
       os.flush();
       //
@@ -798,7 +813,7 @@ namespace Timbl {
       delete args;
       pthread_mutex_lock(&my_lock);
       // use a mutex to update and display the global service counter
-      *Log(Mother->my_log()) << "Socket Total = " << --service_count << endl;
+      *Log(Mother->myLog) << "Socket Total = " << --service_count << endl;
       pthread_mutex_unlock(&my_lock);
       //
     }
@@ -813,8 +828,8 @@ namespace Timbl {
       unlink( pidFile.c_str() ) ;
       ofstream pid_file( pidFile.c_str() ) ;
       if ( !pid_file ){
-	*Log(exp->my_err())<< "unable to create pidfile:"<< pidFile << endl;
-	*Log(exp->my_err())<< "TimblServer NOT Started" << endl;
+	*Log(myLog)<< "unable to create pidfile:"<< pidFile << endl;
+	*Log(myLog)<< "TimblServer NOT Started" << endl;
 	exit(1);
       }
     }
@@ -823,16 +838,15 @@ namespace Timbl {
 	logFile = '/' + logFile;
       ostream *tmp = new ofstream( logFile.c_str() );
       if ( tmp && tmp->good() ){
-	*Log(exp->my_err()) << "switching logging to file " 
-			       << logFile << endl;
-	exp->my_log().associate( *tmp );
-	exp->my_err().associate( *tmp );
-	*Log(exp->my_log())  << "Started logging " << endl;	
-	*Log(exp->my_log())  << "Server verbosity " << toString<VerbosityFlags>( exp->ServerVerbosity()) << endl;	
+	*Log(myLog) << "switching logging to file " 
+		    << logFile << endl;
+	myLog.associate( *tmp );
+	*Log(myLog)  << "Started logging " << endl;	
+	*Log(myLog)  << "debugging is " << (doDebug()?"on":"off") << endl;	
       }
       else {
-	*Log(exp->my_err()) << "unable to create logfile: " << logFile << endl;
-	*Log(exp->my_err()) << "not started" << endl;
+	*Log(myLog) << "unable to create logfile: " << logFile << endl;
+	*Log(myLog) << "not started" << endl;
 	exit(1);
       }
     }
@@ -851,8 +865,8 @@ namespace Timbl {
       // signal it to the world
       ofstream pid_file( pidFile.c_str() ) ;
       if ( !pid_file ){
-	*Log(exp->my_err())<< "unable to create pidfile:"<< pidFile << endl;
-	*Log(exp->my_err())<< "TimblServer NOT Started" << endl;
+	*Log(myLog)<< "unable to create pidfile:"<< pidFile << endl;
+	*Log(myLog)<< "TimblServer NOT Started" << endl;
 	exit(1);
       }
       else {
@@ -864,24 +878,24 @@ namespace Timbl {
     pthread_attr_t attr;
     if ( pthread_attr_init(&attr) ||
 	 pthread_attr_setdetachstate( &attr, PTHREAD_CREATE_DETACHED ) ){
-      *Log(exp->my_err()) << "Threads: couldn't set attributes" << endl;
+      *Log(myLog) << "Threads: couldn't set attributes" << endl;
       exit(0);
     }
-    *Log(exp->my_log()) << "Starting Server on port:" << serverPort << endl;
+    *Log(myLog) << "Starting Server on port:" << serverPort << endl;
 
     pthread_t chld_thr;
 
     Sockets::ServerSocket server;
     string portString = toString<int>(serverPort);
     if ( !server.connect( portString ) ){
-      *Log(exp->my_err()) << "failed to start Server: " 
-			     << server.getMessage() << endl;
+      *Log(myLog) << "failed to start Server: " 
+		  << server.getMessage() << endl;
       exit(0);
     }
 
     if ( !server.listen( 5 ) ) {
       // maximum of 5 pending requests
-      *Log(exp->my_err()) << server.getMessage() << endl;
+      *Log(myLog) << server.getMessage() << endl;
       exit(0);
     }
     
@@ -890,10 +904,10 @@ namespace Timbl {
       signal( SIGPIPE, SIG_IGN );
       Sockets::ServerSocket *newSocket = new Sockets::ServerSocket();
       if ( !server.accept( *newSocket ) ){
-	*Log(exp->my_err()) << server.getMessage() << endl;
+	*Log(myLog) << server.getMessage() << endl;
 	if ( ++failcount > 20 ){
-	  *Log(exp->my_err()) << "accept failcount >20 " << endl;
-	  *Log(exp->my_err()) << "server stopped." << endl;
+	  *Log(myLog) << "accept failcount > 20 " << endl;
+	  *Log(myLog) << "server stopped." << endl;
 	  exit(EXIT_FAILURE);
 	}
 	else {
@@ -902,16 +916,16 @@ namespace Timbl {
       }
       else {
 	failcount = 0;
-	*Log(exp->my_log()) << "Accepting Connection #" 
-			       << newSocket->getSockId()
-			       << " from remote host: " 
-			       << newSocket->getClientName() << endl;
+	*Log(myLog) << "Accepting Connection #" 
+		    << newSocket->getSockId()
+		    << " from remote host: " 
+		    << newSocket->getClientName() << endl;
 	// create a new thread to process the incoming request 
 	// (The thread will terminate itself when done processing
 	// and release its socket handle)
 	//
 	childArgs *args = new childArgs();
-	args->Mother = exp;
+	args->Mother = this;
 	args->socket = newSocket;
 	args->maxC   = maxConn;
 	args->experiments = &experiments;
@@ -964,7 +978,7 @@ namespace Timbl {
   IB1_Server::IB1_Server( GetOptClass *opt ){
     exp = new IB1_Experiment( opt->MaxFeatures() );
     if (exp ){
-      exp->UseOptions( opt );
+      exp->setOptParams( opt );
       logFile = opt->getLogFile();
       pidFile = opt->getPidFile();
     }
@@ -973,7 +987,7 @@ namespace Timbl {
   IG_Server::IG_Server( GetOptClass *opt ){
     exp = new IG_Experiment( opt->MaxFeatures() );
     if (exp ){
-      exp->UseOptions( opt );
+      exp->setOptParams( opt );
       logFile = opt->getLogFile();
       pidFile = opt->getPidFile();
     }
@@ -982,7 +996,7 @@ namespace Timbl {
   TRIBL_Server::TRIBL_Server( GetOptClass *opt ){
     exp = new TRIBL_Experiment( opt->MaxFeatures() );
     if (exp ){
-      exp->UseOptions( opt );
+      exp->setOptParams( opt );
       logFile = opt->getLogFile();
       pidFile = opt->getPidFile();
     }
@@ -991,7 +1005,7 @@ namespace Timbl {
   TRIBL2_Server::TRIBL2_Server( GetOptClass *opt ){
     exp = new TRIBL2_Experiment( opt->MaxFeatures() );
     if (exp ){
-      exp->UseOptions( opt );
+      exp->setOptParams( opt );
       logFile = opt->getLogFile();
       pidFile = opt->getPidFile();
     }

@@ -34,6 +34,10 @@ namespace Timbl {
   class TimblServer : public MsgClass {
     friend class TimblServerAPI;
     friend TimblServer *CreateServerPimpl( AlgorithmType, GetOptClass * );
+  public:
+    LogStream myLog;
+    bool doDebug() { return debug; };
+    TimblExperiment *theExp(){ return exp; };
   protected:
     TimblServer();
     bool getConfig( const std::string& );
@@ -41,14 +45,14 @@ namespace Timbl {
     bool startMultiServer( const std::string& );
     void RunClassicServer();
     void RunHttpServer();
-    TimblExperiment *CreateClient( Sockets::ServerSocket* ) const;
     TimblExperiment *splitChild() const;
-    //    VerbosityFlags ServerVerbosity() { return exp->get_s_verbosity(); };
+    void setDebug( bool d ){ debug = d; };
     Sockets::ServerSocket *TcpSocket() const { return tcp_socket; };
     TimblExperiment *exp;
     std::string logFile;
     std::string pidFile;
   private:
+    bool debug;
     int maxConn;
     int serverPort;
     Sockets::ServerSocket *tcp_socket;
@@ -56,6 +60,9 @@ namespace Timbl {
     std::string serverConfigFile;
     std::map<std::string, std::string> serverConfig;
   };
+
+  TimblExperiment *createClient( const TimblExperiment *,
+				 Sockets::ServerSocket* );
 
   class IB1_Server: public TimblServer {
   public:

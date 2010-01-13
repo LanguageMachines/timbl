@@ -46,6 +46,7 @@ namespace Timbl {
     int MaxFeatures() const { return MaxFeats; };
     std::string getLogFile() const { return logFile; };
     std::string getPidFile() const { return pidFile; };
+    VerbosityFlags getVerbosity() { return myVerbosity; };
   private:  
     AlgorithmType local_algo;
     MetricType local_metric;
@@ -72,7 +73,7 @@ namespace Timbl {
     int seed;
     int threshold;
     int igThreshold;
-    VerbosityFlags MyVerbosity;
+    VerbosityFlags myVerbosity;
     bool opt_init;
     bool opt_changed;
     bool do_exact;
