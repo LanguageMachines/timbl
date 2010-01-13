@@ -37,6 +37,8 @@ namespace Timbl {
   public:
     LogStream myLog;
     bool doDebug() { return debug; };
+    bool doSetOptions( TimblExperiment *, const std::string&  );
+    bool classifyOneLine( TimblExperiment *, const std::string& );
     TimblExperiment *theExp(){ return exp; };
   protected:
     TimblServer();

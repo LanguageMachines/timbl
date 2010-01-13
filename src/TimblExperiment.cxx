@@ -1914,7 +1914,7 @@ namespace Timbl {
 	  Info( "Reading Instance-Base from: " + FileName );
 	if ( GetInstanceBase( infile ) ){
 	  if ( !Verbosity(SILENT) ){
-	    writePermutation( my_log() );
+	    writePermutation( cout );
 	  }
 	  result = true;
 	}

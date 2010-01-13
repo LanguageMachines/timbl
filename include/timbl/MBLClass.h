@@ -40,9 +40,6 @@ namespace Timbl {
     bool SetOption( const std::string& );
     xmlNode *settingsToXml() const;
     bool ShowWeights( std::ostream& ) const;
-    LogStream& my_err() const { return *myerr; };
-    LogStream& my_log() const { return *mylog; };
-    LogStream& my_debug() const { return *mydebug; };
     bool Verbosity( VerbosityFlags v ) const { 
       return verbosity & v; };
     void SetVerbosityFlag( VerbosityFlags v ) { verbosity |= v; };
