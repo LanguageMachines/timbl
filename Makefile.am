@@ -1,7 +1,7 @@
 # $Id$
 # $URL$
 
-ACLOCAL_AMFLAGS =-I m4 --install
+ACLOCAL_AMFLAGS =-I m4
 
 SUBDIRS = src include demos docs init m4
 
