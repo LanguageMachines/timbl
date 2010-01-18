@@ -62,6 +62,10 @@ else
   CXXFLAGS="$CXXFLAGS -W"
 fi
 
+ACX_PTHREAD([LIBS="$PTHREAD_LIBS $LIBS"
+	    CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"],
+	    [AC_MSG_ERROR([We need pthreads!])])
+
 AX_OPENMP(
   [AC_MSG_NOTICE( we have Open MP )
    CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"],
@@ -148,18 +152,6 @@ extern int accept(int, struct sockaddr *, size_t t *);
         ])
 AC_MSG_RESULT($ac_cv_check_socklen_t)
 AC_DEFINE_UNQUOTED(TIMBL_SOCKLEN_T,$ac_cv_check_socklen_t, "sock_len" )
-
-dnl ------ server mode
-AC_ARG_ENABLE(server,[  --enable-server[=PREFIX]  enable server mode])
-if test "$enable_server" -a "$enable_server" = "no"; then
-AC_MSG_WARN([not building servermode] )
-else
-    if test "$enable_server" != "no"; then
-        LIBS="$LIBS -lpthread"
-        CXXFLAGS="$CXXFLAGS -DPTHREADS -DUSE_LOGSTREAMS"
-    fi
-fi
-dnl
 
 AC_OUTPUT([
   Makefile
