@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -31,13 +31,6 @@
 #include <cstring>
 #include <ctime>
 #include <cctype>
-
-#ifdef USE_LOGSTREAMS
-#include "timbl/LogStream.h"
-#else
-typedef std::ostream LogStream;
-#endif
-
 #include "timbl/Common.h"
 #include "timbl/StringOps.h"
 #include "timbl/Types.h"
@@ -181,7 +174,6 @@ namespace Timbl {
     return result;
   }
   
-#ifdef PTHREADS
   void GetOptClass::Error( const string& out_line ) const {
     if ( parent_socket_os )
       *parent_socket_os << "ERROR { " << out_line << " }" << endl;
@@ -190,14 +182,6 @@ namespace Timbl {
     }
   }
   
-#else
-  
-  void GetOptClass::Error( const string& out_line ) const {
-    cerr << "Error:" << out_line << endl;
-  }
-  
-#endif
-
   bool GetOptClass::definitive_options( TimblExperiment *Exp ){
     if ( opt_changed || !opt_init ){
       opt_changed = false;

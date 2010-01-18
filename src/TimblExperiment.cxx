@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -57,15 +57,6 @@
 #include "timbl/neighborSet.h"
 #include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
-
-#ifdef USE_LOGSTREAMS
-#include "timbl/LogStream.h"
-#else
-typedef std::ostream LogStream;
-#define Log(X) (X)
-#define Dbg(X) (X)
-#endif
-
 #include "timbl/MBLClass.h"
 #include "timbl/CommandLine.h"
 #include "timbl/GetOptClass.h"
@@ -230,11 +221,6 @@ namespace Timbl {
 		  toString(algorithm) );
     }
     *result = *this;
-    string line = "child-";
-#ifdef USE_LOGSTREAMS
-    result->myerr->message( line );
-    result->mydebug->message( line );
-#endif
     if ( OptParams ){
       result->OptParams = OptParams->Clone( 0 );
     }
@@ -289,18 +275,6 @@ namespace Timbl {
     }
   }
   
-  bool TimblExperiment::SetSingleThreaded(){
-#ifdef USE_LOGSTREAMS
-    if ( !mylog->set_single_threaded_mode() ||
-	 !myerr->set_single_threaded_mode() ||
-	 !mydebug->set_single_threaded_mode() ){
-      cerr << "problem setting to single threaded mode" << endl;
-      return false;
-    }
-#endif
-    return true;
-  }
-
   bool TimblExperiment::skipARFFHeader( istream& is ){
     string Buffer;
     while ( getline( is, Buffer ) &&
@@ -357,18 +331,18 @@ namespace Timbl {
 	  }
 	  else {
 	    if ( !Verbosity(SILENT) ){
-	      *Log(mylog) << "Examine datafile '" << FileName 
-			  << "' gave the following results:"
-			  << endl
-			  << "Number of Features: " << Num << endl;
-	      showInputFormat( *Log(mylog) );
+	      *mylog << "Examine datafile '" << FileName 
+		     << "' gave the following results:"
+		     << endl
+		     << "Number of Features: " << Num << endl;
+	      showInputFormat( *mylog );
 	    }
 	    if ( NumOfFeatures() == 0 ){
 	      Initialize( Num );
 	    }
 	    CurrentDataFile = FileName;
 	    if ( Verbosity(OPTIONS) ){
-	      ShowSettings( *Log(mylog) );
+	      ShowSettings( *mylog );
 	    }
 	    // Open the file.
 	    //
@@ -417,12 +391,12 @@ namespace Timbl {
 		time_stamp( "Finished:  ", stats.totalLines() );
 		time_stamp( "Calculating Entropy " );
 		if ( Verbosity(FEAT_W) ){
-		  *Log(mylog) << "Lines of data     : " 
-			      << stats.dataLines() << endl;
+		  *mylog << "Lines of data     : " 
+			 << stats.dataLines() << endl;
 		  if ( stats.skippedLines() != 0 )
-		    *Log(mylog) << "SkippedLines      : "
-				<< stats.skippedLines() << endl;
-		  LearningInfo( *Log(mylog) );
+		    *mylog << "SkippedLines      : "
+			   << stats.skippedLines() << endl;
+		  LearningInfo( *mylog );
 		}
 		else
 		  calculate_fv_entropy( false );
@@ -525,7 +499,7 @@ namespace Timbl {
 	}
 	time_stamp( "Finished:  ", stats.dataLines() );
 	if ( !Verbosity(SILENT) )
-	  IBInfo( *Log(mylog) );
+	  IBInfo( *mylog );
       }
     }
     return result;
@@ -654,7 +628,7 @@ namespace Timbl {
 	} while( found );
 	time_stamp( "Finished:  ", stats.dataLines() );
 	if ( !Verbosity(SILENT) )
-	  IBInfo( *Log(mylog) );
+	  IBInfo( *mylog );
       }
     }
     return result;
@@ -719,7 +693,7 @@ namespace Timbl {
 	} while( found );
 	time_stamp( "Finished:  ", stats.dataLines() );
 	if ( !Verbosity(SILENT) )
-	  IBInfo( *Log(mylog) );
+	  IBInfo( *mylog );
       }
     }
     return result;
@@ -1088,7 +1062,6 @@ namespace Timbl {
 			 toString<int>(stats.totalLines() ) + ":\n" +
 			 Buffer + "\nIgnoring the new weight" );
 	      }
-	      *Dbg(mydebug) << "adding " << &CurrInst << endl;
 	      ++Added;
 	      ++TotalAdded;
 	      MBL_init = true; // avoid recalculations in LocalClassify
@@ -1096,7 +1069,7 @@ namespace Timbl {
 	    }
 	    // Progress update.
 	    //
-	    if ( show_learn_progress( *Log(mylog), lStartTime, Added ) ){
+	    if ( show_learn_progress( *mylog, lStartTime, Added ) ){
 	      Added = 0;
 	    }
 	    found = false;
@@ -1112,10 +1085,10 @@ namespace Timbl {
 	  } while( found );
 	  if ( result ){
 	    time_stamp( "Finished:  ", stats.dataLines() );
-	    *Log(mylog) << "in total added " << TotalAdded << " new entries" << endl;
+	    *mylog << "in total added " << TotalAdded << " new entries" << endl;
 	    if ( !Verbosity(SILENT) ){
-	      IBInfo( *Log(mylog) );
-	      LearningInfo( *Log(mylog) );
+	      IBInfo( *mylog );
+	      LearningInfo( *mylog );
 	    }
 	    MBL_init = false; // force recalculations when testing
 	  }
@@ -1177,11 +1150,11 @@ namespace Timbl {
 	return false;
       }
       if ( !Verbosity(SILENT) ){
-	*Log(mylog) << "Examine datafile '" << testStreamName 
-		    << "' gave the following results:"
-		    << endl
-		    << "Number of Features: " << numF << endl;
-	showInputFormat( *Log(mylog) );
+	*mylog << "Examine datafile '" << testStreamName 
+	       << "' gave the following results:"
+	       << endl
+	       << "Number of Features: " << numF << endl;
+	showInputFormat( *mylog );
       }
     }	
     return true;
@@ -1515,7 +1488,7 @@ namespace Timbl {
     if ( initTestFiles( FileName, OutFile ) ){
       initExperiment();
       stats.clear();
-      showTestingInfo( *Log(mylog) );
+      showTestingInfo( *mylog );
       // Start time.
       //
       time_t lStartTime;
@@ -1536,20 +1509,20 @@ namespace Timbl {
 	  bool exact = LocalTest( CurrInst, outStream );
 	  if ( exact ){ // remember that a perfect match may be incorrect!
 	    if ( Verbosity(EXACT) ) {
-	      *Log(mylog) << "Exacte match:\n";
-	      show_org_input( *Log(mylog) );
-	      *Log(mylog) << endl;
+	      *mylog << "Exacte match:\n";
+	      show_org_input( *mylog );
+	      *mylog << endl;
 	    }
 	  }
 	  if ( !Verbosity(SILENT) )
 	    // Display progress counter.
-	    show_progress( *Log(mylog), lStartTime );
+	    show_progress( *mylog, lStartTime );
 	}
       }// end while.
       if ( !Verbosity(SILENT) ){
 	time_stamp( "Ready:  ", stats.dataLines() );
-	show_speed_summary( *Log(mylog), startTime );
-	showStatistics( *Log(mylog) );
+	show_speed_summary( *mylog, startTime );
+	showStatistics( *mylog );
       }
       result = true;
     }
@@ -1568,7 +1541,7 @@ namespace Timbl {
     if ( initTestFiles( FileName, OutFile ) ){
       initExperiment();
       stats.clear();
-      showTestingInfo( *Log(mylog) );
+      showTestingInfo( *mylog );
       // Start time.
       //
       time_t lStartTime;
@@ -1591,12 +1564,12 @@ namespace Timbl {
 	  outStream << endl << *res;
 	  if ( !Verbosity(SILENT) )
 	    // Display progress counter.
-	    show_progress( *Log(mylog), lStartTime );
+	    show_progress( *mylog, lStartTime );
 	}
       }// end while.
       if ( !Verbosity(SILENT) ){
 	time_stamp( "Ready:  ", stats.dataLines() );
-	show_speed_summary( *Log(mylog), startTime );
+	show_speed_summary( *mylog, startTime );
       }
       result = true;
     }

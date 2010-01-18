@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -138,7 +138,7 @@ namespace Timbl{
     bool ShowStatistics( std::ostream& ) const;
     bool SetOptions( const std::string& );
     bool SetIndirectOptions( const TimblOpts&  );
-    bool Set_Single_Threaded();
+    bool Set_Single_Threaded() { return true; };
     Algorithm Algo() const;
     InputFormatType getInputFormat() const;
     static int Default_Max_Feats();

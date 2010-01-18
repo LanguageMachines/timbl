@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -96,13 +96,11 @@ namespace Timbl {
     bool WriteInstanceBaseXml( const std::string& );
     bool WriteInstanceBaseLevels( const std::string&, unsigned int );
     bool WriteNamesFile( const std::string& ) const;
-    bool SetSingleThreaded();
     int Estimate() const { return estimate; };
     void Estimate( int e ){ estimate = e; };
     void setOutPath( const std::string& s ){ outPath = s; };
     TimblExperiment *CreateClient( int  ) const;
     TimblExperiment *splitChild() const;
-    VerbosityFlags ServerVerbosity() { return get_s_verbosity(); };
     bool SetOptions( int, const char ** );
     bool SetOptions( const std::string& );
     bool SetOptions( const CL_Options&  );

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -31,9 +31,7 @@
 
 #include <typeinfo>
 #include "timbl/LogStream.h"
-#ifdef PTHREADS
 #include <pthread.h>
-#endif
 
 #if defined __GNUC__
 #define DARE_TO_OPTIMIZE
@@ -225,30 +223,8 @@ o_manip_2<const char *, const int> write_buf( const char *m, const int l ){
   return o_manip_2<const char*, const int>( &write_sup, m, l );
 }
 
-#ifdef PTHREADS
-#ifdef DO_SIMPLE
-#ifdef __sgi__
-static pthread_mutex_t global_logging_mutex = {PTHREAD_MUTEX_INITIALIZER};
-#else
-static pthread_mutex_t global_logging_mutex = PTHREAD_MUTEX_INITIALIZER;
-#endif
-
-inline bool init_mutex(){ 
-  pthread_mutex_lock( &global_logging_mutex );
-  return true;
-}
-
-inline void mutex_release(){ 
-  pthread_mutex_unlock( &global_logging_mutex );
-}
-#else // not DO_SIMPLE
-#ifdef __sgi__
-pthread_mutex_t global_logging_mutex = {PTHREAD_MUTEX_INITIALIZER};
-pthread_mutex_t global_lock_mutex = {PTHREAD_MUTEX_INITIALIZER};
-#else
 pthread_mutex_t global_logging_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t global_lock_mutex = PTHREAD_MUTEX_INITIALIZER;
-#endif
 
 struct lock_s { pthread_t id; int cnt; time_t tim; };
 
@@ -343,15 +319,6 @@ inline void mutex_release(){
     pthread_mutex_unlock( &global_logging_mutex );
   }
 }
-
-#endif // DO_SIMPLE
-#else // no PTHREADS (unwise)
-inline bool init_mutex(){ return true; }
-inline void mutex_release(){ return; }
-bool LogStream::Problems(){
-  return false;
-}
-#endif
 
 bool LogStream::IsBlocking(){
   if ( !bad() ){

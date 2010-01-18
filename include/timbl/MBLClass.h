@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -81,7 +81,6 @@ namespace Timbl {
     MBLClass& operator=( const MBLClass& );
     void Initialize( size_t = 0 );
     bool PutInstanceBase( std::ostream& ) const;
-    VerbosityFlags get_s_verbosity() const { return *server_verbosity; };
     VerbosityFlags get_verbosity() const { return verbosity; };
     void set_verbosity( VerbosityFlags v ) { verbosity = v; };
     const Instance *chopped_to_instance( PhaseValue );
@@ -131,9 +130,8 @@ namespace Timbl {
     std::vector<Feature *> PermFeatures;
     std::vector<size_t> permutation;
     InstanceBase_base *InstanceBase;
-    LogStream *mylog;
-    LogStream *myerr;
-    LogStream *mydebug;
+    std::ostream *mylog;
+    std::ostream *myerr;
     size_t TRIBL_offset() const { return tribl_offset; };
     unsigned int igOffset() const { return igThreshold; };
     unsigned int IB2_offset() const { return ib2_offset; };
@@ -191,7 +189,6 @@ namespace Timbl {
     size_t MaxFeatures;
     std::vector<MetricType> UserOptions;
     InputFormatType input_format;
-    const VerbosityFlags *server_verbosity;
     VerbosityFlags verbosity;
     mutable int err_count;
     size_t num_of_features;

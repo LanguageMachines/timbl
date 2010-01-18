@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -37,13 +37,6 @@
 #include "timbl/StringOps.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
-#ifdef USE_LOGSTREAMS
-#include "timbl/LogStream.h"
-#else
-typedef std::ostream LogStream;
-#define Log(X) (X)
-#define Dbg(X) (X)
-#endif
 #include "timbl/Options.h"
 #include "timbl/BestArray.h"
 #include "timbl/MBLClass.h"

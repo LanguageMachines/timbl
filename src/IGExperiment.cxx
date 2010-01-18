@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -41,15 +41,6 @@
 #include "timbl/Tree.h"
 #include "timbl/Instance.h"
 #include "timbl/IBtree.h"
-
-#ifdef USE_LOGSTREAMS
-#include "timbl/LogStream.h"
-#else
-typedef std::ostream LogStream;
-#define Log(X) (X)
-#define Dbg(X) (X)
-#endif
-
 #include "timbl/TimblExperiment.h"
 
 namespace Timbl {
@@ -420,7 +411,7 @@ namespace Timbl {
 	}
 	time_stamp( "Finished:  ", stats.dataLines() );
 	if ( !Verbosity(SILENT) )
-	  IBInfo( *Log(mylog) );
+	  IBInfo( *mylog );
       }
     }
 //     totalT.stop();

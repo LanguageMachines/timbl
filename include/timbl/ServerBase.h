@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -28,6 +28,8 @@
 #define TIMBLSERVER_H
 
 #include "timbl/TimblExperiment.h"
+#include "timbl/LogStream.h"
+#include "timbl/SocketBasics.h"
 
 namespace Timbl {
 

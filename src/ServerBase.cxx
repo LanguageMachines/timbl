@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -32,11 +32,9 @@
 #include "timbl/Instance.h"
 #include "timbl/Common.h"
 #include "timbl/FdStream.h"
-#include "timbl/LogStream.h"
 #include "timbl/Options.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblAPI.h"
-#include "timbl/SocketBasics.h"
 #include "timbl/ServerBase.h"
 
 using namespace std;
@@ -131,8 +129,6 @@ namespace Timbl {
     if ( exp->getOptParams() ){
       result->setOptParams( exp->getOptParams()->Clone( result->sock_os ) );
     }
-    //    *Dbg(mydebug) << "created a new Client" << endl;
-    //    *Dbg(result->mydebug) <<  "I am the new client" << endl;
     result->setExpName(string("exp-")+toString( sock->getSockId() ) );
     return result;
   }
@@ -248,7 +244,7 @@ namespace Timbl {
     ostream *os = Exp->sock_os;
     if ( Exp->Classify( params, Answer, Distrib, Distance ) ){
       if ( doDebug() )
-	*Log(myLog) << params << " --> " 
+	*Log(myLog) << Exp->ExpName() << ":" << params << " --> " 
 		    << Answer << " " << Distrib 
 		    << " " << Distance << endl;
       *os << "CATEGORY {" << Answer << "}";
@@ -275,7 +271,8 @@ namespace Timbl {
     }
     else {
       if ( doDebug())
-	*Log(myLog) << ": Classify Failed on '" << params << "'" << endl;
+	*Log(myLog) << Exp->ExpName() << ": Classify Failed on '" 
+		    << params << "'" << endl;
       return false;
     }
   }
@@ -386,7 +383,7 @@ namespace Timbl {
 	  *os << "SKIP '" << Line << "'" << endl;
 	  break;
 	default:
-	  if ( Chld->ServerVerbosity() & CLIENTDEBUG )
+	  if ( theServer->doDebug() )
 	    *Log(theServer->myLog) << sockId << ": Don't understand '" 
 				   << Line << "'" << endl;
 	  *os << "ERROR { Illegal instruction:'" << Command << "' in line:" 

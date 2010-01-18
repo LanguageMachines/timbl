@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -45,15 +45,6 @@
 #include "timbl/neighborSet.h"
 #include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
-
-#ifdef USE_LOGSTREAMS
-#include "timbl/LogStream.h"
-#else
-typedef std::ostream LogStream;
-#define Log(X) (X)
-#define Dbg(X) (X)
-#endif
-
 #include "timbl/MBLClass.h"
 #include "timbl/TimblExperiment.h"
 
@@ -87,7 +78,7 @@ namespace Timbl {
       return false;
     }
     else if ( Verbosity(FEAT_W) ){
-      LearningInfo( *Log(mylog) );
+      LearningInfo( *mylog );
     }
     return true;
   }
@@ -96,7 +87,6 @@ namespace Timbl {
     bool result = false;
     if ( !ExpInvalid() ){
       NumOfFiles = 0;
-      *Dbg(mydebug) << "get_file_names: '"<< FileName << "'" << endl;
       ifstream file_names( FileName.c_str(), ios::in );
       string name;
       if ( file_names.good() ) {
@@ -107,17 +97,15 @@ namespace Timbl {
 	ifstream file_names2( FileName.c_str(), ios::in );
 	size_t size = 0;
 	int pos = 0;
-	*Dbg(mydebug) << "get_file_names: ' step 0" << endl;
 	while ( getline( file_names2, name ) ){
-	  *Dbg(mydebug) << "examine : " << name << endl;
 	  size_t tmp = examineData( name );
 	  if ( tmp != 0 ){
 	    if ( !Verbosity(SILENT) ){
-	      *Log(mylog) << "Examine datafile '" << FileName 
-			  << "' gave the following results:"
-			  << endl
-			  << "Number of Features: " << tmp << endl;
-	      showInputFormat( *Log(mylog) );
+	      *mylog << "Examine datafile '" << FileName 
+		     << "' gave the following results:"
+		     << endl
+		     << "Number of Features: " << tmp << endl;
+	      showInputFormat( *mylog );
 	    }
 	    FileNames[pos++] = name;
 	    if ( size == 0 )
@@ -183,10 +171,9 @@ namespace Timbl {
     VerbosityFlags keep = get_verbosity();
     set_verbosity( SILENT );
     if ( get_file_names( FileName ) ){
-      *Dbg(mydebug) << "looked in: '"<< FileName << "' " << NumOfFiles << endl;
-      *Log(mylog) << "Starting Cross validation test on files:" << endl;
+      *mylog << "Starting Cross validation test on files:" << endl;
       for ( int i = 0; i < NumOfFiles; ++i )
-	*Log(mylog) << FileNames[i] << endl;
+	*mylog << FileNames[i] << endl;
       TimblExperiment::Prepare( FileNames[1] );
       TimblExperiment::Learn( FileNames[1] );
       for ( int filenum = 2; filenum < NumOfFiles; ++filenum )

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -28,7 +28,6 @@
 #include "timbl/Common.h"
 #include "timbl/StringOps.h"
 #include "timbl/MsgClass.h"
-#include "timbl/LogStream.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
 #include "timbl/Tree.h"
@@ -684,10 +683,6 @@ namespace Timbl {
   
   bool TimblAPI::StartMultiServer( const string& ){
     return false;
-  }
-  
-  bool TimblAPI::Set_Single_Threaded(){
-    return Valid() && pimpl->SetSingleThreaded();
   }
   
   string TimblAPI::VersionInfo( bool full ){

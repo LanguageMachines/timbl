@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -37,8 +37,6 @@
 #include <cctype>
 
 #include "timbl/TimblAPI.h"
-#include "timbl/SocketBasics.h"
-#include "timbl/LogStream.h"
 #include "timbl/Options.h"
 #include "timbl/ServerBase.h"
 #include "timbl/TimblServerAPI.h"
@@ -434,7 +432,7 @@ int main(int argc, char *argv[]){
     // Start.
     //
     cerr << "TiMBL Server" << TimblAPI::VersionInfo()
-	 << " (c) ILK 1998 - 2009.\n" 
+	 << " (c) ILK 1998 - 2010.\n" 
 	 << "Tilburg Memory Based Learner\n"
 	 << "Induction of Linguistic Knowledge Research Group, Tilburg University\n"
 	 << "CLiPS Computational Linguistics Group, University of Antwerp" << endl;

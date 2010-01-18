@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -46,31 +46,6 @@ using namespace Timbl;
 namespace Sockets {
   const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers
 
-#ifndef PTHREADS
-  // define stubs
-  
-  bool Socket::read( string& ) {
-    cerr << "No Socket operations available." << endl;
-    return false;
-  }
-
-  bool Socket::read( string&, unsigned int ) {
-    cerr << "No Socket operations available." << endl;
-    return false;
-  }
-
-  bool Socket::write( const string& ){
-    cerr << "No Socket operations available." << endl;
-    return false;
-  }
-
-  bool Socket::write( const string&, unsigned int ){
-    cerr << "No Socket operations available." << endl;
-    return false;
-  }
-
-#else
-  
   Socket::~Socket() { 
     if ( sock >= 0 ) ::close(sock); 
   };
@@ -555,6 +530,4 @@ namespace Sockets {
       return true;
   }
 
-
-#endif // PTHREADS
 }

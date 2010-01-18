@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -39,7 +39,6 @@ using namespace std;
 #include "timbl/Common.h"
 #include "timbl/StringOps.h"
 #include "timbl/MsgClass.h"
-#include "timbl/LogStream.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
 #include "timbl/Tree.h"
@@ -64,15 +63,6 @@ inline void usage( char *name ){
        << name << " NodeName PortNumber [InputFile [OutputFile [BATCH]]]"
        << endl;
 }
-
-#ifdef USE_LOGSTREAMS
-#include "timbl/LogStream.h"
-#else
-typedef std::ostream LogStream;
-#define Log(X) (&X)
-#define Dbg(X) (X)
-#endif
-
 
 const int TCP_BUFFER_SIZE = 2048;     // length of Internet inputbuffers,
 enum CodeType { UnknownCode, Result, Error, OK, Echo, Skip,

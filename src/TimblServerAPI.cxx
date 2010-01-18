@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -28,7 +28,6 @@
 #include "timbl/Common.h"
 #include "timbl/StringOps.h"
 #include "timbl/MsgClass.h"
-#include "timbl/LogStream.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
 #include "timbl/Tree.h"
@@ -36,7 +35,6 @@
 #include "timbl/neighborSet.h"
 #include "timbl/BestArray.h"
 #include "timbl/Statistics.h"
-#include "timbl/SocketBasics.h"
 #include "timbl/MBLClass.h"
 #include "timbl/GetOptClass.h"
 

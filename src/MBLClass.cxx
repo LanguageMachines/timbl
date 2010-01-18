@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -51,13 +51,6 @@
 #include "timbl/Instance.h"
 #include "timbl/IBtree.h"
 #include "timbl/FdStream.h"
-#ifdef USE_LOGSTREAMS
-#include "timbl/LogStream.h"
-#else
-typedef std::ostream LogStream;
-#define Log(X) (X)
-#define Dbg(X) (X)
-#endif
 #include "timbl/BestArray.h"
 #include "timbl/Testers.h"
 #include "timbl/Metrics.h"
@@ -219,18 +212,8 @@ namespace Timbl {
     tester = 0;
     fill_table();
     decay = 0;
-#ifndef USE_LOGSTREAMS
     myerr = &cerr;
     mylog = &cout;
-    mydebug = &cerr;
-#else
-    myerr = new LogStream( cerr, NULL, NoStamp );
-    mylog = new LogStream( cout, NULL, NoStamp );
-    mydebug = new LogStream( cout, "Debug", StampBoth );
-    //    mylog->setlevel(LogSilent); 
-    //    mydebug->settreshold(LogHeavy); 
-#endif
-    server_verbosity = &verbosity;
   }
 
   MBLClass::MBLClass( const string& name ){
@@ -300,16 +283,8 @@ namespace Timbl {
       setInputFormat( m.input_format );
       //one extra to store the target!
       CurrInst.Init( num_of_features );
-#ifndef USE_LOGSTREAMS
       myerr = m.myerr;
       mylog = m.mylog;
-      mydebug = m.mydebug;
-#else
-      myerr = new LogStream( m.myerr );
-      mylog = new LogStream( m.mylog );
-      mydebug = new LogStream( m.mydebug );
-#endif
-      server_verbosity = &m.verbosity;
     }
     return *this;
   }
@@ -342,21 +317,15 @@ namespace Timbl {
     delete tester;
     delete decay;
     delete ChopInput;
-#ifndef USE_LOGSTREAMS
-#else
-    delete mylog;
-    delete myerr;
-    delete mydebug;
-#endif
   }
   
   
   void MBLClass::Info( const string& out_line ) const {
     // Info NEVER to socket !
     if ( exp_name != "" )
-      *Log(mylog) << "-" << exp_name << "-" << out_line << endl;
+      *mylog << "-" << exp_name << "-" << out_line << endl;
     else
-      *Log(mylog) << out_line << endl;
+      *mylog << out_line << endl;
   }
   
   void MBLClass::Warning( const string& out_line ) const {
@@ -364,9 +333,9 @@ namespace Timbl {
       *sock_os << "ERROR { " << out_line << " }" << endl;
     else {
       if ( exp_name != "" )
-	*Log(myerr) << "Warning:-" << exp_name << "-" << out_line << endl;
+	*myerr << "Warning:-" << exp_name << "-" << out_line << endl;
       else 
-	*Log(myerr) << "Warning:" << out_line << endl;
+	*myerr << "Warning:" << out_line << endl;
     }
   }
   
@@ -375,9 +344,9 @@ namespace Timbl {
       *sock_os << "ERROR { " << out_line << " }"  << endl;
     else {
       if ( exp_name != "" )
-	*Log(myerr) << "Error:-" << exp_name << "-" << out_line << endl;
+	*myerr << "Error:-" << exp_name << "-" << out_line << endl;
       else
-	*Log(myerr) << "Error:" << out_line << endl;
+	*myerr << "Error:" << out_line << endl;
     }
     err_count++;
   }
@@ -387,13 +356,13 @@ namespace Timbl {
       *sock_os << "ERROR { " << out_line << " }" << endl;
     else {
       if ( exp_name != "" )
-	*Log(myerr) << "-" << exp_name << "-";
-      *Log(myerr) << out_line << endl;
+	*myerr << "-" << exp_name << "-";
+      *myerr << out_line << endl;
       if ( exp_name != "" )
-	*Log(myerr) << "Error:-" << exp_name << "-" << out_line
+	*myerr << "Error:-" << exp_name << "-" << out_line
 		    << "stopped" << endl;
       else 
-	*Log(myerr) << "Error:-" << out_line << "stopped" << endl;
+	*myerr << "Error:-" << out_line << "stopped" << endl;
       throw( "Stopped" );
     }
   }
@@ -656,7 +625,7 @@ namespace Timbl {
       }
     calculatePermutation( Order );
     if ( !Verbosity(SILENT) )
-      writePermutation( *Log(mylog) );
+      writePermutation( *mylog );
     for ( size_t j=0; j < num_of_features; ++j ){
       if ( j < effective_feats )
 	PermFeatures[j] = Features[permutation[j]];
@@ -908,14 +877,14 @@ namespace Timbl {
 	if ( !Features[i]->Ignore() ){
 	  bool dummy;
 	  if (Features[i]->matrixPresent( dummy ) ){
-	    *Log(mylog) << "Value matrix of feature # " 
-			<< i+1 << endl;
-	    Features[i]->print_matrix( *Log(mylog), true );
-	    *Log(mylog) << endl;
+	    *mylog << "Value matrix of feature # " 
+		   << i+1 << endl;
+	    Features[i]->print_matrix( *mylog, true );
+	    *mylog << endl;
 	  }
 	  else {
-	    *Log(mylog) << "Value Difference matrix of feature # " 
-			<< i+1 << endl << "Not available." << endl;
+	    *mylog << "Value Difference matrix of feature # " 
+		   << i+1 << endl << "Not available." << endl;
 	  }
 	}
   }

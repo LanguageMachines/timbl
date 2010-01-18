@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2009
+  Copyright (c) 1998 - 2010
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
@@ -46,15 +46,6 @@
 #include "timbl/neighborSet.h"
 #include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
-
-#ifdef USE_LOGSTREAMS
-#include "timbl/LogStream.h"
-#else
-typedef std::ostream LogStream;
-#define Log(X) (X)
-#define Dbg(X) (X)
-#endif
-
 #include "timbl/MBLClass.h"
 #include "timbl/TimblExperiment.h"
 
@@ -132,7 +123,7 @@ namespace Timbl {
       confusionInfo = 0;
       if ( Verbosity(ADVANCED_STATS) )
 	confusionInfo = new ConfusionMatrix( Targets->ValuesArray.size() );
-      showTestingInfo( *Log(mylog) );
+      showTestingInfo( *mylog );
       // Start time.
       //
       time_t lStartTime;
@@ -154,19 +145,19 @@ namespace Timbl {
 	  bool exact = LocalTest( CurrInst, outStream );
 	  if ( exact ){ // remember that a perfect match may be incorrect!
 	    if ( Verbosity(EXACT) ) {
-	      *Log(mylog) << "Exacte match:\n";
-	      show_org_input( *Log(mylog) );
-	      *Log(mylog) << endl;
+	      *mylog << "Exacte match:\n";
+	      show_org_input( *mylog );
+	      *mylog << endl;
 	    }
 	  }
 	  // Display progress counter.
-	  show_progress( *Log(mylog), lStartTime );
+	  show_progress( *mylog, lStartTime );
 	  Increment( CurrInst );
 	}
       }// end while.
       time_stamp( "Ready:  ", stats.dataLines() );
-      show_speed_summary( *Log(mylog), startTime );
-      showStatistics( *Log(mylog) );
+      show_speed_summary( *mylog, startTime );
+      showStatistics( *mylog );
       result = true;
     }
     return result;
