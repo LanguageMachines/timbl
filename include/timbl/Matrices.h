@@ -85,6 +85,19 @@ class SparseSymetricMatrix {
       ++it1;
     }
     return tot;
+  };
+  SparseSymetricMatrix<Class> *copy(void) const{
+    SparseSymetricMatrix<Class> *res = new SparseSymetricMatrix<Class>();
+    typename CCDmap::const_iterator it1 = my_mat.begin();
+    while ( it1 != my_mat.end() ){
+      typename CDmap::const_iterator it2 = it1->second.begin();
+      while ( it2 != it1->second.end() ){
+	res->my_mat[it1->first][it2->first] = it2->second;
+	++it2;
+      }
+      ++it1;
+    }
+    return res;
   }
  private:
   CCDmap my_mat;

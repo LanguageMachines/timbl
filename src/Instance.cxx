@@ -685,14 +685,22 @@ namespace Timbl {
   
   Feature& Feature::operator=( const Feature& in ){
     if ( this != &in ){
-      metric_matrix = 0;
-      metric = 0;
-      //      setMetricType( in.getMetricType() );
+      if ( in.PrestoreStatus == ps_read ){
+	metric_matrix = in.metric_matrix->copy();
+	metric = 0;
+	setMetricType( in.getMetricType() );
+	PrestoreStatus = in.PrestoreStatus;
+	Prestored_metric = in.Prestored_metric;
+      }
+      else {
+	metric_matrix = 0;
+	metric = 0;
+	PrestoreStatus = ps_undef;
+	Prestored_metric = UnknownMetric;
+      }
       ignore = in.ignore;
       numeric = in.numeric;
       vcpb_read = in.vcpb_read;
-      PrestoreStatus = ps_undef;
-      Prestored_metric = UnknownMetric;
       entropy = in.entropy;
       info_gain = in.info_gain;
       split_info = in.split_info;
