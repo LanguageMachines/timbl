@@ -42,6 +42,7 @@ using namespace std;
 namespace Timbl {
 
   TimblServer::TimblServer(): myLog("TimblServer"){
+    debug = false;
     maxConn = 25;
     serverPort = -1;
     exp = 0;
