@@ -138,7 +138,7 @@ namespace Timbl {
     Options.Add( new IntegerOption( "MVD_LIMIT", 
 				    &mvd_threshold, 1, 1, 100000 ) );
     Options.Add( new SizeOption( "NEIGHBORS", 
-				 &num_of_neighbors, 1, 1, 5000 ) );
+				 &num_of_neighbors, 1, 1, INT_MAX ) );
     Options.Add( new IntegerOption( "PROGRESS", 
 				    &progress, 10000, 1, INT_MAX ) );
     if ( !Options.Add( new IntegerOption( "CLIP_FACTOR", 
@@ -255,6 +255,7 @@ namespace Timbl {
       progress           = m.progress;
       tribl_offset       = m.tribl_offset;
       ib2_offset         = m.ib2_offset;
+      clip_factor        = m.clip_factor;
       runningPhase       = m.runningPhase;
       Weighting          = m.Weighting;
       do_sloppy_loo      = m.do_sloppy_loo;
