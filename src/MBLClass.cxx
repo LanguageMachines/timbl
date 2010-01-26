@@ -268,7 +268,10 @@ namespace Timbl {
       PermFeatures = m.PermFeatures;
       for ( unsigned int i=0; i < Features.size(); ++i ){
 	Features[i] = new Feature( *m.Features[i] );
-	PermFeatures[i] = new Feature( *m.PermFeatures[i] );
+	if ( m.PermFeatures[i] )
+	  PermFeatures[i] = new Feature( *m.PermFeatures[i] );
+	else
+	  PermFeatures[i] = 0;
       }
       Targets   = m.Targets;
       err_count = 0;
