@@ -46,6 +46,7 @@ namespace Timbl {
     int MaxFeatures() const { return MaxFeats; };
     std::string getLogFile() const { return logFile; };
     std::string getPidFile() const { return pidFile; };
+    bool daemonize() const { return do_daemon; };
     VerbosityFlags getVerbosity() { return myVerbosity; };
   private:  
     AlgorithmType local_algo;
@@ -89,6 +90,7 @@ namespace Timbl {
     bool do_sloppy_loo;
     bool do_silly;
     bool do_diversify;
+    bool do_daemon;
     std::vector<MetricType>metricsArray;
     std::ostream *parent_socket_os;
     std::string inPath;

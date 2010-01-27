@@ -42,6 +42,7 @@ namespace Timbl {
     bool doSetOptions( TimblExperiment *, const std::string&  );
     bool classifyOneLine( TimblExperiment *, const std::string& );
     TimblExperiment *theExp(){ return exp; };
+    virtual ~TimblServer();
   protected:
     TimblServer();
     bool getConfig( const std::string& );
@@ -55,6 +56,7 @@ namespace Timbl {
     TimblExperiment *exp;
     std::string logFile;
     std::string pidFile;
+    bool doDaemon;
   private:
     bool debug;
     int maxConn;

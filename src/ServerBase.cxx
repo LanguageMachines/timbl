@@ -47,7 +47,12 @@ namespace Timbl {
     serverPort = -1;
     exp = 0;
     tcp_socket = 0;
+    doDaemon = true;
   }  
+
+  TimblServer::~TimblServer(){
+    delete exp;
+  };
 
   bool TimblServer::getConfig( const string& serverConfigFile ){
     maxConn = 25;
@@ -185,6 +190,16 @@ namespace Timbl {
     map<string, TimblExperiment*> *experiments;
   };
 
+  static bool keepGoing = true;
+
+  void KillServerFun( int Signal ){
+    cerr << "caught a signal " << Signal << endl;
+    if ( Signal == SIGTERM || Signal == SIGINT ){
+      keepGoing = false;
+      exit(1);
+    }
+  }
+  
   void BrokenPipeChildFun( int Signal ){
     if ( Signal == SIGPIPE ){
       signal( SIGPIPE, BrokenPipeChildFun );
@@ -277,6 +292,7 @@ namespace Timbl {
       return false;
     }
   }
+  
   
   int runFromSocket( childArgs *args ){ 
     string Line;
@@ -472,8 +488,10 @@ namespace Timbl {
 
     map<string, TimblExperiment*> experiments;
     startExperimentsFromConfig( serverConfig, experiments );
-    int start = daemon( 0, logFile.empty() );
 
+    int start = 1;
+    if ( doDaemon )
+      start = daemon( 0, logFile.empty() );
     if ( start < 0 ){
       cerr << "failed to daemonize error= " << strerror(errno) << endl;
       exit(1);
@@ -506,8 +524,7 @@ namespace Timbl {
     Sockets::ServerSocket server;
     string portString = toString<int>(serverPort);
     if ( !server.connect( portString ) ){
-      *Log(myLog) << "failed to start Server: " 
-			  << server.getMessage() << endl;
+      *Log(myLog) << "failed to start Server: " << server.getMessage() << endl;
       exit(0);
     }
 
@@ -518,7 +535,9 @@ namespace Timbl {
     }
     
     int failcount = 0;
-    while( true ){ // waiting for connections loop
+    signal( SIGTERM, KillServerFun );
+    signal( SIGINT, KillServerFun );
+    while( keepGoing ){ // waiting for connections loop
       signal( SIGPIPE, SIG_IGN );
       Sockets::ServerSocket *newSocket = new Sockets::ServerSocket();
       if ( !server.accept( *newSocket ) ){
@@ -533,6 +552,7 @@ namespace Timbl {
 	}
       }
       else {
+	if ( !keepGoing ) break;
 	failcount = 0;
 	*Log(myLog) << "Accepting Connection #" 
 		    << newSocket->getSockId()
@@ -839,9 +859,11 @@ namespace Timbl {
 
     map<string, TimblExperiment*> experiments;
     startExperimentsFromConfig( serverConfig, experiments );
-    
-    int start = daemon( 0, logFile.empty() );
 
+    int start = 1;
+    if ( doDaemon )
+      start = daemon( 0, logFile.empty() );
+    
     if ( start < 0 ){
       cerr << "failed to daemonize error= " << strerror(errno) << endl;
       exit(1);
@@ -886,7 +908,9 @@ namespace Timbl {
     }
     
     int failcount = 0;
-    while( true ){ // waiting for connections loop
+    signal( SIGTERM, KillServerFun );
+    signal( SIGINT, KillServerFun );
+    while( keepGoing ){ // waiting for connections loop
       signal( SIGPIPE, SIG_IGN );
       Sockets::ServerSocket *newSocket = new Sockets::ServerSocket();
       if ( !server.accept( *newSocket ) ){
@@ -902,6 +926,7 @@ namespace Timbl {
       }
       else {
 	failcount = 0;
+	if ( !keepGoing ) break;
 	*Log(myLog) << "Accepting Connection #" 
 		    << newSocket->getSockId()
 		    << " from remote host: " 
@@ -931,6 +956,10 @@ namespace Timbl {
     if ( exp && exp->ConfirmOptions() ){
       exp->initExperiment( true );
       RunClassicServer();
+      delete exp;
+      exp = 0;
+      Info( "server terminated" );
+      return true;
     }
     else {
       Error( "invalid options" );
@@ -944,10 +973,14 @@ namespace Timbl {
 	if ( serverProtocol == "http" ){
 	  Info( "Starting a HTTP server on port " + toString( serverPort ) );
 	  RunHttpServer();
+	  Info( "HTTP server terminated" );
+	  return true;
 	}
 	else {
 	  Info( "Starting a TCP server on port " + toString( serverPort ) );
 	  RunClassicServer();
+	  Info( "server terminated" );
+	  return true;
 	}
       }
       else {
@@ -967,6 +1000,7 @@ namespace Timbl {
       exp->setOptParams( opt );
       logFile = opt->getLogFile();
       pidFile = opt->getPidFile();
+      doDaemon = opt->daemonize();
     }
   }
 
@@ -976,6 +1010,7 @@ namespace Timbl {
       exp->setOptParams( opt );
       logFile = opt->getLogFile();
       pidFile = opt->getPidFile();
+      doDaemon = opt->daemonize();
     }
   }
 
@@ -985,6 +1020,7 @@ namespace Timbl {
       exp->setOptParams( opt );
       logFile = opt->getLogFile();
       pidFile = opt->getPidFile();
+      doDaemon = opt->daemonize();
     }
   }
 
@@ -994,6 +1030,7 @@ namespace Timbl {
       exp->setOptParams( opt );
       logFile = opt->getLogFile();
       pidFile = opt->getPidFile();
+      doDaemon = opt->daemonize();
     }
   }
 

@@ -290,21 +290,21 @@ namespace Timbl {
       if ( myVerbosity & DISTRIB ){
 	if ( !keep_distributions && local_algo == IGTREE_a ){
 	  myVerbosity &= ~DISTRIB;
-	  Info( "Ignoring option +vdb, while +D is missing!" );
+	  Error( "Invalid option +vdb, while +D is missing!" );
 	}
       }
       if ( myVerbosity & ALL_K ){
 	if ( local_algo == IGTREE_a ){
-	  Info( "Ignoring option +vk, impossible with IGtree algorithm" );
+	  Error( "Invalid option +vk, impossible with IGtree algorithm" );
 	}
 	else if ( !(myVerbosity & DISTRIB) ){
-	  Info( "setting option +vdb while +vk is also set" );
+	  Error( "setting option +vdb while +vk is also set" );
 	  myVerbosity |= DISTRIB;
 	}
       }
       if ( myVerbosity & NEAR_N ){
 	if ( local_algo == IGTREE_a ){
-	  Info( "Ignoring option +vn, impossible with IGtree algorithm" );
+	  Error( "Invalid option +vn, impossible with IGtree algorithm" );
 	}
       }
       if ( myVerbosity & CONF_MATRIX ||
@@ -733,50 +733,62 @@ namespace Timbl {
 	break;
 	
       case 'd': {
-	string::size_type pos1 = myoptarg.find( ":" );
-	if ( pos1 == string::npos ){
-	  pos1 = myoptarg.find_first_of( "0123456789" );
-	  if ( pos1 != string::npos ){
-	    if ( ! ( stringTo<DecayType>( string( myoptarg, 0, pos1 ),
-					  local_decay ) &&
-		     stringTo<double>( string( myoptarg, pos1 ), 
-				       local_decay_alfa ) ) ){
-	      Error( "illegal value for -d option: " + myoptarg );
-	      return false;
-	    }
-	  }
-	  else if ( !stringTo<DecayType>( myoptarg, local_decay ) ){
-	    Error( "illegal value for -d option: " + myoptarg );
+	if ( long_option == "daemonize" ){
+	  string up = myoptarg;
+	  uppercase(up);
+	  if ( !isBool(up) ){
+	    Error( "invalid value for " + long_option + ": '" 
+		   + myoptarg + "'" );
 	    return false;
 	  }
+	  do_daemon = ( up=="TRUE" || up=="YES" );
 	}
 	else {
-	  string::size_type pos2 = myoptarg.find( ':', pos1+1 );
-	  if ( pos2 == string::npos ){
-	    pos2 = myoptarg.find_first_of( "0123456789", pos1+1 );
-	    if ( pos2 != string::npos ){
+	  string::size_type pos1 = myoptarg.find( ":" );
+	  if ( pos1 == string::npos ){
+	    pos1 = myoptarg.find_first_of( "0123456789" );
+	    if ( pos1 != string::npos ){
 	      if ( ! ( stringTo<DecayType>( string( myoptarg, 0, pos1 ),
 					    local_decay ) &&
-		       stringTo<double>( string( myoptarg, pos2 ), 
+		       stringTo<double>( string( myoptarg, pos1 ), 
 					 local_decay_alfa ) ) ){
 		Error( "illegal value for -d option: " + myoptarg );
 		return false;
 	      }
 	    }
-	    else {
+	    else if ( !stringTo<DecayType>( myoptarg, local_decay ) ){
 	      Error( "illegal value for -d option: " + myoptarg );
 	      return false;
 	    }
 	  }
 	  else {
-	    if ( ! ( stringTo<DecayType>( string( myoptarg, 0, pos1 ),
-					  local_decay ) &&
-		     stringTo<double>( string( myoptarg, pos1+1, pos2-pos1-1 ), 
-				       local_decay_alfa ) &&
-		     stringTo<double>( string( myoptarg, pos2+1 ), 
-				       local_decay_beta ) ) ){
-	      Error( "illegal value for -d option: " + myoptarg );
-	      return false;
+	    string::size_type pos2 = myoptarg.find( ':', pos1+1 );
+	    if ( pos2 == string::npos ){
+	      pos2 = myoptarg.find_first_of( "0123456789", pos1+1 );
+	      if ( pos2 != string::npos ){
+		if ( ! ( stringTo<DecayType>( string( myoptarg, 0, pos1 ),
+					      local_decay ) &&
+			 stringTo<double>( string( myoptarg, pos2 ), 
+					   local_decay_alfa ) ) ){
+		  Error( "illegal value for -d option: " + myoptarg );
+		  return false;
+		}
+	      }
+	      else {
+		Error( "illegal value for -d option: " + myoptarg );
+		return false;
+	      }
+	    }
+	    else {
+	      if ( ! ( stringTo<DecayType>( string( myoptarg, 0, pos1 ),
+					    local_decay ) &&
+		       stringTo<double>( string( myoptarg, pos1+1, pos2-pos1-1 ), 
+					 local_decay_alfa ) &&
+		       stringTo<double>( string( myoptarg, pos2+1 ), 
+					 local_decay_beta ) ) ){
+		Error( "illegal value for -d option: " + myoptarg );
+		return false;
+	      }
 	    }
 	  }
 	}

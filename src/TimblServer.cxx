@@ -162,6 +162,7 @@ inline void usage_full(void){
   cerr << "--pidfile=<f> store pid in file <f>" << endl; 
   cerr << "--logfile=<f> log server activity in file <f>" << endl; 
   cerr << "--serverconfig=<f> read server settings from file <f>" << endl; 
+  cerr << "--daemonize=[yes|no] (default yes)" << endl;
   cerr << "Internal representation options:" << endl;
   cerr << "-B n      : number of bins used for discretization of numeric " 
        << "feature values" << endl;
@@ -466,11 +467,13 @@ int main(int argc, char *argv[]){
       }
       if ( TreeInFile != "" ){
 	if ( !Run->GetInstanceBase( TreeInFile ) ){
+	  delete Run;
 	  return 3;
 	}
       }
       else {
 	if ( !Run->Learn( dataFile ) ){
+	  delete Run;
 	  return 3;
 	}
       }
@@ -482,8 +485,10 @@ int main(int argc, char *argv[]){
       if ( MatrixInFile != "" ) {
 	Run->GetMatrices( MatrixInFile );
       }
-      if ( Run->StartServer( ServerPort, Max_Connections ) )
+      if ( Run->StartServer( ServerPort, Max_Connections ) ){
+	delete Run;
 	return 0;
+      }
       else
 	cerr << "starting a server failed" << endl;
     }
@@ -495,8 +500,8 @@ int main(int argc, char *argv[]){
       if ( !Run->StartMultiServer( ServerConfigFile ) ){
 	cerr << "starting a MultiServer failed" << endl;
       }
-    }
-    else {
+      else
+	delete Run;
     }
     return 0;
   }
@@ -516,4 +521,5 @@ int main(int argc, char *argv[]){
     cerr << "some exception was raised" << endl;
     cerr << "Timbl terminated, Sorry for that" << endl; 
   }
+  return 0;
 }
