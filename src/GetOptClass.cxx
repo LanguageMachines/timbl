@@ -291,20 +291,23 @@ namespace Timbl {
 	if ( !keep_distributions && local_algo == IGTREE_a ){
 	  myVerbosity &= ~DISTRIB;
 	  Error( "Invalid option +vdb, while +D is missing!" );
+	  return false;
 	}
       }
       if ( myVerbosity & ALL_K ){
 	if ( local_algo == IGTREE_a ){
 	  Error( "Invalid option +vk, impossible with IGtree algorithm" );
+	  return false;
 	}
 	else if ( !(myVerbosity & DISTRIB) ){
-	  Error( "setting option +vdb while +vk is also set" );
+	  // silently add +vdb when +vk is set
 	  myVerbosity |= DISTRIB;
 	}
       }
       if ( myVerbosity & NEAR_N ){
 	if ( local_algo == IGTREE_a ){
 	  Error( "Invalid option +vn, impossible with IGtree algorithm" );
+	  return false;
 	}
       }
       if ( myVerbosity & CONF_MATRIX ||
