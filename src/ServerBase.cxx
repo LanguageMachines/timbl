@@ -193,14 +193,22 @@ namespace Timbl {
   static bool keepGoing = true;
 
   void KillServerFun( int Signal ){
-    cerr << "caught a signal " << Signal << endl;
+    cerr << "KillServerFun caught a signal " << Signal << endl;
     if ( Signal == SIGTERM || Signal == SIGINT ){
       keepGoing = false;
       exit(1);
     }
   }
   
+  void AfterDaemonFun( int Signal ){
+    cerr << "AfterDaemonFun caught a signal " << Signal << endl;
+    if ( Signal == SIGCHLD ){
+      exit(1);
+    }
+  }
+
   void BrokenPipeChildFun( int Signal ){
+    cerr << "BrokenPipeChildFun caught a signal " << Signal << endl;
     if ( Signal == SIGPIPE ){
       signal( SIGPIPE, BrokenPipeChildFun );
     }
@@ -490,8 +498,10 @@ namespace Timbl {
     startExperimentsFromConfig( serverConfig, experiments );
 
     int start = 1;
-    if ( doDaemon )
+    if ( doDaemon ){
+      signal( SIGCHLD, AfterDaemonFun );
       start = daemon( 0, logFile.empty() );
+    }
     if ( start < 0 ){
       cerr << "failed to daemonize error= " << strerror(errno) << endl;
       exit(1);
@@ -861,9 +871,10 @@ namespace Timbl {
     startExperimentsFromConfig( serverConfig, experiments );
 
     int start = 1;
-    if ( doDaemon )
-      start = daemon( 0, logFile.empty() );
-    
+    if ( doDaemon ){
+      signal( SIGCHLD, AfterDaemonFun );
+      start = daemon( 0, logFile.empty());
+    }
     if ( start < 0 ){
       cerr << "failed to daemonize error= " << strerror(errno) << endl;
       exit(1);
@@ -953,6 +964,9 @@ namespace Timbl {
     if ( maxC > 0 )
       maxConn = maxC;
     Info( "Starting a classic server on port " + toString( serverPort ) );
+    if ( doDaemon ){
+      Info( "running as a dæmon" );
+    }
     if ( exp && exp->ConfirmOptions() ){
       exp->initExperiment( true );
       RunClassicServer();
@@ -972,12 +986,18 @@ namespace Timbl {
       if ( getConfig( config ) ){
 	if ( serverProtocol == "http" ){
 	  Info( "Starting a HTTP server on port " + toString( serverPort ) );
+	  if ( doDaemon ){
+	    Info( "running as a dæmon" );
+	  }
 	  RunHttpServer();
 	  Info( "HTTP server terminated" );
 	  return true;
 	}
 	else {
 	  Info( "Starting a TCP server on port " + toString( serverPort ) );
+	  if ( doDaemon ){
+	    Info( "running as a dæmon" );
+	  }
 	  RunClassicServer();
 	  Info( "server terminated" );
 	  return true;
