@@ -98,11 +98,11 @@ inline void usage_full(void){
   cerr << "     N: numeric values" << endl;
   cerr << "     I: Ignore named  values" << endl;
   cerr << "-w n      : Weighting" << endl;
-  cerr << "     0: No Weighting" << endl;
-  cerr << "     1: Weight using GainRatio (default)" << endl;
-  cerr << "     2: Weight using InfoGain" << endl;
-  cerr << "     3: Weight using Chi-square" << endl;
-  cerr << "     4: Weight using Shared Variance" << endl;
+  cerr << "     0 or nw: No Weighting" << endl;
+  cerr << "     1 or gr: Weight using GainRatio (default)" << endl;
+  cerr << "     2 or ig: Weight using InfoGain" << endl;
+  cerr << "     3 or x2: Weight using Chi-square" << endl;
+  cerr << "     4 or sv: Weight using Shared Variance" << endl;
   cerr << "-w f      : read Weights from file 'f'" << endl;
   cerr << "-w f:n    : read Weight n from file 'f'" << endl;
   cerr << "-b n      : number of lines used for bootstrapping (IB2 only)" 
