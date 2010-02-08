@@ -246,6 +246,8 @@ namespace Timbl {
 	if ( ib2_offset != 0 ){
 	  //
 	  // isn't this obsolete for the new IB2 implementation?
+	  // You should think so, But I see small differences :{
+	  // So leave this code for now
 	  //
 	  // invalidate MVDM matrices, they might be changing in size
 	  for ( size_t j=0; j < NumOfFeatures(); ++j ){
