@@ -248,22 +248,24 @@ string correct_path( const string& filename,
     return filename;
 }
 
+class softExit : public exception {};
+
 void Preset_Values( TimblOpts& Opts ){
   bool mood;
   string value;
   if ( Opts.Find( 'h', value, mood ) ){
     usage_full();
-    exit(1);
+    throw( softExit() );
   }
   if ( Opts.Find( 'V', value, mood ) ){
     cerr << "TiMBL " << TimblAPI::VersionInfo( true ) << endl;
-    exit(1);
+    throw( softExit() );
   }
   if ( Opts.Find( 'a', value, mood ) ){
     // the user gave an algorithm
     if ( !string_to( value, algorithm ) ){
       cerr << "illegal -a value: " << value << endl;
-      exit(1); // no chance to proceed
+      throw( softExit() ); // no chance to proceed
     }
     Opts.Delete( 'a' );
   }
@@ -291,14 +293,14 @@ void Preset_Values( TimblOpts& Opts ){
   if ( Opts.Find( 'S', value, mood ) ){
     if ( Do_Multi_Server ){
       cerr << "options -S conflicts with option --serverconfig" << endl;
-      exit(3);
+      throw( softExit() );
     }
     else {
       Do_Server = true;
       ServerPort = stringTo<int>( value );
       if ( ServerPort < 1 || ServerPort > 100000 ){
 	cerr << "-S option, portnumber invalid: " << ServerPort << endl;
-	exit(3);
+	throw( softExit() );
       }
     }
   }
@@ -311,11 +313,11 @@ void Preset_Values( TimblOpts& Opts ){
   if ( Opts.Find( 'C', value, mood ) ){
     if ( Do_Multi_Server ){
       cerr << "-C must be specified in the severconfigfile" << endl;
-      exit(3);
+      throw( softExit() );
     }
     if ( !Do_Server ){
       cerr << "-C option invalid without -S" << endl;
-      exit(3);
+      throw( softExit() );
     }
     Max_Connections = stringTo<int>( value );
     if ( Max_Connections < 1 || Max_Connections > 1000 ){
@@ -509,12 +511,15 @@ int main(int argc, char *argv[]){
     cerr << "ran out of memory somewhere" << endl;
     cerr << "Timbl terminated, Sorry for that" << endl;
   }
-  catch(std::exception& e){
-    cerr << "a standard exception was raised: '" << e.what() << "'" << endl;
-    cerr << "Timbl terminated, Sorry for that" << endl; 
+  catch( softExit& e ){
+    return 0;
   }
   catch(std::string& what){
     cerr << "an exception was raised: '" << what << "'" << endl;
+    cerr << "Timbl terminated, Sorry for that" << endl; 
+  }
+  catch(std::exception& e){
+    cerr << "a standard exception was raised: '" << e.what() << "'" << endl;
     cerr << "Timbl terminated, Sorry for that" << endl; 
   }
   catch(...){
