@@ -870,6 +870,7 @@ namespace Timbl {
 	*Log(myLog)  << "debugging is " << (doDebug()?"on":"off") << endl;	
       }
       else {
+	delete tmp;
 	*Log(myLog) << "unable to create logfile: " << logFile << endl;
 	*Log(myLog) << "not started" << endl;
 	exit(1);
