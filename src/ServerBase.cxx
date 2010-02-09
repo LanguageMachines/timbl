@@ -195,7 +195,8 @@ namespace Timbl {
   void KillServerFun( int Signal ){
     if ( Signal == SIGTERM ){
       cerr << "KillServerFun caught a signal SIGTERM" << endl;
-      keepGoing = false;
+      keepGoing = false; // so stop accepting new connections
+      sleep(5); // give children some spare time...
     }
   }
   
@@ -498,7 +499,7 @@ namespace Timbl {
     int start = 1;
     if ( doDaemon ){
       signal( SIGCHLD, AfterDaemonFun );
-      start = daemon( 0, logFile.empty() );
+      start = daemon( 0, 1 /* logFile.empty() */ );
     }
     if ( start < 0 ){
       cerr << "failed to daemonize error= " << strerror(errno) << endl;
@@ -543,12 +544,17 @@ namespace Timbl {
     }
     
     int failcount = 0;
-    signal( SIGTERM, KillServerFun );
+    struct sigaction act;
+    sigaction( SIGTERM, NULL, &act ); // get current action
+    act.sa_handler = KillServerFun;  // add a handler function
+    act.sa_flags &= ~SA_RESTART;     // do not continue after SIGTERM
+    sigaction( SIGTERM, &act, NULL ); // and set the handler
     while( keepGoing ){ // waiting for connections loop
       signal( SIGPIPE, SIG_IGN );
       Sockets::ServerSocket *newSocket = new Sockets::ServerSocket();
       if ( !server.accept( *newSocket ) ){
 	delete newSocket;
+	cerr << "accept failed: " + server.getMessage() << endl;
 	*Log(myLog) << server.getMessage() << endl;
 	if ( ++failcount > 20 ){
 	  *Log(myLog) << "accept failcount > 20 " << endl;
@@ -580,14 +586,19 @@ namespace Timbl {
       }
       // the server is now free to accept another socket request 
     }
-    pthread_attr_destroy(&attr); 
+    pthread_attr_destroy(&attr);
+    map<string, TimblExperiment*>::iterator it = experiments.begin();
+    while( it != experiments.end() ){
+      delete it->second;
+      ++it;
+    }
   }
 
 #define IS_DIGIT(x) (((x) >= '0') && ((x) <= '9'))
 #define IS_HEX(x) ((IS_DIGIT(x)) || (((x) >= 'a') && ((x) <= 'f')) || \
             (((x) >= 'A') && ((x) <= 'F')))
 
-
+  
   string urlDecode( const string& s ) {
     int cc;
     string result;
@@ -871,7 +882,7 @@ namespace Timbl {
     int start = 1;
     if ( doDaemon ){
       signal( SIGCHLD, AfterDaemonFun );
-      start = daemon( 0, logFile.empty() );
+      start = daemon( 0, 1 /* logFile.empty() */ );
     }
     if ( start < 0 ){
       cerr << "failed to daemonize error= " << strerror(errno) << endl;
@@ -916,11 +927,16 @@ namespace Timbl {
     }
     
     int failcount = 0;
-    signal( SIGTERM, KillServerFun );
+    struct sigaction act;
+    sigaction( SIGTERM, NULL, &act ); // get current action
+    act.sa_handler = KillServerFun; 
+    act.sa_flags &= ~SA_RESTART;      // do not continue after SIGTERM
+    sigaction( SIGTERM, &act, NULL );
     while( keepGoing ){ // waiting for connections loop
       signal( SIGPIPE, SIG_IGN );
       Sockets::ServerSocket *newSocket = new Sockets::ServerSocket();
       if ( !server.accept( *newSocket ) ){
+	cerr << "accept failed: " + server.getMessage() << endl;
 	delete newSocket;
 	*Log(myLog) << server.getMessage() << endl;
 	if ( ++failcount > 20 ){
@@ -953,6 +969,11 @@ namespace Timbl {
       // the server is now free to accept another socket request 
     }
     pthread_attr_destroy(&attr); 
+    map<string, TimblExperiment*>::iterator it = experiments.begin();
+    while( it != experiments.end() ){
+      delete it->second;
+      ++it;
+    }
   }
   
   
@@ -987,6 +1008,8 @@ namespace Timbl {
 	    Info( "running as a dæmon" );
 	  }
 	  RunHttpServer();
+	  delete exp;
+	  exp = 0;
 	  Info( "HTTP server terminated" );
 	  return true;
 	}
@@ -996,6 +1019,8 @@ namespace Timbl {
 	    Info( "running as a dæmon" );
 	  }
 	  RunClassicServer();
+	  delete exp;
+	  exp = 0;
 	  Info( "server terminated" );
 	  return true;
 	}

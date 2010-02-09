@@ -372,7 +372,11 @@ namespace Sockets {
     TIMBL_SOCKLEN_T clilen = sizeof(cli_addr);
     int newsock = ::accept( sock, (struct sockaddr *)&cli_addr, &clilen );
     if( newsock < 0 ){
-      mess = string("server-accept failed: (") + strerror(errno) + ")";
+      if ( errno == EINTR )
+	mess = string("server-accept interupted." );
+      else
+	mess = string("server-accept failed: (") + strerror(errno) + ")";
+      return false;
     }
     else {
       char host_name[NI_MAXHOST];
@@ -492,7 +496,11 @@ namespace Sockets {
     TIMBL_SOCKLEN_T clilen = sizeof(cli_addr);
     int newsock = ::accept( sock, (struct sockaddr *)&cli_addr, &clilen );
     if( newsock < 0 ){
-      mess = string("ServerSocket: accept failed: (") + strerror(errno) + ")";
+      if ( errno == EINTR )
+	mess = string("server-accept interupted." );
+      else
+	mess = string("server-accept failed: (") + strerror(errno) + ")";
+      return false;
     }
     else {
       string clientname;
