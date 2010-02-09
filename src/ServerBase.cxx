@@ -193,10 +193,9 @@ namespace Timbl {
   static bool keepGoing = true;
 
   void KillServerFun( int Signal ){
-    cerr << "KillServerFun caught a signal " << Signal << endl;
-    if ( Signal == SIGTERM || Signal == SIGINT ){
+    if ( Signal == SIGTERM ){
+      cerr << "KillServerFun caught a signal SIGTERM" << endl;
       keepGoing = false;
-      exit(1);
     }
   }
   
@@ -300,7 +299,6 @@ namespace Timbl {
       return false;
     }
   }
-  
   
   int runFromSocket( childArgs *args ){ 
     string Line;
@@ -425,7 +423,6 @@ namespace Timbl {
     return 0;
   }
  
-
   // ***** This is the routine that is executed from a new TCP thread *******
   void *socketChild( void *arg ){
     childArgs *args = (childArgs *)arg;
@@ -437,8 +434,8 @@ namespace Timbl {
     // use a mutex to update the global service counter
     service_count++;
     if ( service_count > args->maxC ){
-      *theServer->theExp()->sock_os << "Maximum connections exceeded." << endl;
-      *theServer->theExp()->sock_os << "try again later..." << endl;
+      args->socket->write( "Maximum connections exceeded.\n" );
+      args->socket->write( "try again later...\n" );
       pthread_mutex_unlock( &my_lock );
       cerr << "Thread " << (uintptr_t)pthread_self() << " refused " << endl;
     }
@@ -485,6 +482,7 @@ namespace Timbl {
 	*Log(myLog)  << "debugging is " << (doDebug()?"on":"off") << endl;	
       }
       else {
+	delete tmp;
 	*Log(myLog) << "unable to create logfile: " << logFile << endl;
 	*Log(myLog) << "not started" << endl;
 	exit(1);
@@ -546,14 +544,14 @@ namespace Timbl {
     
     int failcount = 0;
     signal( SIGTERM, KillServerFun );
-    signal( SIGINT, KillServerFun );
     while( keepGoing ){ // waiting for connections loop
       signal( SIGPIPE, SIG_IGN );
       Sockets::ServerSocket *newSocket = new Sockets::ServerSocket();
       if ( !server.accept( *newSocket ) ){
+	delete newSocket;
 	*Log(myLog) << server.getMessage() << endl;
 	if ( ++failcount > 20 ){
-	  *Log(myLog) << "accept failcount >20 " << endl;
+	  *Log(myLog) << "accept failcount > 20 " << endl;
 	  *Log(myLog) << "server stopped." << endl;
 	  exit(EXIT_FAILURE);
 	}
@@ -873,7 +871,7 @@ namespace Timbl {
     int start = 1;
     if ( doDaemon ){
       signal( SIGCHLD, AfterDaemonFun );
-      start = daemon( 0, logFile.empty());
+      start = daemon( 0, logFile.empty() );
     }
     if ( start < 0 ){
       cerr << "failed to daemonize error= " << strerror(errno) << endl;
@@ -907,8 +905,7 @@ namespace Timbl {
     Sockets::ServerSocket server;
     string portString = toString<int>(serverPort);
     if ( !server.connect( portString ) ){
-      *Log(myLog) << "failed to start Server: " 
-		  << server.getMessage() << endl;
+      *Log(myLog) << "failed to start Server: " << server.getMessage() << endl;
       exit(0);
     }
 
@@ -920,11 +917,11 @@ namespace Timbl {
     
     int failcount = 0;
     signal( SIGTERM, KillServerFun );
-    signal( SIGINT, KillServerFun );
     while( keepGoing ){ // waiting for connections loop
       signal( SIGPIPE, SIG_IGN );
       Sockets::ServerSocket *newSocket = new Sockets::ServerSocket();
       if ( !server.accept( *newSocket ) ){
+	delete newSocket;
 	*Log(myLog) << server.getMessage() << endl;
 	if ( ++failcount > 20 ){
 	  *Log(myLog) << "accept failcount > 20 " << endl;
@@ -936,8 +933,8 @@ namespace Timbl {
 	}
       }
       else {
-	failcount = 0;
 	if ( !keepGoing ) break;
+	failcount = 0;
 	*Log(myLog) << "Accepting Connection #" 
 		    << newSocket->getSockId()
 		    << " from remote host: " 
