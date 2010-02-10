@@ -660,6 +660,7 @@ namespace Timbl {
   bool MBLClass::readMatrices( istream& is ){
     string line;
     bool skip = false;
+    bool anything = false;
     while ( getline( is, line ) ){
       line = compress( line );
       if ( line.empty() )
@@ -694,11 +695,17 @@ namespace Timbl {
 	    }
 	    else if ( !Features[num-1]->fill_matrix( is ) )
 	      return false;
-	    else
+	    else {
 	      Info( "read ValueMatrix for feature " + nums );
+	      anything = true;
+	    }
 	  }
 	}
       }
+    }
+    if ( !anything ){
+      Error( "NO metric values found" );
+      return false;
     }
     return true;
   }
@@ -1295,6 +1302,17 @@ namespace Timbl {
       else if ( Features[g]->ValuesArray.size() == 1 )
 	feat_status[g] = Singleton;
       if ( always || realy_first ){
+	bool isRead;
+	if ( Features[g]->metric &&
+	     Features[g]->getMetricType() != TmpMetric &&
+	     Features[g]->isStorableMetric() &&
+	     Features[g]->matrixPresent( isRead ) &&
+	     isRead ){
+	  Error( "The metric " + toString(Features[g]->getMetricType()) + 
+		 " for feature " + toString( g+1 ) + 
+		 " is set from a file. It cannot be changed!" );
+	  return;
+	}
 	metricChanged = !Features[g]->setMetricType(TmpMetric);
 	if ( Weighting != UserDefined_w ){
 	  if ( Features[g]->isNumerical() ){
