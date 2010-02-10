@@ -1009,6 +1009,7 @@ namespace Timbl {
 
   bool TimblServer::startMultiServer( const string& config ){
     if ( exp && exp->ConfirmOptions() ){
+      exp->initExperiment( true );
       if ( getConfig( config ) ){
 	if ( serverProtocol == "http" ){
 	  Info( "Starting a HTTP server on port " + toString( serverPort ) );
