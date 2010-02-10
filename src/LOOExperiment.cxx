@@ -58,14 +58,6 @@ namespace Timbl {
 	initDecay();
 	if ( !is_copy ){
 	  calculate_fv_entropy( true );
-	  if ( ib2_offset != 0 ){
-	    // invalidate MVDM matrices, they might be changing in size
-	    for ( size_t j=0; j < NumOfFeatures(); ++j ){
-	      if ( !Features[j]->Ignore() ){
-		Features[j]->delete_matrix();
-	      }
-	    }
-	  }
 	  if ( initProbabilityArrays( all_vd ) )
 	    calculatePrestored();
 	  else {
