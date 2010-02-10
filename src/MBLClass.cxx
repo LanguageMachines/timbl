@@ -244,6 +244,7 @@ namespace Timbl {
       do_exact_match     = m.do_exact_match;
       sock_is            = 0;
       sock_os            = 0;
+      globalMetricOption = m.globalMetricOption;
       if ( m.GlobalMetric )
 	GlobalMetric     = getMetricClass( m.GlobalMetric->type() );
       UserOptions        = m.UserOptions;
