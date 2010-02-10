@@ -647,7 +647,7 @@ namespace Timbl {
       break;
     case 2:
       // limited usage, for Server
-      ok_opt = "C:d:G:k:l:L:m:p:QS:v:x"; 
+      ok_opt = "C:d:G:k:l:L:p:QS:v:x"; 
       break;
     default:
       ok_opt = NULL;
