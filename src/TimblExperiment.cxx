@@ -252,7 +252,7 @@ namespace Timbl {
 	  // invalidate MVDM matrices, they might be changing in size
 	  for ( size_t j=0; j < NumOfFeatures(); ++j ){
 	    if ( !Features[j]->Ignore() ){
-	      Features[j]->delete_matrix();
+	      Features[j]->clear_matrix();
 	    }
 	  }
 	}

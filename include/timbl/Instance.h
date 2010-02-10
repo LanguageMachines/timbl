@@ -277,7 +277,7 @@ namespace Timbl {
     bool matrixPresent( bool& ) const;
     unsigned int matrix_byte_size() const;
     bool store_matrix( int = 1 );
-    void delete_matrix();
+    void clear_matrix();
     bool fill_matrix( std::istream& );
     void print_matrix( std::ostream&, bool = false ) const;
     void print_vc_pb_array( std::ostream& ) const;
@@ -296,6 +296,7 @@ namespace Timbl {
     enum ps_stat{ ps_undef, ps_failed, ps_ok, ps_read };
     enum ps_stat PrestoreStatus;
     MetricType Prestored_metric;
+    void delete_matrix();
     double entropy;
     double info_gain;
     double split_info;

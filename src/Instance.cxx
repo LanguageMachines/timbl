@@ -1501,6 +1501,13 @@ namespace Timbl {
       shared_variance = chi_square / (double)( NumInst * k );
   }
   
+  void Feature::clear_matrix(){
+    if ( PrestoreStatus == ps_read )
+      return;
+    else
+      delete_matrix();
+  }
+  
   void Feature::delete_matrix(){
     if ( metric_matrix ){
       metric_matrix->Clear();
