@@ -196,7 +196,8 @@ namespace Timbl {
     if ( Signal == SIGTERM ){
       cerr << "KillServerFun caught a signal SIGTERM" << endl;
       keepGoing = false; // so stop accepting new connections
-      sleep(5); // give children some spare time...
+      // need a better plan here.
+      sleep(10); // give children some spare time...
     }
   }
   
@@ -471,19 +472,20 @@ namespace Timbl {
 	exit(1);
       }
     }
+    ostream *logS = 0;
     if ( !logFile.empty() ){
       if ( logFile[0] != '/' ) // make sure the path is absolute
 	logFile = '/' + logFile;
-      ostream *tmp = new ofstream( logFile.c_str() );
-      if ( tmp && tmp->good() ){
+      logS = new ofstream( logFile.c_str() );
+      if ( logS && logS->good() ){
 	*Log(myLog) << "switching logging to file " 
 			       << logFile << endl;
-	myLog.associate( *tmp );
+	myLog.associate( *logS );
 	*Log(myLog)  << "Started logging " << endl;	
 	*Log(myLog)  << "debugging is " << (doDebug()?"on":"off") << endl;	
       }
       else {
-	delete tmp;
+	delete logS;
 	*Log(myLog) << "unable to create logfile: " << logFile << endl;
 	*Log(myLog) << "not started" << endl;
 	exit(1);
@@ -586,7 +588,9 @@ namespace Timbl {
       }
       // the server is now free to accept another socket request 
     }
+    // cleanup
     pthread_attr_destroy(&attr);
+    delete logS;
     map<string, TimblExperiment*>::iterator it = experiments.begin();
     while( it != experiments.end() ){
       delete it->second;
@@ -858,19 +862,20 @@ namespace Timbl {
 	exit(1);
       }
     }
+    ostream *logS = 0;
     if ( !logFile.empty() ){
       if ( logFile[0] != '/' ) // make sure the path is absolute
 	logFile = '/' + logFile;
-      ostream *tmp = new ofstream( logFile.c_str() );
-      if ( tmp && tmp->good() ){
+      logS = new ofstream( logFile.c_str() );
+      if ( logS && logS->good() ){
 	*Log(myLog) << "switching logging to file " 
 		    << logFile << endl;
-	myLog.associate( *tmp );
+	myLog.associate( *logS );
 	*Log(myLog)  << "Started logging " << endl;	
 	*Log(myLog)  << "debugging is " << (doDebug()?"on":"off") << endl;	
       }
       else {
-	delete tmp;
+	delete logS;
 	*Log(myLog) << "unable to create logfile: " << logFile << endl;
 	*Log(myLog) << "not started" << endl;
 	exit(1);
@@ -969,7 +974,9 @@ namespace Timbl {
       }
       // the server is now free to accept another socket request 
     }
+    // some cleanup
     pthread_attr_destroy(&attr); 
+    delete logS;
     map<string, TimblExperiment*>::iterator it = experiments.begin();
     while( it != experiments.end() ){
       delete it->second;
