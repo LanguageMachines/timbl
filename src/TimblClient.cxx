@@ -171,7 +171,7 @@ void RunClient( istream& Input, ostream& Output,
 	      }
 	      break;
 	    default:
-	      Output << "Server is confused?? " << ResultLine << endl;
+	      Output << "Client is confused?? " << ResultLine << endl;
 	      Output << "Code was '" << Code << "'" << endl;
 	      break;
 	    }
