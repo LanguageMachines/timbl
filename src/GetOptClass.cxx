@@ -678,7 +678,7 @@ namespace Timbl {
 	    q++;
 	  }
 	  Error( string("Illegal option, -") + (char)option
-		 + ", only the following options are allowed:\n"
+		 + ", only the following options are allowed: "
 		 + LongLine );
 	}
 	break;
