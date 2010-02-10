@@ -501,7 +501,7 @@ namespace Timbl {
     int start = 1;
     if ( doDaemon ){
       signal( SIGCHLD, AfterDaemonFun );
-      start = daemon( 0, 1 /* logFile.empty() */ );
+      start = daemon( 0, logFile.empty() );
     }
     if ( start < 0 ){
       cerr << "failed to daemonize error= " << strerror(errno) << endl;
@@ -888,7 +888,7 @@ namespace Timbl {
     int start = 1;
     if ( doDaemon ){
       signal( SIGCHLD, AfterDaemonFun );
-      start = daemon( 0, 1 /* logFile.empty() */ );
+      start = daemon( 0, logFile.empty() );
     }
     if ( start < 0 ){
       cerr << "failed to daemonize error= " << strerror(errno) << endl;
