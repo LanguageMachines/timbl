@@ -434,7 +434,7 @@ int main(int argc, char *argv[]){
     time_t Time;
     // Start.
     //
-    cerr << "TiMBL Server" << TimblAPI::VersionInfo()
+    cerr << "TiMBL Server " << TimblAPI::VersionInfo()
 	 << " (c) ILK 1998 - 2010.\n" 
 	 << "Tilburg Memory Based Learner\n"
 	 << "Induction of Linguistic Knowledge Research Group, Tilburg University\n"
