@@ -24,6 +24,9 @@
       Timbl@uvt.nl
 */
 
+#ifndef HAVE_DAEMOM
+#include <fcntl.h> // for implementing daemon
+#endif
 #include <string>
 #include <cerrno>
 #include <csignal>
@@ -301,6 +304,56 @@ namespace Timbl {
       return false;
     }
   }
+
+#ifdef HAVE_DAEMOM
+  int daemonize( int noCD , int noClose ){
+    return daemon( noDC, noClose );
+  }
+#else
+
+  int daemonize( int noCD , int noClose ){
+    switch (fork()) {
+    case -1:
+      /* error */
+      cerr << "daemon fork failed: " << strerror(errno) << endl;
+      return -1;
+      break;
+    case 0:
+      /* child */
+      break;
+    default:
+      /* parent */
+      exit(0);
+    }
+    //
+    // a good child
+    //
+    if (setsid() == -1) {
+      cerr << "daemon setting session id for daemon failed: "
+	   << strerror(errno) << endl;
+      return -1;
+    }
+    
+    if ( !noCD ){
+      if ( chdir("/") < 0 ){
+	cerr << "daemon cd failed: " << strerror(errno) << endl;
+	return -1;
+      }
+    }
+    if ( !noClose ){
+      close (0);
+      close (1);
+      close (2);
+      //
+      // Set up the standard file descriptors.
+      //
+      (void) open ("/dev/null", O_RDWR);
+      (void) dup2 (0, 1);
+      (void) dup2 (0, 2);
+    }
+    return 0;
+  }
+#endif // HAVE_DAEMON 
   
   int runFromSocket( childArgs *args ){ 
     string Line;
@@ -501,7 +554,7 @@ namespace Timbl {
     int start = 1;
     if ( doDaemon ){
       signal( SIGCHLD, AfterDaemonFun );
-      start = daemon( 0, logFile.empty() );
+      start = daemonize( 0, logFile.empty() );
     }
     if ( start < 0 ){
       cerr << "failed to daemonize error= " << strerror(errno) << endl;
@@ -889,7 +942,7 @@ namespace Timbl {
     int start = 1;
     if ( doDaemon ){
       signal( SIGCHLD, AfterDaemonFun );
-      start = daemon( 0, logFile.empty() );
+      start = daemonize( 0, logFile.empty() );
     }
     if ( start < 0 ){
       cerr << "failed to daemonize error= " << strerror(errno) << endl;

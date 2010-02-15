@@ -89,7 +89,7 @@ AC_TYPE_PID_T
 
 # Checks for library functions.
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([floor getaddrinfo gethostbyaddr gethostbyname gettimeofday inet_ntoa localtime_r memset pow rint socket sqrt strchr strerror])
+AC_CHECK_FUNCS([floor getaddrinfo gethostbyaddr gethostbyname gettimeofday inet_ntoa localtime_r memset pow rint socket sqrt strchr strerror daemon])
 dnl
 dnl ----- Sockets
 checkBoth=0
