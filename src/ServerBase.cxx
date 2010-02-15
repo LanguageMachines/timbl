@@ -590,7 +590,8 @@ namespace Timbl {
     }
     // cleanup
     pthread_attr_destroy(&attr);
-    delete logS;
+    //    delete logS; Don't destroy the egg before the chicken 
+    //                 This leaks 512 bytes at program termination
     map<string, TimblExperiment*>::iterator it = experiments.begin();
     while( it != experiments.end() ){
       delete it->second;
@@ -976,7 +977,8 @@ namespace Timbl {
     }
     // some cleanup
     pthread_attr_destroy(&attr); 
-    delete logS;
+    //    delete logS; Don't destroy the egg before the chicken 
+    //                 This leaks 512 bytes at program termination
     map<string, TimblExperiment*>::iterator it = experiments.begin();
     while( it != experiments.end() ){
       delete it->second;
@@ -1009,7 +1011,6 @@ namespace Timbl {
 
   bool TimblServer::startMultiServer( const string& config ){
     if ( exp && exp->ConfirmOptions() ){
-      exp->initExperiment( true );
       if ( getConfig( config ) ){
 	if ( serverProtocol == "http" ){
 	  Info( "Starting a HTTP server on port " + toString( serverPort ) );
