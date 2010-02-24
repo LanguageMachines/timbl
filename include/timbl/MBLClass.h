@@ -56,8 +56,7 @@ namespace Timbl {
     };
     WeightType CurrentWeighting() const { return Weighting; };
     InputFormatType InputFormat() const { return input_format; };
-    bool connectToSocket( int );
-    std::istream *sock_is;
+    bool connectToSocket( std::ostream * );
     std::ostream *sock_os;
   protected:
     enum PhaseValue { TrainWords, LearnWords, TestWords, TrainLearnWords };

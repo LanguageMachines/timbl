@@ -186,7 +186,6 @@ namespace Timbl {
     GlobalMetric = 0;
     is_copy = false;
     is_synced = false;
-    sock_is = 0;
     sock_os = 0;
     Targets   = NULL;
     err_count = 0;
@@ -242,7 +241,6 @@ namespace Timbl {
       keep_distributions = m.keep_distributions;
       verbosity          = m.verbosity;
       do_exact_match     = m.do_exact_match;
-      sock_is            = 0;
       sock_os            = 0;
       globalMetricOption = m.globalMetricOption;
       if ( m.GlobalMetric )
@@ -316,7 +314,6 @@ namespace Timbl {
 	delete PermFeatures[i];
       }
     }
-    delete sock_is;
     delete sock_os;
     delete GlobalMetric;
     delete tester;
@@ -386,14 +383,13 @@ namespace Timbl {
     return true;
   }
   
-  bool MBLClass::connectToSocket( int id ){
-    if ( sock_is || sock_os ){
+  bool MBLClass::connectToSocket( ostream *ss ){
+    if ( sock_os ){
       throw( logic_error( "connectToSocket:: already connected!" ) );
     }
     else {
-      sock_is = new fdistream( id );
-      sock_os = new fdostream( id );
-      if ( sock_is && sock_os && sock_is->good() && sock_os->good() ){
+      sock_os = ss;
+      if ( sock_os && sock_os->good() ){
 	return true;
       }
       else 
