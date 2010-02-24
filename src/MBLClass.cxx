@@ -50,7 +50,6 @@
 #include "timbl/Tree.h"
 #include "timbl/Instance.h"
 #include "timbl/IBtree.h"
-#include "timbl/FdStream.h"
 #include "timbl/BestArray.h"
 #include "timbl/Testers.h"
 #include "timbl/Metrics.h"
