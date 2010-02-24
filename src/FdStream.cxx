@@ -31,10 +31,21 @@
 #include <iostream>
 #include <streambuf>
 #include <unistd.h>
-#include "timbl/Common.h"
+#include <cstdlib>
 #include "timbl/FdStream.h"
 
 using namespace std;
+
+void milli_wait( int m_secs ){
+  struct timespec tv;
+  ldiv_t div = ldiv( m_secs, 1000 );
+  tv.tv_sec = div.quot;               // seconds
+  tv.tv_nsec = div.rem * 1000000;     // nanoseconds
+  while ( nanosleep( &tv, &tv ) < 0 ){
+    // continue when interupted
+  }
+}
+
 
 int fdoutbuf::overflow( int c ){
   if ( c != EOF ){
@@ -106,7 +117,7 @@ bool nb_getline( istream& is, string& result, int& timeout ){
 #endif
       is.clear();
       errno = 0;
-      Common::milli_wait(100);
+      milli_wait(100);
       if ( ++count == 10 ){
 	--timeout;
 	count = 0;
@@ -142,7 +153,7 @@ bool nb_putline( ostream& os, const string& what, int& timeout ){
 #endif
       os.clear();
       errno = 0;
-      Common::milli_wait(100);
+      milli_wait(100);
       if ( ++count == 10 ){
 	--timeout;
 	count = 0;

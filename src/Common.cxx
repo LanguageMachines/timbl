@@ -73,14 +73,4 @@ namespace Common {
     return os;
   }
 
-  void milli_wait( int m_secs ){
-    struct timespec tv;
-    ldiv_t div = ldiv( m_secs, 1000 );
-    tv.tv_sec = div.quot;               // seconds
-    tv.tv_nsec = div.rem * 1000000;     // nanoseconds
-    while ( nanosleep( &tv, &tv ) < 0 ){
-      // continue when interupted
-    }
-  }
-
 }

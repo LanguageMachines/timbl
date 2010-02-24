@@ -33,15 +33,14 @@
 #include "Common.h"
 #include "MsgClass.h"
 #include "Types.h"
+#include "Options.h"
 #include "CommandLine.h"
 #include "Tree.h"
 #include "Instance.h"
 #include "neighborSet.h"
+#include "TimblExperiment.h"
 
 namespace Timbl{
-  class TimblExperiment;
-  
-  class Distribution;
   
   enum Algorithm { UNKNOWN_ALG, IB1, IB2, IGTREE, TRIBL, TRIBL2, LOO, CV };
   enum Weighting { UNKNOWN_W, UD, NW, GR, IG, X2, SV };

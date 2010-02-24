@@ -29,6 +29,7 @@
 #include <list>
 #include <iosfwd>
 
+#include "Types.h"
 
 namespace Timbl {
   class CL_Options;
