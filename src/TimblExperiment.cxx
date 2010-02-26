@@ -1105,12 +1105,14 @@ namespace Timbl {
     if ( !ExpInvalid() &&
 	 ConfirmOptions() ){
       testStream.close();
+      testStream.clear(); // just to be shure. old G++ libraries are in error here
       testStream.open( InFileName.c_str(), ios::in);
       if ( !testStream ) {
 	Error( "can't open: " + InFileName );
       }
       else {
 	outStream.close();
+	outStream.clear(); // just to be shure. old G++ libraries are in error here
 	// first we check if the outFile is writable.
 	// We don't write it though, because we don't want to have
 	// it mangled when checkTestFile fails
@@ -1123,6 +1125,7 @@ namespace Timbl {
 	  outStreamName = OutFileName;
 	  if ( checkTestFile() ){
 	    outStream.close();
+	    outStream.clear(); // just to be shure. old G++ libraries are in error here
 	    outStream.open( OutFileName.c_str(), ios::out | ios::trunc );
 	    return true;
 	  }
