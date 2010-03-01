@@ -6,7 +6,7 @@ includedir=@includedir@
 Name: Timbl
 Version: @VERSION@
 Description: Timbl library.
-Requires: 
+Requires: libxml-2.0
 Libs: -L${libdir} -lTimbl
 Libs.private: @LIBS@
 Cflags: -I${includedir}
