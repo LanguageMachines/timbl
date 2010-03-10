@@ -88,7 +88,5 @@ AC_OUTPUT([
   docs/Makefile
   include/Makefile
   include/timbl/Makefile
-  init/Makefile
-  init/timbl
   demos/Makefile
 ])

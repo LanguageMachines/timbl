@@ -3,7 +3,7 @@
 
 ACLOCAL_AMFLAGS =-I m4 --install
 
-SUBDIRS = src include demos docs init m4
+SUBDIRS = src include demos docs m4
 
 EXTRA_DIST = bootstrap AUTHORS TODO NEWS timbl.pc.in
 
