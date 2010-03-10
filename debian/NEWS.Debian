@@ -1,0 +1,35 @@
+# $Id$
+# $URL$
+ -- Ko van der Sloot
+timbl (6.2.3) unstable; urgency=low
+
+  * New release
+  * All TimblServer stuff is moved to a separate timblserver package
+
+timbl (6.2.2) unstable; urgency=low
+
+  * New minor release
+  * A separate TimblServer program is build and installed that performs
+    all the server related stuff previously found in Timbl
+
+timbl (6.2.1) unstable; urgency=low
+
+  * First bugfix release
+
+ -- Ko van der Sloot
+timbl (6.2.0) unstable; urgency=low
+
+  * Now it's finaly released
+
+ -- Ko van der Sloot
+timbl (6.2.0~svn20090901-1) unstable; urgency=low
+
+  * This is the latest news.
+
+ -- Ko van der Sloot
+
+timbl (6.2.0~svn20090622-2) unstable; urgency=low
+
+  * This is the news.
+
+ -- Joost van Baal <joostvb-timbl@ad1810.com>  Sun, 05 Jul 2009 08:53:32 +0200

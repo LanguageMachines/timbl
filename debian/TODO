@@ -1,0 +1,43 @@
+# $Id: TODO 2713 2009-07-05 07:06:37Z  $
+# $URL: https://ilk.uvt.nl/svn/trunk/sources/Timbl-pkg/debian/TODO $
+
+KvdS, 10 maart 2010: The following may be outdated!!!!
+
+W: timbl: binary-without-manpage usr/bin/Timbl
+
+W: timbl: non-dev-pkg-with-shlib-symlink usr/lib/libTimbl.so.2.0.0 usr/lib/libTimbl.so
+ policy 8.1, 8.2
+N:   Although this package is not a `-dev' package, it installs a
+N:   `libsomething.so' symbolic link referencing the corresponding shared
+N:   library. When the link doesn't include the version number, it is used
+N:   by the linker when other programs are built against this shared
+N:   library.
+N:   
+N:   Shared libraries are supposed to place such symbolic links in their
+N:   respective `-dev' packages, so it is a bug to include it with the main
+N:   library package.
+N:   
+N:   However, if this is a small package which includes the runtime and the
+N:   development libraries, this is not a bug. In the latter case, please
+N:   override this warning.
+N:   
+N:   Refer to Policy Manual, section 8.4 for details.
+
+W: timbl: package-name-doesnt-match-sonames libTimbl2
+N:   The package name of a library package should usually reflect the
+N:   soname of the included library. The package name can determined from
+N:   the library file name with the following code snippet:
+N:   
+N:    $ objdump -p /path/to/libfoo-bar.so.1.2.3 | sed -n -e's/^[[:space:]]*SONAME[[:space:]]*//p' | sed -e's/\
+([0-9]\)\.so\./\1-/; s/\.so\.//'
+N:   
+N:   Refer to Library Packaging guide 5 for details.
+
+source of documentation is lacking from upstream tarball (and from
+upstream cvs)
+
+---------------------
+
+RPM should use own init script.
+
+

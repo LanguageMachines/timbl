@@ -1,0 +1,85 @@
+# $Id: README.devel 3772 2010-02-22 12:52:01Z sloot $
+# $URL: https://ilk.uvt.nl/svn/trunk/sources/Timbl-pkg/debian/README.devel $
+
+building from a VC checkout
+===========================
+
+# Note the replacement of the hyphen by an underscore !
+debian/timbl% cp timbl-6.1.3.tar.gz timbl_6.1.3.orig.tar.gz
+debian/timbl% tar zxf timbl_6.1.3.orig.tar.gz
+debian/timbl% mkdir timbl-6.1.3/debian
+
+svn.ilk.uvt.nl/sources/Timbl-pkg% vi debian/rules debian/NEWS.Debian
+
+# update debian/changelog (needs Debian package devscripts)
+
+svn.ilk.uvt.nl/sources/Timbl-pkg% dch -i
+
+# Check of je emailadres klopt, en of de magie met het versie-nummer
+# goed is afgelopen. (Meestal NIET!)
+# Zorg ervoor dat het stukje van het versienummer bovenaan debian/changelog wat
+# voor de - staat, overeenkomt met de versie van de tarball.
+# Dus 6.2.0-1 is goed als je 6.2.0.tar.gz wilt packagen.
+# Ook moeje er op letten dat het 'unstable' is :{
+# Daarna:
+
+svn.ilk.uvt.nl/sources/Timbl-pkg% svn commit -m 'foobar'
+
+debian/timbl% cp svn.ilk.uvt.nl/Timbl-pkg/debian/* timbl-6.1.3/debian 
+debian/timbl% cd timbl-6.1.3 
+debian/timbl/timbl-6.1.3% debuild -uc -us
+
+#negeer voor nu:
+W: timbl: binary-without-manpage usr/bin/Timbl
+W: timbl: binary-without-manpage usr/bin/TimblClient
+W: timbl: non-dev-pkg-with-shlib-symlink usr/lib/libTimbl.so.2.0.0 usr/lib/libTimbl.so
+W: timbl: package-name-doesnt-match-sonames libTimbl2
+W: timbl: wrong-name-for-upstream-changelog usr/share/doc/timbl/ChangeLog.gz
+
+#uploading a Debian package and rebuilding the apt archive index files
+#=====================================================================
+
+# make shure that the upload dir is empty:
+
+sloot@zeus:/var/www/apt.ticc.uvt.nl/upload/ rm -rf *
+
+sloot@atalanta:~/build/debian/timbl$ scp timbl_6.2.0.pre1* zeus:/var/www/apt.ticc.uvt.nl/upload/
+
+sloot@zeus:/var/www/apt.ticc.uvt.nl$ make dists/lenny/Release
+
+#PGP-sign the new Release file.
+# you will need the secret key and add it to your keyring
+# also a password is needed ;)
+
+sloot@zeus:/var/www/apt.ticc.uvt.nl$ cd dists/lenny
+sloot@zeus:/var/www/apt.ticc.uvt.nl/dists/lenny$ gpg --no-random-seed-file -bao Release.gpg Release
+
+#building on other machine/architecture, without changes to source
+#=================================================================
+# e.g to get an i386 version
+# the only i386 machine atm is: portal.ticc.uvt.nl
+# access via ssh port 223:  
+
+$ ssh portal.ticc.uvt.nl -p223
+sloot@portal:/tmp/foobar$ dget http://apt.ticc.uvt.nl/upload/timbl_6.2.0.pre1-1.dsc
+sloot@portal:/tmp/foobar$ dpkg-source -x timbl_6.2.0.pre1-1.dsc 
+sloot@portal:/tmp/foobar$ cd timbl-6.2.0.pre1-1
+sloot@portal:/tmp/foobar/timbl-6.2.0.pre1-1$ debuild -b -uc -us
+
+#Make sure this creates only .build, .changes and _i386.deb.  (Not .diff.gz, not .dsc.)
+
+#Now upload timbl_6.2.0-pre1-1_i386.* and regenerate the archive index, see above.
+
+
+#more information on Debian packaging
+#====================================
+#
+#http://www.debian.org/doc/manuals/maint-guide/
+#http://www.debian.org/doc/manuals/developers-reference/
+
+#contact
+#=======
+#
+#IRC: irc.uvt.nl (aka "meuknet") : #ticc
+
+

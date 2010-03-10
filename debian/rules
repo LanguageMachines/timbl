@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+
+# $Id: rules 2660 2009-06-14 09:55:59Z  $
+# $URL: https://ilk.uvt.nl/svn/trunk/sources/Timbl-pkg/debian/rules $
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/autotools.mk
+
+## example override:
+## DEB_CONFIGURE_EXTRA_FLAGS := --libexecdir=/usr/share
+## DEB_DH_INSTALLINIT_ARGS := --onlyscripts --name timbl
+

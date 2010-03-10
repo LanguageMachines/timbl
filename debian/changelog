@@ -1,0 +1,98 @@
+timbl (6.2.2-1) unstable; urgency=low
+
+  * New Upload with bug fixes and separate TimblServer program
+
+ -- Ko van der Sloot <Ko.vanderSloot@uvt.nl>  Mon, 15 Feb 2010 15:10:47 +0100
+
+timbl (6.2.1-3) unstable; urgency=low
+
+  * Ok, jaunty seems to fail also
+
+ -- Ko van der Sloot <Ko.vanderSloot@uvt.nl>  Tue, 01 Dec 2009 12:19:46 +0100
+
+timbl (6.2.1-2) jaunty; urgency=low
+
+  * Need to increase sub-sub version to avoid conflicts
+
+ -- Ko van der Sloot <Ko.vanderSloot@uvt.nl>  Tue, 01 Dec 2009 11:56:22 +0100
+
+timbl (6.2.1-1) jaunty; urgency=low
+
+  * Bugfix release
+
+ -- Ko van der Sloot <Ko.vanderSloot@uvt.nl>  Mon, 30 Nov 2009 15:07:49 +0100
+
+timbl (6.2.0-1) jaunty; urgency=low
+
+  * Finaly a release!
+
+ -- Ko van der Sloot <ko.vandersloot@uvt.nl>  Tue, 03 Nov 2009 15:06:43 +0100
+
+timbl (6.1.99.0-1) unstable; urgency=low
+
+  * New upstream snapshot from SVN.
+
+ -- Ko van der Sloot <ko.vandersloot@uvt.nl>  Tue, 20 Oct 2009 14:42:31 +0200
+
+timbl (6.2.0-pre2-1) UNRELEASED; urgency=low
+
+  * New upstream:
+    - No longer install upstream changelog twice.
+
+ -- Joost van Baal <joostvb-timbl@ad1810.com>  Sat, 05 Sep 2009 08:17:30 +0200
+
+timbl (6.2.0-pre1-1) unstable; urgency=low
+
+  * New upstream.
+
+ -- Joost van Baal <joostvb-timbl@ad1810.com>  Thu, 03 Sep 2009 15:27:01 +0200
+
+timbl (6.2.0~svn20090622-3) unstable; urgency=low
+
+  [ Joost van Baal ]
+  * Add NEWS.Debian
+  [ Ko van der Sloot ]
+  * Enhance README.devel.
+
+ -- Joost van Baal <joostvb-timbl@ad1810.com>  Thu, 09 Jul 2009 16:44:22 +0200
+
+timbl (6.2.0~svn20090622-2) unstable; urgency=low
+
+  * Do not start daemon on initial install.
+  * control: add Vcs header.
+
+ -- Joost van Baal <joostvb-timbl@ad1810.com>  Sun, 05 Jul 2009 08:53:32 +0200
+
+timbl (6.2.0~svn20090622-1) unstable; urgency=low
+
+  * New upstream svn snapshot.
+  * init.d: fix LOGFILE setting.
+
+ -- Joost van Baal <joostvb-timbl@ad1810.com>  Sun, 21 Jun 2009 14:28:51 +0200
+
+timbl (6.1.5-3) unstable; urgency=low
+
+  * init.d: Ship and use Debian-specific init script.
+  * Use dedicated useraccount "timbl" for running daemon.
+  * control: Update from policy 3.7.3 to 3.8.0 (no changes needed).
+  * control: depend upon adduser (thanks lintian).
+  * control: changed maintainer from Sebastiaan Tesink to me.
+  * default: now ships defaults for init script.
+
+ -- Joost van Baal <joostvb-timbl@ad1810.com>  Sun, 14 Jun 2009 11:39:23 +0200
+
+timbl (6.1.5-2) unstable; urgency=low
+
+  * add #!/bin/sh to {post,pre}inst.
+
+ -- Joost van Baal <joostvb-timbl@ad1810.com>  Mon, 16 Mar 2009 06:26:27 +0100
+
+timbl (6.1.5-1) unstable; urgency=low
+
+  [ Changes by Joost van Baal ]
+  * Initial Debian packaging.
+
+ -- Sebastiaan Tesink <sebas@uvt.nl>  Tue, 08 Apr 2008 17:20:44 +0200
+
+# $Id: changelog 3737 2010-02-15 14:13:39Z sloot $
+# $URL: https://ilk.uvt.nl/svn/trunk/sources/Timbl-pkg/debian/changelog $

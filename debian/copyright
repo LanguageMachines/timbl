@@ -1,0 +1,51 @@
+This package was debianized by Joost van Baal <joostvb+timbl@uvt.nl> on
+Tue, 08 Apr 2008 17:26:24 +0200.
+
+It was fetched from CVS: ilkcvs.uvt.nl:/corpus/cvsroot.  TiMBL releases are
+published on http://ilk.uvt.nl/downloads/pub/software/.
+
+Copyright on debian/: Joost van Baal <joostvb+timbl@uvt.nl>, 2008.
+License on debian/: GPL v3 or later.
+
+Upstream Authors: Ko van der Sloot with Peter Berck, Antal van den Bosch, Walter
+Daelemans, Ton Weijters and Jakub Zavrel.
+
+Copyright:
+
+ Copyright (c) 1998 - 2008
+  ILK  -  Tilburg University
+  CNTS -  University of Antwerp
+
+ TiMBL is free software; you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 3 of the License, or (at your option) any later
+ version.
+
+ TiMBL is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with
+ TiMBL. If not, see <http://www.gnu.org/licenses/>.
+
+ In publication of research that makes use of TiMBL 6.1, a citation should be
+ given of: “Walter Daelemans, Jakub Zavrel, Ko van der Sloot, and Antal van den
+ Bosch (2007). TiMBL: Tilburg Memory Based Learner, version 6.1, Reference
+ Guide. ILK Technical Report 07-xx, Available from
+ http://ilk.uvt.nl/downloads/pub/papers/ilk0703.pdf” For information about
+ commercial licenses for TiMBL 6.1, contact Timbl@uvt.nl, or send your request
+ in writing to:
+
+  Prof. dr. Walter Daelemans
+  CNTS - Language Technology Group
+  Linguistics / University of Antwerp
+  Universiteitsplein 1
+  B-2610 Wilrijk (Antwerp)
+  Belgium
+
+
+On Debian GNU/Linux systems, the complete text of the GNU General
+Public License can be found in `/usr/share/common-licenses/GPL'.
+
+# $Id: copyright 2658 2009-06-14 09:38:14Z  $
+# $URL: https://ilk.uvt.nl/svn/trunk/sources/Timbl-pkg/debian/copyright $
