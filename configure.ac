@@ -3,8 +3,8 @@
 # $Id$
 # $URL $
 
-AC_PREREQ(2.59)
-AC_INIT([Timbl], [6.2.3], [timbl@uvt.nl])
+AC_PREREQ(2.61)
+AC_INIT([Timbl],[6.2.3],[timbl@uvt.nl])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_MACRO_DIR([m4])
@@ -21,15 +21,13 @@ if test x"${CXXFLAGS+set}" = xset; then
 else
   cxx_flags_were_set=false
 fi
-
-# Checks for programs.
-AC_PROG_CXX( [g++] )
-
 if $cxx_flags_were_set; then
   CXXFLAGS=$CXXFLAGS
 fi
 
-
+# Checks for programs.
+AC_PROG_CXX( [g++] )
+AC_PROG_RANLIB
 # libtool stuff
 # unfortunately, a lot of old libtools hang around.
 # so LT_INIT and LT_PREREQ cannot be used for now
@@ -73,14 +71,16 @@ AC_CHECK_HEADERS([sys/time.h sys/timeb.h unistd.h])
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
 AC_C_INLINE
+AC_C_CONST
 AC_TYPE_SIZE_T
-AC_TYPE_PID_T
+AC_HEADER_TIME
+AC_STRUCT_TM
 
 # Checks for library functions.
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([floor gettimeofday localtime_r memset pow rint sqrt strchr strerror])
+AC_CHECK_FUNCS([floor gettimeofday localtime_r pow rint sqrt strchr])
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
   Makefile
   timbl.pc
   m4/Makefile
@@ -90,3 +90,4 @@ AC_OUTPUT([
   include/timbl/Makefile
   demos/Makefile
 ])
+AC_OUTPUT
