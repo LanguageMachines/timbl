@@ -1,4 +1,4 @@
-Timbl 6.2.0 (c) ILK/CLiPS 1998-2009
+Timbl 6.3.0 (c) ILK/CLiPS 1998-2010
 
 Tilburg Memory Based Learner
 
@@ -16,16 +16,13 @@ Timbl is distributed under the GNU Public Licence (see the file COPYING).
 
 
 This software has been tested on:
-- Sparc platform running Solaris 2.8
-- Intel platform running several versions of Linux
+- Intel platform running several versions of Linux, including Ubuntu and Debian
+  both 32 and 64 bits
 - Windows platform using Cygwin
 - MAC platform running OS X 10.5
-- MIPS-SGI platform running IRIX 6.5
 
 Compilers:
-- GCC (3.0 - 4.2.0). It is highly recommended to upgrade to at least GCC 4.1
-- Intel Compiler ICPC 7.0
-- IBM XL C++ compiler version 8.0
+- GCC (3.4 - 4.2.0). It is highly recommended to upgrade to at least GCC 4.1
 
 Contents of this distribution:
 - Sources
@@ -35,4 +32,9 @@ Contents of this distribution:
 - Example data files ( in the demos directory )
 - Documentation ( in the docs directory )
 
+Dependencies:
+To be able to succesfully build Timbl from the tarball, you need the
+following pakages:
+- pkg-config
+- libxml2-dev
 
