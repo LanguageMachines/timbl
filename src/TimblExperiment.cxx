@@ -392,7 +392,7 @@ namespace Timbl {
 	      else {
 		time_stamp( "Finished:  ", stats.totalLines() );
 		time_stamp( "Calculating Entropy " );
-		if ( Verbosity(FEAT_W) ){
+		if ( Verbosity(FEAT_W) && !Verbosity(SILENT) ){
 		  *mylog << "Lines of data     : " 
 			 << stats.dataLines() << endl;
 		  if ( stats.skippedLines() != 0 )

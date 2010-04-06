@@ -28,10 +28,6 @@
 #include "timbl/Common.h"
 #include "config.h"
 
-extern "C" {
-  int timbl_present(){ return 1; }
-}
-
 using namespace std;
 
 namespace Common {

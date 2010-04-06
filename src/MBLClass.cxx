@@ -981,7 +981,7 @@ namespace Timbl {
   }
   
   void MBLClass::LearningInfo( ostream& os ) {
-    if ( !ExpInvalid() ){
+    if ( !ExpInvalid() && !Verbosity(SILENT) ){
       calculate_fv_entropy( !MBL_init );
       os.setf(ios::showpoint );
       int OldPrec = os.precision(8);
