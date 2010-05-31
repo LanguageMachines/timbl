@@ -1,3 +1,8 @@
+timbl (6.2.3-1) karmic; urgency=low
+
+  * lame attempt
+ -- Ko van der Sloot <Ko.vanderSloot@uvt.nl>  Wed, 10 Mar 2010 10:46:43 +0100
+
 timbl (6.2.2-1) unstable; urgency=low
 
   * New Upload with bug fixes and separate TimblServer program
