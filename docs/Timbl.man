@@ -1,17 +1,14 @@
-.TH Timbl 1 "june 1 2010" "test" "Tilburg University"
-
+.TH Timbl 1 "2010 june 1"
 
 .SH NAME
 Timbl - Tilburg Memory Based Learner
-
 .SH SYNOPSYS
 Timbl [options]
 
 Timbl -f data-file -t test-file
 
 .SH DESCRIPTION
-.P
- TiMBL is meant to be a versatile tool for Memory Based Learning. It implements the k-nn search algorithm and a lot of metrics. bla die bla.
+TiMBL is meant to be a versatile tool for Memory Based Learning. It implements the k-nn search algorithm and a lot of metrics. bla die bla.
 
 .SH OPTIONS
 .B
@@ -23,7 +20,8 @@ or
 <string>
 .RS
 determines the classification algorithm.
- Possible values are:
+
+Possible values are:
 
 .B
 0
@@ -92,7 +90,8 @@ clipping frequency for prestoring MVDM matrices
 .B
 +D
 .RS
-store distributions on all nodes (necessary for using +v db with IGTree, but wastes memory otherwise)
+store distributions on all nodes (necessary for 
+using +v db with IGTree, but wastes memory otherwise)
 .RE
 
 .B
@@ -463,4 +462,7 @@ dump the InstanceBase as XML in 'file'
 .SH BUGS
 possibly
 
+.SH AUTHORS
+Antal van de Bosch
+Ko van der Sloot
 
