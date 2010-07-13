@@ -292,8 +292,8 @@ namespace Timbl{
     case Numeric:
       return new NumericMetric();
       break;
-    case Euclidian:
-      return new EuclidianMetric();
+    case Euclidean:
+      return new EuclideanMetric();
       break;
     case Cosine:
       return new CosineMetric();
@@ -425,9 +425,9 @@ namespace Timbl{
     return -1.0;
   }
   
-  double EuclidianMetric::distance( FeatureValue *, FeatureValue *, 
+  double EuclideanMetric::distance( FeatureValue *, FeatureValue *, 
 				    size_t ) const {
-    throw( logic_error( "unimplemented distance() for Euclidian metric!" ) );
+    throw( logic_error( "unimplemented distance() for Eucledian metric!" ) );
     return -1.0;
   }
   

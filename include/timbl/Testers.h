@@ -50,7 +50,7 @@ namespace Timbl{
 		 Feature *Feat ) const;
   };
 
-  class euclidianTestFunction: public metricTestFunction {
+  class euclideanTestFunction: public metricTestFunction {
   public:
     double test( FeatureValue *FV,
 		 FeatureValue *G,

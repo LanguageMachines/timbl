@@ -60,7 +60,7 @@ namespace Timbl {
 				  { "M", "Value Difference" },
 				  { "J", "Jeffrey Divergence" },
 				  { "S", "Jensen-Shannon Divergence" },
-				  { "E", "Euclidian Distance" } };
+				  { "E", "Euclidean Distance" } };
   
   const char *WeightName[][2] = { { "un", "Unknown Weighting" },
 				  { "nw", "No Weighting" },
