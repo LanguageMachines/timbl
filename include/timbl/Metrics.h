@@ -70,6 +70,14 @@ namespace Timbl{
     double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
 
+  class EuclidicMetric: public distanceMetricClass {
+  public:
+  EuclidicMetric(): distanceMetricClass( Euclidic ){};
+    bool isNumerical() const { return true; };
+    bool isStorable() const { return false; };
+    double distance( FeatureValue *, FeatureValue *, size_t ) const;
+  };
+
   class ValueDiffMetric: public distanceMetricClass {
   public:
   ValueDiffMetric(): distanceMetricClass( ValueDiff ){};
@@ -89,6 +97,14 @@ namespace Timbl{
   class JeffreyMetric: public distanceMetricClass {
   public:
   JeffreyMetric(): distanceMetricClass( JeffreyDiv ){};
+    bool isNumerical() const { return false; };
+    bool isStorable() const { return true; };
+    double distance( FeatureValue *, FeatureValue *, size_t ) const;
+  };
+
+  class JSMetric: public distanceMetricClass {
+  public:
+  JSMetric(): distanceMetricClass( JSDiv ){};
     bool isNumerical() const { return false; };
     bool isStorable() const { return true; };
     double distance( FeatureValue *, FeatureValue *, size_t ) const;

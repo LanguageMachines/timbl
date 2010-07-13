@@ -201,41 +201,84 @@ namespace Timbl{
     return result;
   }
   
-  double k_log_k_div_m( double k, double l ) {
-    if ( abs(k+l) < Epsilon )
+  double p_log_p_div_q( double p, double q ) {
+    if ( abs(q) < Epsilon )
       return 0;
-    return k * Log2( (2.0 * k)/( k + l ) );
+    return p * Log2( p/q );
   }
   
   double jd_distance( SparseValueProbClass *r, SparseValueProbClass *s ){
-    double result = 0.0;
+    double part1 = 0.0;
+    double part2 = 0.0;
     SparseValueProbClass::IDiterator p1 = r->begin();
     SparseValueProbClass::IDiterator p2 = s->begin();
     while( p1 != r->end() &&
 	   p2 != s->end() ){
       if ( p2->first < p1->first ){
-	result += p2->second;
+	part2 += p2->second;
 	++p2;
       }
       else if ( p2->first == p1->first ){
-	result += k_log_k_div_m( p1->second, p2->second );
-	result += k_log_k_div_m( p2->second, p1->second );
+	part1 += p_log_p_div_q( p1->second, p2->second );
+	part2 += p_log_p_div_q( p2->second, p1->second );
 	++p1;
 	++p2;
       }
       else {
-	result += p1->second;
+	part1 += p1->second;
 	++p1;
       }	  
     }
     while ( p1 != r->end() ){
-      result += p1->second;
+      part1 += p1->second;
       ++p1;
     }
     while ( p2 != s->end() ){
-      result += p2->second;
+      part2 += p2->second;
       ++p2;
     }
+    double result = part1 + part2;
+    result = result / 2.0;
+    return result;
+  }
+
+  double k_log_k_div_m( double k, double l ) {
+    if ( abs(k+l) < Epsilon )
+      return 0;
+    return k * Log2( (2.0 * k)/( k + l ) );
+  }  
+
+  double js_distance( SparseValueProbClass *r, SparseValueProbClass *s ){
+    double part1 = 0.0;
+    double part2 = 0.0;
+    SparseValueProbClass::IDiterator p1 = r->begin();
+    SparseValueProbClass::IDiterator p2 = s->begin();
+    while( p1 != r->end() &&
+	   p2 != s->end() ){
+      if ( p2->first < p1->first ){
+	part2 += p2->second;
+	++p2;
+      }
+      else if ( p2->first == p1->first ){
+	part1 += k_log_k_div_m( p1->second, p2->second );
+	part2 += k_log_k_div_m( p2->second, p1->second );
+	++p1;
+	++p2;
+      }
+      else {
+	part1 += p1->second;
+	++p1;
+      }	  
+    }
+    while ( p1 != r->end() ){
+      part1 += p1->second;
+      ++p1;
+    }
+    while ( p2 != s->end() ){
+      part2 += p2->second;
+      ++p2;
+    }
+    double result = part1 + part2;
     result = result / 2.0;
     return result;
   }
@@ -249,6 +292,9 @@ namespace Timbl{
     case Numeric:
       return new NumericMetric();
       break;
+    case Euclidic:
+      return new EuclidicMetric();
+      break;
     case Cosine:
       return new CosineMetric();
       break;
@@ -260,6 +306,9 @@ namespace Timbl{
       break;
     case JeffreyDiv:
       return new JeffreyMetric();
+      break;
+    case JSDiv:
+      return new JSMetric();
       break;
     case Levenshtein:
       return new LevenshteinMetric();
@@ -313,6 +362,26 @@ namespace Timbl{
     return result;
   }
 
+  double JSMetric::distance( FeatureValue *F, FeatureValue *G, 
+				  size_t limit ) const {
+    double result = 0.0;
+    if ( G != F ){
+      if ( F->ValFreq() < limit ||
+	   G->ValFreq() < limit ){
+#ifdef METRIC_DEBUG
+	cerr << "result = 1.0 vanwege F.valFreq=" <<  F->ValFreq()
+	     << " en G.valFreq()=" << G ->ValFreq() 
+	     << " met limiet= " << limit << endl;
+#endif
+	result = 1.0;
+      }
+      else {
+	result = js_distance( F->valueClassProb(), G->valueClassProb() );
+      }
+    }
+    return result;
+  }
+
   double LevenshteinMetric::distance( FeatureValue *F, FeatureValue *G, 
 				      size_t ) const {
     double result = 0.0;
@@ -353,6 +422,12 @@ namespace Timbl{
   double NumericMetric::distance( FeatureValue *, FeatureValue *, 
 				  size_t ) const {
     throw( logic_error( "unimplemented distance() for Numeric metric!" ) );
+    return -1.0;
+  }
+  
+  double EuclidicMetric::distance( FeatureValue *, FeatureValue *, 
+				   size_t ) const {
+    throw( logic_error( "unimplemented distance() for Euclidic metric!" ) );
     return -1.0;
   }
   

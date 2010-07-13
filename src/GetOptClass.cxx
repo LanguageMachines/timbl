@@ -482,11 +482,17 @@ namespace Timbl {
       case 'J' :
 	Def = JeffreyDiv;
 	break;
+      case 'S' :
+	Def = JSDiv;
+	break;
       case 'M' :
 	Def = ValueDiff;
 	break;
       case 'N' :
 	Def = Numeric;
+	break;
+      case 'E' :
+	Def = Euclidic;
 	break;
       case 'D' :
 	if ( p == line.end() || *p == ':' )
@@ -546,6 +552,9 @@ namespace Timbl {
 	  case 'O' : 
 	    TmpMT = Overlap;
 	    break;
+	  case 'S' :
+	    TmpMT = JSDiv;
+	    break;
 	  case 'J' :
 	    TmpMT = JeffreyDiv;
 	    break;
@@ -561,6 +570,9 @@ namespace Timbl {
 	    break;
 	  case 'M' :
 	    TmpMT = ValueDiff;
+	    break;
+	  case 'E' :
+	    TmpMT = Euclidic;
 	    break;
 	  case 'N' :
 	    TmpMT = Numeric;
