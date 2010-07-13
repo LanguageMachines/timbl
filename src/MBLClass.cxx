@@ -1277,8 +1277,9 @@ namespace Timbl {
       if ( Features[g]->Ignore() )
 	continue;
       bool metricChanged = false;
-      MetricType TmpMetric = UserOptions[g+1];
-      if ( TmpMetric == Numeric ){
+      MetricType TmpMetricType = UserOptions[g+1];
+      metricClass *tmpMetric = getMetricClass( TmpMetricType );
+      if ( tmpMetric->isNumerical() ){
 	feat_status[g] = Features[g]->prepare_numeric_stats();
 	if ( feat_status[g] == SingletonNumeric &&
 	     input_format == SparseBin &&
@@ -1287,19 +1288,20 @@ namespace Timbl {
 	}
 	else if ( feat_status[g] != NumericValue ){
 	  if ( GlobalMetric->isNumerical() ){
-	    TmpMetric = Overlap;
+	    TmpMetricType = Overlap;
 	  }
 	  else {
-	    TmpMetric = globalMetricOption;
+	    TmpMetricType = globalMetricOption;
 	  }
 	} 
       }
       else if ( Features[g]->ValuesArray.size() == 1 )
 	feat_status[g] = Singleton;
+      delete tmpMetric;
       if ( always || realy_first ){
 	bool isRead;
 	if ( Features[g]->metric &&
-	     Features[g]->getMetricType() != TmpMetric &&
+	     Features[g]->getMetricType() != TmpMetricType &&
 	     Features[g]->isStorableMetric() &&
 	     Features[g]->matrixPresent( isRead ) &&
 	     isRead ){
@@ -1308,7 +1310,7 @@ namespace Timbl {
 		 " is set from a file. It cannot be changed!" );
 	  return;
 	}
-	metricChanged = !Features[g]->setMetricType(TmpMetric);
+	metricChanged = !Features[g]->setMetricType(TmpMetricType);
 	if ( Weighting != UserDefined_w ){
 	  if ( Features[g]->isNumerical() ){
 	    Features[g]->NumStatistics( DBEntropy, Targets, Bin_Size,

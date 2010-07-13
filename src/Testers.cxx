@@ -95,6 +95,28 @@ namespace Timbl{
     return result;
   }
 
+  double euclidicTestFunction::test( FeatureValue *F,
+				     FeatureValue *G,
+				     Feature *Feat ) const {
+    double r1, r2, result;
+#ifdef DBGTEST
+    cerr << "euclidic_distance(" << F << "," << G << ") = ";
+#endif
+    if ( FV_to_real( F, r1 ) &&
+	 FV_to_real( G, r2 ) )
+      result = sqrt(fabs(r1*r1-r2*r2))/ (Feat->Max() - Feat->Min());
+    else
+      result = 1.0;
+#ifdef DBGTEST
+    cerr << result;
+#endif
+    result *= Feat->Weight();
+#ifdef DBGTEST
+    cerr << " gewogen " << result << endl;
+#endif
+    return result;
+  }
+
   double valueDiffTestFunction::test( FeatureValue *F,
 				      FeatureValue *G,
 				      Feature *Feat ) const {
@@ -182,10 +204,18 @@ namespace Timbl{
  	metricTest[i] = new valueDiffTestFunction( mvdmThreshold );
       }
       else if ( features[i]->isNumerical() ){
+	if ( features[i]->getMetricType() == Euclidic ){
 #ifdef DBGTEST
-	cerr << "created numericOverlapTestFunction " << endl;
+	  cerr << "created euclidicTestFunction " << endl;
 #endif
-	metricTest[i] = new numericOverlapTestFunction();
+	  metricTest[i] = new euclidicTestFunction();
+	}
+	else {
+#ifdef DBGTEST
+	  cerr << "created numericOverlapTestFunction " << endl;
+#endif
+	  metricTest[i] = new numericOverlapTestFunction();
+	}
       }
       else {
 #ifdef DBGTEST
