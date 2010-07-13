@@ -492,7 +492,7 @@ namespace Timbl {
 	Def = Numeric;
 	break;
       case 'E' :
-	Def = Euclidic;
+	Def = Euclidian;
 	break;
       case 'D' :
 	if ( p == line.end() || *p == ':' )
@@ -572,7 +572,7 @@ namespace Timbl {
 	    TmpMT = ValueDiff;
 	    break;
 	  case 'E' :
-	    TmpMT = Euclidic;
+	    TmpMT = Euclidian;
 	    break;
 	  case 'N' :
 	    TmpMT = Numeric;

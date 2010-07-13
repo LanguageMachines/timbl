@@ -70,9 +70,9 @@ namespace Timbl{
     double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
 
-  class EuclidicMetric: public distanceMetricClass {
+  class EuclidianMetric: public distanceMetricClass {
   public:
-  EuclidicMetric(): distanceMetricClass( Euclidic ){};
+  EuclidianMetric(): distanceMetricClass( Euclidian ){};
     bool isNumerical() const { return true; };
     bool isStorable() const { return false; };
     double distance( FeatureValue *, FeatureValue *, size_t ) const;

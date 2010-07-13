@@ -95,12 +95,12 @@ namespace Timbl{
     return result;
   }
 
-  double euclidicTestFunction::test( FeatureValue *F,
+  double euclidianTestFunction::test( FeatureValue *F,
 				     FeatureValue *G,
 				     Feature *Feat ) const {
     double r1, r2, result;
 #ifdef DBGTEST
-    cerr << "euclidic_distance(" << F << "," << G << ") = ";
+    cerr << "euclidian_distance(" << F << "," << G << ") = ";
 #endif
     if ( FV_to_real( F, r1 ) &&
 	 FV_to_real( G, r2 ) )
@@ -204,11 +204,11 @@ namespace Timbl{
  	metricTest[i] = new valueDiffTestFunction( mvdmThreshold );
       }
       else if ( features[i]->isNumerical() ){
-	if ( features[i]->getMetricType() == Euclidic ){
+	if ( features[i]->getMetricType() == Euclidian ){
 #ifdef DBGTEST
-	  cerr << "created euclidicTestFunction " << endl;
+	  cerr << "created euclidianTestFunction " << endl;
 #endif
-	  metricTest[i] = new euclidicTestFunction();
+	  metricTest[i] = new euclidianTestFunction();
 	}
 	else {
 #ifdef DBGTEST

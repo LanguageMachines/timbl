@@ -115,7 +115,7 @@ namespace Timbl {
   
   enum MetricType { UnknownMetric, Ignore, 
 		    Numeric, DotProduct, Cosine, Overlap, Levenshtein, 
-		    Dice, ValueDiff, JeffreyDiv, JSDiv, Euclidic, MaxMetric };
+		    Dice, ValueDiff, JeffreyDiv, JSDiv, Euclidian, MaxMetric };
   
   inline MetricType& operator++( MetricType &W ){
     return W = ( MaxMetric == W ) ? UnknownMetric : MetricType(W+1);
