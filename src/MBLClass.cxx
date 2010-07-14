@@ -1080,35 +1080,6 @@ namespace Timbl {
 	os << "# Classes: " << Targets->ValuesArray.size() << endl;
 	os << "# Lines of data: " << Targets->TotalValues() << endl;
 	int OldPrec = os.precision(DBL_DIG);
-	os << "# " << toString( No_w ) << endl;
-	os << "# Fea." << "\t" << "Weight" << endl;
-	for (  size_t i = 0; i < num_of_features; ++i ) {
-	  os.precision(DBL_DIG);
-	  if ( Features[i]->Ignore() )
-	    os << i+1 << "\t" << "Ignore" << endl;
-	  else
-	    os << i+1 << "\t" << 1.0 << endl;
-	}
-	os << "#" << endl;
-	os << "# " << toString( GR_w ) << endl;
-	os << "# Fea." << "\t" << "Weight" << endl;
-	for (  size_t i = 0; i < num_of_features; ++i ) {
-	  os.precision(DBL_DIG);
-	  if ( Features[i]->Ignore() )
-	    os << i+1 << "\t" << "Ignore" << endl;
-	  else
-	    os << i+1 << "\t" << Features[i]->GainRatio() << endl;
-	}
-	os << "#" << endl;
-	os << "# " << toString( IG_w ) << endl;
-	os << "# Fea." << "\t" << "Weight" << endl;
-	for (  size_t i = 0; i < num_of_features; ++i ) {
-	  os.precision(DBL_DIG);
-	  if ( Features[i]->Ignore() )
-	    os << i+1 << "\t" << "Ignore" << endl;
-	  else
-	    os << i+1 << "\t" << Features[i]->InfoGain() << endl;
-	}
 	if ( CurrentWeighting() == SD_w ){
 	  os << "#" << endl;
 	  os << "# " << toString( SD_w ) << endl;
@@ -1122,28 +1093,59 @@ namespace Timbl {
 	  }
 	  os << "#" << endl;
 	}
-	else if ( need_all_weights ){
-	  os << "#" << endl;
-	  os << "# " << toString( SV_w ) << endl;
+	else {
+	  os << "# " << toString( No_w ) << endl;
 	  os << "# Fea." << "\t" << "Weight" << endl;
 	  for (  size_t i = 0; i < num_of_features; ++i ) {
 	    os.precision(DBL_DIG);
 	    if ( Features[i]->Ignore() )
 	      os << i+1 << "\t" << "Ignore" << endl;
 	    else
-	      os << i+1 << "\t" << Features[i]->SharedVariance() << endl;
+	      os << i+1 << "\t" << 1.0 << endl;
 	  }
 	  os << "#" << endl;
-	  os << "# " << toString( X2_w ) << endl;
+	  os << "# " << toString( GR_w ) << endl;
 	  os << "# Fea." << "\t" << "Weight" << endl;
 	  for (  size_t i = 0; i < num_of_features; ++i ) {
 	    os.precision(DBL_DIG);
 	    if ( Features[i]->Ignore() )
 	      os << i+1 << "\t" << "Ignore" << endl;
 	    else
-	      os << i+1 << "\t" << Features[i]->ChiSquare() << endl;
+	      os << i+1 << "\t" << Features[i]->GainRatio() << endl;
 	  }
 	  os << "#" << endl;
+	  os << "# " << toString( IG_w ) << endl;
+	  os << "# Fea." << "\t" << "Weight" << endl;
+	  for (  size_t i = 0; i < num_of_features; ++i ) {
+	    os.precision(DBL_DIG);
+	    if ( Features[i]->Ignore() )
+	      os << i+1 << "\t" << "Ignore" << endl;
+	    else
+	      os << i+1 << "\t" << Features[i]->InfoGain() << endl;
+	  }
+	  else if ( need_all_weights ){
+	    os << "#" << endl;
+	    os << "# " << toString( SV_w ) << endl;
+	    os << "# Fea." << "\t" << "Weight" << endl;
+	    for (  size_t i = 0; i < num_of_features; ++i ) {
+	      os.precision(DBL_DIG);
+	      if ( Features[i]->Ignore() )
+		os << i+1 << "\t" << "Ignore" << endl;
+	      else
+		os << i+1 << "\t" << Features[i]->SharedVariance() << endl;
+	    }
+	    os << "#" << endl;
+	    os << "# " << toString( X2_w ) << endl;
+	    os << "# Fea." << "\t" << "Weight" << endl;
+	    for (  size_t i = 0; i < num_of_features; ++i ) {
+	      os.precision(DBL_DIG);
+	      if ( Features[i]->Ignore() )
+		os << i+1 << "\t" << "Ignore" << endl;
+	      else
+		os << i+1 << "\t" << Features[i]->ChiSquare() << endl;
+	    }
+	    os << "#" << endl;
+	  }
 	}
 	os.precision(OldPrec);
 	result = true;
