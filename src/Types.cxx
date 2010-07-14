@@ -68,6 +68,7 @@ namespace Timbl {
 				  { "ig", "InfoGain" },
 				  { "x2", "Chi-square" }, 
 				  { "sv", "Shared Variance" }, 
+				  { "sd", "Standard Deviation" }, 
 				  { "ud", "User Defined"} };
   
   const char *DecayName[][2] = { { "Unknown", "Unknown Decay" },
@@ -93,8 +94,10 @@ namespace Timbl {
 				    { "IxE", "InformationGain*Entropy" },
 				    { "X2O", "Chi-Squared" },
 				    { "SVO", "Shared Variance" },
+				    { "SDO", "Standard Deviation" },
 				    { "X/V", "Chi-Squared/Values" },
-				    { "S/V", "Shared Variance/Values" } };
+				    { "S/V", "Shared Variance/Values" },
+				    { "SD/V", "Standard Deviation/Values" } };
   
   const char *InputFormatName[][2] = {
     { "Unknown", "Unknown Input Format" }, 
@@ -136,7 +139,7 @@ namespace Timbl {
     switch ( w ){
     case '0':
       return No_w;
-      case '1':
+    case '1':
 	return GR_w;
     case '2':
       return IG_w;
@@ -144,6 +147,8 @@ namespace Timbl {
       return X2_w;
     case '4':
       return SV_w;
+    case '5':
+      return SD_w;
     default:
       return Unknown_w;
     }

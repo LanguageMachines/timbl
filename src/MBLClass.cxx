@@ -512,6 +512,9 @@ namespace Timbl {
 	case SV_w:
 	  Features[i]->SetWeight( Features[i]->SharedVariance() );
 	  break;
+	case SD_w:
+	  Features[i]->SetWeight( Features[i]->StandardDeviation() );
+	  break;
 	case UserDefined_w:
 	  break;
 	case No_w:
@@ -557,6 +560,9 @@ namespace Timbl {
       case SV_w:
 	TreeOrder = SVOrder;
 	break;
+      case SD_w:
+	TreeOrder = SDOrder;
+	break;
       case No_w:
 	TreeOrder = NoOrder;
 	break;
@@ -599,6 +605,9 @@ namespace Timbl {
       case SVOrder:
 	Order[i] = Features[i]->SharedVariance();
 	break;
+      case SDOrder:
+	Order[i] = Features[i]->StandardDeviation();
+	break;
       case OneoverFeature:
 	Order[i] =  1.0 / Features[i]->ValuesArray.size();
 	break;
@@ -613,6 +622,9 @@ namespace Timbl {
 	break;
       case SVoverFeature:
 	Order[i] =  Features[i]->SharedVariance() / Features[i]->ValuesArray.size();
+	break;
+      case SDoverFeature:
+	Order[i] =  Features[i]->StandardDeviation() / Features[i]->ValuesArray.size();
 	break;
       case OneoverSplitInfo:
 	Order[i] =  1.0 / Features[i]->SplitInfo();
@@ -989,7 +1001,27 @@ namespace Timbl {
       os << "Number of Classes : " << Targets->EffectiveValues() << endl;
       os << endl;
       if ( Verbosity(FEAT_W) ){
-	if (  need_all_weights ){
+	if (  CurrentWeighting() == SD_w ){
+	  os << "Feats\tVals\tStandard Deviation" << endl;
+	  for ( size_t i = 0; i < num_of_features; ++i ) {
+	    os << setw(5) << i+1;
+	    os.setf(ios::right, ios::adjustfield);
+	    if ( Features[i]->Ignore() ){
+	      os << " (ignored) " << endl;
+	    }
+	    else {
+	      os.setf(ios::right, ios::adjustfield);
+	      os << setw(7) << Features[i]->EffectiveValues()
+		 << "\t" << Features[i]->StandardDeviation();
+	      if ( Features[i]->isNumerical() )
+		os << " NUMERIC";
+	      os << endl;
+	    }
+	  }
+	  os << endl;
+	  os.precision(OldPrec);
+	}
+	else if ( need_all_weights ){
 	  os << "Feats\tVals\tX-square\tVariance\tInfoGain\tGainRatio" << endl;
 	  for ( size_t i = 0; i < num_of_features; ++i ) {
 	    os << setw(5) << i+1;
@@ -1077,7 +1109,20 @@ namespace Timbl {
 	  else
 	    os << i+1 << "\t" << Features[i]->InfoGain() << endl;
 	}
-	if ( need_all_weights ){
+	if ( CurrentWeighting() == SD_w ){
+	  os << "#" << endl;
+	  os << "# " << toString( SD_w ) << endl;
+	  os << "# Fea." << "\t" << "Weight" << endl;
+	  for (  size_t i = 0; i < num_of_features; ++i ) {
+	    os.precision(DBL_DIG);
+	    if ( Features[i]->Ignore() )
+	      os << i+1 << "\t" << "Ignore" << endl;
+	    else
+	      os << i+1 << "\t" << Features[i]->StandardDeviation() << endl;
+	  }
+	  os << "#" << endl;
+	}
+	else if ( need_all_weights ){
 	  os << "#" << endl;
 	  os << "# " << toString( SV_w ) << endl;
 	  os << "# Fea." << "\t" << "Weight" << endl;
@@ -1099,8 +1144,8 @@ namespace Timbl {
 	      os << i+1 << "\t" << Features[i]->ChiSquare() << endl;
 	  }
 	  os << "#" << endl;
-	  os.precision(OldPrec);
 	}
+	os.precision(OldPrec);
 	result = true;
       }
     }
@@ -1243,6 +1288,7 @@ namespace Timbl {
 	Features[i]->GainRatio( Features[i]->Weight() );
 	Features[i]->ChiSquare( Features[i]->Weight() );
 	Features[i]->SharedVariance( Features[i]->Weight() );
+	Features[i]->StandardDeviation( 0.0 );
       }
       Weighting = UserDefined_w;
     }
@@ -1311,23 +1357,16 @@ namespace Timbl {
 	  return;
 	}
 	metricChanged = !Features[g]->setMetricType(TmpMetricType);
-	if ( Weighting != UserDefined_w ){
-	  if ( Features[g]->isNumerical() ){
-	    Features[g]->NumStatistics( DBEntropy, Targets, Bin_Size,
-					need_all_weights );
-	  }
-	  else {
-	    Features[g]->Statistics( DBEntropy, Targets,
-				     need_all_weights );
-	  }
-	}
       }
       if ( metricChanged )
 	nothing_changed = false;
     } // end g
-    if ( GlobalMetric->isSimilarityMetric() && !nothing_changed ){
+    if ( ( CurrentWeighting() == SD_w || 
+	   GlobalMetric->isSimilarityMetric() )
+	 && !nothing_changed ){
       // check to see if ALL features are still Numeric.
-      // otherwise we can't do Inner product!
+      // otherwise we can't do Standard Deviation weighting, 
+      // or Similarity Metrics!
       bool first = true;
       ostringstream ostr1;
       ostringstream ostr2;
@@ -1351,7 +1390,10 @@ namespace Timbl {
 	}
       if ( !first  ){
 	Error( ostr1.str() );
-	Error( "Therefore InnerProduct/Cosine operations are impossible" );
+	if ( GlobalMetric->isSimilarityMetric() )
+	  Error( "Therefore InnerProduct/Cosine operations are impossible" );
+	else
+	  Error( "Therefore " + toString(CurrentWeighting()) + " weighting is impossible" );	  
 	return;
       }
     }
@@ -1407,6 +1449,22 @@ namespace Timbl {
 	}
       if ( !first  ){
 	Warning( ostr2.str() );
+      }
+    }
+    if ( always || realy_first ){
+      for ( size_t i = 0; i < num_of_features; ++i ) {
+	if ( Weighting != UserDefined_w ){
+	  if ( CurrentWeighting() == SD_w )
+	    Features[i]->StandardDeviationStatistics( );
+	  else if ( Features[i]->isNumerical() ){
+	    Features[i]->NumStatistics( DBEntropy, Targets, Bin_Size,
+					need_all_weights );
+	  }
+	  else {
+	    Features[i]->Statistics( DBEntropy, Targets,
+				     need_all_weights );
+	  }
+	}
       }
     }
     delete [] feat_status;

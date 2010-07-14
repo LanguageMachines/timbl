@@ -669,6 +669,7 @@ namespace Timbl {
     gain_ratio(0.0),
     chi_square(0.0),
     shared_variance(0.0),
+    standard_deviation(0.0),
     matrix_clip_freq(10),
     n_dot_j( 0 ),
     n_i_dot( 0 ),
@@ -707,6 +708,7 @@ namespace Timbl {
       gain_ratio = in.gain_ratio;
       chi_square = in.chi_square;
       shared_variance = in.shared_variance;
+      standard_deviation = in.standard_deviation;
       matrix_clip_freq = in.matrix_clip_freq;
       n_dot_j = in.n_dot_j;
       n_i_dot = in.n_i_dot;
@@ -838,7 +840,7 @@ namespace Timbl {
       gain_ratio = info_gain / split_info;
   }
  
-  void Feature::Statistics( double DBentropy, Target *Targets, bool full ){
+  void Feature::Statistics( double DBentropy, Target *Targets, bool full ){ 
     Statistics( DBentropy );
     if ( full ){
       ChiSquareStatistics( Targets );
@@ -1499,6 +1501,24 @@ namespace Timbl {
       shared_variance = 0;
     else
       shared_variance = chi_square / (double)( NumInst * k );
+  }
+  
+  void Feature::StandardDeviationStatistics( ){
+    double sum = 0.0;
+    vector<double> store( ValuesArray.size() );
+    for ( unsigned int i=0; i < ValuesArray.size(); ++i ){
+      FeatureValue *FV = (FeatureValue *)ValuesArray[i];
+      double val = stringTo<double>( FV->Name() );
+      store[i] = val;
+      sum += val;
+    }
+    double mean = sum /  ValuesArray.size();
+    double total = 0.0;
+    for ( unsigned int i=0; i < ValuesArray.size(); ++i ){
+      double diff = sum - store[i];
+      total += diff*diff;
+    }
+    standard_deviation = sqrt( total / ValuesArray.size() );
   }
   
   void Feature::clear_matrix(){

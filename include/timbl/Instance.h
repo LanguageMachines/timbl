@@ -259,6 +259,8 @@ namespace Timbl {
     void ChiSquare( const double w ){ chi_square = w; };
     double SharedVariance() const { return shared_variance; };
     void SharedVariance( const double w ){ shared_variance = w; };
+    double StandardDeviation() const { return standard_deviation; };
+    void StandardDeviation( const double w ){ standard_deviation = w; };
     double Min() const { return n_min; };
     void Min( const double val ){ n_min = val; };
     double Max() const { return n_max; };
@@ -303,6 +305,7 @@ namespace Timbl {
     double gain_ratio;
     double chi_square;
     double shared_variance;
+    double standard_deviation;;
     size_t matrix_clip_freq;
     long int *n_dot_j;
     long int* n_i_dot;
@@ -316,6 +319,7 @@ namespace Timbl {
     void ChiSquareStatistics( std::vector<FeatureValue *>&, size_t, Target * );
     void ChiSquareStatistics( Target * );
     void SharedVarianceStatistics( Target *, int );
+    void StandardDeviationStatistics();
     Feature( const Feature& );
     Feature& operator=( const Feature& );
   };

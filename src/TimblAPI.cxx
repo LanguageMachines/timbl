@@ -251,6 +251,9 @@ namespace Timbl {
     case SV:
       result = "sv";
       break;
+    case SD:
+      result = "sd";
+      break;
     default:
       cerr << "invalid Weighting in switch " << endl;
       result = "Unknown Weight";
@@ -272,6 +275,8 @@ namespace Timbl {
     case X2_w: w = X2;
       break;
     case SV_w: w = SV;
+      break;
+    case SD_w: w = SD;
       break;
     default:
       w = UNKNOWN_W;
@@ -353,6 +358,8 @@ namespace Timbl {
       case X2: tmp = X2_w;
 	break;
       case SV: tmp = SV_w;
+	break;
+      case SD: tmp = SD_w;
 	break;
       default:
 	return false;
@@ -540,6 +547,8 @@ namespace Timbl {
       case X2: tmp = X2_w;
 	break;
       case SV: tmp = SV_w;
+	break;
+      case SD: tmp = SD_w;
 	break;
       default:
 	return false;

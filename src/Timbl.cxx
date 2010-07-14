@@ -103,6 +103,7 @@ inline void usage_full(void){
   cerr << "     2 or ig: Weight using InfoGain" << endl;
   cerr << "     3 or x2: Weight using Chi-square" << endl;
   cerr << "     4 or sv: Weight using Shared Variance" << endl;
+  cerr << "     5 or sd: Weight using Standard Deviation. (all features must be numeric)" << endl;
   cerr << "-w f      : read Weights from file 'f'" << endl;
   cerr << "-w f:n    : read Weight n from file 'f'" << endl;
   cerr << "-b n      : number of lines used for bootstrapping (IB2 only)" 
@@ -214,6 +215,8 @@ inline void usage_full(void){
   cerr << "       X/V: using X-square/# of Vals" << endl;
   cerr << "       SVO: using Shared Variance" << endl;
   cerr << "       S/V: using Shared Variance/# of Vals" << endl;
+  cerr << "       SDO: using Standard Deviation" << endl;
+  cerr << "       SD/V: using Standard Deviation/# of Vals" << endl;
   cerr << "       GxE: using GainRatio * SplitInfo" << endl;
   cerr << "       IxE: using InformationGain * SplitInfo" << endl;
   cerr << "       1/S: using 1/SplitInfo" << endl;

@@ -96,7 +96,7 @@ namespace Timbl {
   
   
   enum WeightType { Unknown_w,
-		    No_w, GR_w, IG_w, X2_w, SV_w, UserDefined_w, 
+		    No_w, GR_w, IG_w, X2_w, SV_w, SD_w, UserDefined_w, 
 		    Max_w };
   
   inline WeightType& operator++( WeightType &W ){
@@ -126,8 +126,8 @@ namespace Timbl {
 		      OneoverFeature, OneoverSplitInfo,
 		      GRoverFeature, IGoverFeature,
 		      GREntropyOrder, IGEntropyOrder,
-		      X2Order, SVOrder, 
-		      X2overFeature, SVoverFeature,
+		      X2Order, SVOrder, SDOrder,
+		      X2overFeature, SVoverFeature, SDoverFeature,
 		      MaxOrdening };
   
   inline OrdeningType& operator++( OrdeningType &W ){
