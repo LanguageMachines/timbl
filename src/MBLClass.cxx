@@ -1123,7 +1123,7 @@ namespace Timbl {
 	    else
 	      os << i+1 << "\t" << Features[i]->InfoGain() << endl;
 	  }
-	  else if ( need_all_weights ){
+	  if ( need_all_weights ){
 	    os << "#" << endl;
 	    os << "# " << toString( SV_w ) << endl;
 	    os << "# Fea." << "\t" << "Weight" << endl;
