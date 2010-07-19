@@ -186,11 +186,7 @@ namespace Timbl{
     cerr << "create a tester with treshold = " << mvdmThreshold << endl;
 #endif
     metricTest = new metricTestFunction*[_size];
-    for ( size_t j=0; j < _size; ++j ){
-      metricTest[j] = 0;
-    }
     for ( size_t i=0; i < _size; ++i ){
-      delete metricTest[i];
       metricTest[i] = 0;
 #ifdef DBGTEST
       cerr << "set metric[" << i+1 << "]=" << toString(features[i]->getMetricType()) << endl;
