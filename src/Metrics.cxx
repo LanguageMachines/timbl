@@ -326,7 +326,8 @@ namespace Timbl{
 
   double OverlapMetric::distance( FeatureValue *F,
 				  FeatureValue *G, 
-				  size_t ) const {
+				  size_t,
+				  double ) const {
     if ( F == G )
       return 0.0;
     else
@@ -343,7 +344,8 @@ namespace Timbl{
   }  
 
   double JeffreyMetric::distance( FeatureValue *F, FeatureValue *G, 
-				  size_t limit ) const {
+				  size_t limit,
+				  double ) const {
     double result = 0.0;
     if ( G != F ){
       if ( F->ValFreq() < limit ||
@@ -363,7 +365,8 @@ namespace Timbl{
   }
 
   double JSMetric::distance( FeatureValue *F, FeatureValue *G, 
-				  size_t limit ) const {
+			     size_t limit,
+			     double ) const {
     double result = 0.0;
     if ( G != F ){
       if ( F->ValFreq() < limit ||
@@ -383,7 +386,7 @@ namespace Timbl{
   }
 
   double LevenshteinMetric::distance( FeatureValue *F, FeatureValue *G, 
-				      size_t ) const {
+				      size_t, double) const {
     double result = 0.0;
     if ( G != F ){
       result = lv_distance( F->Name(), G->Name() );
@@ -392,7 +395,7 @@ namespace Timbl{
   }  
 
   double DiceMetric::distance( FeatureValue *F, FeatureValue *G, 
-			       size_t ) const {
+			       size_t, double ) const {
     double result = 0.0;
     if ( G != F ){
       result = dc_distance( F->Name(), G->Name() );
@@ -401,7 +404,8 @@ namespace Timbl{
   }
   
   double ValueDiffMetric::distance( FeatureValue *F, FeatureValue *G, 
-				    size_t limit ) const {
+				    size_t limit,
+				    double ) const {
     double result = 0.0;
     if ( G != F ){
       if ( F->ValFreq() < limit ||
@@ -419,26 +423,38 @@ namespace Timbl{
     return result;
   }
 
-  double NumericMetric::distance( FeatureValue *, FeatureValue *, 
-				  size_t ) const {
-    throw( logic_error( "unimplemented distance() for Numeric metric!" ) );
-    return -1.0;
+  double NumericMetric::distance( FeatureValue *F, FeatureValue *G, 
+				  size_t, 
+				  double scale ) const {
+    double r1, r2, result;
+    if ( FV_to_real( F, r1 ) &&
+	 FV_to_real( G, r2 ) )
+      result = fabs( (r1-r2)/ ( scale ) );
+    else
+      result = 1.0;
+    return result;
   }
   
-  double EuclideanMetric::distance( FeatureValue *, FeatureValue *, 
-				    size_t ) const {
-    throw( logic_error( "unimplemented distance() for Eucledian metric!" ) );
-    return -1.0;
+  double EuclideanMetric::distance( FeatureValue *F, FeatureValue *G, 
+				    size_t, 
+				    double scale ) const {
+    double r1, r2, result;
+    if ( FV_to_real( F, r1 ) &&
+	 FV_to_real( G, r2 ) )
+      result = sqrt(fabs(r1*r1-r2*r2))/ ( scale );
+    else
+      result = 1.0;
+    return result;
   }
   
   double DotProductMetric::distance( FeatureValue *, FeatureValue *, 
-				     size_t ) const {
+				     size_t, double ) const {
     throw( logic_error( "unimplemented distance() for Dotproduct metric!" ) );
     return -1.0;
   }
 
   double CosineMetric::distance( FeatureValue *, FeatureValue *, 
-				 size_t ) const {
+				 size_t, double ) const {
     throw( logic_error( "unimplemented distance() for Cosine metric!" ) );
     return -1.0;
   }

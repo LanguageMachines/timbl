@@ -42,7 +42,8 @@ namespace Timbl{
     virtual bool isSimilarityMetric() const = 0;
     virtual bool isNumerical() const = 0;
     virtual bool isStorable() const = 0;
-    virtual double distance( FeatureValue *, FeatureValue *, size_t=1 ) const = 0;
+    virtual double distance( FeatureValue *, FeatureValue *, 
+			     size_t=1, double = 1.0 ) const = 0;
   private:
     MetricType _type;
   };
@@ -59,23 +60,27 @@ namespace Timbl{
   OverlapMetric(): distanceMetricClass( Overlap ){};
     bool isNumerical() const { return false; };
     bool isStorable() const { return false; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
   };
   
-  class NumericMetric: public distanceMetricClass {
+  class NumericMetricClass: public distanceMetricClass {
   public:
-  NumericMetric(): distanceMetricClass( Numeric ){};
+  NumericMetricClass( MetricType m ): distanceMetricClass( m ){};
+    virtual ~NumericMetricClass() {};
     bool isNumerical() const { return true; };
     bool isStorable() const { return false; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
   };
 
-  class EuclideanMetric: public distanceMetricClass {
+  class NumericMetric: public NumericMetricClass {
   public:
-  EuclideanMetric(): distanceMetricClass( Euclidean ){};
-    bool isNumerical() const { return true; };
-    bool isStorable() const { return false; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
+  NumericMetric(): NumericMetricClass( Numeric ){};
+    double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
+  };
+
+  class EuclideanMetric: public NumericMetricClass {
+  public:
+  EuclideanMetric(): NumericMetricClass( Euclidean ){};
+    double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
   };
 
   class ValueDiffMetric: public distanceMetricClass {
@@ -83,7 +88,7 @@ namespace Timbl{
   ValueDiffMetric(): distanceMetricClass( ValueDiff ){};
     bool isNumerical() const { return false; };
     bool isStorable() const { return true; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
   };
   
   class DiceMetric: public distanceMetricClass {
@@ -91,7 +96,7 @@ namespace Timbl{
   DiceMetric(): distanceMetricClass( Dice ){};
     bool isNumerical() const { return false; };
     bool isStorable() const { return true; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
   };
 
   class JeffreyMetric: public distanceMetricClass {
@@ -99,7 +104,7 @@ namespace Timbl{
   JeffreyMetric(): distanceMetricClass( JeffreyDiv ){};
     bool isNumerical() const { return false; };
     bool isStorable() const { return true; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
   };
 
   class JSMetric: public distanceMetricClass {
@@ -107,7 +112,7 @@ namespace Timbl{
   JSMetric(): distanceMetricClass( JSDiv ){};
     bool isNumerical() const { return false; };
     bool isStorable() const { return true; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
   };
 
   class LevenshteinMetric: public distanceMetricClass {
@@ -115,7 +120,7 @@ namespace Timbl{
   LevenshteinMetric(): distanceMetricClass( Levenshtein ){};
     bool isNumerical() const { return false; };
     bool isStorable() const { return true; };
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
   };
 
   class similarityMetricClass: public metricClass {
@@ -130,13 +135,13 @@ namespace Timbl{
   class CosineMetric: public similarityMetricClass {
   public:
   CosineMetric(): similarityMetricClass( Cosine ){};
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
   };
 
   class DotProductMetric: public similarityMetricClass {
   public:
   DotProductMetric(): similarityMetricClass( DotProduct ){};
-    double distance( FeatureValue *, FeatureValue *, size_t ) const;
+    double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
   };
 
 }  

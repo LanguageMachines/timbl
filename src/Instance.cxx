@@ -1084,6 +1084,9 @@ namespace Timbl {
 	   G->ValFreq() >= matrix_clip_freq ){
 	result = metric_matrix->Extract( F, G );
       }
+      else if ( metric->isNumerical() ) {
+	result = metric->distance( F, G, limit, Max() - Min() );
+      }
       else {
 	result = metric->distance( F, G, limit );
       }

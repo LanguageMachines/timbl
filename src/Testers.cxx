@@ -65,26 +65,14 @@ namespace Timbl{
     return result;
   }
     
-  inline bool FV_to_real( FeatureValue *FV, double &result ){
-    if ( FV ){
-      if ( stringTo<double>( FV->Name(), result ) )
-	return true;
-    }
-    return false;
-  }  
-
   double numericOverlapTestFunction::test( FeatureValue *F,
 					   FeatureValue *G,
 					   Feature *Feat ) const {
-    double r1, r2, result;
+
 #ifdef DBGTEST
     cerr << "numeric_distance(" << F << "," << G << ") = ";
 #endif
-    if ( FV_to_real( F, r1 ) &&
-	 FV_to_real( G, r2 ) )
-      result = fabs( (r1-r2)/ (Feat->Max() - Feat->Min()) );
-    else
-      result = 1.0;
+    double result = Feat->fvDistance( F, G );
 #ifdef DBGTEST
     cerr << result;
 #endif
@@ -98,15 +86,10 @@ namespace Timbl{
   double euclideanTestFunction::test( FeatureValue *F,
 				     FeatureValue *G,
 				     Feature *Feat ) const {
-    double r1, r2, result;
 #ifdef DBGTEST
     cerr << "euclidean_distance(" << F << "," << G << ") = ";
 #endif
-    if ( FV_to_real( F, r1 ) &&
-	 FV_to_real( G, r2 ) )
-      result = sqrt(fabs(r1*r1-r2*r2))/ (Feat->Max() - Feat->Min());
-    else
-      result = 1.0;
+    double result = Feat->fvDistance( F, G );
 #ifdef DBGTEST
     cerr << result;
 #endif
@@ -253,6 +236,14 @@ namespace Timbl{
   double DistanceTester::getDistance( size_t pos ) const{
     return distances[pos];
   }
+
+  inline bool FV_to_real( FeatureValue *FV, double &result ){
+    if ( FV ){
+      if ( stringTo<double>( FV->Name(), result ) )
+	return true;
+    }
+    return false;
+  }  
 
   double innerProduct( FeatureValue *FV,
 		       FeatureValue *G ) {
