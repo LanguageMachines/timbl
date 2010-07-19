@@ -64,41 +64,6 @@ namespace Timbl{
 #endif
     return result;
   }
-    
-  double numericOverlapTestFunction::test( FeatureValue *F,
-					   FeatureValue *G,
-					   Feature *Feat ) const {
-
-#ifdef DBGTEST
-    cerr << "numeric_distance(" << F << "," << G << ") = ";
-#endif
-    double result = Feat->fvDistance( F, G );
-#ifdef DBGTEST
-    cerr << result;
-#endif
-    result *= Feat->Weight();
-#ifdef DBGTEST
-    cerr << " gewogen " << result << endl;
-#endif
-    return result;
-  }
-
-  double euclideanTestFunction::test( FeatureValue *F,
-				     FeatureValue *G,
-				     Feature *Feat ) const {
-#ifdef DBGTEST
-    cerr << "euclidean_distance(" << F << "," << G << ") = ";
-#endif
-    double result = Feat->fvDistance( F, G );
-#ifdef DBGTEST
-    cerr << result;
-#endif
-    result *= Feat->Weight();
-#ifdef DBGTEST
-    cerr << " gewogen " << result << endl;
-#endif
-    return result;
-  }
 
   double valueDiffTestFunction::test( FeatureValue *F,
 				      FeatureValue *G,
@@ -116,7 +81,6 @@ namespace Timbl{
 #endif
     return result;
   }
-
 
   TesterClass* getTester( MetricType m, 
 			  const std::vector<Feature*>& features, 
@@ -181,20 +145,6 @@ namespace Timbl{
 	cerr << "created  valueDiffTestFunction " << endl;
 #endif
  	metricTest[i] = new valueDiffTestFunction( mvdmThreshold );
-      }
-      else if ( features[i]->isNumerical() ){
-	if ( features[i]->getMetricType() == Euclidean ){
-#ifdef DBGTEST
-	  cerr << "created euclideanTestFunction " << endl;
-#endif
-	  metricTest[i] = new euclideanTestFunction();
-	}
-	else {
-#ifdef DBGTEST
-	  cerr << "created numericOverlapTestFunction " << endl;
-#endif
-	  metricTest[i] = new numericOverlapTestFunction();
-	}
       }
       else {
 #ifdef DBGTEST
