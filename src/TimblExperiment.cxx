@@ -973,12 +973,104 @@ namespace Timbl {
   }
   
   bool IB2_Experiment::Learn( const string& FileName ){
-    bool result = false;
-    if ( IB2_offset() == 0 )
+    if ( IB2_offset() == 0 ){
       Error( "IB2 learning failed, invalid bootstrap option?" );
-    else if ( TimblExperiment::Learn( FileName ) )
-      result = Expand_N( FileName );
-    return result;
+      return false;
+    }
+    else {
+      bool result = true;
+      Common::Timer learnT;
+      if ( ExpInvalid() ||
+	   !ConfirmOptions() ){
+	result = false;
+      }
+      else {
+	if ( is_synced ){
+	  CurrentDataFile = FileName; // assume magic!
+	}
+	if ( CurrentDataFile == "" )
+	  if ( FileName == "" ){
+	    Warning( "unable to build an InstanceBase: No datafile defined yet" );
+	    result = false;
+	  }
+	  else {
+	    if ( !Prepare( FileName ) || ExpInvalid() ){
+	      result = false;
+	    }
+	  }
+	else if ( FileName != "" &&
+		  CurrentDataFile != FileName ){
+	  Error( "Unable to Learn from file '" + FileName + "'\n"
+		 "while previously instantiated from file '" + 
+		 CurrentDataFile + "'" );
+	  result = false;
+	}
+      }
+      if ( result ) {
+	string Buffer;
+	stats.clear();
+	// Open the file.
+	//
+	ifstream datafile( CurrentDataFile.c_str(), ios::in);
+	if ( InputFormat() == ARFF )
+	  skipARFFHeader( datafile );
+	if ( !nextLine( datafile, Buffer ) ){
+	  Error( "cannot start learning from in: " + CurrentDataFile );
+	  result = false;    // No more input
+	}
+	else if ( !chopLine( Buffer ) ){
+	  Error( "no useful data in: " + CurrentDataFile );
+	  result = false;    // No more input
+	}
+	else {
+	  learnT.start();
+	  InitInstanceBase( );
+	  if ( !Verbosity(SILENT) ) {
+	    Info( "Phase 2: Learning from Datafile: " + CurrentDataFile );
+	    time_stamp( "Start:     ", 0 );
+	  }
+	  bool found;
+	  bool go_on = ( stats.dataLines() <= IB2_offset() );
+	  while( go_on ){ 
+	    // The next Instance to store. 
+	    chopped_to_instance( TrainWords );
+	    if ( !IBAdd( CurrInst ) ){
+	      Warning( "deviating exemplar weight in line #" +
+		       toString<int>(stats.totalLines()) + ":\n" +
+		       Buffer + "\nIgnoring the new weight" );
+	    }
+	    // Progress update.
+	    //
+	    if ((stats.dataLines() % Progress() ) == 0) 
+	      time_stamp( "Learning:  ", stats.dataLines() );
+	    if ( stats.dataLines() >= IB2_offset() )
+	      go_on = false;
+	    else {
+	      found = false;
+	      while ( !found && 
+		      nextLine( datafile, Buffer ) ){
+		found = chopLine( Buffer );
+		if ( !found ){
+		  Warning( "datafile, skipped line #" + 
+			   toString<int>( stats.totalLines() ) +
+			   "\n" + Buffer );
+		}
+	      }
+	      go_on = found;
+	    }
+	  }
+	  time_stamp( "Finished:  ", stats.dataLines() );
+	  learnT.stop();
+	  if ( !Verbosity(SILENT) ){
+	    IBInfo( *mylog );
+	    Info( "Learning took " + learnT.toString() );
+	  }
+	}
+	if ( result )
+	  result = Expand_N( FileName );
+      }
+      return result;
+    }
   }
   
   bool IB2_Experiment::Expand( const string& FileName ){
@@ -1948,6 +2040,133 @@ namespace Timbl {
     }
     return true;
   }
-  
+
+  bool TimblExperiment::build_file_index( const string& file_name, 
+					  featureMultiIndex& fmIndex ){
+    bool result = true;
+    string Buffer;
+    stats.clear();
+    size_t cur_pos = 0;
+    // Open the file.
+    //
+    ifstream datafile( file_name.c_str(), ios::in);
+    if ( InputFormat() == ARFF )
+      skipARFFHeader( datafile );
+    cur_pos = datafile.tellg();
+    if ( !nextLine( datafile, Buffer ) ){
+      Error( "cannot start learning from in: " + file_name );
+      result = false;    // No more input
+    }
+    else if ( !chopLine( Buffer ) ){
+      Error( "no useful data in: " + file_name );
+      result = false;    // No more input
+    }
+    else {
+      if ( !Verbosity(SILENT) ) {
+	Info( "Phase 2: Building index on Datafile: " + file_name );
+	time_stamp( "Start:     ", 0 );
+      }
+      bool found;
+      bool go_on = true;
+      while( go_on ){ 
+	// The next Instance to store. 
+	chopped_to_instance( TrainWords );
+	FeatureValue *fv0 = CurrInst.FV[0];
+	FeatureValue *fv1 = CurrInst.FV[1];
+	pair<FeatureValue*,streamsize> fsPair = make_pair( fv1, cur_pos );
+	featureMultiIndex::iterator it = fmIndex.find( fv0 );
+	if ( it != fmIndex.end() )
+	  it->second.insert( fsPair );
+	else {
+	  MultiIndex mi;
+	  mi.insert( fsPair );
+	  fmIndex[fv0] = mi;
+	}
+	if ((stats.dataLines() % Progress() ) == 0) 
+	  time_stamp( "Indexing:  ", stats.dataLines() );
+	found = false;
+	while ( !found && 
+		( cur_pos = datafile.tellg(),
+		  nextLine( datafile, Buffer ) ) ){
+	  found = chopLine( Buffer );
+	  if ( !found ){
+	    Warning( "datafile, skipped line #" + 
+		     toString<int>( stats.totalLines() ) +
+		     "\n" + Buffer );
+	  }
+	}
+	go_on = found;
+      }
+      time_stamp( "Finished:  ", stats.dataLines() );
+    }
+    return result;
+  }
+
+  void TimblExperiment::compressIndex( const featureMultiIndex& fmIndex,
+				       featureMultiIndex& res ){
+    res.clear();
+    featureMultiIndex::const_iterator fmIt = fmIndex.begin();
+    while ( fmIt != fmIndex.end() ){
+      if ( fmIt->second.size() < igOffset() ){
+	res[fmIt->first] = fmIt->second;
+      }
+      else {
+	MultiIndex out;
+	typedef MultiIndex::const_iterator Mit;
+	Mit mit = fmIt->second.begin();
+	FeatureValue *fv = 0;
+	size_t totalCnt = 0;
+	while ( mit != fmIt->second.end() ){
+	  pair<Mit,Mit> range = fmIt->second.equal_range( mit->first );
+	  size_t cnt = fmIt->second.count( mit->first );
+	  if ( cnt > igOffset() ){
+	    res[fmIt->first].insert( range.first, range.second );
+	  }
+	  else {
+	    if ( !fv )
+	      fv = mit->first;
+	    for ( Mit rit=range.first; rit != range.second; ++rit)
+	      out.insert( make_pair(fv, rit->second ) );
+	    totalCnt += cnt;
+	    if ( totalCnt > igOffset() ){
+	      fv = 0;
+	      totalCnt = 0;
+	      res[fmIt->first].insert( out.begin(), out.end() );
+	      out.clear();
+	    }
+	  }
+	  mit = range.second;
+	}
+	if ( !out.empty() ){
+	  res[fmIt->first].insert( out.begin(), out.end() );
+	}
+      }
+      ++fmIt;
+    }
+  }
+
+  ostream& operator<< ( ostream& os, 
+			const TimblExperiment::MultiIndex& mi ){
+    TimblExperiment::MultiIndex::const_iterator mIt = mi.begin();
+    while ( mIt != mi.end() ){
+      os << "<";
+      os << mIt->first << "," << mIt->second;
+	os << ">";
+      ++mIt;
+    }
+    return os;
+  }
+
+  ostream& operator<< ( ostream& os, 
+			const TimblExperiment::featureMultiIndex& fmi ){
+    os << "[";
+    TimblExperiment::featureMultiIndex::const_iterator fmIt = fmi.begin();
+    while ( fmIt != fmi.end() ){
+      os << fmIt->first << " " << fmIt->second << endl;
+      ++fmIt;
+    }
+    os << "]";
+    return os;
+  }  
   
 }

@@ -201,6 +201,20 @@ namespace Timbl {
     void show_weight_info( std::ostream& os ) const;
     void show_metric_info( std::ostream& os ) const;
     double sum_remaining_weights( size_t ) const;
+
+    class fCmp {
+    public:
+      bool operator()( const FeatureValue* F, const FeatureValue* G ) const{
+	return F->Index() > G->Index();
+      }
+    };  
+
+    typedef std::multimap<FeatureValue*,std::streamsize > MultiIndex;
+    typedef std::map<FeatureValue*, MultiIndex, fCmp > featureMultiIndex;
+    friend std::ostream& operator<< ( std::ostream&, const featureMultiIndex& );
+    friend std::ostream& operator<< ( std::ostream&, const MultiIndex& );
+    bool build_file_index( const std::string&, featureMultiIndex&  );
+    void compressIndex( const featureMultiIndex&, featureMultiIndex& );
     
     bool Initialized;
     GetOptClass *OptParams;
@@ -380,22 +394,10 @@ namespace Timbl {
 				      double&,
 				      bool& );
   private:
-    class fCmp {
-    public:
-      bool operator()( const FeatureValue* F, const FeatureValue* G ) const{
-	return F->Index() > G->Index();
-      }
-    };  
     
-  typedef std::multimap<FeatureValue*,std::streamsize > MultiIndex;
-  typedef std::map<FeatureValue*, MultiIndex, fCmp > featureMultiIndex;
-  friend std::ostream& operator<< ( std::ostream&, const featureMultiIndex& );
-  friend std::ostream& operator<< ( std::ostream&, const MultiIndex& );
-  bool build_file_index( const std::string&, featureMultiIndex&  );
-  void compressIndex( const featureMultiIndex&, featureMultiIndex& );
-  bool GetInstanceBase( std::istream& );
-};
-
+    bool GetInstanceBase( std::istream& );
+  };
+  
 }
 
 #endif // TIMBLEXP_H
