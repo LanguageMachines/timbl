@@ -68,5 +68,11 @@ namespace Common {
        << div.rem << " microseconds";
     return os;
   }
+  
+  string Timer::toString(){
+    stringstream os;
+    os << *this;
+    return os.str();
+  }
 
 }

@@ -77,6 +77,7 @@ namespace Common {
     };
     void stop();
     unsigned int secs() { stop(); return myTime.tv_sec; };
+    std::string toString();
     static std::string now();
   private:
     timeval startTime;
