@@ -362,6 +362,8 @@ namespace Timbl {
 	      result = false;
 	    }
 	    else {
+	      Common::Timer prepT;
+	      prepT.start();
 	      bool found;
 	      bool go_on = true;
 	      if ( !Verbosity(SILENT) ){
@@ -402,6 +404,8 @@ namespace Timbl {
 		}
 		else
 		  calculate_fv_entropy( false );
+		prepT.stop();
+		Info( "Preparation took " + prepT.toString() );
 		result = true;
 	      }
 	    }
@@ -421,6 +425,7 @@ namespace Timbl {
 
   bool TimblExperiment::Learn( const string& FileName ){
     bool result = true;
+    Common::Timer learnT;
     if ( ExpInvalid() ||
 	 !ConfirmOptions() ){
       result = false;
@@ -464,6 +469,7 @@ namespace Timbl {
 	result = false;    // No more input
       }
       else {
+	learnT.start();
 	InitInstanceBase( );
 	if ( !Verbosity(SILENT) ) {
 	  Info( "Phase 2: Learning from Datafile: " + CurrentDataFile );
@@ -500,8 +506,11 @@ namespace Timbl {
 	  }
 	}
 	time_stamp( "Finished:  ", stats.dataLines() );
-	if ( !Verbosity(SILENT) )
+	learnT.stop();
+	if ( !Verbosity(SILENT) ){
 	  IBInfo( *mylog );
+	  Info( "Learning took " + learnT.toString() );
+	}
       }
     }
     return result;

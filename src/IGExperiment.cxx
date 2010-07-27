@@ -249,6 +249,8 @@ namespace Timbl {
       }
     }
     if ( result ) {
+      Common::Timer learnT;
+      learnT.start();
       InitInstanceBase();
       featureMultiIndex fmIndexRaw;
       //      Common::Timer t;
@@ -410,8 +412,11 @@ namespace Timbl {
 	  ++it;
 	}
 	time_stamp( "Finished:  ", stats.dataLines() );
-	if ( !Verbosity(SILENT) )
+	learnT.stop();
+	if ( !Verbosity(SILENT) ){
 	  IBInfo( *mylog );
+	  Info( "Learning took " + learnT.toString() );
+	}
       }
     }
 //     totalT.stop();
