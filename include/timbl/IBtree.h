@@ -124,7 +124,8 @@ namespace Timbl {
 					  const ValueDistribution *&,
 					  size_t& );
     bool read_hash( std::istream &, StringHash *, StringHash * ) const;
-    virtual InstanceBase_base *Clone() const = 0;
+    virtual InstanceBase_base *Copy() const = 0;
+    virtual InstanceBase_base *clone() const = 0;
     void Save( std::ostream &, bool=false );
     void Save( std::ostream &, StringHash *, StringHash *, bool=false );
     void toXML( std::ostream& );
@@ -190,7 +191,8 @@ namespace Timbl {
     IB_InstanceBase( size_t size, unsigned long& cnt, bool rand ):
       InstanceBase_base( size, cnt, rand , false ) {
     };
-    IB_InstanceBase *Clone() const;
+    IB_InstanceBase *Copy() const;
+    IB_InstanceBase *clone() const;
     const ValueDistribution *InitGraphTest( std::vector<FeatureValue *>&, 
 					    const std::vector<FeatureValue *> *,
 					    size_t,
@@ -208,7 +210,8 @@ namespace Timbl {
     IG_InstanceBase( size_t size, unsigned long& cnt, 
 		     bool rand, bool pruned, bool keep_dists ):
       InstanceBase_base( size, cnt, rand, keep_dists ), Pruned( pruned ) {};
-    IG_InstanceBase *Clone() const;
+    IG_InstanceBase *clone() const;
+    IG_InstanceBase *Copy() const;
     void Prune( const TargetValue *, long = 0 );
     void specialPrune( const TargetValue * );
     bool IsPruned() const { return Pruned; };
@@ -227,7 +230,8 @@ namespace Timbl {
     TRIBL_InstanceBase( size_t size, unsigned long& cnt, 
 			bool rand, bool keep_dists ):
       InstanceBase_base( size, cnt, rand, keep_dists ), Treshold(0) {};
-    TRIBL_InstanceBase *Clone() const;
+    TRIBL_InstanceBase *clone() const;
+    TRIBL_InstanceBase *Copy() const;
     IB_InstanceBase *TRIBL_test( const Instance&,
 				 size_t,
 				 const TargetValue *&,
@@ -245,7 +249,8 @@ namespace Timbl {
 			 bool rand, bool keep_dists ):
       InstanceBase_base( size, cnt, rand, keep_dists ) {
     };
-    TRIBL2_InstanceBase *Clone() const;
+    TRIBL2_InstanceBase *clone() const;
+    TRIBL2_InstanceBase *Copy() const;
     IB_InstanceBase *TRIBL2_test( const Instance& , 
 				  const ValueDistribution *&,
 				  size_t& );

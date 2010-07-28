@@ -268,10 +268,6 @@ namespace Timbl {
 	  Exp->SetOption( optline );
 	}
 	if ( igThreshold > 0 ){
-	  if ( local_algo != IGTREE_a ){
-	    Error( "Threshold only valid for IG algorithm" );
-	    return false;
-	  }
 	  optline = "IG_THRESHOLD: " + toString<int>(igThreshold);
 	  Exp->SetOption( optline );
 	}

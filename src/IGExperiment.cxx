@@ -106,9 +106,9 @@ namespace Timbl {
 	  result = false;
 	}
 	else {
-	if ( !Prepare( FileName ) || ExpInvalid() ){
-	  result = false;
-	}
+	  if ( !Prepare( FileName ) || ExpInvalid() ){
+	    result = false;
+	  }
 	}
       }
       else if ( FileName != "" &&
@@ -177,6 +177,7 @@ namespace Timbl {
 	      typedef MultiIndex::const_iterator mit;
 	      pair<mit,mit> b = it->second.equal_range( the2fv );
 	      for ( mit i = b.first; i != b.second; ++i ){
+		datafile.clear();
 		datafile.seekg( i->second );
 		nextLine( datafile, Buffer );
 		chopLine( Buffer );
@@ -241,6 +242,7 @@ namespace Timbl {
 	    //	    cerr << "other case!" << endl;
 	    MultiIndex::const_iterator mIt = it->second.begin();
 	    while ( mIt != it->second.end() ){
+	      datafile.clear();
 	      datafile.seekg( mIt->second );
 	      nextLine( datafile, Buffer );
 	      chopLine( Buffer );

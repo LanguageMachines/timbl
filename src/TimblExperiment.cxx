@@ -441,7 +441,7 @@ namespace Timbl {
 	}
 	else {
 	  if ( !Prepare( FileName ) || ExpInvalid() ){
-	  result = false;
+	    result = false;
 	  }
 	}
       else if ( FileName != "" &&
@@ -453,66 +453,168 @@ namespace Timbl {
       }
     }
     if ( result ) {
-      string Buffer;
-      stats.clear();
-      // Open the file.
-      //
-      ifstream datafile( CurrentDataFile.c_str(), ios::in);
-      if ( InputFormat() == ARFF )
-	skipARFFHeader( datafile );
-      if ( !nextLine( datafile, Buffer ) ){
-	Error( "cannot start learning from in: " + CurrentDataFile );
-	result = false;    // No more input
-      }
-      else if ( !chopLine( Buffer ) ){
-	Error( "no useful data in: " + CurrentDataFile );
-	result = false;    // No more input
-      }
-      else {
-	learnT.start();
-	InitInstanceBase( );
+      Common::Timer learnT;
+      learnT.start();
+      InitInstanceBase();
+      if ( ExpInvalid() )
+	return false;
+      featureMultiIndex fmIndexRaw;
+      //      Common::Timer t;
+      //      t.start();
+      result = build_file_index( CurrentDataFile, fmIndexRaw );
+      //      t.stop();
+      //      cerr << "indexing took " << t << endl;
+      //      totalT.start();
+      if ( result ){
+	featureMultiIndex fmIndex;
+	//	Common::Timer t;
+	//	t.start();
+	//	cerr << "compressing index " << fmIndexRaw << endl;
+	compressIndex( fmIndexRaw, fmIndex );
+	//	cerr << "resulting index " << fmIndex << endl;
+	//	t.stop();
+	//	cerr << "compressing took " << t << endl;
+	stats.clear();
 	if ( !Verbosity(SILENT) ) {
-	  Info( "Phase 2: Learning from Datafile: " + CurrentDataFile );
+	  Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
 	  time_stamp( "Start:     ", 0 );
 	}
-	bool found;
-	bool go_on = ( IB2_offset() == 0 || stats.dataLines() <= IB2_offset() );
-	while( go_on ){ 
-	  // The next Instance to store. 
-	  chopped_to_instance( TrainWords );
-	  if ( !IBAdd( CurrInst ) ){
-	    Warning( "deviating exemplar weight in line #" +
-		     toString<int>(stats.totalLines()) + ":\n" +
-		     Buffer + "\nIgnoring the new weight" );
+	string Buffer;
+	InstanceBase_base *PartInstanceBase = 0;
+	InstanceBase_base *outInstanceBase = 0;
+	TargetValue *TopTarget = Targets->MajorityClass();
+	//	cerr << "MAJORITY CLASS = " << TopTarget << endl;
+	// Open the file.
+	//
+	ifstream datafile( CurrentDataFile.c_str(), ios::in);
+	//
+	featureMultiIndex::const_iterator it = fmIndex.begin();
+	while ( it != fmIndex.end() ){
+	  FeatureValue *the_fv = (FeatureValue*)(it->first);
+	  //	  cerr << "handle feature " << the_fv << " met index " << the_fv->Index() << endl;
+	  MultiIndex::const_iterator fmIt = it->second.begin();
+	  if ( fmIt == it->second.end() ){
+	    FatalError( "panic" );
 	  }
-	  // Progress update.
-	  //
-	  if ((stats.dataLines() % Progress() ) == 0) 
-	    time_stamp( "Learning:  ", stats.dataLines() );
-	  if ( IB2_offset() > 0 && stats.dataLines() >= IB2_offset() )
-	    go_on = false;
-	  else {
-	    found = false;
-	    while ( !found && 
-		    nextLine( datafile, Buffer ) ){
-	      found = chopLine( Buffer );
-	      if ( !found ){
-		Warning( "datafile, skipped line #" + 
-			 toString<int>( stats.totalLines() ) +
-			 "\n" + Buffer );
+	  if ( igOffset() > 0 && it->second.size() > igOffset() ){
+	    //	    cerr << "within offset!" << endl;
+	    IVCmaptype::const_iterator it2
+	      = Features[permutation[1]]->ValuesMap.begin();
+	    InstanceBase_base *TmpInstanceBase = 0;
+	    TmpInstanceBase = InstanceBase->clone();
+	    while ( it2 != Features[permutation[1]]->ValuesMap.end() ){
+	      FeatureValue *the2fv = (FeatureValue*)(it2->second);
+	      //	      cerr << "handle secondary feature " << the2fv << endl;
+	      typedef MultiIndex::const_iterator mit;
+	      pair<mit,mit> b = it->second.equal_range( the2fv );
+	      for ( mit i = b.first; i != b.second; ++i ){
+		datafile.clear();
+		datafile.seekg( i->second );
+		nextLine( datafile, Buffer );
+		chopLine( Buffer );
+		// Progress update.
+		//
+		if (( stats.dataLines() % Progress() ) == 0) 
+		  time_stamp( "Learning:  ", stats.dataLines() );
+		chopped_to_instance( TrainWords );
+		if ( !PartInstanceBase ){
+		  PartInstanceBase = InstanceBase->clone();
+		}
+		//		cerr << "add instance " << &CurrInst << endl;
+		if ( !PartInstanceBase->AddInstance( CurrInst ) ){
+		  Warning( "deviating exemplar weight in:\n" + 
+			   Buffer + "\nIgnoring the new weight" );
+		}
 	      }
+	      if ( PartInstanceBase ){
+		//		cerr << "finished handling secondary feature:" << the2fv << endl;
+		//		cerr << PartInstanceBase << endl;
+		//		subMergeT.start();
+		if ( !TmpInstanceBase->MergeSub( PartInstanceBase ) ){
+		  FatalError( "Merging InstanceBases failed. PANIC" );
+		  return false;
+		}
+		//		subMergeT.stop();
+		//		cerr << "after Merge: intermediate result" << endl;
+		//		cerr << TmpInstanceBase << endl;
+		delete PartInstanceBase;
+		PartInstanceBase = 0;
+	      }
+	      else {
+		//		cerr << "Partial IB is empty" << endl;
+	      }
+	      ++it2;
 	    }
-	    go_on = found;
+	    //	    time_stamp( "Finished Final stage " );
+	    //	    cerr << TmpInstanceBase << endl;
+	    //	    totMergeT.start();
+	    if ( !InstanceBase->MergeSub( TmpInstanceBase ) ){
+	      FatalError( "Merging InstanceBases failed. PANIC" );
+	      return false;
+	    }
+	    //	    totMergeT.start();
+	    //	    cerr << "finale Merge gave" << endl;
+	    //	    cerr << InstanceBase << endl;
+	    delete TmpInstanceBase;
 	  }
+	  else {
+	    //	    cerr << "other case!" << endl;
+	    MultiIndex::const_iterator mIt = it->second.begin();
+	    while ( mIt != it->second.end() ){
+	      //      cerr << "zoek naar positie " << mIt->second << endl;
+	      datafile.clear();
+	      datafile.seekg( mIt->second );
+	      nextLine( datafile, Buffer );
+	      chopLine( Buffer );
+	      // Progress update.
+	      //
+	      if (( stats.dataLines() % Progress() ) == 0) 
+		time_stamp( "Learning:  ", stats.dataLines() );
+	      chopped_to_instance( TrainWords );
+	      if ( !outInstanceBase )
+		outInstanceBase = InstanceBase->clone();
+	      //	      cerr << "add instance " << &CurrInst << endl;
+	      if ( !outInstanceBase->AddInstance( CurrInst ) ){
+		Warning( "deviating exemplar weight in:\n" + 
+			 Buffer + "\nIgnoring the new weight" );
+	      }
+	      ++mIt;
+	    }
+	    if ( outInstanceBase ){
+	      // cerr << "merge:" << endl;
+	      // cerr << outInstanceBase << endl;
+	      // cerr << "in:" << endl;
+	      // cerr << InstanceBase << endl;
+	      if ( !InstanceBase->MergeSub( outInstanceBase ) ){
+		FatalError( "Merging InstanceBases failed. PANIC" );
+		return false;
+	      }
+	      // cerr << "after merge: Instance Base" << endl;
+	      // cerr << InstanceBase << endl;
+	      delete outInstanceBase;
+	      outInstanceBase = 0;
+	    }
+	  }
+	  ++it;
 	}
 	time_stamp( "Finished:  ", stats.dataLines() );
 	learnT.stop();
+	// cerr << "Endresult " << endl;
+	// cerr << InstanceBase << endl;
 	if ( !Verbosity(SILENT) ){
 	  IBInfo( *mylog );
 	  Info( "Learning took " + learnT.toString() );
 	}
       }
     }
+//     totalT.stop();
+//     cerr << "normal pruning took " << pruneT << endl;
+//     cerr << "sub pruning took " << subPruneT << endl;
+//     cerr << "special pruning took " <<  specialPruneT << endl;
+//     cerr << "normal merging took " << mergeT << endl;
+//     cerr << "submerging took " << subMergeT << endl;
+//     cerr << "final merging took " << totMergeT << endl;
+//     cerr << "In total learning took " << totalT << endl;
     return result;
   }
   
@@ -543,7 +645,8 @@ namespace Timbl {
       }
       else {	
 	chopped_to_instance( TrainLearnWords );
-	if ( !IBAdd( CurrInst ) ){
+	MBL_init = false;
+	if ( !InstanceBase->AddInstance( CurrInst ) ){
 	  Warning( "deviating exemplar weight in:\n" + 
 		   InstanceString + "\nIgnoring the new weight" );
 	}
@@ -610,6 +713,7 @@ namespace Timbl {
 	result = false;    // No more input
       }
       else {
+	MBL_init = false;
 	if ( !Verbosity(SILENT) ) {
 	  Info( "Phase 2: Expanding from Datafile: " + FileName );
 	  time_stamp( "Start:     ", 0 );
@@ -618,7 +722,7 @@ namespace Timbl {
 	do {
 	  // The next Instance to store. 
 	  chopped_to_instance( TrainLearnWords );
-	  if ( !IBAdd( CurrInst ) ){
+	  if ( !InstanceBase->AddInstance( CurrInst ) ){
 	    Warning( "deviating exemplar weight in line #" + 
 		     toString<int>(stats.totalLines() ) + ":\n" +
 		     Buffer + "\nIgnoring the new weight" );	
@@ -1025,6 +1129,9 @@ namespace Timbl {
 	else {
 	  learnT.start();
 	  InitInstanceBase( );
+	  if ( ExpInvalid() )
+	    return false;
+	  MBL_init = false;
 	  if ( !Verbosity(SILENT) ) {
 	    Info( "Phase 2: Learning from Datafile: " + CurrentDataFile );
 	    time_stamp( "Start:     ", 0 );
@@ -1034,7 +1141,7 @@ namespace Timbl {
 	  while( go_on ){ 
 	    // The next Instance to store. 
 	    chopped_to_instance( TrainWords );
-	    if ( !IBAdd( CurrInst ) ){
+	    if ( !InstanceBase->AddInstance( CurrInst ) ){
 	      Warning( "deviating exemplar weight in line #" +
 		       toString<int>(stats.totalLines()) + ":\n" +
 		       Buffer + "\nIgnoring the new weight" );
@@ -1160,7 +1267,7 @@ namespace Timbl {
 	    stats = stats_keep;
 	    if ( ResultTarget != CurrInst.TV ) {
 	      chopped_to_instance( TrainLearnWords );
-	      if ( !IBAdd( CurrInst ) ){
+	      if ( !InstanceBase->AddInstance( CurrInst ) ){
 		Warning( "deviating exemplar weight in line #" + 
 			 toString<int>(stats.totalLines() ) + ":\n" +
 			 Buffer + "\nIgnoring the new weight" );
@@ -2070,7 +2177,9 @@ namespace Timbl {
       bool go_on = true;
       while( go_on ){ 
 	// The next Instance to store. 
+	//	cerr << "line at pos " << cur_pos << " : " << Buffer << endl;
 	chopped_to_instance( TrainWords );
+	//	cerr << "gives Instance " << &CurrInst << endl;
 	FeatureValue *fv0 = CurrInst.FV[0];
 	FeatureValue *fv1 = CurrInst.FV[1];
 	pair<FeatureValue*,streamsize> fsPair = make_pair( fv1, cur_pos );

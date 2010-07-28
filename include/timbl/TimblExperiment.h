@@ -239,6 +239,11 @@ namespace Timbl {
     const TargetValue *classifyString( const std::string& , double& );
   }; 
 
+  std::ostream& operator<< ( std::ostream&,
+			     const TimblExperiment::featureMultiIndex& );
+  std::ostream& operator<< ( std::ostream&, 
+			     const TimblExperiment::MultiIndex& );
+
   class IB1_Experiment: public TimblExperiment {
   public:
     IB1_Experiment( const size_t N = DEFAULT_MAX_FEATS, 

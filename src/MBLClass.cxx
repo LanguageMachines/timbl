@@ -275,7 +275,7 @@ namespace Timbl {
       err_count = 0;
       MBL_init = false;
       need_all_weights = false;
-      InstanceBase = m.InstanceBase->Clone();
+      InstanceBase = m.InstanceBase->Copy();
       TargetStrings = m.TargetStrings;
       FeatureStrings = m.FeatureStrings;
       effective_feats = m.effective_feats;

@@ -46,11 +46,6 @@ using namespace std;
 
 namespace Timbl {
 
-  bool MBLClass::IBAdd( const Instance& I ){ 
-    MBL_init = false;
-    return InstanceBase->AddInstance( I );
-  }
-
   bool MBLClass::HideInstance( const Instance& Inst ){
     bool result = true;
     InstanceBase->RemoveInstance( Inst );

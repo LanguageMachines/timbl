@@ -104,7 +104,6 @@ namespace Timbl {
     void addToNeighborSet( neighborSet& ns, size_t n ) const;
     double getBestDistance() const;
     WValueDistribution *getBestDistribution( unsigned int =0 );
-    bool IBAdd( const Instance& );
     IB_Stat IBStatus() const;
     bool get_ranges( const std::string& );
     bool get_IB_Info( std::istream&, bool&, int&, bool&, std::string& );

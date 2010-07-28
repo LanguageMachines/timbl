@@ -1012,9 +1012,12 @@ namespace Timbl {
     delete WTop;
   }
   
-  IB_InstanceBase *IB_InstanceBase::Clone() const {
-    IB_InstanceBase *result =
-      new IB_InstanceBase( Depth, ibCount, Random );
+  IB_InstanceBase *IB_InstanceBase::clone() const {
+    return new IB_InstanceBase( Depth, ibCount, Random );
+  }
+  
+  IB_InstanceBase *IB_InstanceBase::Copy() const {
+    IB_InstanceBase *result = clone();
     result->DefAss = DefAss;
     result->DefaultsValid = DefaultsValid;
     result->NumOfTails = NumOfTails; // only usefull for Server???
@@ -1024,10 +1027,13 @@ namespace Timbl {
     return result;
   }
   
-  IG_InstanceBase *IG_InstanceBase::Clone() const {
-    IG_InstanceBase *result =
-      new IG_InstanceBase( Depth, ibCount, 
-			   Random, Pruned, PersistentDistributions );
+  IG_InstanceBase *IG_InstanceBase::clone() const {
+    return new IG_InstanceBase( Depth, ibCount, 
+				Random, Pruned, PersistentDistributions );
+  }
+  
+  IG_InstanceBase *IG_InstanceBase::Copy() const {
+    IG_InstanceBase *result = clone();
     result->Pruned = Pruned;
     result->DefAss = DefAss;
     result->DefaultsValid = DefaultsValid;
@@ -1064,10 +1070,13 @@ namespace Timbl {
     }
   }
 
-  TRIBL_InstanceBase *TRIBL_InstanceBase::Clone() const {
-    TRIBL_InstanceBase *result =
-      new TRIBL_InstanceBase( Depth, ibCount, 
-			      Random, PersistentDistributions );
+  TRIBL_InstanceBase *TRIBL_InstanceBase::clone() const {
+    return new TRIBL_InstanceBase( Depth, ibCount, 
+				   Random, PersistentDistributions );
+  }
+
+  TRIBL_InstanceBase *TRIBL_InstanceBase::Copy() const {
+    TRIBL_InstanceBase *result = clone();
     result->Treshold = Treshold;
     result->DefAss = DefAss;
     result->DefaultsValid = DefaultsValid;
@@ -1078,10 +1087,13 @@ namespace Timbl {
     return result;
   }
   
-  TRIBL2_InstanceBase *TRIBL2_InstanceBase::Clone() const {
-    TRIBL2_InstanceBase *result =
-      new TRIBL2_InstanceBase( Depth, ibCount,
-			       Random, PersistentDistributions );
+  TRIBL2_InstanceBase *TRIBL2_InstanceBase::clone() const {
+    return new TRIBL2_InstanceBase( Depth, ibCount,
+				    Random, PersistentDistributions );
+  }
+
+  TRIBL2_InstanceBase *TRIBL2_InstanceBase::Copy() const {
+    TRIBL2_InstanceBase *result = clone();
     result->DefAss = DefAss;
     result->DefaultsValid = DefaultsValid;
     result->NumOfTails = NumOfTails; // only usefull for Server???
@@ -1236,9 +1248,66 @@ namespace Timbl {
   }
 
 
-  bool InstanceBase_base::MergeSub( InstanceBase_base * ){
-    FatalError( "Merge" );
-    return false;
+  bool InstanceBase_base::MergeSub( InstanceBase_base *ib ){
+    if ( ib->InstBase ){
+      IBtree *ibPnt = ib->InstBase;
+      while( ibPnt ){
+	IBtree *ibPntNext = ibPnt->next;
+	ibPnt->next = 0;
+	FeatureValue *fv = ibPnt->FValue;
+	if ( InstBase ){
+	  IBtree **pnt = &InstBase;
+	  if ( (*pnt)->FValue->Index() < fv->Index() ){
+	    FatalError( "MergeSub assumes sorted additions!" );
+	    return false;
+	  }
+	  if ( (*pnt)->FValue->Index() == fv->Index() ){
+	    // this may happen 
+	    // snip the link and insert at our link
+	    IBtree *snip = ibPnt->link;
+	    ibPnt->link = 0;
+	    delete ibPnt->TDistribution;
+	    ibPnt->TDistribution = 0;
+	    --ib->ibCount;
+	    delete ibPnt;
+	    while ( snip ){
+	      if ( PersistentDistributions )
+		(*pnt)->TDistribution->Merge( *snip->TDistribution ); 
+	      else
+		delete snip->TDistribution;
+	      IBtree **tmp = &(*pnt)->link;
+	      while ( *tmp && (*tmp)->FValue->Index() < snip->FValue->Index() ){
+		tmp = &(*tmp)->next;
+	      }
+	      IBtree *nxt = snip->next;
+	      snip->next = 0;
+	      if ( *tmp ){
+		if( (*tmp)->FValue->Index() == snip->FValue->Index() ){
+		  return false;
+		}
+		snip->next = *tmp;
+	      }
+	      *tmp = snip;
+	      snip = nxt;
+	    }
+	  }
+	  else {
+	    ibPnt->next = *pnt;
+	    *pnt = ibPnt;
+	  }
+	}
+	else {
+	  InstBase = ibPnt;
+	}
+	ibPnt = ibPntNext;
+      }
+    }
+    NumOfTails += ib->NumOfTails;
+    TopDistribution->Merge( *ib->TopDistribution );
+    DefaultsValid = false;
+    DefAss = false;
+    ib->InstBase = 0;
+    return true;
   }  
 
   void IBtree::cleanDistributions() {
