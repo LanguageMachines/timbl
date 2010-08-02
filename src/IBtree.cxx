@@ -979,7 +979,8 @@ namespace Timbl {
     TopDistribution( new ValueDistribution ),
     WTop( 0 ),
     TopT( 0 ),
-    InstBase( NULL ),
+    InstBase( 0 ),
+    LastInstBasePos( 0 ),
     RestartSearch( new const IBtree *[depth] ),
     SkipSearch( new const IBtree *[depth] ),
     InstPath( new const IBtree *[depth] ),
@@ -1022,6 +1023,7 @@ namespace Timbl {
     result->DefaultsValid = DefaultsValid;
     result->NumOfTails = NumOfTails; // only usefull for Server???
     result->InstBase = InstBase;
+    result->LastInstBasePos = LastInstBasePos;
     delete result->TopDistribution;
     result->TopDistribution = TopDistribution;
     return result;
@@ -1039,6 +1041,7 @@ namespace Timbl {
     result->DefaultsValid = DefaultsValid;
     result->NumOfTails = NumOfTails; // only usefull for Server???
     result->InstBase = InstBase;
+    result->LastInstBasePos = LastInstBasePos;
     delete result->TopDistribution;
     result->TopDistribution = TopDistribution;
     return result;
@@ -1082,6 +1085,7 @@ namespace Timbl {
     result->DefaultsValid = DefaultsValid;
     result->NumOfTails = NumOfTails; // only usefull for Server???
     result->InstBase = InstBase;
+    result->LastInstBasePos = LastInstBasePos;
     delete result->TopDistribution;
     result->TopDistribution = TopDistribution;
     return result;
@@ -1098,6 +1102,7 @@ namespace Timbl {
     result->DefaultsValid = DefaultsValid;
     result->NumOfTails = NumOfTails; // only usefull for Server???
     result->InstBase = InstBase;
+    result->LastInstBasePos = LastInstBasePos;
     delete result->TopDistribution;
     result->TopDistribution = TopDistribution;
     return result;
@@ -1219,12 +1224,17 @@ namespace Timbl {
 	++ibCount;
 	pnt = &((*pnt)->link);
       }
+      LastInstBasePos = InstBase;
+      //      cerr << "LastInstBasePos at start:\n" << LastInstBasePos << endl;
     }
     else {
       for ( unsigned int i = 0; i < Depth; ++i ){
 	hlp = (*pnt)->add_feat_val( Inst.FV[i], pnt, ibCount );
+	if ( i==0 && hlp->next == 0 )
+	  LastInstBasePos = hlp;
 	pnt = &(hlp->link);
       }
+      //      cerr << "LastInstBasePos after add:\n" << LastInstBasePos << endl;
     }
     if ( *pnt == NULL ){
       *pnt = new IBtree();
@@ -1258,16 +1268,12 @@ namespace Timbl {
       }
       else {
 	IBtree *ibPnt = ib->InstBase;
-	IBtree **tmp = &(ibPnt->next);
-	while ( *tmp ){
-	  tmp = &(*tmp)->next;
-	}
-	if ( *tmp && (*tmp)->FValue->Index() >= InstBase->FValue->Index() ){
+	if ( ib->LastInstBasePos->FValue->Index() >= InstBase->FValue->Index() ){
 	  FatalError( "confused indices in MergeSub !" );
 	  return false;
 	}
 	else {
-	  *tmp = InstBase;
+	  ib->LastInstBasePos->next = InstBase;
 	  InstBase = ibPnt;
 	}
       }

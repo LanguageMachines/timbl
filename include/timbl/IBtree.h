@@ -157,6 +157,7 @@ namespace Timbl {
     FI_map fast_index;
     bool tiedTop;
     IBtree *InstBase;
+    IBtree *LastInstBasePos;
     const IBtree **RestartSearch;
     const IBtree **SkipSearch;
     const IBtree **InstPath;
