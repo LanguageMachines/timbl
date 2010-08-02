@@ -1250,62 +1250,35 @@ namespace Timbl {
 
   bool InstanceBase_base::MergeSub( InstanceBase_base *ib ){
     if ( ib->InstBase ){
-      IBtree *ibPnt = ib->InstBase;
-      while( ibPnt ){
-	IBtree *ibPntNext = ibPnt->next;
-	ibPnt->next = 0;
-	FeatureValue *fv = ibPnt->FValue;
-	if ( InstBase ){
-	  IBtree **pnt = &InstBase;
-	  if ( (*pnt)->FValue->Index() < fv->Index() ){
-	    FatalError( "MergeSub assumes sorted additions!" );
-	    return false;
-	  }
-	  if ( (*pnt)->FValue->Index() == fv->Index() ){
-	    // this may happen 
-	    // snip the link and insert at our link
-	    IBtree *snip = ibPnt->link;
-	    ibPnt->link = 0;
-	    delete ibPnt->TDistribution;
-	    ibPnt->TDistribution = 0;
-	    --ib->ibCount;
-	    delete ibPnt;
-	    while ( snip ){
-	      if ( PersistentDistributions )
-		(*pnt)->TDistribution->Merge( *snip->TDistribution ); 
-	      else
-		delete snip->TDistribution;
-	      IBtree **tmp = &(*pnt)->link;
-	      while ( *tmp && (*tmp)->FValue->Index() < snip->FValue->Index() ){
-		tmp = &(*tmp)->next;
-	      }
-	      IBtree *nxt = snip->next;
-	      snip->next = 0;
-	      if ( *tmp ){
-		if( (*tmp)->FValue->Index() == snip->FValue->Index() ){
-		  return false;
-		}
-		snip->next = *tmp;
-	      }
-	      *tmp = snip;
-	      snip = nxt;
-	    }
-	  }
-	  else {
-	    ibPnt->next = *pnt;
-	    *pnt = ibPnt;
-	  }
+      // we place the InstanceBase of ib in front of the current InstanceBase
+      // the assumption is that both are sorted on ascending index, and that 
+      // the idices in ib are all smaller then those in inte current IB
+      if ( !InstBase ){
+	InstBase = ib->InstBase;
+      }
+      else {
+	IBtree *ibPnt = ib->InstBase;
+	IBtree **tmp = &(ibPnt->next);
+	while ( *tmp ){
+	  tmp = &(*tmp)->next;
+	}
+	if ( *tmp && (*tmp)->FValue->Index() >= InstBase->FValue->Index() ){
+	  FatalError( "confused indices in MergeSub !" );
+	  return false;
 	}
 	else {
+	  *tmp = InstBase;
 	  InstBase = ibPnt;
 	}
-	ibPnt = ibPntNext;
       }
+    }
+    else {
+      Warning( "adding empty instancebase?" );
     }
     NumOfTails += ib->NumOfTails;
     TopDistribution->Merge( *ib->TopDistribution );
     DefaultsValid = false;
-    DefAss = false;
+    DefAss = true;
     ib->InstBase = 0;
     return true;
   }  

@@ -65,6 +65,22 @@ namespace Timbl {
     std::string topCache;
     std::string resultCache;
   };
+
+  typedef std::multimap<FeatureValue*,std::streamsize > MultiIndex;
+  class fCmp {
+  public:
+    bool operator()( const FeatureValue* F, const FeatureValue* G ) const{
+      return F->Index() > G->Index();
+    }
+  };  
+  typedef std::map<FeatureValue*, MultiIndex, fCmp > featureMultiIndex;
+  std::ostream& operator<< ( std::ostream&, const featureMultiIndex& );
+  std::ostream& operator<< ( std::ostream&, const MultiIndex& );
+  void compressIndex( const featureMultiIndex&,
+		      featureMultiIndex& res, 
+		      unsigned int );
+  typedef std::multimap<FeatureValue*, std::streamsize, fCmp > featureIndex;
+  std::ostream& operator<< ( std::ostream&, const featureIndex& );
   
   class TimblExperiment: public MBLClass {
     friend class TimblAPI;
@@ -202,20 +218,8 @@ namespace Timbl {
     void show_metric_info( std::ostream& os ) const;
     double sum_remaining_weights( size_t ) const;
 
-    class fCmp {
-    public:
-      bool operator()( const FeatureValue* F, const FeatureValue* G ) const{
-	return F->Index() > G->Index();
-      }
-    };  
+    bool build_file_index( const std::string&, featureIndex&  );
 
-    typedef std::multimap<FeatureValue*,std::streamsize > MultiIndex;
-    typedef std::map<FeatureValue*, MultiIndex, fCmp > featureMultiIndex;
-    friend std::ostream& operator<< ( std::ostream&, const featureMultiIndex& );
-    friend std::ostream& operator<< ( std::ostream&, const MultiIndex& );
-    bool build_file_index( const std::string&, featureMultiIndex&  );
-    void compressIndex( const featureMultiIndex&, featureMultiIndex& );
-    
     bool Initialized;
     GetOptClass *OptParams;
     AlgorithmType algorithm;
@@ -238,11 +242,6 @@ namespace Timbl {
     int estimate;
     const TargetValue *classifyString( const std::string& , double& );
   }; 
-
-  std::ostream& operator<< ( std::ostream&,
-			     const TimblExperiment::featureMultiIndex& );
-  std::ostream& operator<< ( std::ostream&, 
-			     const TimblExperiment::MultiIndex& );
 
   class IB1_Experiment: public TimblExperiment {
   public:
@@ -395,6 +394,7 @@ namespace Timbl {
     void showTestingInfo( std::ostream& );
     bool checkLine( const std::string& );
     bool sanityCheck() const;
+    bool build_file_multi_index( const std::string&, featureMultiIndex&  );
     const TargetValue *LocalClassify( const Instance&,
 				      double&,
 				      bool& );

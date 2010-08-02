@@ -82,7 +82,138 @@ namespace Timbl {
     else
       return false;
   }
+
+  void compressIndex( const featureMultiIndex& fmIndex,
+		      featureMultiIndex& res, 
+		      unsigned int offset ){
+    res.clear();
+    featureMultiIndex::const_iterator fmIt = fmIndex.begin();
+    while ( fmIt != fmIndex.end() ){
+      if ( fmIt->second.size() < offset ){
+	res[fmIt->first] = fmIt->second;
+      }
+      else {
+	MultiIndex out;
+	typedef MultiIndex::const_iterator Mit;
+	Mit mit = fmIt->second.begin();
+	FeatureValue *fv = 0;
+	size_t totalCnt = 0;
+	while ( mit != fmIt->second.end() ){
+	  pair<Mit,Mit> range = fmIt->second.equal_range( mit->first );
+	  size_t cnt = fmIt->second.count( mit->first );
+	  if ( cnt > offset ){
+	    res[fmIt->first].insert( range.first, range.second );
+	  }
+	  else {
+	    if ( !fv )
+	      fv = mit->first;
+	    for ( Mit rit=range.first; rit != range.second; ++rit)
+	      out.insert( make_pair(fv, rit->second ) );
+	    totalCnt += cnt;
+	    if ( totalCnt > offset ){
+	      fv = 0;
+	      totalCnt = 0;
+	      res[fmIt->first].insert( out.begin(), out.end() );
+	      out.clear();
+	    }
+	  }
+	  mit = range.second;
+	}
+	if ( !out.empty() ){
+	  res[fmIt->first].insert( out.begin(), out.end() );
+	}
+      }
+      ++fmIt;
+    }
+  }
+
+  ostream& operator<< ( ostream& os, 
+			const MultiIndex& mi ){
+    MultiIndex::const_iterator mIt = mi.begin();
+    while ( mIt != mi.end() ){
+      os << "<";
+      os << mIt->first << "," << mIt->second;
+	os << ">";
+      ++mIt;
+    }
+    return os;
+  }
+
+  ostream& operator<< ( ostream& os, 
+			const featureMultiIndex& fmi ){
+    os << "[";
+    featureMultiIndex::const_iterator fmIt = fmi.begin();
+    while ( fmIt != fmi.end() ){
+      os << fmIt->first << " " << fmIt->second << endl;
+      ++fmIt;
+    }
+    os << "]";
+    return os;
+  }  
     
+  bool IG_Experiment::build_file_multi_index( const string& file_name, 
+					      featureMultiIndex& fmIndex ){
+    bool result = true;
+    string Buffer;
+    stats.clear();
+    size_t cur_pos = 0;
+    // Open the file.
+    //
+    ifstream datafile( file_name.c_str(), ios::in);
+    if ( InputFormat() == ARFF )
+      skipARFFHeader( datafile );
+    cur_pos = datafile.tellg();
+    if ( !nextLine( datafile, Buffer ) ){
+      Error( "cannot start learning from in: " + file_name );
+      result = false;    // No more input
+    }
+    else if ( !chopLine( Buffer ) ){
+      Error( "no useful data in: " + file_name );
+      result = false;    // No more input
+    }
+    else {
+      if ( !Verbosity(SILENT) ) {
+	Info( "Phase 2: Building multi index on Datafile: " + file_name );
+	time_stamp( "Start:     ", 0 );
+      }
+      bool found;
+      bool go_on = true;
+      while( go_on ){ 
+	// The next Instance to store. 
+	//	cerr << "line at pos " << cur_pos << " : " << Buffer << endl;
+	chopped_to_instance( TrainWords );
+	//	cerr << "gives Instance " << &CurrInst << endl;
+	FeatureValue *fv0 = CurrInst.FV[0];
+	FeatureValue *fv1 = CurrInst.FV[1];
+	pair<FeatureValue*,streamsize> fsPair = make_pair( fv1, cur_pos );
+	featureMultiIndex::iterator it = fmIndex.find( fv0 );
+	if ( it != fmIndex.end() )
+	  it->second.insert( fsPair );
+	else {
+	  MultiIndex mi;
+	  mi.insert( fsPair );
+	  fmIndex[fv0] = mi;
+	}
+	if ((stats.dataLines() % Progress() ) == 0) 
+	  time_stamp( "Indexing:  ", stats.dataLines() );
+	found = false;
+	while ( !found && 
+		( cur_pos = datafile.tellg(),
+		  nextLine( datafile, Buffer ) ) ){
+	  found = chopLine( Buffer );
+	  if ( !found ){
+	    Warning( "datafile, skipped line #" + 
+		     toString<int>( stats.totalLines() ) +
+		     "\n" + Buffer );
+	  }
+	}
+	go_on = found;
+      }
+      time_stamp( "Finished:  ", stats.dataLines() );
+    }
+    return result;
+  }
+
   bool IG_Experiment::Learn( const string& FileName ){
     bool result = true;
 //     Common::Timer mergeT;
@@ -126,7 +257,7 @@ namespace Timbl {
       featureMultiIndex fmIndexRaw;
       //      Common::Timer t;
       //      t.start();
-      result = build_file_index( CurrentDataFile, fmIndexRaw );
+      result = build_file_multi_index( CurrentDataFile, fmIndexRaw );
       //      t.stop();
       //      cerr << "indexing took " << t << endl;
       //      totalT.start();
@@ -135,7 +266,7 @@ namespace Timbl {
 	//	Common::Timer t;
 	//	t.start();
 	//	cerr << "compressing index " << fmIndexRaw << endl;
-	compressIndex( fmIndexRaw, fmIndex );
+	compressIndex( fmIndexRaw, fmIndex, igOffset() );
 	//	cerr << "resulting index " << fmIndex << endl;
 	//	t.stop();
 	//	cerr << "compressing took " << t << endl;
