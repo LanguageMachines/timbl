@@ -1262,7 +1262,7 @@ namespace Timbl {
     if ( ib->InstBase ){
       // we place the InstanceBase of ib in front of the current InstanceBase
       // the assumption is that both are sorted on ascending index, and that 
-      // the idices in ib are all smaller then those in inte current IB
+      // the indices in ib are all smaller then those in the current IB
       if ( !InstBase ){
 	InstBase = ib->InstBase;
       }
@@ -1284,7 +1284,7 @@ namespace Timbl {
     NumOfTails += ib->NumOfTails;
     TopDistribution->Merge( *ib->TopDistribution );
     DefaultsValid = false;
-    DefAss = true;
+    DefAss = false;
     ib->InstBase = 0;
     return true;
   }  
@@ -1305,12 +1305,15 @@ namespace Timbl {
       if ( !PersistentDistributions ){
 	ib->InstBase->cleanDistributions();
       }
-      IBtree *ibPnt = ib->InstBase;
-      while( ibPnt ){
-	IBtree *ibPntNext = ibPnt->next;
-	ibPnt->next = 0;
-	FeatureValue *fv = ibPnt->FValue;
-	if ( InstBase ){
+      if ( !InstBase ){
+	InstBase = ib->InstBase;
+      }
+      else {
+	IBtree *ibPnt = ib->InstBase;
+	while( ibPnt ){
+	  IBtree *ibPntNext = ibPnt->next;
+	  ibPnt->next = 0;
+	  FeatureValue *fv = ibPnt->FValue;
 	  IBtree **pnt = &InstBase;
 	  if ( (*pnt)->FValue->Index() < fv->Index() ){
 	    FatalError( "MergeSub assumes sorted additions!" );
@@ -1350,11 +1353,8 @@ namespace Timbl {
 	    ibPnt->next = *pnt;
 	    *pnt = ibPnt;
 	  }
+	  ibPnt = ibPntNext;
 	}
-	else {
-	  InstBase = ibPnt;
-	}
-	ibPnt = ibPntNext;
       }
     }
     NumOfTails += ib->NumOfTails;

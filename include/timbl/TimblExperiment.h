@@ -28,6 +28,7 @@
 #define TIMBLEXP_H
 
 #include <fstream>
+#include <set>
 #include "timbl/XMLtools.h"
 #include "timbl/BestArray.h"
 #include "timbl/Statistics.h"
@@ -66,22 +67,24 @@ namespace Timbl {
     std::string resultCache;
   };
 
-  typedef std::multimap<FeatureValue*,std::streamsize > MultiIndex;
   class fCmp {
   public:
     bool operator()( const FeatureValue* F, const FeatureValue* G ) const{
       return F->Index() > G->Index();
     }
   };  
-  typedef std::map<FeatureValue*, MultiIndex, fCmp > featureMultiIndex;
-  std::ostream& operator<< ( std::ostream&, const featureMultiIndex& );
-  std::ostream& operator<< ( std::ostream&, const MultiIndex& );
-  void compressIndex( const featureMultiIndex&,
-		      featureMultiIndex& res, 
+
+  typedef std::map<FeatureValue*,std::set<std::streamsize>, fCmp> fileIndex;
+  typedef std::multimap<FeatureValue*,std::streamsize, fCmp> fileMultiIndex;
+  typedef std::map<FeatureValue*, fileMultiIndex, fCmp > featureFileMultiIndex;
+  std::ostream& operator<< ( std::ostream&, const fileIndex& );
+  std::ostream& operator<< ( std::ostream&, const featureFileMultiIndex& );
+  std::ostream& operator<< ( std::ostream&, const fileMultiIndex& );
+  void compressIndex( const featureFileMultiIndex&,
+		      featureFileMultiIndex& res, 
 		      unsigned int );
-  typedef std::multimap<FeatureValue*, std::streamsize, fCmp > featureIndex;
-  std::ostream& operator<< ( std::ostream&, const featureIndex& );
-  
+
+
   class TimblExperiment: public MBLClass {
     friend class TimblAPI;
   public:
@@ -218,7 +221,8 @@ namespace Timbl {
     void show_metric_info( std::ostream& os ) const;
     double sum_remaining_weights( size_t ) const;
 
-    bool build_file_index( const std::string&, featureIndex&  );
+    bool build_file_index( const std::string&, fileIndex&  );
+    bool build_file_multi_index( const std::string&, featureFileMultiIndex&  );
 
     bool Initialized;
     GetOptClass *OptParams;
@@ -394,7 +398,6 @@ namespace Timbl {
     void showTestingInfo( std::ostream& );
     bool checkLine( const std::string& );
     bool sanityCheck() const;
-    bool build_file_multi_index( const std::string&, featureMultiIndex&  );
     const TargetValue *LocalClassify( const Instance&,
 				      double&,
 				      bool& );
