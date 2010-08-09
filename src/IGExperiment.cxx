@@ -177,15 +177,25 @@ namespace Timbl {
 	time_stamp( "Start:     ", 0 );
       }
       bool found;
+#ifdef NEWINDEX
+      unsigned int nextPos = 0;
+#endif
       bool go_on = true;
       while( go_on ){ 
 	// The next Instance to store. 
 	//	cerr << "line at pos " << cur_pos << " : " << Buffer << endl;
 	chopped_to_instance( TrainWords );
 	//	cerr << "gives Instance " << &CurrInst << endl;
+#ifdef NEWINDEX
+	instances.push_back( CurrInst );
+#endif
 	FeatureValue *fv0 = CurrInst.FV[0];
 	FeatureValue *fv1 = CurrInst.FV[1];
+#ifdef NEWINDEX
+	pair<FeatureValue*,unsigned int> fsPair = make_pair( fv1, nextPos++ );
+#else
 	pair<FeatureValue*,streamsize> fsPair = make_pair( fv1, cur_pos );
+#endif
 	featureFileMultiIndex::iterator it = fmIndex.find( fv0 );
 	if ( it != fmIndex.end() )
 	  it->second.insert( fsPair );
@@ -274,9 +284,12 @@ namespace Timbl {
 	  IG_InstanceBase *PartInstanceBase = 0;
 	  TargetValue *TopTarget = Targets->MajorityClass();
 	  //	  cerr << "MAJORITY CLASS = " << TopTarget << endl;
+#ifdef NEWINDEX
+#else
 	  // Open the file.
 	  //
 	  ifstream datafile( CurrentDataFile.c_str(), ios::in);
+#endif
 	  //
 	  fileIndex::const_iterator it = fmIndex.begin();
 	  unsigned int totalDone = 0;
@@ -308,6 +321,8 @@ namespace Timbl {
 	    }
 	    set<streamsize>::const_iterator fit = it->second.begin();
 	    while ( fit != it->second.end() ){
+#ifdef NEWINDEX
+#else
 	      datafile.clear();
 	      datafile.seekg( *fit );
 	      string Buffer;
@@ -318,6 +333,7 @@ namespace Timbl {
 	      if (( stats.dataLines() % Progress() ) == 0) 
 		time_stamp( "Learning:  ", stats.dataLines() );
 	      chopped_to_instance( TrainWords );
+#endif
 	      if ( !PartInstanceBase ){
 		PartInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
 							ibCount,
@@ -325,8 +341,13 @@ namespace Timbl {
 							false, 
 							true );
 	      }
+#ifdef NEWINDEX
+	      //		cerr << "add instance " << &CurrInst << endl;
+	      PartInstanceBase->AddInstance( instances[*fit] );
+#else
 	      //		cerr << "add instance " << &CurrInst << endl;
 	      PartInstanceBase->AddInstance( CurrInst );
+#endif
 	      ++fit;
 	      ++totalDone;
 	    }
@@ -381,9 +402,12 @@ namespace Timbl {
 	  IG_InstanceBase *outInstanceBase = 0;
 	  TargetValue *TopTarget = Targets->MajorityClass();
 	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
+#ifdef NEWINDEX
+#else
 	  // Open the file.
 	  //
 	  ifstream datafile( CurrentDataFile.c_str(), ios::in);
+#endif
 	  //
 	  featureFileMultiIndex::const_iterator it = fmIndex.begin();
 	  while ( it != fmIndex.end() ){
@@ -409,6 +433,8 @@ namespace Timbl {
 		typedef fileMultiIndex::const_iterator mit;
 		pair<mit,mit> b = it->second.equal_range( the2fv );
 		for ( mit i = b.first; i != b.second; ++i ){
+#ifdef NEWINDEX
+#else
 		  datafile.clear();
 		  datafile.seekg( i->second );
 		  nextLine( datafile, Buffer );
@@ -418,6 +444,7 @@ namespace Timbl {
 		  if (( stats.dataLines() % Progress() ) == 0) 
 		    time_stamp( "Learning:  ", stats.dataLines() );
 		  chopped_to_instance( TrainWords );
+#endif
 		  if ( !PartInstanceBase ){
 		    PartInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
 							    ibCount,
@@ -425,8 +452,13 @@ namespace Timbl {
 							    false, 
 							    true );
 		  }
+#ifdef NEWINDEX
+		  //		cerr << "add instance " << &CurrInst << endl;
+		  PartInstanceBase->AddInstance( instances[i->second] );		  
+#else
 		  //		cerr << "add instance " << &CurrInst << endl;
 		  PartInstanceBase->AddInstance( CurrInst );
+#endif
 		}
 		if ( PartInstanceBase ){
 		  //  		cerr << "finished handling secondary feature:" << the2fv << endl;
@@ -474,6 +506,8 @@ namespace Timbl {
 	      //	    cerr << "other case!" << endl;
 	      fileMultiIndex::const_iterator mIt = it->second.begin();
 	      while ( mIt != it->second.end() ){
+#ifdef NEWINDEX
+#else
 		datafile.clear();
 		datafile.seekg( mIt->second );
 		nextLine( datafile, Buffer );
@@ -483,14 +517,20 @@ namespace Timbl {
 		if (( stats.dataLines() % Progress() ) == 0) 
 		  time_stamp( "Learning:  ", stats.dataLines() );
 		chopped_to_instance( TrainWords );
+#endif
 		if ( !outInstanceBase )
 		  outInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
 							 ibCount,
 							 (RandomSeed()>=0), 
 							 false, 
 							 true );
+#ifdef NEWINDEX
+		//	      cerr << "add instance " << &CurrInst << endl;
+		outInstanceBase->AddInstance( instances[mIt->second] );
+#else
 		//	      cerr << "add instance " << &CurrInst << endl;
 		outInstanceBase->AddInstance( CurrInst );
+#endif
 		++mIt;
 	      }
 	      if ( outInstanceBase ){
@@ -519,6 +559,9 @@ namespace Timbl {
 	}
       }
       time_stamp( "Finished:  ", stats.dataLines() );
+#ifdef NEWINDEX
+      instances.clear();
+#endif
       learnT.stop();
       if ( !Verbosity(SILENT) ){
 	IBInfo( *mylog );

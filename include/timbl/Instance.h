@@ -339,8 +339,6 @@ namespace Timbl {
     TargetValue *TV;
   private:
     double sample_weight; // relative weight
-    Instance( const Instance& );
-    Instance& operator=( const Instance& );
   };
   
 }

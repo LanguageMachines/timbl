@@ -34,6 +34,8 @@
 #include "timbl/Statistics.h"
 #include "timbl/MBLClass.h"
 
+//#define NEWINDEX
+
 namespace Timbl {
 
   class TimblAPI;
@@ -236,6 +238,9 @@ namespace Timbl {
     std::ofstream outStream;
     unsigned long ibCount; 
     ConfusionMatrix *confusionInfo;
+#ifdef NEWINDEX
+    std::vector<Instance> instances;
+#endif
     StatisticsClass stats;
     resultStore bestResult;
     size_t match_depth;

@@ -1846,7 +1846,7 @@ namespace Timbl {
   Instance::~Instance(){
     clear();
   }
-  
+
   void Instance::clear(){
     for ( unsigned int i=0; i < FV.size(); ++i ){
       if ( FV[i] ){

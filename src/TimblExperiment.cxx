@@ -498,9 +498,12 @@ namespace Timbl {
 	  InstanceBase_base  *OutInstanceBase = 0;
 	  TargetValue *TopTarget = Targets->MajorityClass();
 	  //	  cerr << "MAJORITY CLASS = " << TopTarget << endl;
+#ifdef NEWINDEX
+#else
 	  // Open the file.
 	  //
 	  ifstream datafile( CurrentDataFile.c_str(), ios::in);
+#endif
 	  //
 	  fileIndex::const_iterator it = fmIndex.begin();
 	  unsigned int totalDone = 0;
@@ -524,6 +527,8 @@ namespace Timbl {
 	    }
 	    set<streamsize>::const_iterator fit = it->second.begin();
 	    while ( fit != it->second.end() ){
+#ifdef NEWINDEX
+#else
 	      datafile.clear();
 	      datafile.seekg( *fit );
 	      string Buffer;
@@ -534,11 +539,16 @@ namespace Timbl {
 	      if (( stats.dataLines() % Progress() ) == 0) 
 		time_stamp( "Learning:  ", stats.dataLines() );
 	      chopped_to_instance( TrainWords );
+#endif
 	      if ( !OutInstanceBase ){
 		OutInstanceBase = InstanceBase->clone();
 	      }
 	      //		cerr << "add instance " << &CurrInst << endl;
+#ifdef NEWINDEX
+	      OutInstanceBase->AddInstance( instances[*fit] );
+#else
 	      OutInstanceBase->AddInstance( CurrInst );
+#endif
 	      ++fit;
 	      ++totalDone;
 	    }
@@ -578,10 +588,13 @@ namespace Timbl {
 	  InstanceBase_base *outInstanceBase = 0;
 	  TargetValue *TopTarget = Targets->MajorityClass();
 	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
+#ifdef NEWINDEX
+#else
 	  // Open the file.
 	  //
 	  ifstream datafile( CurrentDataFile.c_str(), ios::in);
 	  //
+#endif
 	  featureFileMultiIndex::const_iterator mit = fIndex.begin();
 	  unsigned int totalCount = 0;
 	  while ( mit != fIndex.end() ){
@@ -607,6 +620,8 @@ namespace Timbl {
 	    fileMultiIndex::const_iterator sit = mit->second.begin();
 	    while ( sit != mit->second.end() ){
 	      //      cerr << "zoek naar positie " << it->second << endl;
+#ifdef NEWINDEX
+#else
 	      datafile.clear();
 	      datafile.seekg( sit->second );
 	      nextLine( datafile, Buffer );
@@ -616,10 +631,17 @@ namespace Timbl {
 	      if (( stats.dataLines() % Progress() ) == 0) 
 		time_stamp( "Learning:  ", stats.dataLines() );
 	      chopped_to_instance( TrainWords );
+#endif
 	      if ( !outInstanceBase )
 		outInstanceBase = InstanceBase->clone();
 	      //	      cerr << "add instance " << &CurrInst << endl;
+#ifdef NEWINDEX
+	      //	      cerr << "add instance " << &instances[sit->second] << endl;
+	      if ( !outInstanceBase->AddInstance( instances[sit->second] ) ){
+#else
+	      //	      cerr << "add instance " << &CurrInst << endl;
 	      if ( !outInstanceBase->AddInstance( CurrInst ) ){
+#endif
 		Warning( "deviating exemplar weight in:\n" + 
 			 Buffer + "\nIgnoring the new weight" );
 	      }
@@ -643,6 +665,9 @@ namespace Timbl {
 	}
       }
       time_stamp( "Finished:  ", stats.dataLines() );
+#ifdef NEWINDEX
+      instances.clear();
+#endif
       learnT.stop();
       // cerr << "Endresult " << endl;
       // cerr << InstanceBase << endl;
@@ -2209,6 +2234,9 @@ namespace Timbl {
 	Info( "Phase 2: Building index on Datafile: " + file_name );
 	time_stamp( "Start:     ", 0 );
       }
+#ifdef NEWINDEX
+      unsigned int nextPos = 0;
+#endif
       bool found;
       bool go_on = true;
       while( go_on ){ 
@@ -2216,15 +2244,26 @@ namespace Timbl {
 	//	cerr << "line at pos " << cur_pos << " : " << Buffer << endl;
 	chopped_to_instance( TrainWords );
 	//	cerr << "gives Instance " << &CurrInst << endl;
+#ifdef NEWINDEX
+	instances.push_back( CurrInst );
+#endif
 	FeatureValue *fv0 = CurrInst.FV[0];
 	fileIndex::iterator it = fmIndex.find( fv0 );
 	if ( it == fmIndex.end() ){
 	  set<streamsize> st;
+#ifdef NEWINDEX
+	  st.insert(nextPos++);
+#else
 	  st.insert(cur_pos);
+#endif
 	  fmIndex[fv0] = st;
 	}
 	else {
+#ifdef NEWINDEX
+	  it->second.insert( nextPos++ );
+#else
 	  it->second.insert( cur_pos );
+#endif
 	}
 	if ((stats.dataLines() % Progress() ) == 0) 
 	  time_stamp( "Indexing:  ", stats.dataLines() );
