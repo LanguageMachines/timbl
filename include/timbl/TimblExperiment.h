@@ -34,8 +34,6 @@
 #include "timbl/Statistics.h"
 #include "timbl/MBLClass.h"
 
-//#define NEWINDEX
-
 namespace Timbl {
 
   class TimblAPI;
@@ -93,7 +91,6 @@ namespace Timbl {
     virtual ~TimblExperiment();
     virtual TimblExperiment *clone() const = 0;
     TimblExperiment& operator=( const TimblExperiment& );
-    virtual bool Learn( const std::string& = "" );
     virtual bool Prepare( const std::string& = "" );
     virtual bool CVprepare( const std::string& = "",
 			    WeightType = GR_w,
@@ -117,6 +114,13 @@ namespace Timbl {
     bool WriteInstanceBaseXml( const std::string& );
     bool WriteInstanceBaseLevels( const std::string&, unsigned int );
     bool WriteNamesFile( const std::string& ) const;
+    void DoSpeedTrain( bool b ) { speedTraining = b; };
+    virtual bool Learn( const std::string& s = "" ){
+      if ( speedTraining )
+	return SpeedLearn( s );
+      else
+	return ClassicLearn( s );
+    }
     int Estimate() const { return estimate; };
     void Estimate( int e ){ estimate = e; };
     void setOutPath( const std::string& s ){ outPath = s; };
@@ -192,6 +196,8 @@ namespace Timbl {
   protected:
     TimblExperiment( const AlgorithmType, const std::string& = "" );
     virtual bool checkLine( const std::string& );
+    virtual bool SpeedLearn( const std::string& = "" );
+    virtual bool ClassicLearn( const std::string& = "" );
     virtual const TargetValue *LocalClassify( const Instance& , 
 					      double&,
 					      bool& );
@@ -225,6 +231,8 @@ namespace Timbl {
 
     bool build_file_index( const std::string&, fileIndex&  );
     bool build_file_multi_index( const std::string&, featureFileMultiIndex&  );
+    bool build_speed_index( const std::string&, fileIndex&  );
+    bool build_speed_multi_index( const std::string&, featureFileMultiIndex&  );
 
     bool Initialized;
     GetOptClass *OptParams;
@@ -238,9 +246,7 @@ namespace Timbl {
     std::ofstream outStream;
     unsigned long ibCount; 
     ConfusionMatrix *confusionInfo;
-#ifdef NEWINDEX
     std::vector<Instance> instances;
-#endif
     StatisticsClass stats;
     resultStore bestResult;
     size_t match_depth;
@@ -249,6 +255,7 @@ namespace Timbl {
   private:
     TimblExperiment( const TimblExperiment& );
     int estimate;
+    bool speedTraining;
     const TargetValue *classifyString( const std::string& , double& );
   }; 
 
@@ -390,7 +397,6 @@ namespace Timbl {
     TimblExperiment( IGTREE_a, s ) { 
       if ( init ) InitClass( N );
     };
-    bool Learn( const std::string& f = "" );
     AlgorithmType Algorithm() const { return IGTREE_a; };
     void InitInstanceBase();
     bool WriteInstanceBase( const std::string& );
@@ -399,6 +405,8 @@ namespace Timbl {
   protected:
     TimblExperiment *clone() const { 
       return new IG_Experiment( MaxFeats(), "", false ); };
+    bool SpeedLearn( const std::string& = "" );
+    bool ClassicLearn( const std::string& = "" );
     bool checkTestFile();
     void showTestingInfo( std::ostream& );
     bool checkLine( const std::string& );

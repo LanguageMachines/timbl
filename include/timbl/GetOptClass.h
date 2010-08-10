@@ -92,6 +92,7 @@ namespace Timbl {
     bool do_silly;
     bool do_diversify;
     bool do_daemon;
+    bool do_speed_train;
     std::vector<MetricType>metricsArray;
     std::ostream *parent_socket_os;
     std::string inPath;

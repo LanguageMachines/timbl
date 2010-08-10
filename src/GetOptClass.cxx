@@ -78,6 +78,7 @@ namespace Timbl {
     do_sloppy_loo = false;
     do_silly = false;
     do_diversify = false;
+    do_speed_train = false;
     if ( MaxFeats == -1 ){
       MaxFeats = Max;
       LocalInputFormat = UnknownInputFormat; // InputFormat and verbosity
@@ -160,6 +161,7 @@ namespace Timbl {
     do_sloppy_loo( false ),
     do_silly( in.do_silly ),
     do_diversify( in.do_diversify ),
+    do_speed_train( in.do_speed_train ),
     metricsArray( in.metricsArray ),
     parent_socket_os( in.parent_socket_os ),
     outPath( in.outPath ),
@@ -279,6 +281,10 @@ namespace Timbl {
 	  Exp->setOutPath( outPath );
 	}
       }
+      if ( do_speed_train )
+	Exp->DoSpeedTrain( true );
+      else
+	Exp->DoSpeedTrain( false );
       if ( estimate < 10 )
 	Exp->Estimate( 0 );
       else
@@ -972,6 +978,16 @@ namespace Timbl {
 	    return false;
 	  }
 	  do_sloppy_loo = ( up=="TRUE" || up=="YES" );
+	}
+	else if ( long_option == "speedtrain" ){
+	  string up = myoptarg;
+	  uppercase(up);
+	  if ( !isBool(up) ){
+	    Error( "invalid value for " + long_option + ": '" 
+		   + myoptarg + "'" );
+	    return false;
+	  }
+	  do_speed_train = ( up=="TRUE" || up=="YES" );
 	}
 	else if ( long_option == "silly" ){
 	  string up = myoptarg;
