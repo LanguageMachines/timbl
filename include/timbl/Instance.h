@@ -336,6 +336,7 @@ namespace Timbl {
     void ExemplarWeight( const double sw ){ sample_weight = sw; }; 
     size_t size(){ return FV.size(); };
     std::vector<FeatureValue *> FV;
+    void permute( const std::vector<size_t> );
     TargetValue *TV;
   private:
     double sample_weight; // relative weight

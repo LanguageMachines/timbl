@@ -150,7 +150,6 @@ namespace Timbl {
     os << "]";
     return os;
   }  
-    
 
   bool IG_Experiment::SpeedLearn( const string& FileName ){
     bool result = true;
@@ -199,7 +198,7 @@ namespace Timbl {
 	fileIndex fmIndex;
 	//      Common::Timer t;
 	//      t.start();
-	result = build_file_index( CurrentDataFile, fmIndex );
+	result = build_speed_index( fmIndex );
 	//      t.stop();
 	//      cerr << "indexing took " << t << endl;
 	//      totalT.start();
@@ -252,7 +251,9 @@ namespace Timbl {
 							true );
 	      }
 	      //		cerr << "add instance " << &CurrInst << endl;
-	      PartInstanceBase->AddInstance( instances[*fit] );
+	      Instance tmp = instances[*fit]; 
+	      tmp.permute( permutation );
+	      PartInstanceBase->AddInstance( tmp );
 	      ++fit;
 	      ++partialDone;
 	      ++totalDone;
@@ -285,7 +286,7 @@ namespace Timbl {
 	featureFileMultiIndex fmIndexRaw;
 	//      Common::Timer t;
 	//      t.start();
-	result = build_file_multi_index( CurrentDataFile, fmIndexRaw );
+	result = build_speed_multi_index( fmIndexRaw );
 	//      t.stop();
 	//      cerr << "indexing took " << t << endl;
 	//      totalT.start();
@@ -342,7 +343,9 @@ namespace Timbl {
 							    true );
 		  }
 		  //		cerr << "add instance " << &CurrInst << endl;
-		  PartInstanceBase->AddInstance( instances[i->second] );
+		  Instance tmp =  instances[i->second];
+		  tmp.permute( permutation );
+		  PartInstanceBase->AddInstance( tmp );
 		  ++totalDone;
 		}
 		if ( PartInstanceBase ){
@@ -402,7 +405,9 @@ namespace Timbl {
 							 false, 
 							 true );
 		//	      cerr << "add instance " << &CurrInst << endl;
-		outInstanceBase->AddInstance( instances[mIt->second] );
+		Instance tmp =  instances[mIt->second];
+		tmp.permute( permutation );
+		outInstanceBase->AddInstance( tmp );
 		++totalDone;
 		++mIt;
 	      }

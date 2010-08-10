@@ -231,8 +231,8 @@ namespace Timbl {
 
     bool build_file_index( const std::string&, fileIndex&  );
     bool build_file_multi_index( const std::string&, featureFileMultiIndex&  );
-    bool build_speed_index( const std::string&, fileIndex&  );
-    bool build_speed_multi_index( const std::string&, featureFileMultiIndex&  );
+    bool build_speed_index( fileIndex&  );
+    bool build_speed_multi_index( featureFileMultiIndex&  );
 
     bool Initialized;
     GetOptClass *OptParams;

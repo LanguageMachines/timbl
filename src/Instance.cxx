@@ -1874,5 +1874,15 @@ namespace Timbl {
       os << " Empty Instance";
     return os;
   }
-
+  
+  void Instance::permute( const std::vector<size_t> permutation ){
+    std::vector<FeatureValue *> vals( FV.size(), 0 );
+    for ( size_t i=0; i < FV.size(); ++i ){
+      vals[i] = FV[permutation[i]];
+    }
+    for ( size_t i=0; i < FV.size(); ++i ){
+      FV[i] = vals[i];
+    }
+  }
+  
 }
