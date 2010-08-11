@@ -66,7 +66,7 @@ namespace Timbl {
     IBtree( FeatureValue * );
     ~IBtree();
     IBtree *Reduce( const TargetValue *, unsigned long&, long );
-    inline IBtree *add_feat_val( FeatureValue *, IBtree **, unsigned long& );
+    inline IBtree *add_feat_val( FeatureValue *, unsigned int&, IBtree **, unsigned long& );
     inline ValueDistribution *sum_distributions( bool );
     inline IBtree *make_unique( const TargetValue *, unsigned long& );
     void cleanDistributions();
@@ -144,7 +144,8 @@ namespace Timbl {
     bool PersistentD() const { return PersistentDistributions; };
     unsigned long int nodeCount() const { return ibCount;} ;
     const IBtree *instBase() const { return InstBase; };
-
+    
+    std::vector<unsigned int> mismatch;
   protected:
     bool DefAss;
     bool DefaultsValid;

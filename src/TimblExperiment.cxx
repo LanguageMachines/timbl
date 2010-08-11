@@ -513,6 +513,7 @@ namespace Timbl {
 		return false;
 	      }
 	      else {
+		cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;
 		//		subMergeT.stop();
 		//	cerr << "after Merge: intermediate result" << endl;
 		//		cerr << InstanceBase << endl;
@@ -521,7 +522,7 @@ namespace Timbl {
 		subDone = 0;
 	      }
 	    }
-	    set<streamsize>::const_iterator fit = it->second.begin();
+	    set<long int>::const_iterator fit = it->second.begin();
 	    while ( fit != it->second.end() ){
 	      // Progress update.
 	      //
@@ -550,6 +551,7 @@ namespace Timbl {
 	    }
 	    //		subMergeT.stop();
 	    //	    cerr << "Final result" << endl;
+	    cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;
 	    delete OutInstanceBase;
 	    OutInstanceBase = 0;
 	  }
@@ -586,6 +588,7 @@ namespace Timbl {
 		return false;
 	      }
 	      else {
+		cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
 		delete outInstanceBase;
 		outInstanceBase = 0;
 		subDone = 0;
@@ -625,6 +628,7 @@ namespace Timbl {
 	    }
 	    //	  cerr << "after merge: Instance Base" << endl;
 	    //	  cerr << InstanceBase << endl;
+	    cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
 	    delete outInstanceBase;
 	    outInstanceBase = 0;
 	  }
@@ -639,6 +643,7 @@ namespace Timbl {
 	IBInfo( *mylog );
 	Info( "Learning took " + learnT.toString() );
       }
+      cerr << "final mismatches:                    " << InstanceBase->mismatch << endl;
     }
     return result;
   }
@@ -715,6 +720,7 @@ namespace Timbl {
 		//		subMergeT.stop();
 		//	cerr << "after Merge: intermediate result" << endl;
 		//		cerr << InstanceBase << endl;
+		cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;	
 		delete OutInstanceBase;
 		OutInstanceBase = 0;
 		totalDone = 0;
@@ -752,7 +758,7 @@ namespace Timbl {
 	    }
 	    //		subMergeT.stop();
 	    //	    cerr << "Final result" << endl;
-	    delete OutInstanceBase;
+	    cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;	    delete OutInstanceBase;
 	    OutInstanceBase = 0;
 	  }
 	}
@@ -793,6 +799,7 @@ namespace Timbl {
 		return false;
 	      }
 	      else {
+		cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
 		delete outInstanceBase;
 		outInstanceBase = 0;
 		totalCount = 0;
@@ -835,6 +842,7 @@ namespace Timbl {
 	    }
 	    //	  cerr << "after merge: Instance Base" << endl;
 	    //	  cerr << InstanceBase << endl;
+	    cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
 	    delete outInstanceBase;
 	    outInstanceBase = 0;
 	  }
@@ -848,6 +856,7 @@ namespace Timbl {
 	IBInfo( *mylog );
 	Info( "Learning took " + learnT.toString() );
       }
+      cerr << "finale mismatches:                   " << InstanceBase->mismatch << endl;
     }
     return result;
   }
@@ -1406,6 +1415,7 @@ namespace Timbl {
 	    IBInfo( *mylog );
 	    Info( "Learning took " + learnT.toString() );
 	  }
+	  cerr << "mismatches: " << InstanceBase->mismatch << endl;
 	}
 	if ( result )
 	  result = Expand_N( FileName );
@@ -2386,7 +2396,7 @@ namespace Timbl {
     bool result = true;
     string Buffer;
     if ( !Verbosity(SILENT) ) {
-      Info( "Phase 2: Building index on Datafile: " + CurrentDataFile );
+      Info( "Phase 2: Building fast index for Datafile: " + CurrentDataFile );
       time_stamp( "Start:     ", 0 );
     }
     for ( unsigned int nextPos = 0; nextPos < instances.size(); ++nextPos ){
@@ -2475,7 +2485,7 @@ namespace Timbl {
   bool TimblExperiment::build_speed_multi_index( featureFileMultiIndex& fmIndex ){
     bool result = true;
     if ( !Verbosity(SILENT) ) {
-      Info( "Phase 2: Building multi index on Datafile: " + CurrentDataFile );
+      Info( "Phase 2: Building fast multi index for Datafile: " + CurrentDataFile );
       time_stamp( "Start:     ", 0 );
     }
     for ( unsigned int nextPos=0; nextPos < instances.size(); ++nextPos ){

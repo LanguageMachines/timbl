@@ -28,14 +28,44 @@
 #define TYPES_H
 
 #include <string>
+#include <set>
 #include <vector>
 #include <exception>
 #include <stdexcept>
+#include <ostream>
 #include <sstream>
 
 #include "StringOps.h"
 
 namespace Timbl {
+
+  template< typename T >
+    std::ostream& operator<< ( std::ostream& os, const std::set<T>& s ){
+    os << "{";
+    typename std::set<T>::const_iterator it = s.begin();
+    while ( it != s.end() ){
+      os << *it;
+      ++it;
+      if ( it != s.end() )
+	os << ",";
+    }
+    os << "}";
+    return os;
+  }
+
+  template< typename T >
+    std::ostream& operator<< ( std::ostream& os, const std::vector<T>& s ){
+    os << "[";
+    typename std::vector<T>::const_iterator it = s.begin();
+    while ( it != s.end() ){
+      os << *it;
+      ++it;
+      if ( it != s.end() )
+	os << ",";
+    }
+    os << "]";
+    return os;
+  }
 
   template< typename T >
     T stringTo( const std::string& str ) {

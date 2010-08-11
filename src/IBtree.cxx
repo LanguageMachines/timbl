@@ -64,6 +64,7 @@ namespace Timbl {
   }
   
   inline IBtree *IBtree::add_feat_val( FeatureValue *FV, 
+				       unsigned int &mm,
 				       IBtree **tree,
 				       unsigned long& cnt ){
     // Add a Featurevalue to the IB. 
@@ -74,6 +75,7 @@ namespace Timbl {
 	return *pnt;
       }
       else if ( (*pnt)->FValue->Index() < FV->Index() ){
+	++mm;
 	pnt = &((*pnt)->next);
       }
       else {
@@ -1218,6 +1220,9 @@ namespace Timbl {
   bool InstanceBase_base::AddInstance( const Instance& Inst ){
     // add one instance to the IB
     IBtree *hlp, **pnt = &InstBase;
+    if ( mismatch.size() == 0 ){
+      mismatch.resize(Depth+1, 0);
+    }
     if ( !InstBase ){
       for ( unsigned int i = 0; i < Depth; ++i ){
 	*pnt = new IBtree( Inst.FV[i] );
@@ -1229,7 +1234,7 @@ namespace Timbl {
     }
     else {
       for ( unsigned int i = 0; i < Depth; ++i ){
-	hlp = (*pnt)->add_feat_val( Inst.FV[i], pnt, ibCount );
+	hlp = (*pnt)->add_feat_val( Inst.FV[i], mismatch[i], pnt, ibCount );
 	if ( i==0 && hlp->next == 0 )
 	  LastInstBasePos = hlp;
 	pnt = &(hlp->link);
