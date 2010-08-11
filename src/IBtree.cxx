@@ -63,10 +63,16 @@ namespace Timbl {
     delete next;
   }
   
+#ifdef IBSTATS
   inline IBtree *IBtree::add_feat_val( FeatureValue *FV, 
 				       unsigned int &mm,
 				       IBtree **tree,
 				       unsigned long& cnt ){
+#else
+  inline IBtree *IBtree::add_feat_val( FeatureValue *FV, 
+				       IBtree **tree,
+				       unsigned long& cnt ){
+#endif
     // Add a Featurevalue to the IB. 
     IBtree **pnt = tree;
     while ( *pnt ){
@@ -75,7 +81,9 @@ namespace Timbl {
 	return *pnt;
       }
       else if ( (*pnt)->FValue->Index() < FV->Index() ){
+#ifdef IBSTATS
 	++mm;
+#endif
 	pnt = &((*pnt)->next);
       }
       else {
@@ -1220,9 +1228,11 @@ namespace Timbl {
   bool InstanceBase_base::AddInstance( const Instance& Inst ){
     // add one instance to the IB
     IBtree *hlp, **pnt = &InstBase;
+#ifdef IBSTATS
     if ( mismatch.size() == 0 ){
       mismatch.resize(Depth+1, 0);
     }
+#endif
     if ( !InstBase ){
       for ( unsigned int i = 0; i < Depth; ++i ){
 	*pnt = new IBtree( Inst.FV[i] );
@@ -1234,7 +1244,11 @@ namespace Timbl {
     }
     else {
       for ( unsigned int i = 0; i < Depth; ++i ){
+#ifdef IBSTATS
 	hlp = (*pnt)->add_feat_val( Inst.FV[i], mismatch[i], pnt, ibCount );
+#else
+	hlp = (*pnt)->add_feat_val( Inst.FV[i], pnt, ibCount );
+#endif
 	if ( i==0 && hlp->next == 0 )
 	  LastInstBasePos = hlp;
 	pnt = &(hlp->link);
@@ -1288,6 +1302,15 @@ namespace Timbl {
     }
     NumOfTails += ib->NumOfTails;
     TopDistribution->Merge( *ib->TopDistribution );
+#ifdef IBSTATS
+    if ( ib->mismatch.size() > 0 ){
+      if ( mismatch.size() == 0 )
+	mismatch.resize( ib->mismatch.size(), 0 );
+      for ( unsigned int i = 0; i < mismatch.size(); ++i ){
+	mismatch[i] += ib->mismatch[i];
+      }
+    }
+#endif
     DefaultsValid = false;
     DefAss = false;
     ib->InstBase = 0;
@@ -1364,6 +1387,15 @@ namespace Timbl {
     }
     NumOfTails += ib->NumOfTails;
     TopDistribution->Merge( *ib->TopDistribution );
+#ifdef IBSTATS
+    if ( ib->mismatch.size() > 0 ){
+      if ( mismatch.size() == 0 )
+	mismatch.resize( ib->mismatch.size(), 0 );
+      for ( unsigned int i = 0; i < mismatch.size(); ++i ){
+	mismatch[i] += ib->mismatch[i];
+      }
+    }
+#endif
     Pruned = true;
     DefaultsValid = true;
     DefAss = true;

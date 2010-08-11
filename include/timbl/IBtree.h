@@ -28,6 +28,8 @@
 
 #include "timbl/XMLtools.h"
 
+//#define IBSTATS
+
 namespace Timbl {
   using Hash::StringHash;
 
@@ -66,7 +68,11 @@ namespace Timbl {
     IBtree( FeatureValue * );
     ~IBtree();
     IBtree *Reduce( const TargetValue *, unsigned long&, long );
+#ifdef IBSTATS
     inline IBtree *add_feat_val( FeatureValue *, unsigned int&, IBtree **, unsigned long& );
+#else
+    inline IBtree *add_feat_val( FeatureValue *, IBtree **, unsigned long& );
+#endif
     inline ValueDistribution *sum_distributions( bool );
     inline IBtree *make_unique( const TargetValue *, unsigned long& );
     void cleanDistributions();
@@ -145,7 +151,9 @@ namespace Timbl {
     unsigned long int nodeCount() const { return ibCount;} ;
     const IBtree *instBase() const { return InstBase; };
     
+#ifdef IBSTATS
     std::vector<unsigned int> mismatch;
+#endif
   protected:
     bool DefAss;
     bool DefaultsValid;

@@ -513,7 +513,7 @@ namespace Timbl {
 		return false;
 	      }
 	      else {
-		cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;
+		//		cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;
 		//		subMergeT.stop();
 		//	cerr << "after Merge: intermediate result" << endl;
 		//		cerr << InstanceBase << endl;
@@ -551,7 +551,7 @@ namespace Timbl {
 	    }
 	    //		subMergeT.stop();
 	    //	    cerr << "Final result" << endl;
-	    cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;
+	    //	    cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;
 	    delete OutInstanceBase;
 	    OutInstanceBase = 0;
 	  }
@@ -588,7 +588,7 @@ namespace Timbl {
 		return false;
 	      }
 	      else {
-		cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
+		//		cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
 		delete outInstanceBase;
 		outInstanceBase = 0;
 		subDone = 0;
@@ -628,7 +628,7 @@ namespace Timbl {
 	    }
 	    //	  cerr << "after merge: Instance Base" << endl;
 	    //	  cerr << InstanceBase << endl;
-	    cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
+	    //	    cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
 	    delete outInstanceBase;
 	    outInstanceBase = 0;
 	  }
@@ -643,7 +643,9 @@ namespace Timbl {
 	IBInfo( *mylog );
 	Info( "Learning took " + learnT.toString() );
       }
-      cerr << "final mismatches:                    " << InstanceBase->mismatch << endl;
+#ifdef IBSTATS
+      cerr << "final mismatches: " << InstanceBase->mismatch << endl;
+#endif
     }
     return result;
   }
@@ -720,7 +722,7 @@ namespace Timbl {
 		//		subMergeT.stop();
 		//	cerr << "after Merge: intermediate result" << endl;
 		//		cerr << InstanceBase << endl;
-		cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;	
+		//		cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;	
 		delete OutInstanceBase;
 		OutInstanceBase = 0;
 		totalDone = 0;
@@ -758,7 +760,8 @@ namespace Timbl {
 	    }
 	    //		subMergeT.stop();
 	    //	    cerr << "Final result" << endl;
-	    cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;	    delete OutInstanceBase;
+	    //	    cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;
+	    delete OutInstanceBase;
 	    OutInstanceBase = 0;
 	  }
 	}
@@ -799,7 +802,7 @@ namespace Timbl {
 		return false;
 	      }
 	      else {
-		cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
+		//		cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
 		delete outInstanceBase;
 		outInstanceBase = 0;
 		totalCount = 0;
@@ -842,7 +845,7 @@ namespace Timbl {
 	    }
 	    //	  cerr << "after merge: Instance Base" << endl;
 	    //	  cerr << InstanceBase << endl;
-	    cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
+	    //	    cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
 	    delete outInstanceBase;
 	    outInstanceBase = 0;
 	  }
@@ -856,7 +859,9 @@ namespace Timbl {
 	IBInfo( *mylog );
 	Info( "Learning took " + learnT.toString() );
       }
-      cerr << "finale mismatches:                   " << InstanceBase->mismatch << endl;
+#ifdef IBSTATS
+      cerr << "final mismatches: " << InstanceBase->mismatch << endl;
+#endif
     }
     return result;
   }
@@ -1415,7 +1420,9 @@ namespace Timbl {
 	    IBInfo( *mylog );
 	    Info( "Learning took " + learnT.toString() );
 	  }
-	  cerr << "mismatches: " << InstanceBase->mismatch << endl;
+#ifdef IBSTATS
+	  cerr << "IB2 mismatches: " << InstanceBase->mismatch << endl;
+#endif
 	}
 	if ( result )
 	  result = Expand_N( FileName );
@@ -2420,6 +2427,33 @@ namespace Timbl {
     return result;
   }
 
+  bool TimblExperiment::build_speed_multi_index( featureFileMultiIndex& fmIndex ){
+    bool result = true;
+    if ( !Verbosity(SILENT) ) {
+      Info( "Phase 2: Building fast multi index for Datafile: " + CurrentDataFile );
+      time_stamp( "Start:     ", 0 );
+    }
+    for ( unsigned int nextPos=0; nextPos < instances.size(); ++nextPos ){
+      // The next Instance to store. 
+      //	cerr << "Instance[" << nextPos << "] = " << instancec[nextPos] << endl;
+      FeatureValue *fv0 = instances[nextPos].FV[permutation[0]];
+      FeatureValue *fv1 = instances[nextPos].FV[permutation[1]];
+      pair<FeatureValue*,unsigned int> fsPair = make_pair( fv1, nextPos );
+      featureFileMultiIndex::iterator it = fmIndex.find( fv0 );
+      if ( it != fmIndex.end() )
+	it->second.insert( fsPair );
+      else {
+	fileMultiIndex mi;
+	mi.insert( fsPair );
+	fmIndex[fv0] = mi;
+      }
+      if (( nextPos % Progress() ) == 0) 
+	time_stamp( "Indexing:  ", nextPos );
+    }
+    time_stamp( "Finished:  ", instances.size() );
+    return result;
+  }
+
   bool TimblExperiment::build_file_index( const string& file_name, 
 					  fileIndex& fmIndex ){
     bool result = true;
@@ -2479,33 +2513,6 @@ namespace Timbl {
       }
       time_stamp( "Finished:  ", stats.dataLines() );
     }
-    return result;
-  }
-
-  bool TimblExperiment::build_speed_multi_index( featureFileMultiIndex& fmIndex ){
-    bool result = true;
-    if ( !Verbosity(SILENT) ) {
-      Info( "Phase 2: Building fast multi index for Datafile: " + CurrentDataFile );
-      time_stamp( "Start:     ", 0 );
-    }
-    for ( unsigned int nextPos=0; nextPos < instances.size(); ++nextPos ){
-      // The next Instance to store. 
-      //	cerr << "Instance[" << nextPos << "] = " << instancec[nextPos] << endl;
-      FeatureValue *fv0 = instances[nextPos].FV[permutation[0]];
-      FeatureValue *fv1 = instances[nextPos].FV[permutation[1]];
-      pair<FeatureValue*,unsigned int> fsPair = make_pair( fv1, nextPos );
-      featureFileMultiIndex::iterator it = fmIndex.find( fv0 );
-      if ( it != fmIndex.end() )
-	it->second.insert( fsPair );
-      else {
-	fileMultiIndex mi;
-	mi.insert( fsPair );
-	fmIndex[fv0] = mi;
-      }
-      if (( nextPos % Progress() ) == 0) 
-	time_stamp( "Indexing:  ", nextPos );
-    }
-    time_stamp( "Finished:  ", instances.size() );
     return result;
   }
   

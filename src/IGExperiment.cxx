@@ -234,7 +234,7 @@ namespace Timbl {
 		//		subMergeT.stop();
 		//		cerr << "after Merge: intermediate result" << endl;
 		//		cerr << InstanceBase << endl;
-		cerr << "intermediate mismatch: " << PartInstanceBase->mismatch << endl;
+		//		cerr << "intermediate mismatch: " << PartInstanceBase->mismatch << endl;
 		delete PartInstanceBase;
 		PartInstanceBase = 0;
 		partialDone = 0;
@@ -278,7 +278,7 @@ namespace Timbl {
 	    }
 	    //		subMergeT.stop();
 	    //	    cerr << "Final result" << endl;
-	    cerr << "intermediate mismatch: " << PartInstanceBase->mismatch << endl;
+	    //	    cerr << "intermediate mismatch: " << PartInstanceBase->mismatch << endl;
 	    delete PartInstanceBase;
 	    PartInstanceBase = 0;
 	  }
@@ -367,7 +367,7 @@ namespace Timbl {
 		  //		subMergeT.stop();
 		  //		cerr << "after Merge: intermediate result" << endl;
 		  //		cerr << TmpInstanceBase << endl;
-		  cerr << "intermediate mismatch: " << PartInstanceBase->mismatch << endl;
+		  //		  cerr << "intermediate mismatch: " << PartInstanceBase->mismatch << endl;
 		  delete PartInstanceBase;
 		  PartInstanceBase = 0;
 		}
@@ -431,7 +431,7 @@ namespace Timbl {
 		  return false;
 		}
 		//	      mergeT.stop();
-		cerr << "intermediate mismatch: " << outInstanceBase->mismatch << endl;
+		//		cerr << "intermediate mismatch: " << outInstanceBase->mismatch << endl;
 		delete outInstanceBase;
 		outInstanceBase = 0;
 	      }
@@ -447,7 +447,9 @@ namespace Timbl {
 	IBInfo( *mylog );
 	Info( "Learning took " + learnT.toString() );
       }
-      cerr << "finale mismatch:                                        " << InstanceBase->mismatch << endl;
+#ifdef IBSTATS
+      cerr << "final mismatch: " << InstanceBase->mismatch << endl;
+#endif
       //     totalT.stop();
       //     cerr << "normal pruning took " << pruneT << endl;
       //     cerr << "sub pruning took " << subPruneT << endl;
@@ -595,7 +597,8 @@ namespace Timbl {
 	    }
 	    //		subMergeT.stop();
 	    //	    cerr << "Final result" << endl;
-	    cerr << "intermediate mismatch: " << PartInstanceBase->mismatch << endl;	    delete PartInstanceBase;
+	    //	    cerr << "intermediate mismatch: " << PartInstanceBase->mismatch << endl;
+	    delete PartInstanceBase;
 	    PartInstanceBase = 0;
 	  }
 	}
@@ -690,7 +693,7 @@ namespace Timbl {
 		  //		subMergeT.stop();
 		  //		cerr << "after Merge: intermediate result" << endl;
 		  //		cerr << TmpInstanceBase << endl;
-		  cerr << "intermediate mismatch: " << PartInstanceBase->mismatch << endl;
+		  //		  cerr << "intermediate mismatch: " << PartInstanceBase->mismatch << endl;
 		  delete PartInstanceBase;
 		  PartInstanceBase = 0;
 		}
@@ -756,7 +759,7 @@ namespace Timbl {
 		  return false;
 		}
 		//	      mergeT.stop();
-		cerr << "intermediate mismatch: " << outInstanceBase->mismatch << endl;
+		//		cerr << "intermediate mismatch: " << outInstanceBase->mismatch << endl;
 		delete outInstanceBase;
 		outInstanceBase = 0;
 	      }
@@ -771,7 +774,9 @@ namespace Timbl {
 	IBInfo( *mylog );
 	Info( "Learning took " + learnT.toString() );
       }
-      cerr << "mismatches: " << InstanceBase->mismatch << endl;
+#ifdef IBSTATS
+      cerr << "mismatche: " << InstanceBase->mismatch << endl;
+#endif
       //     totalT.stop();
       //     cerr << "normal pruning took " << pruneT << endl;
       //     cerr << "sub pruning took " << subPruneT << endl;
