@@ -75,13 +75,13 @@ namespace Timbl {
   };  
 
   typedef std::map<FeatureValue*,std::set<std::streamsize>, fCmp> fileIndex;
-  typedef std::multimap<FeatureValue*,std::streamsize, fCmp> fileMultiIndex;
-  typedef std::map<FeatureValue*, fileMultiIndex, fCmp > featureFileMultiIndex;
+  typedef std::map<FeatureValue*, fileIndex, fCmp > fileDoubleIndex;
+  typedef std::map<FeatureValue*, fileDoubleIndex, fCmp > fileTripleIndex;
   std::ostream& operator<< ( std::ostream&, const fileIndex& );
-  std::ostream& operator<< ( std::ostream&, const featureFileMultiIndex& );
-  std::ostream& operator<< ( std::ostream&, const fileMultiIndex& );
-  void compressIndex( const featureFileMultiIndex&,
-		      featureFileMultiIndex& res, 
+  std::ostream& operator<< ( std::ostream&, const fileDoubleIndex& );
+  std::ostream& operator<< ( std::ostream&, const fileTripleIndex& );
+  void compressIndex( const fileDoubleIndex&,
+		      fileDoubleIndex& res, 
 		      unsigned int );
 
 
@@ -230,9 +230,9 @@ namespace Timbl {
     double sum_remaining_weights( size_t ) const;
 
     bool build_file_index( const std::string&, fileIndex&  );
-    bool build_file_multi_index( const std::string&, featureFileMultiIndex&  );
+    bool build_file_multi_index( const std::string&, fileDoubleIndex&  );
     bool build_speed_index( fileIndex&  );
-    bool build_speed_multi_index( featureFileMultiIndex&  );
+    bool build_speed_multi_index( fileDoubleIndex&  );
 
     bool Initialized;
     GetOptClass *OptParams;

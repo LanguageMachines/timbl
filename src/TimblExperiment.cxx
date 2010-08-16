@@ -534,7 +534,10 @@ namespace Timbl {
 	      //		cerr << "add instance " << &CurrInst << endl;
 	      Instance tmp =  instances[*fit];
 	      tmp.permute( permutation );
-	      OutInstanceBase->AddInstance( tmp );
+	      if ( !OutInstanceBase->AddInstance( tmp ) ){
+		Warning( "deviating exemplar weight in:\n" + 
+			 toString(&instances[*fit]) + "\nIgnoring the new weight" );
+	      }
 	      ++fit;
 	      ++subDone;
 	      ++totalDone;
@@ -558,7 +561,7 @@ namespace Timbl {
 	}
       }
       else {
-	featureFileMultiIndex fIndex;
+	fileDoubleIndex fIndex;
 	//      Common::Timer t;
 	//      t.start();
 	result = build_speed_multi_index( fIndex );
@@ -575,7 +578,7 @@ namespace Timbl {
 	  InstanceBase_base *outInstanceBase = 0;
 	  TargetValue *TopTarget = Targets->MajorityClass();
 	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
-	  featureFileMultiIndex::const_iterator mit = fIndex.begin();
+	  fileDoubleIndex::const_iterator mit = fIndex.begin();
 	  unsigned int subDone = 0;
 	  while ( mit != fIndex.end() ){
 	    FeatureValue *the_fv = (FeatureValue*)(mit->first);
@@ -598,24 +601,28 @@ namespace Timbl {
 	    else {
 	      //	    cerr << "need more..." << endl;
 	    }
-	    fileMultiIndex::const_iterator sit = mit->second.begin();
-	    while ( sit != mit->second.end() ){
-	      //      cerr << "zoek naar positie " << it->second << endl;
-	      if (( totalDone % Progress() ) == 0) 
-		time_stamp( "Learning:  ", totalDone );
-	      chopped_to_instance( TrainWords );
-	      if ( !outInstanceBase )
-		outInstanceBase = InstanceBase->clone();
-	      //	      cerr << "add instance " << &instances[sit->second] << endl;
-	      Instance tmp = instances[sit->second];
-	      tmp.permute( permutation );
-	      if ( !outInstanceBase->AddInstance( tmp ) ){
-		Warning( "deviating exemplar weight in:\n" + 
-			 Buffer + "\nIgnoring the new weight" );
+	    fileIndex::const_iterator fit = mit->second.begin();
+	    while ( fit != mit->second.end() ){
+	      set<long int>::const_iterator sit = fit->second.begin();
+	      while ( sit != fit->second.end() ){
+		//      cerr << "zoek naar positie " << it->second << endl;
+		if (( totalDone % Progress() ) == 0) 
+		  time_stamp( "Learning:  ", totalDone );
+		chopped_to_instance( TrainWords );
+		if ( !outInstanceBase )
+		  outInstanceBase = InstanceBase->clone();
+		//	      cerr << "add instance " << &instances[sit->second] << endl;
+		Instance tmp = instances[*sit];
+		tmp.permute( permutation );
+		if ( !outInstanceBase->AddInstance( tmp ) ){
+		  Warning( "deviating exemplar weight in:\n" + 
+			   toString(&instances[*sit]) + "\nIgnoring the new weight" );
+		}
+		++subDone;
+		++totalDone;
+		++sit;
 	      }
-	      ++subDone;
-	      ++totalDone;
-	      ++sit;
+	      ++fit;
 	    }
 	    ++mit;
 	  }
@@ -744,7 +751,10 @@ namespace Timbl {
 		OutInstanceBase = InstanceBase->clone();
 	      }
 	      //		cerr << "add instance " << &CurrInst << endl;
-	      OutInstanceBase->AddInstance( CurrInst );
+	      if ( !OutInstanceBase->AddInstance( CurrInst ) ){
+		Warning( "deviating exemplar weight in:\n" + 
+			 Buffer + "\nIgnoring the new weight" );
+	      }
 	      ++fit;
 	      ++totalDone;
 	    }
@@ -767,11 +777,11 @@ namespace Timbl {
 	}
       }
       else {
-	featureFileMultiIndex fIndex;
+	fileDoubleIndex fIndex;
 	//      Common::Timer t;
 	//      t.start();
 	result = build_file_multi_index( CurrentDataFile, fIndex );
-	//      cerr << "index: " << fIndex << endl;
+	//	cerr << "index: " << fIndex << endl;
 	//      t.stop();
 	//      cerr << "indexing took " << t << endl;
 	//      totalT.start();
@@ -789,50 +799,54 @@ namespace Timbl {
 	  //
 	  ifstream datafile( CurrentDataFile.c_str(), ios::in);
 	  //
-	  featureFileMultiIndex::const_iterator mit = fIndex.begin();
+	  fileDoubleIndex::const_iterator mit = fIndex.begin();
 	  unsigned int totalCount = 0;
 	  while ( mit != fIndex.end() ){
 	    FeatureValue *the_fv = (FeatureValue*)(mit->first);
-	    //	  cerr << "handle feature " << the_fv << " met index " << the_fv->Index() << endl;
+	    //	    cerr << "handle feature " << the_fv << " met index " << the_fv->Index() << endl;
 	    if ( outInstanceBase &&
 		 totalCount + mit->second.size() >= igOffset() ){
-	      //	    cerr << "merging intermediate tree\n" << outInstanceBase << endl;
+	      //	      cerr << "merging intermediate tree\n" << outInstanceBase << endl;
 	      if ( !InstanceBase->MergeSub( outInstanceBase ) ){
 		FatalError( "Merging InstanceBases failed. PANIC" );
 		return false;
 	      }
 	      else {
-		//		cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
+		//cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
 		delete outInstanceBase;
 		outInstanceBase = 0;
 		totalCount = 0;
 	      }
-	      //	    cerr << "Intermediate result tree\n" << InstanceBase << endl;
+	      //	      cerr << "Intermediate result tree\n" << InstanceBase << endl;
 	    }
 	    else {
-	      //	    cerr << "need more..." << endl;
+	      //	      cerr << "need more..." << endl;
 	    }
-	    fileMultiIndex::const_iterator sit = mit->second.begin();
-	    while ( sit != mit->second.end() ){
-	      //      cerr << "zoek naar positie " << it->second << endl;
-	      datafile.clear();
-	      datafile.seekg( sit->second );
-	      nextLine( datafile, Buffer );
-	      chopLine( Buffer );
-	      // Progress update.
-	      //
-	      if (( stats.dataLines() % Progress() ) == 0) 
-		time_stamp( "Learning:  ", stats.dataLines() );
-	      chopped_to_instance( TrainWords );
-	      if ( !outInstanceBase )
-		outInstanceBase = InstanceBase->clone();
-	      //	      cerr << "add instance " << &CurrInst << endl;
-	      if ( !outInstanceBase->AddInstance( CurrInst ) ){
-		Warning( "deviating exemplar weight in:\n" + 
-			 Buffer + "\nIgnoring the new weight" );
+	    fileIndex::const_iterator fit = mit->second.begin();
+	    while ( fit != mit->second.end() ){
+	      set<long int>::const_iterator sit = fit->second.begin();
+	      while ( sit != fit->second.end() ){
+		//		cerr << "zoek naar positie " << *sit << endl;
+		datafile.clear();
+		datafile.seekg( *sit );
+		nextLine( datafile, Buffer );
+		chopLine( Buffer );
+		// Progress update.
+		//
+		if (( stats.dataLines() % Progress() ) == 0) 
+		  time_stamp( "Learning:  ", stats.dataLines() );
+		chopped_to_instance( TrainWords );
+		if ( !outInstanceBase )
+		  outInstanceBase = InstanceBase->clone();
+		//		cerr << "add instance " << &CurrInst << endl;
+		if ( !outInstanceBase->AddInstance( CurrInst ) ){
+		  Warning( "deviating exemplar weight in:\n" + 
+			   Buffer + "\nIgnoring the new weight" );
+		}
+		++totalCount;
+		++sit;
 	      }
-	      ++totalCount;
-	      ++sit;
+	      ++fit;
 	    }
 	    ++mit;
 	  }
@@ -2427,7 +2441,7 @@ namespace Timbl {
     return result;
   }
 
-  bool TimblExperiment::build_speed_multi_index( featureFileMultiIndex& fmIndex ){
+  bool TimblExperiment::build_speed_multi_index( fileDoubleIndex& fmIndex ){
     bool result = true;
     if ( !Verbosity(SILENT) ) {
       Info( "Phase 2: Building fast multi index for Datafile: " + CurrentDataFile );
@@ -2438,13 +2452,13 @@ namespace Timbl {
       //	cerr << "Instance[" << nextPos << "] = " << instancec[nextPos] << endl;
       FeatureValue *fv0 = instances[nextPos].FV[permutation[0]];
       FeatureValue *fv1 = instances[nextPos].FV[permutation[1]];
-      pair<FeatureValue*,unsigned int> fsPair = make_pair( fv1, nextPos );
-      featureFileMultiIndex::iterator it = fmIndex.find( fv0 );
-      if ( it != fmIndex.end() )
-	it->second.insert( fsPair );
+      fileDoubleIndex::iterator it = fmIndex.find( fv0 );
+      if ( it != fmIndex.end() ){
+	it->second[fv1].insert( nextPos );
+      }
       else {
-	fileMultiIndex mi;
-	mi.insert( fsPair );
+	fileIndex mi;
+	mi[fv1].insert( nextPos );
 	fmIndex[fv0] = mi;
       }
       if (( nextPos % Progress() ) == 0) 
@@ -2517,7 +2531,7 @@ namespace Timbl {
   }
   
   bool TimblExperiment::build_file_multi_index( const string& file_name, 
-						featureFileMultiIndex& fmIndex ){
+						fileDoubleIndex& fmIndex ){
     bool result = true;
     string Buffer;
     stats.clear();
@@ -2550,13 +2564,12 @@ namespace Timbl {
 	//	cerr << "gives Instance " << &CurrInst << endl;
 	FeatureValue *fv0 = CurrInst.FV[0];
 	FeatureValue *fv1 = CurrInst.FV[1];
-	pair<FeatureValue*,streamsize> fsPair = make_pair( fv1, cur_pos );
-	featureFileMultiIndex::iterator it = fmIndex.find( fv0 );
+	fileDoubleIndex::iterator it = fmIndex.find( fv0 );
 	if ( it != fmIndex.end() )
-	  it->second.insert( fsPair );
+	  it->second[fv1].insert( cur_pos );
 	else {
-	  fileMultiIndex mi;
-	  mi.insert( fsPair );
+	  fileIndex mi;
+	  mi[fv1].insert( cur_pos );
 	  fmIndex[fv0] = mi;
 	}
 	if ((stats.dataLines() % Progress() ) == 0) 
