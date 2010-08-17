@@ -80,10 +80,6 @@ namespace Timbl {
   std::ostream& operator<< ( std::ostream&, const fileIndex& );
   std::ostream& operator<< ( std::ostream&, const fileDoubleIndex& );
   std::ostream& operator<< ( std::ostream&, const fileTripleIndex& );
-  void compressIndex( const fileDoubleIndex&,
-		      fileDoubleIndex& res, 
-		      unsigned int );
-
 
   class TimblExperiment: public MBLClass {
     friend class TimblAPI;
@@ -205,6 +201,7 @@ namespace Timbl {
     virtual bool GetInstanceBase( std::istream& ) = 0;
     virtual void showTestingInfo( std::ostream& );
     virtual bool checkTestFile();
+    bool learnFromFileIndex( const fileIndex&, std::istream& );
     bool initTestFiles( const std::string&, const std::string& );
     void show_results( std::ostream&,
 		       const std::string&, 
@@ -405,6 +402,8 @@ namespace Timbl {
   protected:
     TimblExperiment *clone() const { 
       return new IG_Experiment( MaxFeats(), "", false ); };
+    bool learnFromFileIndex( const fileIndex&, std::istream&, 
+			     const TargetValue* );
     bool SpeedLearn( const std::string& = "" );
     bool ClassicLearn( const std::string& = "" );
     bool checkTestFile();

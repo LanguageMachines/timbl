@@ -109,12 +109,12 @@ namespace Timbl{
   
   void TesterClass::init( const Instance& inst,
 			  size_t effective, 
-			  size_t offset ){
+			  size_t oset ){
 #ifdef DBGTEST
     cerr << "tester Initialized!" << endl;
 #endif
-    effSize = effective-offset;
-    offSet = offset;
+    effSize = effective-oset;
+    offSet = oset;
     FV = &inst.FV;
   }
 
