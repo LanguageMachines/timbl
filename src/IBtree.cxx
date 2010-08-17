@@ -1288,7 +1288,7 @@ namespace Timbl {
       else {
 	IBtree *ibPnt = ib->InstBase;
 	if ( ib->LastInstBasePos->FValue->Index() >= InstBase->FValue->Index() ){
-	  FatalError( "confused indices in MergeSub !" );
+	  Error( "confused indices in MergeSub !" );
 	  return false;
 	}
 	else {
@@ -1344,7 +1344,7 @@ namespace Timbl {
 	  FeatureValue *fv = ibPnt->FValue;
 	  IBtree **pnt = &InstBase;
 	  if ( (*pnt)->FValue->Index() < fv->Index() ){
-	    FatalError( "MergeSub assumes sorted additions!" );
+	    Error( "MergeSub assumes sorted additions!" );
 	    return false;
 	  }
 	  if ( (*pnt)->FValue->Index() == fv->Index() ){
