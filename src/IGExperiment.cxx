@@ -158,8 +158,6 @@ namespace Timbl {
 	  fileIndex::const_iterator fit = fmIndex.begin();
 	  unsigned int partialDone = 0;
 	  while ( fit != fmIndex.end() ){
-	    //	  FeatureValue *the_fv = (FeatureValue*)(fit->first);
-	    //	  cerr << "handle feature " << the_fv << " met index " << the_fv->Index() << endl;
 	    if ( PartInstanceBase &&
 		 (partialDone + fit->second.size()) > igOffset() ){
 	      //	      cerr << "start prune " << endl;
@@ -248,8 +246,6 @@ namespace Timbl {
 	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
 	  fileDoubleIndex::const_iterator it = fmIndex.begin();
 	  while ( it != fmIndex.end() ){
-	    //	  FeatureValue *the_fv = (FeatureValue*)(it->first);
-	    //	  cerr << "handle feature " << the_fv << " met index " << the_fv->Index() << endl;
 	    fileIndex::const_iterator fit = it->second.begin();
 	    while ( fit != it->second.end() ){
 	      set<streamsize>::const_iterator sit = fit->second.begin();
@@ -319,7 +315,85 @@ namespace Timbl {
     }
     return result;
   }
-  
+
+  bool IG_Experiment::learnFromFileIndex( const fileIndex& fi, 
+					  istream& datafile,
+					  const TargetValue* TopTarget ){
+    IG_InstanceBase *outInstanceBase = 0;
+    unsigned int partialDone = 0;
+    fileIndex::const_iterator fit = fi.begin();
+    while ( fit != fi.end() ){
+      if ( outInstanceBase &&
+	   (partialDone + fit->second.size()) > igOffset() ){
+	//	      cerr << "start prune " << endl;
+	//	      cerr << PartInstanceBase << endl;
+	outInstanceBase->Prune( TopTarget );
+	//		subPruneT.stop();
+	//		time_stamp( "Finished Pruning: " );
+	//	      cerr << "finished prune:" << endl;
+	//	      cerr << PartInstanceBase << endl;
+	//		subMergeT.start();
+	if ( !InstanceBase->MergeSub( outInstanceBase ) ){
+	  FatalError( "Merging InstanceBases failed. PANIC" );
+	  return false;
+	}
+	else {
+	  //		subMergeT.stop();
+	  //		cerr << "after Merge: intermediate result" << endl;
+	  //		cerr << InstanceBase << endl;
+	  delete outInstanceBase;
+	  outInstanceBase = 0;
+	  partialDone = 0;
+	}
+      }
+      set<streamsize>::const_iterator sit = fit->second.begin();
+      while ( sit != fit->second.end() ){
+	datafile.clear();
+	datafile.seekg( *sit );
+	string Buffer;
+	nextLine( datafile, Buffer );
+	chopLine( Buffer );
+	// Progress update.
+	//
+	if (( stats.dataLines() % Progress() ) == 0) 
+	  time_stamp( "Learning:  ", stats.dataLines() );
+	chopped_to_instance( TrainWords );
+	if ( !outInstanceBase )
+	  outInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
+						 ibCount,
+						 (RandomSeed()>=0), 
+						 false, 
+						 true );
+	//		  cerr << "add instance " << &CurrInst << endl;
+	outInstanceBase->AddInstance( CurrInst );
+	++sit;
+      }
+      ++fit;
+    }
+    if ( outInstanceBase ){
+      //	      cerr << "Out Instance Base" << endl;
+      //	      time_stamp( "Start Pruning:    " );
+      //	      cerr << outInstanceBase << endl;
+      //	      pruneT.start();
+      outInstanceBase->Prune( TopTarget );
+      //	      pruneT.stop();
+      //	      time_stamp( "Finished Pruning: " );
+      //	      cerr << outInstanceBase << endl;
+      //	      time_stamp( "Before Merge: " );
+      //	      cerr << InstanceBase << endl;
+      //	      mergeT.start();
+      if ( !InstanceBase->MergeSub( outInstanceBase ) ){
+	FatalError( "Merging InstanceBases failed. PANIC" );
+	return false;
+      }
+      //	      mergeT.stop();
+      //		cerr << "intermediate mismatch: " << outInstanceBase->mismatch << endl;
+      delete outInstanceBase;
+      outInstanceBase = 0;
+    }
+    return true;
+  }
+
   bool IG_Experiment::ClassicLearn( const string& FileName ){
     bool result = true;
 //     Common::Timer mergeT;
@@ -360,6 +434,8 @@ namespace Timbl {
       Common::Timer learnT;
       learnT.start();
       InitInstanceBase();
+      TargetValue *TopTarget = Targets->MajorityClass();
+      //	  cerr << "MAJORITY CLASS = " << TopTarget << endl;
       if ( ExpInvalid() )
 	return false;
       if ( EffectiveFeatures() < 2 ) {
@@ -377,88 +453,10 @@ namespace Timbl {
 	    Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
 	    time_stamp( "Start:     ", 0 );
 	  }
-	  IG_InstanceBase *PartInstanceBase = 0;
-	  TargetValue *TopTarget = Targets->MajorityClass();
-	  //	  cerr << "MAJORITY CLASS = " << TopTarget << endl;
 	  // Open the file.
 	  //
 	  ifstream datafile( CurrentDataFile.c_str(), ios::in);
-	  //
-	  fileIndex::const_iterator fit = fmIndex.begin();
-	  unsigned int partialDone = 0;
-	  while ( fit != fmIndex.end() ){
-	    //	  FeatureValue *the_fv = (FeatureValue*)(fit->first);
-	    //	  cerr << "handle feature " << the_fv << " met index " << the_fv->Index() << endl;
-	    if ( PartInstanceBase &&
-		 (partialDone + fit->second.size()) > igOffset() ){
-	      //	      cerr << "start prune " << endl;
-	      //	      cerr << PartInstanceBase << endl;
-	      PartInstanceBase->Prune( TopTarget );
-	      //		subPruneT.stop();
-	      //		time_stamp( "Finished Pruning: " );
-	      //	      cerr << "finished prune:" << endl;
-	      //	      cerr << PartInstanceBase << endl;
-	      //		subMergeT.start();
-	      if ( !InstanceBase->MergeSub( PartInstanceBase ) ){
-		FatalError( "Merging InstanceBases failed. PANIC" );
-		return false;
-	      }
-	      else {
-		//		subMergeT.stop();
-		//		cerr << "after Merge: intermediate result" << endl;
-		//		cerr << InstanceBase << endl;
-		delete PartInstanceBase;
-		PartInstanceBase = 0;
-		partialDone = 0;
-	      }
-	    }
-	    set<streamsize>::const_iterator sit = fit->second.begin();
-	    while ( sit != fit->second.end() ){
-	      datafile.clear();
-	      datafile.seekg( *sit );
-	      string Buffer;
-	      nextLine( datafile, Buffer );
-	      chopLine( Buffer );
-	      // Progress update.
-	      //
-	      if (( stats.dataLines() % Progress() ) == 0) 
-		time_stamp( "Learning:  ", stats.dataLines() );
-	      chopped_to_instance( TrainWords );
-	      if ( !PartInstanceBase ){
-		PartInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
-							ibCount,
-							(RandomSeed()>=0), 
-							false, 
-							true );
-	      }
-	      //		cerr << "add instance " << &CurrInst << endl;
-	      PartInstanceBase->AddInstance( CurrInst );
-	      ++sit;
-	      ++partialDone;
-	    }
-	    ++fit;
-	  }
-	  if ( PartInstanceBase ){
-	    time_stamp( "Final  Pruning:    " );
-	    //	    cerr << PartInstanceBase << endl;
-	    //		subPruneT.start();
-	    PartInstanceBase->Prune( TopTarget );
-	    //		subPruneT.stop();
-	    time_stamp( "Finished Pruning: " );
-	    //	    cerr << PartInstanceBase << endl;
-	    //		subMergeT.start();
-	    //	    cerr << "merge into " << endl;
-	    //	    cerr << InstanceBase << endl;
-	    if ( !InstanceBase->MergeSub( PartInstanceBase ) ){
-	      FatalError( "Merging InstanceBases failed. PANIC" );
-	      return false;
-	    }
-	    //		subMergeT.stop();
-	    //	    cerr << "Final result" << endl;
-	    //	    cerr << "intermediate mismatch: " << PartInstanceBase->mismatch << endl;
-	    delete PartInstanceBase;
-	    PartInstanceBase = 0;
-	  }
+	  learnFromFileIndex( fmIndex, datafile, TopTarget );
 	}
       }
       else {
@@ -475,64 +473,12 @@ namespace Timbl {
 	    Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
 	    time_stamp( "Start:     ", 0 );
 	  }
-	  string Buffer;
-	  IG_InstanceBase *PartInstanceBase = 0;
-	  IG_InstanceBase *outInstanceBase = 0;
-	  TargetValue *TopTarget = Targets->MajorityClass();
-	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
 	  // Open the file.
 	  //
 	  ifstream datafile( CurrentDataFile.c_str(), ios::in);
 	  fileDoubleIndex::const_iterator fit = fmIndex.begin();
 	  while ( fit != fmIndex.end() ){
-	    FeatureValue *the_fv = (FeatureValue*)(fit->first);
-	    //	    cerr << "handle feature " << the_fv << " met index " << the_fv->Index() << " en " << it->second << endl;
-	    fileIndex::const_iterator mIt = fit->second.begin();
-	    while ( mIt != fit->second.end() ){
-	      set<streamsize>::const_iterator sit = mIt->second.begin();
-	      while ( sit != mIt->second.end() ){
-		datafile.clear();
-		datafile.seekg( *sit );
-		nextLine( datafile, Buffer );
-		chopLine( Buffer );
-		// Progress update.
-		//
-		if (( stats.dataLines() % Progress() ) == 0) 
-		  time_stamp( "Learning:  ", stats.dataLines() );
-		chopped_to_instance( TrainWords );
-		if ( !outInstanceBase )
-		  outInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
-							 ibCount,
-							 (RandomSeed()>=0), 
-							 false, 
-							 true );
-		//		  cerr << "add instance " << &CurrInst << endl;
-		outInstanceBase->AddInstance( CurrInst );
-		++sit;
-	      }
-	      ++mIt;
-	    }
-	    if ( outInstanceBase ){
-	      //	      cerr << "Out Instance Base" << endl;
-	      //	      time_stamp( "Start Pruning:    " );
-	      //	      cerr << outInstanceBase << endl;
-	      //	      pruneT.start();
-	      outInstanceBase->Prune( TopTarget );
-	      //	      pruneT.stop();
-	      //	      time_stamp( "Finished Pruning: " );
-	      //	      cerr << outInstanceBase << endl;
-	      //	      time_stamp( "Before Merge: " );
-	      //	      cerr << InstanceBase << endl;
-	      //	      mergeT.start();
-	      if ( !InstanceBase->MergeSub( outInstanceBase ) ){
-		FatalError( "Merging InstanceBases failed. PANIC" );
-		return false;
-	      }
-	      //	      mergeT.stop();
-	      //		cerr << "intermediate mismatch: " << outInstanceBase->mismatch << endl;
-	      delete outInstanceBase;
-	      outInstanceBase = 0;
-	    }
+	    learnFromFileIndex( fit->second, datafile, TopTarget );
 	    ++fit;
 	  }
 	}
