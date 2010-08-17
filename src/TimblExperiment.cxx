@@ -1520,6 +1520,7 @@ namespace Timbl {
 	    time_stamp( "Start:     ", stats.dataLines() );
 	  }
 	  bool found;
+	  initExperiment();
 	  do {
 	    // The next Instance to store. 
 	    chopped_to_instance( TestWords );
