@@ -690,7 +690,10 @@ namespace Timbl {
 						 false, 
 						 true );
 	//		  cerr << "add instance " << &CurrInst << endl;
-	outInstanceBase->AddInstance( CurrInst );
+	if ( !outInstanceBase->AddInstance( CurrInst ) ){
+	  Warning( "deviating exemplar weight in:\n" + 
+		   Buffer + "\nIgnoring the new weight" );
+	}
 	++partialDone;
 	++sit;
       }
@@ -791,64 +794,8 @@ namespace Timbl {
 	  fileDoubleIndex::const_iterator mit = fIndex.begin();
 	  unsigned int totalCount = 0;
 	  while ( mit != fIndex.end() ){
-	    if ( outInstanceBase &&
-		 totalCount + mit->second.size() >= igOffset() ){
-	      //	      cerr << "merging intermediate tree\n" << outInstanceBase << endl;
-	      if ( !InstanceBase->MergeSub( outInstanceBase ) ){
-		FatalError( "Merging InstanceBases failed. PANIC" );
-		return false;
-	      }
-	      else {
-		//cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
-		delete outInstanceBase;
-		outInstanceBase = 0;
-		totalCount = 0;
-	      }
-	      //	      cerr << "Intermediate result tree\n" << InstanceBase << endl;
-	    }
-	    else {
-	      //	      cerr << "need more..." << endl;
-	    }
-	    fileIndex::const_iterator fit = mit->second.begin();
-	    while ( fit != mit->second.end() ){
-	      set<long int>::const_iterator sit = fit->second.begin();
-	      while ( sit != fit->second.end() ){
-		//		cerr << "zoek naar positie " << *sit << endl;
-		datafile.clear();
-		datafile.seekg( *sit );
-		nextLine( datafile, Buffer );
-		chopLine( Buffer );
-		// Progress update.
-		//
-		if (( stats.dataLines() % Progress() ) == 0) 
-		  time_stamp( "Learning:  ", stats.dataLines() );
-		chopped_to_instance( TrainWords );
-		if ( !outInstanceBase )
-		  outInstanceBase = InstanceBase->clone();
-		//		cerr << "add instance " << &CurrInst << endl;
-		if ( !outInstanceBase->AddInstance( CurrInst ) ){
-		  Warning( "deviating exemplar weight in:\n" + 
-			   Buffer + "\nIgnoring the new weight" );
-		}
-		++totalCount;
-		++sit;
-	      }
-	      ++fit;
-	    }
+	    learnFromFileIndex( mit->second, datafile );
 	    ++mit;
-	  }
-	  if ( outInstanceBase ){
-	    //	  cerr << "final merge:" << endl;
-	    //	  cerr << outInstanceBase << endl;
-	    if ( !InstanceBase->MergeSub( outInstanceBase ) ){
-	      FatalError( "Merging InstanceBases failed. PANIC" );
-	      return false;
-	    }
-	    //	  cerr << "after merge: Instance Base" << endl;
-	    //	  cerr << InstanceBase << endl;
-	    //	    cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
-	    delete outInstanceBase;
-	    outInstanceBase = 0;
 	  }
 	}
       }
