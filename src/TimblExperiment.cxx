@@ -183,7 +183,7 @@ namespace Timbl {
     match_depth(-1),
     last_leaf(true),
     estimate( 0 ),
-    speedTraining( true )
+    speedTraining( false )
   {
     Weighting = GR_w;
   }
