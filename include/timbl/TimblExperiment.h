@@ -202,6 +202,7 @@ namespace Timbl {
     virtual void showTestingInfo( std::ostream& );
     virtual bool checkTestFile();
     bool learnFromFileIndex( const fileIndex&, std::istream& );
+    bool learnFromSpeedIndex( const fileIndex&, unsigned int& );
     bool initTestFiles( const std::string&, const std::string& );
     void show_results( std::ostream&,
 		       const std::string&, 
@@ -404,6 +405,8 @@ namespace Timbl {
       return new IG_Experiment( MaxFeats(), "", false ); };
     bool learnFromFileIndex( const fileIndex&, std::istream&, 
 			     const TargetValue* );
+    bool learnFromSpeedIndex( const fileIndex&,  const TargetValue*,
+			      unsigned int& );
     bool SpeedLearn( const std::string& = "" );
     bool ClassicLearn( const std::string& = "" );
     bool checkTestFile();

@@ -78,7 +78,7 @@ namespace Timbl {
     do_sloppy_loo = false;
     do_silly = false;
     do_diversify = false;
-    do_speed_train = false;
+    do_speed_train = true;
     if ( MaxFeats == -1 ){
       MaxFeats = Max;
       LocalInputFormat = UnknownInputFormat; // InputFormat and verbosity

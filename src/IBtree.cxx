@@ -1287,39 +1287,9 @@ namespace Timbl {
       }
       else {
 	IBtree *ibPnt = ib->InstBase;
-	if ( ib->LastInstBasePos->FValue->Index() > InstBase->FValue->Index() ){
-	  Error( "MergeSub assumes sorted additions!" );
+	if ( ib->LastInstBasePos->FValue->Index() >= InstBase->FValue->Index() ){
+	  Error( "MergeSub assumes sorted ans unique additions!" );
 	  return false;
-	}
-	else if ( ib->LastInstBasePos->FValue->Index() == InstBase->FValue->Index() ){
-	  //	  cerr << "EXIST=\n" << InstBase << endl;
-	  //	  cerr << "NEW=\n" << ibPnt << endl;
-	  // this may happen 
-	  // snip the link and insert at our link
-	  IBtree *snip = ibPnt->link;
-	  ibPnt->link = 0;
-	  delete ibPnt->TDistribution;
-	  ibPnt->TDistribution = 0;
-	  --ib->ibCount;
-	  delete ibPnt;
-	  while ( snip ){
-	    delete snip->TDistribution;
-	    IBtree **tmp = &(InstBase->link);
-	    while ( *tmp && (*tmp)->FValue->Index() < snip->FValue->Index() ){
-	      tmp = &(*tmp)->next;
-	    }
-	    IBtree *nxt = snip->next;
-	    snip->next = 0;
-	    if ( *tmp ){
-	      if( (*tmp)->FValue->Index() == snip->FValue->Index() ){
-		Error( "MergeSub assumes sorted additions!" );
-		return false;
-	      }
-	      snip->next = *tmp;
-	    }
-	    *tmp = snip;
-	    snip = nxt;
-	  }
 	}
 	else {
 	  ib->LastInstBasePos->next = InstBase;

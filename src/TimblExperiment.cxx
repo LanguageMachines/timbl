@@ -183,7 +183,7 @@ namespace Timbl {
     match_depth(-1),
     last_leaf(true),
     estimate( 0 ),
-    speedTraining( false )
+    speedTraining( true )
   {
     Weighting = GR_w;
   }
@@ -448,10 +448,53 @@ namespace Timbl {
     return os;
   }
 
+  bool TimblExperiment::learnFromSpeedIndex( const fileIndex& sIndex, 
+					     unsigned int& totalDone ){
+    InstanceBase_base  *OutInstanceBase = 0;
+    fileIndex::const_iterator it = sIndex.begin();
+    
+    while ( it != sIndex.end() ){
+      set<long int>::const_iterator fit = it->second.begin();
+      while ( fit != it->second.end() ){
+	// Progress update.
+	//
+	if (( totalDone % Progress() ) == 0) 
+	  time_stamp( "Learning:  ", totalDone );
+	if ( !OutInstanceBase ){
+	  OutInstanceBase = InstanceBase->clone();
+	}
+	//		cerr << "add instance " << &CurrInst << endl;
+	Instance tmp =  instances[*fit];
+	tmp.permute( permutation );
+	if ( !OutInstanceBase->AddInstance( tmp ) ){
+	  Warning( "deviating exemplar weight in:\n" + 
+		   toString(&instances[*fit]) + "\nIgnoring the new weight" );
+	}
+	++totalDone;
+	++fit;
+      }
+      ++it;
+    }
+    if ( OutInstanceBase ){
+      //	    cerr << OutInstanceBase << endl;
+      //	    cerr << "merge into " << endl;
+      //cerr << InstanceBase << endl;
+      if ( !InstanceBase->MergeSub( OutInstanceBase ) ){
+	FatalError( "Merging InstanceBases failed. PANIC" );
+	return false;
+      }
+      //		subMergeT.stop();
+      //	    cerr << "Final result" << endl;
+      //	    cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;
+      delete OutInstanceBase;
+      OutInstanceBase = 0;
+    } 
+    return true;
+  }
+
   bool TimblExperiment::SpeedLearn( const string& FileName ){
     bool result = true;
     Common::Timer learnT;
-    unsigned int totalDone = 0;
     if ( ExpInvalid() ||
 	 !ConfirmOptions() ){
       result = false;
@@ -484,6 +527,7 @@ namespace Timbl {
       InitInstanceBase();
       if ( ExpInvalid() )
 	return false;
+      unsigned int totalDone = 0;
       if ( EffectiveFeatures() < 2 ) {
 	fileIndex fmIndex;
 	//      Common::Timer t;
@@ -498,64 +542,7 @@ namespace Timbl {
 	    Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
 	    time_stamp( "Start:     ", 0 );
 	  }
-	  InstanceBase_base  *OutInstanceBase = 0;
-	  TargetValue *TopTarget = Targets->MajorityClass();
-	  //	  cerr << "MAJORITY CLASS = " << TopTarget << endl;
-	  fileIndex::const_iterator it = fmIndex.begin();
-	  unsigned int subDone = 0;
-	  while ( it != fmIndex.end() ){
-	    if ( OutInstanceBase &&
-		 (subDone + it->second.size()) > igOffset() ){
-	      if ( !InstanceBase->MergeSub( OutInstanceBase ) ){
-		FatalError( "Merging InstanceBases failed. PANIC" );
-		return false;
-	      }
-	      else {
-		//		cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;
-		//		subMergeT.stop();
-		//	cerr << "after Merge: intermediate result" << endl;
-		//		cerr << InstanceBase << endl;
-		delete OutInstanceBase;
-		OutInstanceBase = 0;
-		subDone = 0;
-	      }
-	    }
-	    set<long int>::const_iterator fit = it->second.begin();
-	    while ( fit != it->second.end() ){
-	      // Progress update.
-	      //
-	      if (( totalDone % Progress() ) == 0) 
-		time_stamp( "Learning:  ", totalDone );
-	      if ( !OutInstanceBase ){
-		OutInstanceBase = InstanceBase->clone();
-	      }
-	      //		cerr << "add instance " << &CurrInst << endl;
-	      Instance tmp =  instances[*fit];
-	      tmp.permute( permutation );
-	      if ( !OutInstanceBase->AddInstance( tmp ) ){
-		Warning( "deviating exemplar weight in:\n" + 
-			 toString(&instances[*fit]) + "\nIgnoring the new weight" );
-	      }
-	      ++fit;
-	      ++subDone;
-	      ++totalDone;
-	    }
-	    ++it;
-	  }
-	  if ( OutInstanceBase ){
-	    //	    cerr << OutInstanceBase << endl;
-	    //	    cerr << "merge into " << endl;
-	    //cerr << InstanceBase << endl;
-	    if ( !InstanceBase->MergeSub( OutInstanceBase ) ){
-	      FatalError( "Merging InstanceBases failed. PANIC" );
-	      return false;
-	    }
-	    //		subMergeT.stop();
-	    //	    cerr << "Final result" << endl;
-	    //	    cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;
-	    delete OutInstanceBase;
-	    OutInstanceBase = 0;
-	  }
+	  result = learnFromSpeedIndex( fmIndex, totalDone );
 	}
       }
       else {
@@ -572,68 +559,10 @@ namespace Timbl {
 	    Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
 	    time_stamp( "Start:     ", 0 );
 	  }
-	  string Buffer;
-	  InstanceBase_base *outInstanceBase = 0;
-	  TargetValue *TopTarget = Targets->MajorityClass();
-	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
 	  fileDoubleIndex::const_iterator mit = fIndex.begin();
-	  unsigned int subDone = 0;
 	  while ( mit != fIndex.end() ){
-	    if ( outInstanceBase &&
-		 subDone + mit->second.size() >= igOffset() ){
-	      //	    cerr << "merging intermediate tree\n" << outInstanceBase << endl;
-	      if ( !InstanceBase->MergeSub( outInstanceBase ) ){
-		FatalError( "Merging InstanceBases failed. PANIC" );
-		return false;
-	      }
-	      else {
-		//		cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
-		delete outInstanceBase;
-		outInstanceBase = 0;
-		subDone = 0;
-	      }
-	      //	    cerr << "Intermediate result tree\n" << InstanceBase << endl;
-	    }
-	    else {
-	      //	    cerr << "need more..." << endl;
-	    }
-	    fileIndex::const_iterator fit = mit->second.begin();
-	    while ( fit != mit->second.end() ){
-	      set<long int>::const_iterator sit = fit->second.begin();
-	      while ( sit != fit->second.end() ){
-		//      cerr << "zoek naar positie " << it->second << endl;
-		if (( totalDone % Progress() ) == 0) 
-		  time_stamp( "Learning:  ", totalDone );
-		chopped_to_instance( TrainWords );
-		if ( !outInstanceBase )
-		  outInstanceBase = InstanceBase->clone();
-		//	      cerr << "add instance " << &instances[sit->second] << endl;
-		Instance tmp = instances[*sit];
-		tmp.permute( permutation );
-		if ( !outInstanceBase->AddInstance( tmp ) ){
-		  Warning( "deviating exemplar weight in:\n" + 
-			   toString(&instances[*sit]) + "\nIgnoring the new weight" );
-		}
-		++subDone;
-		++totalDone;
-		++sit;
-	      }
-	      ++fit;
-	    }
+	    result = learnFromSpeedIndex( mit->second, totalDone );
 	    ++mit;
-	  }
-	  if ( outInstanceBase ){
-	    //	  cerr << "final merge:" << endl;
-	    //	  cerr << outInstanceBase << endl;
-	    if ( !InstanceBase->MergeSub( outInstanceBase ) ){
-	      FatalError( "Merging InstanceBases failed. PANIC" );
-	      return false;
-	    }
-	    //	  cerr << "after merge: Instance Base" << endl;
-	    //	  cerr << InstanceBase << endl;
-	    //	    cerr << "intermediate mismatches: " << outInstanceBase->mismatch << endl;
-	    delete outInstanceBase;
-	    outInstanceBase = 0;
 	  }
 	}
       }
@@ -659,18 +588,6 @@ namespace Timbl {
     unsigned int partialDone = 0;
     fileIndex::const_iterator fit = fi.begin();
     while ( fit != fi.end() ){
-      if ( outInstanceBase &&
-	   (partialDone + fit->second.size()) > igOffset() ){
-	if ( !InstanceBase->MergeSub( outInstanceBase ) ){
-	  FatalError( "Merging InstanceBases failed. PANIC" );
-	  return false;
-	}
-	else {
-	  delete outInstanceBase;
-	  outInstanceBase = 0;
-	  partialDone = 0;
-	}
-      }
       set<streamsize>::const_iterator sit = fit->second.begin();
       while ( sit != fit->second.end() ){
 	datafile.clear();
@@ -743,7 +660,6 @@ namespace Timbl {
       Common::Timer learnT;
       learnT.start();
       InitInstanceBase();
-      TargetValue *TopTarget = Targets->MajorityClass();
       if ( ExpInvalid() )
 	return false;
       if ( EffectiveFeatures() < 2 ) {
@@ -785,8 +701,6 @@ namespace Timbl {
 	  }
 	  string Buffer;
 	  InstanceBase_base *outInstanceBase = 0;
-	  TargetValue *TopTarget = Targets->MajorityClass();
-	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
 	  // Open the file.
 	  //
 	  ifstream datafile( CurrentDataFile.c_str(), ios::in);
