@@ -95,45 +95,29 @@ namespace Timbl {
     return os;
   }  
 
-  bool IG_Experiment::learnFromSpeedIndex( const fileIndex& fIndex, 
+  bool IG_Experiment::learnFromSpeedIndex( const fileIndexNT& fIndex, 
 					   const TargetValue* TopTarget,
 					   unsigned int& totalDone ){
     IG_InstanceBase *PartInstanceBase = 0;
     unsigned int partialDone = 0;
-    fileIndex::const_iterator fit = fIndex.begin();
-    while ( fit != fIndex.end() ){
-      if ( PartInstanceBase &&
-	   (partialDone + fit->second.size()) > igOffset() ){
-	PartInstanceBase->Prune( TopTarget );
-	if ( !InstanceBase->MergeSub( PartInstanceBase ) ){
-	  FatalError( "Merging InstanceBases failed. PANIC" );
-	  return false;
-	}
-	else {
-	  delete PartInstanceBase;
-	  PartInstanceBase = 0;
-	  partialDone = 0;
-	}
+    streamsize pos = fIndex.next();
+    while ( pos != 0 ){
+      pos--;
+      if (( totalDone % Progress() ) == 0) 
+	time_stamp( "Learning:  ", totalDone );
+      if ( !PartInstanceBase ){
+	PartInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
+						ibCount,
+						(RandomSeed()>=0), 
+						false, 
+						true );
       }
-      set<streamsize>::const_iterator sit = fit->second.begin();
-      while ( sit != fit->second.end() ){
-	if (( totalDone % Progress() ) == 0) 
-	  time_stamp( "Learning:  ", totalDone );
-	if ( !PartInstanceBase ){
-	  PartInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
-						  ibCount,
-						  (RandomSeed()>=0), 
-						  false, 
-						  true );
-	}
-	Instance tmp = instances[*sit]; 
-	tmp.permute( permutation );
-	PartInstanceBase->AddInstance( tmp );
-	++sit;
-	++partialDone;
-	++totalDone;
-      }
-      ++fit;
+      Instance tmp = instances[pos]; 
+      tmp.permute( permutation );
+      PartInstanceBase->AddInstance( tmp );
+      ++partialDone;
+      ++totalDone;
+      pos = fIndex.next();
     }
     if ( PartInstanceBase ){
       // time_stamp( "Final  Pruning:    " );
@@ -194,41 +178,19 @@ namespace Timbl {
       TargetValue *TopTarget = Targets->MajorityClass();
       //	  cerr << "MAJORITY CLASS = " << TopTarget << endl;
       unsigned int totalDone = 0;
-      if ( EffectiveFeatures() < 2 ) {
-	fileIndex fmIndex;
-	//      Common::Timer t;
-	//      t.start();
-	result = build_speed_index( fmIndex );
-	//      t.stop();
-	//      cerr << "indexing took " << t << endl;
-	if ( result ){
-	  //	  cerr << "index = " << fmIndex << endl;
-	  if ( !Verbosity(SILENT) ) {
-	    Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
-	    time_stamp( "Start:     ", 0 );
-	  }
-	  result = learnFromSpeedIndex( fmIndex, TopTarget, totalDone );
+      fileIndexNT fmIndex(EffectiveFeatures());
+      //      Common::Timer t;
+      //      t.start();
+      result = build_speed_index( fmIndex );
+      //      t.stop();
+      //      cerr << "indexing took " << t << endl;
+      if ( result ){
+	//	cerr << "index = " << fmIndex << endl;
+	if ( !Verbosity(SILENT) ) {
+	  Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
+	  time_stamp( "Start:     ", 0 );
 	}
-      }
-      else {
-	fileDoubleIndex fmIndex;
-	//      Common::Timer t;
-	//      t.start();
-	result = build_speed_multi_index( fmIndex );
-	//      t.stop();
-	//      cerr << "indexing took " << t << endl;
-	//      totalT.start();
-	if ( result ){
-	  if ( !Verbosity(SILENT) ) {
-	    Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
-	    time_stamp( "Start:     ", 0 );
-	  }
-	  fileDoubleIndex::const_iterator fit = fmIndex.begin();
-	  while ( result && fit != fmIndex.end() ){
-	    result = learnFromSpeedIndex( fit->second, TopTarget, totalDone );
-	    ++fit;
-	  }
-	}
+	result = learnFromSpeedIndex( fmIndex, TopTarget, totalDone );
       }
       time_stamp( "Finished:  ", totalDone );
       instances.clear();
@@ -237,9 +199,6 @@ namespace Timbl {
 	IBInfo( *mylog );
 	Info( "Learning took " + learnT.toString() );
       }
-#ifdef IBSTATS
-      cerr << "final mismatches: " << InstanceBase->mismatch << endl;
-#endif
     }
     return result;
   }
@@ -405,9 +364,6 @@ namespace Timbl {
 	IBInfo( *mylog );
 	Info( "Learning took " + learnT.toString() );
       }
-#ifdef IBSTATS
-      cerr << "final mismatches: " << InstanceBase->mismatch << endl;
-#endif
     }
     return result;
   }

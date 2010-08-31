@@ -374,7 +374,8 @@ namespace Timbl {
 	      }
 	      while( go_on ){
 		chopped_to_instance( LearnWords );
-		instances.push_back( CurrInst );
+		if ( speedTraining )
+		  instances.push_back( CurrInst );
 		// Progress update.
 		//
 		if (( stats.dataLines() % Progress() ) == 0)
@@ -448,32 +449,28 @@ namespace Timbl {
     return os;
   }
 
-  bool TimblExperiment::learnFromSpeedIndex( const fileIndex& sIndex, 
+  bool TimblExperiment::learnFromSpeedIndex( const fileIndexNT& sIndex, 
 					     unsigned int& totalDone ){
     InstanceBase_base  *OutInstanceBase = 0;
-    fileIndex::const_iterator it = sIndex.begin();
+    streamsize pos = sIndex.next();
     
-    while ( it != sIndex.end() ){
-      set<long int>::const_iterator fit = it->second.begin();
-      while ( fit != it->second.end() ){
-	// Progress update.
-	//
-	if (( totalDone % Progress() ) == 0) 
-	  time_stamp( "Learning:  ", totalDone );
-	if ( !OutInstanceBase ){
-	  OutInstanceBase = InstanceBase->clone();
-	}
-	//		cerr << "add instance " << &CurrInst << endl;
-	Instance tmp =  instances[*fit];
-	tmp.permute( permutation );
-	if ( !OutInstanceBase->AddInstance( tmp ) ){
-	  Warning( "deviating exemplar weight in:\n" + 
-		   toString(&instances[*fit]) + "\nIgnoring the new weight" );
-	}
-	++totalDone;
-	++fit;
+    while ( pos != 0 ){
+      pos--;
+      // Progress update.
+      //
+      if (( totalDone % Progress() ) == 0) 
+	time_stamp( "Learning:  ", totalDone );
+      if ( !OutInstanceBase ){
+	OutInstanceBase = InstanceBase->clone();
       }
-      ++it;
+      Instance tmp =  instances[pos];
+      tmp.permute( permutation );
+      if ( !OutInstanceBase->AddInstance( tmp ) ){
+	Warning( "deviating exemplar weight in:\n" + 
+		 toString(&instances[pos]) + "\nIgnoring the new weight" );
+      }
+      ++totalDone;
+      pos = sIndex.next();
     }
     if ( OutInstanceBase ){
       //	    cerr << OutInstanceBase << endl;
@@ -528,43 +525,20 @@ namespace Timbl {
       if ( ExpInvalid() )
 	return false;
       unsigned int totalDone = 0;
-      if ( EffectiveFeatures() < 2 ) {
-	fileIndex fmIndex;
-	//      Common::Timer t;
-	//      t.start();
-	result = build_speed_index( fmIndex );
-	//      t.stop();
-	//      cerr << "indexing took " << t << endl;
-	//      totalT.start();
-	if ( result ){
-	  //	  cerr << "index = " << fmIndex << endl;
-	  if ( !Verbosity(SILENT) ) {
-	    Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
-	    time_stamp( "Start:     ", 0 );
-	  }
-	  result = learnFromSpeedIndex( fmIndex, totalDone );
+      fileIndexNT fmIndex(EffectiveFeatures());
+      //      Common::Timer t;
+      //      t.start();
+      result = build_speed_index( fmIndex );
+      //      t.stop();
+      //      cerr << "indexing took " << t << endl;
+      //      totalT.start();
+      if ( result ){
+	//	cerr << "index = " << fmIndex << endl;
+	if ( !Verbosity(SILENT) ) {
+	  Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
+	  time_stamp( "Start:     ", 0 );
 	}
-      }
-      else {
-	fileDoubleIndex fIndex;
-	//      Common::Timer t;
-	//      t.start();
-	result = build_speed_multi_index( fIndex );
-	//      cerr << "index: " << fIndex << endl;
-	//      t.stop();
-	//      cerr << "indexing took " << t << endl;
-	//      totalT.start();
-	if ( result ){
-	  if ( !Verbosity(SILENT) ) {
-	    Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
-	    time_stamp( "Start:     ", 0 );
-	  }
-	  fileDoubleIndex::const_iterator mit = fIndex.begin();
-	  while ( mit != fIndex.end() ){
-	    result = learnFromSpeedIndex( mit->second, totalDone );
-	    ++mit;
-	  }
-	}
+	result = learnFromSpeedIndex( fmIndex, totalDone );
       }
       time_stamp( "Finished:  ", totalDone );
       instances.clear();
@@ -728,6 +702,13 @@ namespace Timbl {
     return result;
   }
 
+  bool TimblExperiment::Learn( const std::string& s ){
+    if ( speedTraining )
+      return SpeedLearn( s );
+    else
+      return ClassicLearn( s );
+  }
+  
   IB1_Experiment::IB1_Experiment( const size_t N,
 				  const string& s,
 				  const bool init ):
@@ -2262,7 +2243,7 @@ namespace Timbl {
     return true;
   }
 
-  bool TimblExperiment::build_speed_index( fileIndex& fmIndex ){
+  bool TimblExperiment::build_speed_index( fileIndexNT& fmIndex ){
     bool result = true;
     string Buffer;
     if ( !Verbosity(SILENT) ) {
@@ -2272,16 +2253,9 @@ namespace Timbl {
     for ( unsigned int nextPos = 0; nextPos < instances.size(); ++nextPos ){
       // The next Instance to store. 
       //	cerr << "Instance[" << nextPos << "]=" << instances[nextPos] << endl;
-      FeatureValue *fv0 = instances[nextPos].FV[permutation[0]];
-      fileIndex::iterator it = fmIndex.find( fv0 );
-      if ( it == fmIndex.end() ){
-	set<streamsize> st;
-	st.insert(nextPos);
-	fmIndex[fv0] = st;
-      }
-      else {
-	it->second.insert( nextPos );
-      }
+      Instance tmp = instances[nextPos];
+      tmp.permute( permutation );
+      fmIndex.add( tmp.FV, nextPos+1 );
       if (( nextPos % Progress() ) == 0) {
 	time_stamp( "Indexing:  ", nextPos );
       }
@@ -2289,7 +2263,7 @@ namespace Timbl {
     time_stamp( "Finished:  ", instances.size() );
     return result;
   }
-
+  /*
   bool TimblExperiment::build_speed_multi_index( fileDoubleIndex& fmIndex ){
     bool result = true;
     if ( !Verbosity(SILENT) ) {
@@ -2316,6 +2290,7 @@ namespace Timbl {
     time_stamp( "Finished:  ", instances.size() );
     return result;
   }
+  */
 
   bool TimblExperiment::build_file_index( const string& file_name, 
 					  fileIndex& fmIndex ){
