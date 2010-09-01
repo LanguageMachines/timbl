@@ -1011,13 +1011,29 @@ namespace Timbl {
     }
     // the Instance can become very large, with even millions of 'next' pointers
     // so recursive deletion will use a lot of stack
-    // therefore we choose to iterate the first level.
-    IBtree *pnt = InstBase;
-    while ( pnt ){
-      IBtree *toDel = pnt;
-      pnt = pnt->next;
-      toDel->next = 0;
-      delete toDel;
+    // therefore we choose to iterate the first level(s).
+    IBtree *pnt1 = InstBase;
+    while ( pnt1 ){
+      IBtree *toDel1 = pnt1;
+      pnt1 = pnt1->next;
+      toDel1->next = 0;
+      IBtree *pnt2 = toDel1->link;
+      toDel1->link = 0;
+      while ( pnt2 ){
+	IBtree *toDel2 = pnt2;
+	pnt2 = pnt2->next;
+	toDel2->next = 0;
+	IBtree *pnt3 = toDel2->link;
+	toDel2->link = 0;
+	while ( pnt3 ){
+	  IBtree *toDel3 = pnt3;
+	  pnt3 = pnt3->next;
+	  toDel3->next = 0;
+	  delete toDel3;
+	}
+	delete toDel2;
+      }
+      delete toDel1;
     }
     delete TopDistribution;
     delete WTop;
