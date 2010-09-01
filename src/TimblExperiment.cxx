@@ -558,8 +558,7 @@ namespace Timbl {
   
   bool TimblExperiment::learnFromFileIndex( const fileIndex& fi, 
 					    istream& datafile ){
-    IG_InstanceBase *outInstanceBase = 0;
-    unsigned int partialDone = 0;
+    InstanceBase_base *outInstanceBase = 0;
     fileIndex::const_iterator fit = fi.begin();
     while ( fit != fi.end() ){
       set<streamsize>::const_iterator sit = fit->second.begin();
@@ -575,17 +574,12 @@ namespace Timbl {
 	  time_stamp( "Learning:  ", stats.dataLines() );
 	chopped_to_instance( TrainWords );
 	if ( !outInstanceBase )
-	  outInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
-						 ibCount,
-						 (RandomSeed()>=0), 
-						 false, 
-						 true );
+	  outInstanceBase =InstanceBase->clone();
 	//		  cerr << "add instance " << &CurrInst << endl;
 	if ( !outInstanceBase->AddInstance( CurrInst ) ){
 	  Warning( "deviating exemplar weight in:\n" + 
 		   Buffer + "\nIgnoring the new weight" );
 	}
-	++partialDone;
 	++sit;
       }
       ++fit;
