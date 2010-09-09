@@ -135,6 +135,8 @@ namespace Timbl{
 
   const ValueDistribution *NewIBleaf::match( const Instance& I, 
 					     unsigned int pos ) const {
+    if ( TDistribution->ZeroDist() ) // a deleted instance
+      return 0;
     return TDistribution;
   }
 
@@ -142,7 +144,10 @@ namespace Timbl{
 					       unsigned int pos ) const {
     std::map<FeatureValue *,NewIBTree*,rfCmp>::const_iterator it = _mmap.find( I.FV[pos] );
     if ( it != _mmap.end() ){
-      return it->second->match( I, pos+1 );
+      if ( it->first->ValFreq() == 0 ) // a deleted Instance
+	return 0;
+      else
+	return it->second->match( I, pos+1 );
     }
     else
       return 0;
