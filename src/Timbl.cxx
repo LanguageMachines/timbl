@@ -93,8 +93,10 @@ inline void usage_full(void){
   cerr << "     DC: Dice Coefficient" << endl;
   cerr << "     O: weighted Overlap (default)" << endl;
   cerr << "     L: Levenshtein distance" << endl;
+  cerr << "     E: Euclidean Distance" << endl;
   cerr << "     M: Modified value difference" << endl;
   cerr << "     J: Jeffrey Divergence" << endl;
+  cerr << "     S: Jensen-Shannon Divergence" << endl;
   cerr << "     N: numeric values" << endl;
   cerr << "     I: Ignore named  values" << endl;
   cerr << "-w n      : Weighting" << endl;
