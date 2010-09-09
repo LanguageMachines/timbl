@@ -29,11 +29,14 @@ namespace Timbl {
     virtual void assign_defaults( bool, bool, bool, size_t ) = 0; 
     virtual ValueDistribution *sum_distributions( bool ) = 0;
     virtual ValueDistribution *getDistribution( bool ) = 0;
+    virtual const ValueDistribution *match( const Instance&,
+					    unsigned int ) const = 0;
     virtual void save( std::ostream & ) const = 0;
     virtual void prune( const TargetValue *, unsigned int& ) = 0;
     virtual void addInst( const Instance &, 
 			  unsigned int,
 			  unsigned int& ) =0;
+    virtual void delInst( const Instance&, unsigned int, unsigned int& ) =0;
     virtual unsigned int size() const = 0;
     const TargetValue *TValue;
     ValueDistribution *TDistribution;
@@ -46,9 +49,11 @@ namespace Timbl {
     ValueDistribution *getDistribution( bool );
   private:
     void addInst( const Instance &, unsigned int, unsigned int& );
+    void delInst( const Instance&, unsigned int, unsigned int& );
     void save( std::ostream & ) const;
     void assign_defaults( bool, bool, bool, size_t ){}; 
     ValueDistribution *sum_distributions( bool ){};
+    const ValueDistribution *match( const Instance&, unsigned int ) const;
     void prune( const TargetValue *, unsigned int& );
     unsigned int size() const { return 0; } ;
   };
@@ -63,8 +68,10 @@ namespace Timbl {
   private:
     void save( std::ostream & ) const;
     void addInst( const Instance&, unsigned int, unsigned int& );
+    void delInst( const Instance&, unsigned int, unsigned int& );
     void assign_defaults( bool, bool, bool, size_t );
     ValueDistribution *sum_distributions( bool );
+    const ValueDistribution *match( const Instance&, unsigned int ) const;
     void prune( const TargetValue *, unsigned int& );
     unsigned int size() const {return _mmap.size(); };
     std::map<FeatureValue *, NewIBTree *, rfCmp> _mmap;
@@ -79,9 +86,11 @@ namespace Timbl {
     ~NewIBroot();
     void assignDefaults();
     void addInstance( const Instance & );
+    void deleteInstance( const Instance & );
     void Save( std::ostream &, bool );
     void Put( std::ostream &  ) const;
     void Prune( const TargetValue * = 0 );
+    const ValueDistribution *exactMatch( const Instance& ) const;
   protected:
     int _depth;
     bool _random;

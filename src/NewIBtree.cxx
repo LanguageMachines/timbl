@@ -37,6 +37,20 @@ namespace Timbl{
     return os;
   }
 
+  NewIBTree *createNewIBTree( const Instance& I, unsigned int pos,
+			      unsigned int& cnt ){
+    NewIBTree *result = 0;
+    if ( pos == I.FV.size() ){
+      result = new NewIBleaf( );
+    }
+    else { 
+      result = new NewIBbranch( );
+    }
+    ++cnt;
+    result->addInst( I, pos,  cnt );
+    return result;
+  }
+  
   ValueDistribution *NewIBleaf::getDistribution( bool keep ){
     if ( keep )
       return TDistribution;
@@ -75,12 +89,63 @@ namespace Timbl{
     return result;
   }  
   
+  void NewIBbranch::addInst( const Instance& I, 
+			     unsigned int pos,
+			     unsigned int& cnt ){
+    if ( pos < I.FV.size() ){
+      std::map<FeatureValue *,NewIBTree*,rfCmp>::iterator it = _mmap.find( I.FV[pos] );
+      if ( it != _mmap.end() ){
+	it->second->addInst( I, pos+1, cnt );
+      }
+      else {
+	NewIBTree *o = createNewIBTree( I, pos+1, cnt );
+	_mmap[I.FV[pos]] = o;
+	mit = _mmap.begin();
+      }
+    }
+  }
+
+  void NewIBbranch::delInst( const Instance& I, 
+			     unsigned int pos,
+			     unsigned int& cnt ){
+    if ( pos < I.FV.size() ){
+      std::map<FeatureValue *,NewIBTree*,rfCmp>::iterator it = _mmap.find( I.FV[pos] );
+      if ( it != _mmap.end() ){
+	it->second->delInst( I, pos+1, cnt );
+      }
+      else {
+	throw logic_error("attemt to delete an instance which isn't there!");
+      }
+    }
+  }
+  
   void NewIBleaf::addInst( const Instance& v, 
 			   unsigned int,
 			   unsigned int& ){
     if ( !TDistribution )
       TDistribution = new ValueDistribution();
     TDistribution->IncFreq( v.TV, v.ExemplarWeight() );
+  }
+  
+  void NewIBleaf::delInst( const Instance& v, 
+			   unsigned int,
+			   unsigned int& ){
+    TDistribution->DecFreq( v.TV );
+  }
+
+  const ValueDistribution *NewIBleaf::match( const Instance& I, 
+					     unsigned int pos ) const {
+    return TDistribution;
+  }
+
+  const ValueDistribution *NewIBbranch::match( const Instance& I, 
+					       unsigned int pos ) const {
+    std::map<FeatureValue *,NewIBTree*,rfCmp>::const_iterator it = _mmap.find( I.FV[pos] );
+    if ( it != _mmap.end() ){
+      return it->second->match( I, pos+1 );
+    }
+    else
+      return 0;
   }
   
   void NewIBleaf::save( std::ostream& os ) const {
@@ -194,26 +259,20 @@ namespace Timbl{
     }
   }
   
-  NewIBTree *createNewIBTree( const Instance& I, unsigned int pos,
-			      unsigned int& cnt ){
-    NewIBTree *result = 0;
-    if ( pos == I.FV.size() ){
-      result = new NewIBleaf( );
-    }
-    else { 
-      result = new NewIBbranch( );
-    }
-    ++cnt;
-    result->addInst( I, pos,  cnt );
-    return result;
-  }
-  
   void NewIBroot::addInstance( const Instance& I ){
     if ( !_root ){
       _root = createNewIBTree( I, 0, _nodeCount );
     }
     else
       _root->addInst( I, 0, _nodeCount );
+  }
+
+  void NewIBroot::deleteInstance( const Instance& I ){
+    if ( _root ){
+      _root->delInst( I, 0, _nodeCount );
+      if ( TopDist )
+	TopDist->DecFreq(I.TV);
+    }
   }
   
   void NewIBroot::assignDefaults(){
@@ -226,15 +285,15 @@ namespace Timbl{
 	}
 	_root->TValue = _root->TDistribution->BestTarget( dummy, _random );
 	TopTarget = _root->TValue;
-      }
+	TopDist = _root->TDistribution;
+    }
     }
     _defAss = true;
     _defValid = true;
   }
-
+  
   NewIBroot::~NewIBroot(){
     delete _root;
-    delete TopDist;
   }
   
   void NewIBroot::Put( ostream& os ) const{
@@ -274,20 +333,11 @@ namespace Timbl{
     cerr << "end prune with " << _nodeCount << " nodes" << endl;
   }
   
-  void NewIBbranch::addInst( const Instance& I, 
-			     unsigned int pos,
-			     unsigned int& cnt ){
-    if ( pos < I.FV.size() ){
-      std::map<FeatureValue *,NewIBTree*,rfCmp>::iterator it = _mmap.find( I.FV[pos] );
-      if ( it != _mmap.end() ){
-	it->second->addInst( I, pos+1, cnt );
-      }
-      else {
-	NewIBTree *o = createNewIBTree( I, pos+1, cnt );
-	_mmap[I.FV[pos]] = o;
-	mit = _mmap.begin();
-      }
-    }
+  const ValueDistribution *NewIBroot::exactMatch( const Instance& I ) const {  
+    if ( _root )
+      return _root->match( I, 0 );
+    else
+      return 0;
   }
-  
+
 }
