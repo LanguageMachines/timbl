@@ -100,7 +100,6 @@ namespace Timbl{
       else {
 	NewIBTree *o = createNewIBTree( I, pos+1, cnt );
 	_mmap[I.FV[pos]] = o;
-	mit = _mmap.begin();
       }
     }
   }
@@ -131,6 +130,14 @@ namespace Timbl{
 			   unsigned int,
 			   unsigned int& ){
     TDistribution->DecFreq( v.TV );
+  }
+
+  const NewIBTree *NewIBbranch::find( FeatureValue *fv ) const {
+    IBmap::const_iterator mit = _mmap.find( fv );
+    if ( mit != _mmap.end() )
+      return mit->second;
+    else
+      return 0;
   }
 
   const ValueDistribution *NewIBleaf::match( const Instance& I, 
@@ -297,8 +304,21 @@ namespace Timbl{
     _defValid = true;
   }
   
+  NewIBroot::NewIBroot( int depth, bool random, bool keep ): 
+    _depth(depth), _random(random), _keepDist(keep), _root(0), _version(4), 
+    _defValid(false), _defAss(false), _pruned(false), _nodeCount(1),
+    TopTarget(0), TopDist(0), WTop(0) {
+    RestartSearch = new IBiter[depth];
+    SkipSearch = new IBiter[depth];
+    InstPath = new IBiter[depth];
+  };
+  
   NewIBroot::~NewIBroot(){
     delete _root;
+    delete WTop;
+    delete [] RestartSearch;
+    delete [] SkipSearch;
+    delete [] InstPath;
   }
   
   void NewIBroot::Put( ostream& os ) const{
@@ -344,5 +364,186 @@ namespace Timbl{
     else
       return 0;
   }
+  
+  void IBiter::init( NewIBTree *tree ){
+    if ( tree ){
+      _map = tree->getMap();
+      if ( _map )
+	mit = _map->begin();
+    }
+    else {
+      _map = 0;
+    }
+  }
+  
+  NewIBTree *IBiter::value() {
+    if ( _map && mit != _map->end() )
+      return mit->second;
+    else
+      return 0;
+  }
 
+  FeatureValue *IBiter::FValue() {
+    if ( _map && mit != _map->end() )
+      return mit->first;
+    else
+      return 0;
+  }
+
+  NewIBTree *IBiter::find( FeatureValue *fv ) {
+    if ( _map ){
+      mit == _map->find( fv );
+      if ( mit != _map->end() )
+	return mit->second;
+    }
+    return 0;
+  }
+  
+  void IBiter::reset( ) {
+    if ( _map ){
+      mit == _map->begin();
+    }
+  }
+
+  const ValueDistribution *NewIBroot::initTest( vector<FeatureValue *>& Path,
+						const Instance *inst,
+						size_t off,
+						size_t eff ){
+    const ValueDistribution *result = NULL;
+    testInst = inst;
+    offSet = off;
+    InstPath[0].init( _root );
+    RestartSearch[0].init( _root );
+    for ( unsigned int i = 0; i < _depth; ++i ){
+      NewIBTree *pnt = InstPath[i].find( testInst->FV[i+offSet] );
+      if ( pnt ){
+	SkipSearch[i] = InstPath[i];
+	if ( RestartSearch[i].value() == InstPath[i].value() ){
+	  RestartSearch[i].increment();
+	}
+      }
+      else {
+	RestartSearch[i].init(0);
+	SkipSearch[i].init(0);
+	InstPath[i].reset();
+      }
+      Path[i] = InstPath[i].FValue();
+      if ( i == _depth-1 ){
+	result = InstPath[i].value()->TDistribution;
+      }
+      else {
+	InstPath[i+1].init( InstPath[i].value() );
+      }
+    }
+    if ( result && result->ZeroDist() ){
+      // This might happen when doing LOO or CV tests
+      size_t TmpPos = effFeat-1;
+      result = nextTest( Path, TmpPos );
+    }
+    return result;
+  }
+
+  const ValueDistribution *NewIBroot::nextTest( vector<FeatureValue *>& Path, 
+						size_t& pos ){
+    const ValueDistribution *result = 0;
+    const NewIBTree *pnt = 0;
+    while ( !pnt  ){
+      if ( RestartSearch[pos].value() == 0 ) {
+	// No exact match here, so no real problems
+	InstPath[pos].increment();
+      }
+      else {
+	InstPath[pos] = RestartSearch[pos];
+	RestartSearch[pos].init(0);
+      }
+      if ( InstPath[pos].value() == SkipSearch[pos].value() ){
+	InstPath[pos].increment();
+      }
+      pnt = InstPath[pos].value();
+      if ( !pnt ) {
+	if ( pos == 0 )
+	  break;
+	else {
+	  pos--;
+	  //	  cerr << "decremented POS to " << pos << endl;
+	}
+      }
+    }
+    if ( pnt ) {
+      Path[pos] = InstPath[pos].FValue();
+      //      cerr << "set Path[" << pos << "] to " << Path[pos] << endl;
+      if ( pos < _depth-1 ){
+	InstPath[pos+1].init( InstPath[pos].value() );
+	for (  size_t j=pos+1; j < _depth; ++j ){
+	  NewIBTree *tmp = InstPath[j].find( testInst->FV[j+offSet] );
+	  if ( tmp ){ // we found an exact match, so mark Restart position
+	    SkipSearch[j] = InstPath[j];
+	    if ( RestartSearch[j].value() == InstPath[j].value() ){
+	      RestartSearch[j].increment();
+	    }
+	  }
+	  else { // no exact match at this level. Just start with the first....
+	    RestartSearch[j].init(0);
+	    SkipSearch[j].init(0);
+	    InstPath[j].reset();
+	  }
+	  Path[j] = InstPath[j].FValue();
+	  //	  cerr << "set Path[" << j << "] to " << Path[j] << endl;
+	  //	  cerr << "using InstPath[" << j << "] = " << InstPath[j].value() << endl;
+	  pos = j;
+	  if ( j == _depth-1 ){
+	    result = InstPath[j].value()->TDistribution;
+	    //	    cerr << "assign result:" << result << endl;
+	  }
+	  else {
+	    InstPath[j+1].init( InstPath[j].value() );
+	  }
+	}
+      }
+      else {
+	result = InstPath[_depth-1].value()->TDistribution;
+      }
+    }
+    if ( result && result->ZeroDist() ){
+      // This might happen when doing LOO or CV tests
+      size_t TmpPos = effFeat-1;
+      result = nextTest( Path, TmpPos );
+      if ( TmpPos < pos ){
+	pos = TmpPos;
+      }
+    }
+    return result;
+  }
+
+  const ValueDistribution *NewIBroot::IG_test( const Instance& Inst, 
+					       size_t &end_level,
+					       bool &leaf,
+					       const TargetValue *&result ) {
+    // The Test function for the IG algorithm, returns a pointer to the
+    // distribution of the last matching position in the Tree, it's position
+    // in the Instance Base and the default TargetValue
+    result = 0;
+    ValueDistribution *Dist = 0;
+    int pos = 0;
+    leaf = false;
+    if ( _root ){
+      const NewIBTree *pnt = _root->find( Inst.FV[0] );
+      while ( pnt ){
+	result = pnt->TValue;
+	if ( _keepDist )
+	  Dist = pnt->TDistribution;
+	pnt = pnt->find( Inst.FV[++pos] );
+	leaf = (pnt == NULL);
+      }
+      end_level = pos;
+      if ( end_level == 0 ){
+	if ( !WTop && TopDist )
+	  WTop = TopDist->to_WVD_Copy();
+	Dist = WTop;
+      }
+    }
+    return Dist;
+  }
+
+  
 }

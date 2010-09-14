@@ -23,6 +23,7 @@ namespace Timbl {
     friend std::ostream& operator<< ( std::ostream&, const NewIBTree& );
     friend std::ostream& operator<< ( std::ostream&, const NewIBTree * );
   public:
+    typedef std::map<FeatureValue *, NewIBTree *, rfCmp> IBmap;
   NewIBTree(): TValue(0), TDistribution(0){};
     virtual ~NewIBTree(){};
     virtual void put( std::ostream&, int ) const;
@@ -31,6 +32,7 @@ namespace Timbl {
     virtual ValueDistribution *getDistribution( bool ) = 0;
     virtual const ValueDistribution *match( const Instance&,
 					    unsigned int ) const = 0;
+    virtual const NewIBTree *find( FeatureValue * ) const = 0;
     virtual void save( std::ostream & ) const = 0;
     virtual void prune( const TargetValue *, unsigned int& ) = 0;
     virtual void addInst( const Instance &, 
@@ -38,6 +40,7 @@ namespace Timbl {
 			  unsigned int& ) =0;
     virtual void delInst( const Instance&, unsigned int, unsigned int& ) =0;
     virtual unsigned int size() const = 0;
+    virtual IBmap *getMap() = 0;
     const TargetValue *TValue;
     ValueDistribution *TDistribution;
   };
@@ -47,6 +50,7 @@ namespace Timbl {
     ~NewIBleaf();
     void put( std::ostream&, int ) const;
     ValueDistribution *getDistribution( bool );
+    IBmap *getMap() { return 0; };
   private:
     void addInst( const Instance &, unsigned int, unsigned int& );
     void delInst( const Instance&, unsigned int, unsigned int& );
@@ -54,17 +58,18 @@ namespace Timbl {
     void assign_defaults( bool, bool, bool, size_t ){}; 
     ValueDistribution *sum_distributions( bool ){};
     const ValueDistribution *match( const Instance&, unsigned int ) const;
+    const NewIBTree *find( FeatureValue * ) const { return 0; };
     void prune( const TargetValue *, unsigned int& );
     unsigned int size() const { return 0; } ;
   };
   
   class NewIBbranch: public NewIBTree {
+    friend class IBiter;
   public:
     ~NewIBbranch();
     void put( std::ostream&, int ) const;
     ValueDistribution *getDistribution( bool );
-  protected:
-    mutable std::map<FeatureValue *, NewIBTree *, rfCmp>::const_iterator mit;
+    IBmap *getMap() { return &_mmap; };
   private:
     void save( std::ostream & ) const;
     void addInst( const Instance&, unsigned int, unsigned int& );
@@ -72,25 +77,49 @@ namespace Timbl {
     void assign_defaults( bool, bool, bool, size_t );
     ValueDistribution *sum_distributions( bool );
     const ValueDistribution *match( const Instance&, unsigned int ) const;
+    const NewIBTree *find( FeatureValue * ) const;
     void prune( const TargetValue *, unsigned int& );
     unsigned int size() const {return _mmap.size(); };
-    std::map<FeatureValue *, NewIBTree *, rfCmp> _mmap;
+    IBmap _mmap;
   };
-  
+
+  class IBiter {
+  public:
+  IBiter(): _map(0){};
+    void init( NewIBTree * );
+    void reset();
+    void increment() { ++mit; };
+    NewIBTree* find( FeatureValue * );
+    NewIBTree* value();
+    FeatureValue* FValue();
+  private:
+    NewIBTree::IBmap::const_iterator mit;
+    NewIBTree::IBmap *_map;
+  };
+
+
   class NewIBroot {
   public:
-  NewIBroot( int depth, bool random, bool keep ): _depth(depth),
-      _random(random), _keepDist(keep), _root(0), _version(4), 
-      _defValid(false), _defAss(false), _pruned(false), _nodeCount(1),
-      TopTarget(0), TopDist(0) {};
+    NewIBroot( int, bool, bool );
     ~NewIBroot();
     void assignDefaults();
     void addInstance( const Instance & );
     void deleteInstance( const Instance & );
     void Save( std::ostream &, bool );
     void Put( std::ostream &  ) const;
-    void Prune( const TargetValue * = 0 );
+    void Prune( const TargetValue * = 0 ); 
     const ValueDistribution *exactMatch( const Instance& ) const;
+    const ValueDistribution *IG_test( const Instance&, 
+				      size_t&,
+				      bool&,
+				      const TargetValue *& );
+
+    const ValueDistribution *initTest( std::vector<FeatureValue *>&,
+				       const Instance *,
+				       size_t, size_t );
+    const ValueDistribution *nextTest( std::vector<FeatureValue *>&, 
+				       size_t& );
+
   protected:
     int _depth;
     bool _random;
@@ -104,6 +133,15 @@ namespace Timbl {
     unsigned int _nodeCount;
     const TargetValue *TopTarget;
     ValueDistribution *TopDist;
+    ValueDistribution *WTop;
+
+    const Instance *testInst;
+    unsigned int offSet;
+    unsigned int effFeat;
+    unsigned int depth;
+    IBiter *RestartSearch;
+    IBiter *SkipSearch;
+    IBiter *InstPath;
   };
 
 }
