@@ -38,16 +38,17 @@ namespace Timbl{
   }
 
   NewIBTree *createNewIBTree( const Instance& I, unsigned int pos,
-			      unsigned int& cnt ){
+			      unsigned int& ncnt, unsigned int& lcnt ){
     NewIBTree *result = 0;
     if ( pos == I.FV.size() ){
       result = new NewIBleaf( );
+      ++lcnt;
     }
     else { 
       result = new NewIBbranch( );
     }
-    ++cnt;
-    result->addInst( I, pos,  cnt );
+    ++ncnt;
+    result->addInst( I, pos, ncnt, lcnt );
     return result;
   }
   
@@ -89,19 +90,22 @@ namespace Timbl{
     return result;
   }  
   
-  void NewIBbranch::addInst( const Instance& I, 
+  bool NewIBbranch::addInst( const Instance& I, 
 			     unsigned int pos,
-			     unsigned int& cnt ){
+			     unsigned int& ncnt,
+			     unsigned int& lcnt ){
+    bool result = true;
     if ( pos < I.FV.size() ){
       std::map<FeatureValue *,NewIBTree*,rfCmp>::iterator it = _mmap.find( I.FV[pos] );
       if ( it != _mmap.end() ){
-	it->second->addInst( I, pos+1, cnt );
+	result = it->second->addInst( I, pos+1, ncnt, lcnt );
       }
       else {
-	NewIBTree *o = createNewIBTree( I, pos+1, cnt );
+	NewIBTree *o = createNewIBTree( I, pos+1, ncnt, lcnt );
 	_mmap[I.FV[pos]] = o;
       }
     }
+    return result;
   }
 
   void NewIBbranch::delInst( const Instance& I, 
@@ -118,12 +122,13 @@ namespace Timbl{
     }
   }
   
-  void NewIBleaf::addInst( const Instance& v, 
+  bool NewIBleaf::addInst( const Instance& v, 
 			   unsigned int,
+			   unsigned int&,
 			   unsigned int& ){
     if ( !TDistribution )
       TDistribution = new ValueDistribution();
-    TDistribution->IncFreq( v.TV, v.ExemplarWeight() );
+    return TDistribution->IncFreq( v.TV, v.ExemplarWeight() );
   }
   
   void NewIBleaf::delInst( const Instance& v, 
@@ -271,19 +276,21 @@ namespace Timbl{
     }
   }
   
-  void NewIBroot::addInstance( const Instance& I ){
+  bool NewIBroot::addInstance( const Instance& I ){
+    bool result = true;
     if ( !_root ){
-      _root = createNewIBTree( I, 0, _nodeCount );
+      _root = createNewIBTree( I, 0, _nodeCount, _leafCount );
     }
     else
-      _root->addInst( I, 0, _nodeCount );
+      result = _root->addInst( I, 0, _nodeCount, _leafCount );
+    return result;
   }
 
   void NewIBroot::deleteInstance( const Instance& I ){
     if ( _root ){
       _root->delInst( I, 0, _nodeCount );
-      if ( TopDist )
-	TopDist->DecFreq(I.TV);
+      if ( topDist )
+	topDist->DecFreq(I.TV);
     }
   }
   
@@ -296,18 +303,28 @@ namespace Timbl{
 	  _root->TDistribution = _root->sum_distributions( _keepDist );
 	}
 	_root->TValue = _root->TDistribution->BestTarget( dummy, _random );
-	TopTarget = _root->TValue;
-	TopDist = _root->TDistribution;
+	topTV = _root->TValue;
+	topDist = _root->TDistribution;
     }
     }
     _defAss = true;
     _defValid = true;
   }
   
+  const TargetValue *NewIBroot::topTarget( bool &tie ) {
+    if ( !_defValid || !_defAss )
+      topTV = 0;
+    if ( topTV == 0 ){
+      topTV = topDist->BestTarget( tiedTop, _random); 
+    }
+    tie = tiedTop;
+    return topTV;
+  }
+
   NewIBroot::NewIBroot( int depth, bool random, bool keep ): 
     _depth(depth), _random(random), _keepDist(keep), _root(0), _version(4), 
     _defValid(false), _defAss(false), _pruned(false), _nodeCount(1),
-    TopTarget(0), TopDist(0), WTop(0) {
+    _leafCount(0), topTV(0), tiedTop( false ), topDist(0), WTop(0) {
     RestartSearch = new IBiter[depth];
     SkipSearch = new IBiter[depth];
     InstPath = new IBiter[depth];
@@ -320,14 +337,22 @@ namespace Timbl{
     delete [] SkipSearch;
     delete [] InstPath;
   }
+
+  unsigned long int NewIBroot::getSizeInfo( unsigned long int& CurSize, 
+					    double &Compression ) const {
+    unsigned long int MaxSize = (_depth+1) * _leafCount;
+    CurSize = _nodeCount;
+    Compression = 100*(1-(double)CurSize/(double)MaxSize);
+    return CurSize * sizeof(NewIBbranch);
+  }
   
-  void NewIBroot::Put( ostream& os ) const{
-    os << "TOPTARGET = " << TopTarget << endl;
-    os << "TOPDIST = " << TopDist << endl;
+  void NewIBroot::put( ostream& os ) const{
+    os << "TOPTARGET = " << topTV << endl;
+    os << "TOPDIST = " << topDist << endl;
     os << "\n[" << _root << "]" << endl;
   }
 
-  void NewIBroot::Save( ostream &os, bool persist ) {
+  void NewIBroot::save( ostream &os, bool persist ) {
     // save an IBtree for later use.
     bool temp_persist = _keepDist;
     _keepDist = persist;
@@ -343,19 +368,33 @@ namespace Timbl{
     _keepDist = temp_persist;
   }
   
-  void NewIBroot::Prune( const TargetValue *top ) {
-    cerr << "start prune with " << _nodeCount << " nodes" << endl;
+  void NewIBroot::prune( const TargetValue *top ) {
     assignDefaults( );
     if ( !_pruned ) {
       if ( _root ){
 	if ( top )
 	  _root->prune( top, _nodeCount );
 	else
-	  _root->prune( TopTarget, _nodeCount );	  
+	  _root->prune( topTV, _nodeCount );	  
       }
       _pruned = true;
     }
-    cerr << "end prune with " << _nodeCount << " nodes" << endl;
+  }
+
+  NewIBroot *NewIBroot::copy() const {
+    NewIBroot *result = new NewIBroot( _depth, _random, _keepDist );
+    result->_defAss = _defAss;
+    result->_defValid = _defValid;
+    result->_nodeCount = _nodeCount;
+    result->_leafCount = _leafCount; // only usefull for Server???
+    result->_pruned = _pruned;
+    result->_root = _root;
+    result->topDist = topDist;
+    return result;
+  }
+
+  void NewIBroot::cleanPartition( bool what ){
+    assert( 4==5);
   }
   
   const ValueDistribution *NewIBroot::exactMatch( const Instance& I ) const {  
@@ -532,13 +571,17 @@ namespace Timbl{
 	result = pnt->TValue;
 	if ( _keepDist )
 	  Dist = pnt->TDistribution;
-	pnt = pnt->find( Inst.FV[++pos] );
-	leaf = (pnt == NULL);
+	++pos;
+	if ( pos < _depth )
+	  pnt = pnt->find( Inst.FV[pos] );
+	else
+	  pnt = 0;
+	leaf = (pnt == 0 );
       }
       end_level = pos;
       if ( end_level == 0 ){
-	if ( !WTop && TopDist )
-	  WTop = TopDist->to_WVD_Copy();
+	if ( !WTop && topDist )
+	  WTop = topDist->to_WVD_Copy();
 	Dist = WTop;
       }
     }

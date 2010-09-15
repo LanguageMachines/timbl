@@ -35,8 +35,9 @@ namespace Timbl {
     virtual const NewIBTree *find( FeatureValue * ) const = 0;
     virtual void save( std::ostream & ) const = 0;
     virtual void prune( const TargetValue *, unsigned int& ) = 0;
-    virtual void addInst( const Instance &, 
+    virtual bool addInst( const Instance &, 
 			  unsigned int,
+			  unsigned int&,
 			  unsigned int& ) =0;
     virtual void delInst( const Instance&, unsigned int, unsigned int& ) =0;
     virtual unsigned int size() const = 0;
@@ -52,7 +53,8 @@ namespace Timbl {
     ValueDistribution *getDistribution( bool );
     IBmap *getMap() { return 0; };
   private:
-    void addInst( const Instance &, unsigned int, unsigned int& );
+    bool addInst( const Instance &, unsigned int, 
+		  unsigned int&, unsigned int& );
     void delInst( const Instance&, unsigned int, unsigned int& );
     void save( std::ostream & ) const;
     void assign_defaults( bool, bool, bool, size_t ){}; 
@@ -72,7 +74,7 @@ namespace Timbl {
     IBmap *getMap() { return &_mmap; };
   private:
     void save( std::ostream & ) const;
-    void addInst( const Instance&, unsigned int, unsigned int& );
+    bool addInst( const Instance&, unsigned int, unsigned int&, unsigned int& );
     void delInst( const Instance&, unsigned int, unsigned int& );
     void assign_defaults( bool, bool, bool, size_t );
     ValueDistribution *sum_distributions( bool );
@@ -103,12 +105,18 @@ namespace Timbl {
     NewIBroot( int, bool, bool );
     ~NewIBroot();
     void assignDefaults();
-    void addInstance( const Instance & );
+    bool addInstance( const Instance & );
     void deleteInstance( const Instance & );
-    void Save( std::ostream &, bool );
-    void Put( std::ostream &  ) const;
-    void Prune( const TargetValue * = 0 ); 
+    void save( std::ostream &, bool );
+    void put( std::ostream &  ) const;
+    void prune( const TargetValue * = 0 ); 
+    bool isPruned() const { return _pruned; };
+    bool persistentD() const { return _keepDist; };
+    unsigned long int getSizeInfo( unsigned long int&, double & ) const;
+    void cleanPartition( bool );
+    NewIBroot *copy() const;
     const ValueDistribution *exactMatch( const Instance& ) const;
+    const TargetValue *topTarget( bool& );
     const ValueDistribution *IG_test( const Instance&, 
 				      size_t&,
 				      bool&,
@@ -131,8 +139,10 @@ namespace Timbl {
     bool _defAss;
     bool _pruned;
     unsigned int _nodeCount;
-    const TargetValue *TopTarget;
-    ValueDistribution *TopDist;
+    unsigned int _leafCount;
+    const TargetValue *topTV;
+    bool tiedTop;
+    ValueDistribution *topDist;
     ValueDistribution *WTop;
 
     const Instance *testInst;
