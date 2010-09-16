@@ -113,7 +113,7 @@ namespace Timbl {
     bool isPruned() const { return _pruned; };
     bool persistentD() const { return _keepDist; };
     unsigned long int getSizeInfo( unsigned long int&, double & ) const;
-    void cleanPartition( bool );
+    void deleteCopy( bool );
     NewIBroot *copy() const;
     const ValueDistribution *exactMatch( const Instance& ) const;
     const TargetValue *topTarget( bool& );
@@ -149,7 +149,7 @@ namespace Timbl {
     unsigned int offSet;
     unsigned int effFeat;
     unsigned int depth;
-    IBiter *RestartSearch;
+    bool *RestartSearch;
     IBiter *SkipSearch;
     IBiter *InstPath;
   };

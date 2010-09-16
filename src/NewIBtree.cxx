@@ -325,7 +325,7 @@ namespace Timbl{
     _depth(depth), _random(random), _keepDist(keep), _root(0), _version(4), 
     _defValid(false), _defAss(false), _pruned(false), _nodeCount(1),
     _leafCount(0), topTV(0), tiedTop( false ), topDist(0), WTop(0) {
-    RestartSearch = new IBiter[depth];
+    RestartSearch = new bool[depth];
     SkipSearch = new IBiter[depth];
     InstPath = new IBiter[depth];
   };
@@ -393,8 +393,11 @@ namespace Timbl{
     return result;
   }
 
-  void NewIBroot::cleanPartition( bool what ){
-    assert( 4==5);
+  void NewIBroot::deleteCopy( bool distToo ){
+    _root = 0; // prevent deletion of InstBase in next step!
+    if ( !distToo )
+      topDist = 0; // save TopDist for deletion
+    delete this;
   }
   
   const ValueDistribution *NewIBroot::exactMatch( const Instance& I ) const {  
@@ -431,16 +434,19 @@ namespace Timbl{
 
   NewIBTree *IBiter::find( FeatureValue *fv ) {
     if ( _map ){
-      mit == _map->find( fv );
-      if ( mit != _map->end() )
+      //      cerr << "iter search " << fv << endl;
+      mit = _map->find( fv );
+      if ( mit != _map->end() ){
+	//	cerr << "found! " << mit->first << endl;
 	return mit->second;
+      }
     }
     return 0;
   }
   
   void IBiter::reset( ) {
     if ( _map ){
-      mit == _map->begin();
+      mit = _map->begin();
     }
   }
 
@@ -452,21 +458,22 @@ namespace Timbl{
     testInst = inst;
     offSet = off;
     InstPath[0].init( _root );
-    RestartSearch[0].init( _root );
     for ( unsigned int i = 0; i < _depth; ++i ){
       NewIBTree *pnt = InstPath[i].find( testInst->FV[i+offSet] );
       if ( pnt ){
+	//	cerr << "found " << testInst->FV[i+offSet] << endl;
 	SkipSearch[i] = InstPath[i];
-	if ( RestartSearch[i].value() == InstPath[i].value() ){
-	  RestartSearch[i].increment();
-	}
+	Path[i] = testInst->FV[i+offSet];
+	RestartSearch[i] = true;
       }
       else {
-	RestartSearch[i].init(0);
+	//	cerr << "didn't find " << testInst->FV[i+offSet] << endl;	
+	RestartSearch[i] = false;
 	SkipSearch[i].init(0);
 	InstPath[i].reset();
+	Path[i] = InstPath[i].FValue();
       }
-      Path[i] = InstPath[i].FValue();
+      //      cerr << "set Path[" << i << "] to " << Path[i] << endl;
       if ( i == _depth-1 ){
 	result = InstPath[i].value()->TDistribution;
       }
@@ -487,16 +494,22 @@ namespace Timbl{
     const ValueDistribution *result = 0;
     const NewIBTree *pnt = 0;
     while ( !pnt  ){
-      if ( RestartSearch[pos].value() == 0 ) {
+      if ( !RestartSearch[pos] ) {
 	// No exact match here, so no real problems
 	InstPath[pos].increment();
+	//	cerr << "no match before so just increment " << InstPath[pos].FValue() << endl;
       }
       else {
-	InstPath[pos] = RestartSearch[pos];
-	RestartSearch[pos].init(0);
+	InstPath[pos].reset();
+	//	cerr << "restart with " << InstPath[pos].FValue() << endl;	
+	RestartSearch[pos] = false;
       }
-      if ( InstPath[pos].value() == SkipSearch[pos].value() ){
+      if ( InstPath[pos].value() != 0 &&
+	   InstPath[pos].value() == SkipSearch[pos].value() ){
+	//	cerr << "hit on Skip" << endl;
 	InstPath[pos].increment();
+	SkipSearch[pos].init(0);
+	//	cerr << "go to next: " << InstPath[pos].FValue() << endl;	
       }
       pnt = InstPath[pos].value();
       if ( !pnt ) {
@@ -515,21 +528,18 @@ namespace Timbl{
 	InstPath[pos+1].init( InstPath[pos].value() );
 	for (  size_t j=pos+1; j < _depth; ++j ){
 	  NewIBTree *tmp = InstPath[j].find( testInst->FV[j+offSet] );
-	  if ( tmp ){ // we found an exact match, so mark Restart position
+	  if ( tmp ){ // we found an exact match, so mark Restart
 	    SkipSearch[j] = InstPath[j];
-	    if ( RestartSearch[j].value() == InstPath[j].value() ){
-	      RestartSearch[j].increment();
-	    }
+	    RestartSearch[j] = true;
 	  }
 	  else { // no exact match at this level. Just start with the first....
-	    RestartSearch[j].init(0);
+	    RestartSearch[j] = false;
 	    SkipSearch[j].init(0);
 	    InstPath[j].reset();
 	  }
 	  Path[j] = InstPath[j].FValue();
 	  //	  cerr << "set Path[" << j << "] to " << Path[j] << endl;
 	  //	  cerr << "using InstPath[" << j << "] = " << InstPath[j].value() << endl;
-	  pos = j;
 	  if ( j == _depth-1 ){
 	    result = InstPath[j].value()->TDistribution;
 	    //	    cerr << "assign result:" << result << endl;
