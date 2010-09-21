@@ -313,6 +313,27 @@ namespace Timbl{
     _defAss = true;
     _defValid = true;
   }
+
+  void NewIBroot::assignDefaults( size_t treshold ){
+    if ( _treshold != treshold ){
+      _treshold = treshold;
+      _defValid = false;    
+    }
+    if ( !_defValid ){
+      bool dummy;
+      if ( _root ){
+	if ( !_root->TDistribution ){
+	  _root->assign_defaults( _defAss, _random, _keepDist, _depth );
+	  _root->TDistribution = _root->sum_distributions( _keepDist );
+	}
+	_root->TValue = _root->TDistribution->BestTarget( dummy, _random );
+	topTV = _root->TValue;
+	topDist = _root->TDistribution;
+    }
+    }
+    _defAss = true;
+    _defValid = true;
+  }
   
   const TargetValue *NewIBroot::topTarget( bool &tie ) {
     if ( !_defValid || !_defAss )
@@ -326,8 +347,9 @@ namespace Timbl{
 
   NewIBroot::NewIBroot( int depth, bool random, bool keep ): 
     _depth(depth), _random(random), _keepDist(keep), _root(0), _version(4), 
-    _defValid(false), _defAss(false), _pruned(false), _nodeCount(1),
-    _leafCount(0), topTV(0), tiedTop( false ), topDist(0), WTop(0) {
+    _defValid(false), _defAss(false), _pruned(false), _treshold(depth),
+    _nodeCount(1), _leafCount(0), topTV(0), tiedTop( false ), topDist(0), 
+    WTop(0) {
     RestartSearch = new bool[depth];
     SkipSearch = new IBiter[depth];
     InstPath = new IBiter[depth];
@@ -634,12 +656,14 @@ namespace Timbl{
     // The Test function for the TRIBL algorithm, returns a pointer to the
     // Target at the last matching position in the Tree, 
     // or the subtree Instance Base necessary for IB1
-    assignDefaults();
+    assignDefaults( treshold );
     NewIBroot *subt = 0;
     TV = 0;
     dist = 0;
     if ( _root ){
       NewIBTree *pnt = _root->find( Inst.FV[0] );
+      dist = topDist;
+      TV = topTV;
       size_t pos = 0;
       while ( pnt && pos < treshold-1 ){
 	dist = pnt->TDistribution;
@@ -671,10 +695,6 @@ namespace Timbl{
 	  level = pos;
       }
     }
-    // if ( !dist )
-    //   cerr << "GRR een dist van 0 " << endl;
-    // if ( !TV )
-    //   cerr << "GRR een TV van 0 " << endl;
     return subt;
   }
     

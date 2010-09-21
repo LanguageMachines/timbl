@@ -111,6 +111,7 @@ namespace Timbl {
     ~NewIBroot();
     NewIBroot* IBPartition( NewIBTree *sub, size_t dep ) const;
     void assignDefaults();
+    void assignDefaults( size_t );
     bool addInstance( const Instance & );
     void deleteInstance( const Instance & );
     void save( std::ostream &, bool );
@@ -149,6 +150,7 @@ namespace Timbl {
     bool _defValid;
     bool _defAss;
     bool _pruned;
+    size_t _treshold;
     unsigned int _nodeCount;
     unsigned int _leafCount;
     const TargetValue *topTV;
@@ -159,7 +161,6 @@ namespace Timbl {
     const Instance *testInst;
     unsigned int offSet;
     unsigned int effFeat;
-    unsigned int depth;
     bool *RestartSearch;
     IBiter *SkipSearch;
     IBiter *InstPath;
