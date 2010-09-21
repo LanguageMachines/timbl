@@ -207,6 +207,9 @@ namespace Timbl {
     void testInstance( const Instance&,
 		       InstanceBase_base *,
 		       size_t = 0 );
+    void testInstance( const Instance&,
+		       NewIBroot *,
+		       size_t = 0 );
     void normalizeResult();
     const neighborSet *LocalClassify( const Instance&  );
     bool nextLine( std::istream &, std::string& );
@@ -244,11 +247,11 @@ namespace Timbl {
     resultStore bestResult;
     size_t match_depth;
     bool last_leaf;
+    bool speedTraining;
 
   private:
     TimblExperiment( const TimblExperiment& );
     int estimate;
-    bool speedTraining;
     const TargetValue *classifyString( const std::string& , double& );
   }; 
 
@@ -413,6 +416,12 @@ namespace Timbl {
 				      bool& );
   private:
     
+    typedef std::multimap<FeatureValue*,std::streamsize > MultiIndex;
+    typedef std::map<FeatureValue*, MultiIndex, fCmp > featureMultiIndex;
+    friend std::ostream& operator<< ( std::ostream&, const featureMultiIndex& );
+    friend std::ostream& operator<< ( std::ostream&, const MultiIndex& );
+    bool build_file_index( const std::string&, featureMultiIndex&  );
+    void compressIndex( const featureMultiIndex&, featureMultiIndex& );
     bool GetInstanceBase( std::istream& );
   };
   
