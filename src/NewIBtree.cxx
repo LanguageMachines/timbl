@@ -37,10 +37,11 @@ namespace Timbl{
     return os;
   }
 
-  NewIBTree *createNewIBTree( const Instance& I, unsigned int pos,
+  NewIBTree *createNewIBTree( const Instance& I, unsigned int pos, 
+			      unsigned int _depth,
 			      unsigned int& ncnt, unsigned int& lcnt ){
     NewIBTree *result = 0;
-    if ( pos == I.FV.size() ){
+    if ( pos == _depth ){
       result = new NewIBleaf( );
       ++lcnt;
     }
@@ -48,7 +49,7 @@ namespace Timbl{
       result = new NewIBbranch( );
     }
     ++ncnt;
-    result->addInst( I, pos, ncnt, lcnt );
+    result->addInst( I, pos, _depth, ncnt, lcnt );
     return result;
   }
   
@@ -92,16 +93,17 @@ namespace Timbl{
   
   bool NewIBbranch::addInst( const Instance& I, 
 			     unsigned int pos,
+			     unsigned int _depth,
 			     unsigned int& ncnt,
 			     unsigned int& lcnt ){
     bool result = true;
-    if ( pos < I.FV.size() ){
+    if ( pos < _depth ){
       std::map<FeatureValue *,NewIBTree*,rfCmp>::iterator it = _mmap.find( I.FV[pos] );
       if ( it != _mmap.end() ){
-	result = it->second->addInst( I, pos+1, ncnt, lcnt );
+	result = it->second->addInst( I, pos+1, _depth, ncnt, lcnt );
       }
       else {
-	NewIBTree *o = createNewIBTree( I, pos+1, ncnt, lcnt );
+	NewIBTree *o = createNewIBTree( I, pos+1, _depth, ncnt, lcnt );
 	_mmap[I.FV[pos]] = o;
       }
     }
@@ -124,6 +126,7 @@ namespace Timbl{
   
   bool NewIBleaf::addInst( const Instance& v, 
 			   unsigned int,
+			   unsigned int,
 			   unsigned int&,
 			   unsigned int& ){
     if ( !TDistribution )
@@ -137,7 +140,7 @@ namespace Timbl{
     TDistribution->DecFreq( v.TV );
   }
 
-  const NewIBTree *NewIBbranch::find( FeatureValue *fv ) const {
+  NewIBTree *NewIBbranch::find( FeatureValue *fv ) const {
     IBmap::const_iterator mit = _mmap.find( fv );
     if ( mit != _mmap.end() )
       return mit->second;
@@ -279,10 +282,10 @@ namespace Timbl{
   bool NewIBroot::addInstance( const Instance& I ){
     bool result = true;
     if ( !_root ){
-      _root = createNewIBTree( I, 0, _nodeCount, _leafCount );
+      _root = createNewIBTree( I, 0, _depth, _nodeCount, _leafCount );
     }
     else
-      result = _root->addInst( I, 0, _nodeCount, _leafCount );
+      result = _root->addInst( I, 0, _depth, _nodeCount, _leafCount );
     return result;
   }
 
@@ -393,6 +396,26 @@ namespace Timbl{
     return result;
   }
 
+  NewIBroot* NewIBroot::IBPartition( NewIBTree *sub, size_t dep ) const {
+    //    cerr << "creating an IB partition:" << endl;
+    // put( cerr );
+    // cerr << endl;
+    // cerr << "+++++++++++++++++++++++++++++++++++++++++++"<< endl;
+    NewIBroot *result = new NewIBroot( _depth-dep, _random, _keepDist );
+    result->_nodeCount = _nodeCount;
+    result->_leafCount = _leafCount; // only usefull for Server???
+    result->_root = sub;
+    if ( _root ){
+      delete result->topDist;
+      result->assignDefaults();
+    }
+    // cerr << "created an IB partition:" << endl;
+    // result->put( cerr );
+    // cerr << endl;
+    return result;
+  }
+
+
   void NewIBroot::deleteCopy( bool distToo ){
     _root = 0; // prevent deletion of InstBase in next step!
     if ( !distToo )
@@ -456,7 +479,12 @@ namespace Timbl{
 						size_t eff ){
     const ValueDistribution *result = NULL;
     testInst = inst;
+    // cerr << "initTest for " << inst << endl;
+    // cerr << "offset = " << off << endl;
+    // cerr << "effFeat = " << eff << endl;
+    // cerr << "_depth = " << _depth << endl;
     offSet = off;
+    effFeat = eff;
     InstPath[0].init( _root );
     for ( unsigned int i = 0; i < _depth; ++i ){
       NewIBTree *pnt = InstPath[i].find( testInst->FV[i+offSet] );
@@ -598,5 +626,56 @@ namespace Timbl{
     return Dist;
   }
 
-  
+  NewIBroot *NewIBroot::TRIBL_test( const Instance& Inst, 
+				    size_t treshold,
+				    const TargetValue *&TV,
+				    const ValueDistribution *&dist,
+				    size_t &level ) {
+    // The Test function for the TRIBL algorithm, returns a pointer to the
+    // Target at the last matching position in the Tree, 
+    // or the subtree Instance Base necessary for IB1
+    assignDefaults();
+    NewIBroot *subt = 0;
+    TV = 0;
+    dist = 0;
+    if ( _root ){
+      NewIBTree *pnt = _root->find( Inst.FV[0] );
+      size_t pos = 0;
+      while ( pnt && pos < treshold-1 ){
+	dist = pnt->TDistribution;
+	TV = pnt->TValue;
+	++pos;
+	if ( pos < _depth )
+	  pnt = pnt->find( Inst.FV[pos] );
+	else
+	  pnt = 0;
+      }
+      if ( pos == treshold-1 ){
+	if ( pnt ){
+	  subt = IBPartition( pnt, treshold );
+	  dist = 0;
+	}
+	else {
+	  level = pos;
+	}
+      }      
+      else {
+	if ( pos == 0 && dist == 0 ){
+	  if ( !WTop && topDist )
+	    WTop = topDist->to_WVD_Copy();
+	  dist = WTop;
+	  bool dummy;
+	  TV = topTarget(dummy);
+	}
+	else
+	  level = pos;
+      }
+    }
+    // if ( !dist )
+    //   cerr << "GRR een dist van 0 " << endl;
+    // if ( !TV )
+    //   cerr << "GRR een TV van 0 " << endl;
+    return subt;
+  }
+    
 }

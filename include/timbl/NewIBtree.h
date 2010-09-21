@@ -32,10 +32,11 @@ namespace Timbl {
     virtual ValueDistribution *getDistribution( bool ) = 0;
     virtual const ValueDistribution *match( const Instance&,
 					    unsigned int ) const = 0;
-    virtual const NewIBTree *find( FeatureValue * ) const = 0;
+    virtual NewIBTree *find( FeatureValue * ) const = 0;
     virtual void save( std::ostream & ) const = 0;
     virtual void prune( const TargetValue *, unsigned int& ) = 0;
     virtual bool addInst( const Instance &, 
+			  unsigned int,
 			  unsigned int,
 			  unsigned int&,
 			  unsigned int& ) =0;
@@ -53,14 +54,14 @@ namespace Timbl {
     ValueDistribution *getDistribution( bool );
     IBmap *getMap() { return 0; };
   private:
-    bool addInst( const Instance &, unsigned int, 
+    bool addInst( const Instance &, unsigned int, unsigned int,
 		  unsigned int&, unsigned int& );
     void delInst( const Instance&, unsigned int, unsigned int& );
     void save( std::ostream & ) const;
     void assign_defaults( bool, bool, bool, size_t ){}; 
     ValueDistribution *sum_distributions( bool ){};
     const ValueDistribution *match( const Instance&, unsigned int ) const;
-    const NewIBTree *find( FeatureValue * ) const { return 0; };
+    NewIBTree *find( FeatureValue * ) const { return 0; };
     void prune( const TargetValue *, unsigned int& );
     unsigned int size() const { return 0; } ;
   };
@@ -74,12 +75,16 @@ namespace Timbl {
     IBmap *getMap() { return &_mmap; };
   private:
     void save( std::ostream & ) const;
-    bool addInst( const Instance&, unsigned int, unsigned int&, unsigned int& );
+    bool addInst( const Instance&,
+		  unsigned int, 
+		  unsigned int, 
+		  unsigned int&, 
+		  unsigned int& );
     void delInst( const Instance&, unsigned int, unsigned int& );
     void assign_defaults( bool, bool, bool, size_t );
     ValueDistribution *sum_distributions( bool );
     const ValueDistribution *match( const Instance&, unsigned int ) const;
-    const NewIBTree *find( FeatureValue * ) const;
+    NewIBTree *find( FeatureValue * ) const;
     void prune( const TargetValue *, unsigned int& );
     unsigned int size() const {return _mmap.size(); };
     IBmap _mmap;
@@ -104,6 +109,7 @@ namespace Timbl {
   public:
     NewIBroot( int, bool, bool );
     ~NewIBroot();
+    NewIBroot* IBPartition( NewIBTree *sub, size_t dep ) const;
     void assignDefaults();
     bool addInstance( const Instance & );
     void deleteInstance( const Instance & );
@@ -121,6 +127,11 @@ namespace Timbl {
 				      size_t&,
 				      bool&,
 				      const TargetValue *& );
+    NewIBroot *TRIBL_test( const Instance&,
+			   size_t,
+			   const TargetValue *&,
+			   const ValueDistribution *&, 
+			   size_t& ); 
 
     const ValueDistribution *initTest( std::vector<FeatureValue *>&,
 				       const Instance *,
