@@ -37,6 +37,7 @@
 #include "timbl/StringOps.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
+#include "timbl/NewIBtree.h"
 #include "timbl/Options.h"
 #include "timbl/BestArray.h"
 #include "timbl/MBLClass.h"
@@ -81,23 +82,36 @@ namespace Timbl {
   }
   
   MBLClass::IB_Stat MBLClass::IBStatus() const {
-    if (!InstanceBase ) return Invalid;
-    else if (InstanceBase->IsPruned() ) return Pruned;
-    else return Normal;
+    if ( NewIB ){
+      if ( NewIB->isPruned() )
+	return Pruned;
+      else
+	return Normal;
+    }
+    else if (!InstanceBase )
+      return Invalid;
+    else if (InstanceBase->IsPruned() )
+      return Pruned;
+    else
+      return Normal;
   }
   
-  void MBLClass::IBInfo( ostream& os, InstanceBase_base *ib ) const {
+  void MBLClass::IBInfo( ostream& os ) const {
     double Compres;
     unsigned long int CurSize;
-    unsigned long int CurBytes = ib->GetSizeInfo( CurSize, Compres );
+    unsigned long int CurBytes;
+    if ( NewIB )
+      CurBytes = NewIB->getSizeInfo( CurSize, Compres );
+    else
+      CurBytes = InstanceBase->GetSizeInfo( CurSize, Compres );
     ios::fmtflags OldFlg = os.setf( ios::fixed, ios::floatfield );
     int OldPrec = os.precision(2);
     os << "\nSize of InstanceBase = " << CurSize << " Nodes, (" << CurBytes
        << " bytes), " << Compres << " % compression" << endl;
-    if ( Verbosity(BRANCHING) ) {
+    if ( !NewIB && Verbosity(BRANCHING) ) {
       vector<unsigned int> terminals;
       vector<unsigned int> nonTerminals;
-      ib->summarizeNodes( terminals, nonTerminals );
+      InstanceBase->summarizeNodes( terminals, nonTerminals );
       os << "branching info:" << endl;
       unsigned int i = 0;
       vector<unsigned int>::const_iterator nIt = nonTerminals.begin();
@@ -377,8 +391,47 @@ namespace Timbl {
     if ( ExpInvalid() ){
       result = false;
     }
-    else if ( InstanceBase == NULL ){
+    else if ( NewIB == 0 && InstanceBase == 0 ){
       Warning( "unable to write an Instance Base, nothing learned yet" );
+    }
+    else if ( NewIB ){
+      os << "# Status: " 
+	      << (NewIB->isPruned()?"pruned":"complete") << endl;
+      os << "# Permutation: "; 
+      writePermSpecial( os );
+      os << "# Numeric: "; 
+      bool first = true;
+      for ( size_t i=0; i < num_of_features; ++i )
+	if ( !Features[i]->Ignore() &&
+	     Features[i]->isNumerical() ){
+	  if ( !first )
+	    os << ", ";
+	  else
+	    first = false;
+	  os << i+1;
+	}
+      os << '.' << endl;
+      if ( NumNumFeatures() > 0 ){
+	os << "# Ranges: "; 
+	first = true;
+	for ( size_t j=0; j < num_of_features; ++j )
+	  if ( !Features[j]->Ignore() &&
+	       Features[j]->isNumerical() ){
+	    if ( !first )
+	      os << " , ";
+	    else
+	      first = false;
+	    os << j+1 << " [" << Features[j]->Min() 
+		    << "-" << Features[j]->Max() << "]";
+	  }
+	os << " ." << endl;
+      }
+      os << "# Bin_Size: " << Bin_Size << endl;
+      if ( hashed_trees ){
+	NewIB->save( os, keep_distributions );
+      }
+      else
+	NewIB->save( os, keep_distributions );
     }
     else {
       os << "# Status: " 
