@@ -32,6 +32,7 @@ namespace Timbl {
   using namespace Common;
 
   class InstanceBase_base;
+  class NewIBroot;
   class TesterClass;
   class Chopper;
 
@@ -98,6 +99,9 @@ namespace Timbl {
     void TestInstance( const Instance& ,
 		       InstanceBase_base * = NULL,
 		       size_t = 0 );
+    void TestInstance( const Instance& ,
+		       NewIBroot * = 0,
+		       size_t = 0 );
     void show_org_input( std::ostream & ) const;
     const ValueDistribution *ExactMatch( const Instance& ) const;
     void fillNeighborSet( neighborSet& ) const;
@@ -111,9 +115,7 @@ namespace Timbl {
     size_t targetPos() const { return target_pos; };
     size_t NumNumFeatures() const { return num_of_num_features; };
     size_t EffectiveFeatures() const { return effective_feats; };
-    void IBInfo( std::ostream&, InstanceBase_base * ) const;
-    void IBInfo( std::ostream& os ) const { 
-      return IBInfo( os, InstanceBase) ; };
+    void IBInfo( std::ostream& os ) const;
     void MatrixInfo( std::ostream& ) const;
     int RandomSeed() const { return random_seed; };
     void Info( const std::string& ) const;
@@ -128,6 +130,7 @@ namespace Timbl {
     std::vector<Feature *> PermFeatures;
     std::vector<size_t> permutation;
     InstanceBase_base *InstanceBase;
+    NewIBroot *NewIB;
     std::ostream *mylog;
     std::ostream *myerr;
     size_t TRIBL_offset() const { return tribl_offset; };
@@ -218,6 +221,16 @@ namespace Timbl {
     void do_numeric_statistics( );
     TesterClass *tester;
     
+
+    void test_instance( const Instance& ,
+			NewIBroot * = 0,
+			size_t = 0 );
+    void test_instance_sim( const Instance& ,
+			    NewIBroot * = 0,
+			    size_t = 0 );
+    void test_instance_ex( const Instance&,
+			   NewIBroot * = 0,
+			   size_t = 0 );
 
     void test_instance( const Instance& ,
 			InstanceBase_base * = NULL,

@@ -50,6 +50,7 @@
 #include "timbl/Tree.h"
 #include "timbl/Instance.h"
 #include "timbl/IBtree.h"
+#include "timbl/NewIBtree.h"
 #include "timbl/BestArray.h"
 #include "timbl/Testers.h"
 #include "timbl/Metrics.h"
@@ -191,6 +192,7 @@ namespace Timbl {
     MBL_init = false;
     need_all_weights = false;
     InstanceBase = NULL;
+    NewIB = 0;
     TargetStrings = NULL;
     FeatureStrings = NULL;
     num_of_features = 0;
@@ -275,7 +277,10 @@ namespace Timbl {
       err_count = 0;
       MBL_init = false;
       need_all_weights = false;
-      InstanceBase = m.InstanceBase->Copy();
+      if ( m.NewIB )
+	NewIB = m.NewIB->copy();
+      else
+	InstanceBase = m.InstanceBase->Copy();
       TargetStrings = m.TargetStrings;
       FeatureStrings = m.FeatureStrings;
       effective_feats = m.effective_feats;
@@ -295,6 +300,7 @@ namespace Timbl {
     CurrInst.clear();
     if ( !is_copy ){
       delete InstanceBase;
+      delete NewIB;
       delete Targets;
       delete TargetStrings;
       delete FeatureStrings;
@@ -302,9 +308,13 @@ namespace Timbl {
     else {
       if ( is_synced ){
 	delete InstanceBase;
+	delete NewIB;
       }
       else {
-	InstanceBase->CleanPartition( false );
+	if ( NewIB )
+	  NewIB->deleteCopy( false );
+	else
+	  InstanceBase->CleanPartition( false );
       }
     }
     for ( unsigned int i=0; i < Features.size(); ++i ){
@@ -1546,7 +1556,11 @@ namespace Timbl {
 	 ( do_exact_match || 
 	   ( num_of_neighbors == 1 &&
 	     !( Verbosity( NEAR_N | ALL_K) ) ) ) ){
-      result = InstanceBase->ExactMatch( inst );
+      if ( NewIB ){
+	result = NewIB->exactMatch( inst );
+      }
+      else
+	result = InstanceBase->ExactMatch( inst );
     }
     return result;
   }
@@ -1670,6 +1684,62 @@ namespace Timbl {
     }
   }
   
+  void MBLClass::test_instance_ex( const Instance& Inst,
+				   NewIBroot *IB,
+				   size_t ib_offset ){
+    vector<FeatureValue *> CurrentFV(num_of_features);
+    size_t EffFeat = effective_feats - ib_offset;
+    const ValueDistribution *best_distrib = IB->initTest( CurrentFV, 
+							  &Inst,
+							  ib_offset,
+							  effective_feats );
+    tester->init( Inst, effective_feats, ib_offset );
+    ValueDistribution::dist_iterator lastpos;
+    Vfield *Bpnt = NULL;
+    if ( best_distrib ){
+      lastpos = best_distrib->begin();
+      if ( lastpos != best_distrib->end() )
+	Bpnt = lastpos->second;
+    }
+    size_t CurPos = 0;
+    while ( Bpnt ) {
+      // call test() with a maximum threshold, to prevent stepping out early
+      size_t EndPos  = tester->test( CurrentFV,
+				     CurPos,
+				     DBL_MAX );
+      if ( EndPos != EffFeat ){
+	throw( logic_error( "Exemplar testing: test should not stop before last feature" ) );
+      }
+      ValueDistribution ResultDist;
+      ResultDist.SetFreq( Bpnt->Value(), Bpnt->Freq() );
+      string origI;
+      if ( Verbosity(NEAR_N) ){
+	origI = formatInstance( Inst.FV, CurrentFV, 
+				ib_offset, 
+				num_of_features );
+      }
+      double Distance = WeightFun( tester->getDistance(EndPos),
+				   Bpnt->Weight() );
+      bestArray.addResult( Distance, &ResultDist, origI );
+      CurPos = EndPos-1;
+      ++lastpos;
+      if ( lastpos != best_distrib->end() ){
+	Bpnt = lastpos->second;
+      }
+      else {
+	best_distrib = IB->nextTest( CurrentFV, 
+					  CurPos );
+	Bpnt = NULL;
+	if ( best_distrib ){
+	  lastpos = best_distrib->begin();
+	  if ( lastpos != best_distrib->end() ){
+	    Bpnt = lastpos->second;  
+	  }
+	}
+      }
+    }
+  }
+  
   void MBLClass::initDecay(){
     if ( decay ){
       delete decay;
@@ -1725,6 +1795,67 @@ namespace Timbl {
   }
   
   void MBLClass::test_instance( const Instance& Inst,
+				NewIBroot *IB,
+				size_t ib_offset ){
+    vector<FeatureValue *> CurrentFV(num_of_features);
+    double Threshold = DBL_MAX;
+    size_t EffFeat = effective_feats - ib_offset;
+    const ValueDistribution *best_distrib = IB->initTest( CurrentFV, 
+							  &Inst,
+							  ib_offset,
+							  effective_feats );
+    //    cerr << "start test Instance = " << &Inst << " met " << toString(CurrentFV) << endl;
+    tester->init( Inst, effective_feats, ib_offset );
+    size_t CurPos = 0;
+    while ( best_distrib ){
+      //      cerr << "test:" << toString(CurrentFV) << endl;
+      size_t EndPos = tester->test( CurrentFV,
+				    CurPos,
+				    Threshold + Epsilon );
+      //      cerr << "EndPos = " << EndPos << endl;
+      if ( EndPos == EffFeat ){
+	//	cerr << "YES" << endl;
+	// we finished with a certain amount of succes
+	double Distance = tester->getDistance(EndPos);
+	if ( Distance >= 0.0 ){
+	  string origI;
+	  if ( Verbosity(NEAR_N) ){
+	    origI = formatInstance( Inst.FV, CurrentFV, 
+				    ib_offset, 
+				    num_of_features );
+	  }
+	  Threshold = bestArray.addResult( Distance, best_distrib, origI );
+	  if ( do_silly_testing )
+	    Threshold = DBL_MAX;
+	}
+	else {
+	  Error( "DISTANCE == " + toString<double>(Distance) );
+	  FatalError( "we are dead" );
+	}
+      }
+      else {
+	EndPos++; // out of luck, compensate for roll-back
+      }
+      size_t pos=EndPos-1;
+      //      cerr << "start rollback " << pos << endl;
+      while ( true ){
+	//	cerr << "rollback " << pos << endl;
+	if ( tester->getDistance(pos) <= Threshold ){
+	  CurPos = pos;
+	  //	  cerr << "voor next test " << endl;
+	  best_distrib = IB->nextTest( CurrentFV, 
+				       CurPos );
+	  //	  cerr << "na next test, curpos=" << CurPos << "-" << toString(CurrentFV) << endl;
+	  break;
+	}
+	if ( pos == 0 )
+	  break;
+	--pos;
+      }
+    }
+  }
+
+  void MBLClass::test_instance( const Instance& Inst,
 				InstanceBase_base *IB,
 				size_t ib_offset ){
     vector<FeatureValue *> CurrentFV(num_of_features);
@@ -1735,11 +1866,14 @@ namespace Timbl {
 							       ib_offset,
 							       effective_feats );
     tester->init( Inst, effective_feats, ib_offset );
+    //    cerr << "start test Instance = " << &Inst << " met " << toString(CurrentFV) << endl;
     size_t CurPos = 0;
     while ( best_distrib ){
+      //      cerr << "test:" << toString(CurrentFV) << endl;
       size_t EndPos = tester->test( CurrentFV,
 				    CurPos,
 				    Threshold + Epsilon );
+      //      cerr << "EndPos = " << EndPos << endl;
       if ( EndPos == EffFeat ){
 	// we finished with a certain amount of succes
 	double Distance = tester->getDistance(EndPos);
@@ -1763,11 +1897,15 @@ namespace Timbl {
 	EndPos++; // out of luck, compensate for roll-back
       }
       size_t pos=EndPos-1;
+      //      cerr << "start rollback " << pos << endl;
       while ( true ){
+	//	cerr << "rollback " << pos << endl;
 	if ( tester->getDistance(pos) <= Threshold ){
 	  CurPos = pos;
+	  //	  cerr << "voor next test " << endl;
 	  best_distrib = IB->NextGraphTest( CurrentFV, 
 					    CurPos );
+	  //	  cerr << "na next test, curpos=" << CurPos << "-" << toString(CurrentFV) << endl;
 	  break;
 	}
 	if ( pos == 0 )
@@ -1777,6 +1915,50 @@ namespace Timbl {
     }
   }
 
+  void MBLClass::test_instance_sim( const Instance& Inst,
+				    NewIBroot *IB,
+				    size_t ib_offset ){
+    vector<FeatureValue *> CurrentFV(num_of_features);
+    size_t EffFeat = effective_feats - ib_offset;
+    const ValueDistribution *best_distrib = IB->initTest( CurrentFV, 
+							  &Inst,
+							  ib_offset,
+							  effective_feats );
+    tester->init( Inst, effective_feats, ib_offset );
+    size_t CurPos = 0;
+    while ( best_distrib ){
+      double dummy = -1.0;
+      size_t EndPos = tester->test( CurrentFV,
+				    CurPos,
+				    dummy );
+      if ( EndPos == EffFeat ){
+	// we finished with a certain amount of succes
+	double Distance = tester->getDistance(EndPos);
+	if ( Distance >= 0.0 ){
+	  string origI;
+	  if ( Verbosity(NEAR_N) ){
+	    origI = formatInstance( Inst.FV, CurrentFV, 
+				    ib_offset, 
+				    num_of_features );
+	  }
+	  bestArray.addResult( Distance, best_distrib, origI );
+
+	}
+	else {
+	  Error( "DISTANCE == " + toString<double>(Distance) );
+	  FatalError( "we are dead" );
+	}
+      }
+      else {
+	EndPos++; // out of luck, compensate for roll-back
+      }
+      if ( EndPos > 0 ){
+	CurPos = EndPos-1;
+	best_distrib = IB->nextTest( CurrentFV, CurPos );
+      }
+    }
+  }
+  
   void MBLClass::test_instance_sim( const Instance& Inst,
 				    InstanceBase_base *IB,
 				    size_t ib_offset ){
@@ -1819,6 +2001,24 @@ namespace Timbl {
 	best_distrib = IB->NextGraphTest( CurrentFV, 
 					  CurPos );
       }
+    }
+  }
+  
+  void MBLClass::TestInstance( const Instance& Inst, 
+			       NewIBroot *SubTree,
+			       size_t level ){
+    bestArray.init( num_of_neighbors, MaxBests,
+		    Verbosity(NEAR_N), Verbosity(DISTANCE),
+		    Verbosity(DISTRIB) ); 
+    // must be cleared for EVERY test
+    if (  doSamples() ){
+      test_instance_ex( Inst, SubTree, level );
+    }
+    else {
+      if ( GlobalMetric->isSimilarityMetric( ) )
+	test_instance_sim( Inst, SubTree, level );
+      else
+	test_instance( Inst, SubTree, level );
     }
   }
   
