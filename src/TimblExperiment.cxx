@@ -57,6 +57,7 @@
 #include "timbl/neighborSet.h"
 #include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
+#include "timbl/NewIBtree.h"
 #include "timbl/MBLClass.h"
 #include "timbl/CommandLine.h"
 #include "timbl/GetOptClass.h"
@@ -228,8 +229,14 @@ namespace Timbl {
     }
     result->WFileName = WFileName;
     result->CurrentDataFile = "";
-    result->InstanceBase->CleanPartition( false );
-    result->InstanceBase = 0;
+    if ( result->NewIB ){
+      result->NewIB->deleteCopy( false );
+      result->NewIB = 0;
+    }
+    else {
+      result->InstanceBase->CleanPartition( false );
+      result->InstanceBase = 0;
+    }
     result->is_synced = true;
     return result;
   }  
@@ -451,41 +458,61 @@ namespace Timbl {
 
   bool TimblExperiment::learnFromSpeedIndex( const fileIndexNT& sIndex, 
 					     unsigned int& totalDone ){
-    InstanceBase_base  *OutInstanceBase = 0;
-    streamsize pos = sIndex.next();
-    
-    while ( pos != 0 ){
-      pos--;
-      // Progress update.
-      //
-      if (( totalDone % Progress() ) == 0) 
-	time_stamp( "Learning:  ", totalDone );
-      if ( !OutInstanceBase ){
-	OutInstanceBase = InstanceBase->clone();
+    if ( NewIB ){
+      streamsize pos = sIndex.next();      
+      while ( pos != 0 ){
+	pos--;
+	// Progress update.
+	//
+	if (( totalDone % Progress() ) == 0) 
+	  time_stamp( "Learning:  ", totalDone );
+	Instance tmp =  instances[pos];
+	tmp.permute( permutation );
+	if ( !NewIB->addInstance( tmp ) ){
+	  Warning( "deviating exemplar weight in:\n" + 
+		   toString(&instances[pos]) + "\nIgnoring the new weight" );
+	}
+	++totalDone;
+	pos = sIndex.next();
       }
-      Instance tmp =  instances[pos];
-      tmp.permute( permutation );
-      if ( !OutInstanceBase->AddInstance( tmp ) ){
-	Warning( "deviating exemplar weight in:\n" + 
-		 toString(&instances[pos]) + "\nIgnoring the new weight" );
-      }
-      ++totalDone;
-      pos = sIndex.next();
     }
-    if ( OutInstanceBase ){
-      //	    cerr << OutInstanceBase << endl;
-      //	    cerr << "merge into " << endl;
-      //cerr << InstanceBase << endl;
-      if ( !InstanceBase->MergeSub( OutInstanceBase ) ){
-	FatalError( "Merging InstanceBases failed. PANIC" );
-	return false;
+    else {
+      InstanceBase_base  *OutInstanceBase = 0;
+      streamsize pos = sIndex.next();
+      
+      while ( pos != 0 ){
+	pos--;
+	// Progress update.
+	//
+	if (( totalDone % Progress() ) == 0) 
+	  time_stamp( "Learning:  ", totalDone );
+	if ( !OutInstanceBase ){
+	  OutInstanceBase = InstanceBase->clone();
+	}
+	Instance tmp =  instances[pos];
+	tmp.permute( permutation );
+	if ( !OutInstanceBase->AddInstance( tmp ) ){
+	  Warning( "deviating exemplar weight in:\n" + 
+		   toString(&instances[pos]) + "\nIgnoring the new weight" );
+	}
+	++totalDone;
+	pos = sIndex.next();
       }
-      //		subMergeT.stop();
-      //	    cerr << "Final result" << endl;
-      //	    cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;
-      delete OutInstanceBase;
-      OutInstanceBase = 0;
-    } 
+      if ( OutInstanceBase ){
+	//	    cerr << OutInstanceBase << endl;
+	//	    cerr << "merge into " << endl;
+	//cerr << InstanceBase << endl;
+	if ( !InstanceBase->MergeSub( OutInstanceBase ) ){
+	  FatalError( "Merging InstanceBases failed. PANIC" );
+	  return false;
+	}
+	//		subMergeT.stop();
+	//	    cerr << "Final result" << endl;
+	//	    cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;
+	delete OutInstanceBase;
+	OutInstanceBase = 0;
+      } 
+    }
     return true;
   }
 
@@ -547,7 +574,7 @@ namespace Timbl {
       // cerr << InstanceBase << endl;
       if ( !Verbosity(SILENT) ){
 	IBInfo( *mylog );
-	Info( "Learning took " + learnT.toString() );
+	Info( "SpeedLearning took " + learnT.toString() );
       }
 #ifdef IBSTATS
       cerr << "final mismatches: " << InstanceBase->mismatch << endl;
@@ -558,39 +585,66 @@ namespace Timbl {
   
   bool TimblExperiment::learnFromFileIndex( const fileIndex& fi, 
 					    istream& datafile ){
-    InstanceBase_base *outInstanceBase = 0;
-    fileIndex::const_iterator fit = fi.begin();
-    while ( fit != fi.end() ){
-      set<streamsize>::const_iterator sit = fit->second.begin();
-      while ( sit != fit->second.end() ){
-	datafile.clear();
-	datafile.seekg( *sit );
-	string Buffer;
-	nextLine( datafile, Buffer );
-	chopLine( Buffer );
-	// Progress update.
-	//
-	if (( stats.dataLines() % Progress() ) == 0) 
-	  time_stamp( "Learning:  ", stats.dataLines() );
-	chopped_to_instance( TrainWords );
-	if ( !outInstanceBase )
-	  outInstanceBase =InstanceBase->clone();
-	//		  cerr << "add instance " << &CurrInst << endl;
-	if ( !outInstanceBase->AddInstance( CurrInst ) ){
-	  Warning( "deviating exemplar weight in:\n" + 
-		   Buffer + "\nIgnoring the new weight" );
+    if ( NewIB ){
+      fileIndex::const_iterator fit = fi.begin();
+      while ( fit != fi.end() ){
+	set<streamsize>::const_iterator sit = fit->second.begin();
+	while ( sit != fit->second.end() ){
+	  datafile.clear();
+	  datafile.seekg( *sit );
+	  string Buffer;
+	  nextLine( datafile, Buffer );
+	  chopLine( Buffer );
+	  // Progress update.
+	  //
+	  if (( stats.dataLines() % Progress() ) == 0) 
+	    time_stamp( "SpeedLearning:  ", stats.dataLines() );
+	  chopped_to_instance( TrainWords );
+	  //		  cerr << "add instance " << &CurrInst << endl;
+	  if ( !NewIB->addInstance( CurrInst ) ){
+	    Warning( "deviating exemplar weight in:\n" + 
+		     Buffer + "\nIgnoring the new weight" );
+	  }
+	  ++sit;
 	}
-	++sit;
+	++fit;
       }
-      ++fit;
     }
-    if ( outInstanceBase ){
-      if ( !InstanceBase->MergeSub( outInstanceBase ) ){
-	FatalError( "Merging InstanceBases failed. PANIC" );
-	return false;
+    else {
+      InstanceBase_base *outInstanceBase = 0;
+      fileIndex::const_iterator fit = fi.begin();
+      while ( fit != fi.end() ){
+	set<streamsize>::const_iterator sit = fit->second.begin();
+	while ( sit != fit->second.end() ){
+	  datafile.clear();
+	  datafile.seekg( *sit );
+	  string Buffer;
+	  nextLine( datafile, Buffer );
+	  chopLine( Buffer );
+	  // Progress update.
+	  //
+	  if (( stats.dataLines() % Progress() ) == 0) 
+	    time_stamp( "Learning:  ", stats.dataLines() );
+	  chopped_to_instance( TrainWords );
+	  if ( !outInstanceBase )
+	    outInstanceBase =InstanceBase->clone();
+	  //		  cerr << "add instance " << &CurrInst << endl;
+	  if ( !outInstanceBase->AddInstance( CurrInst ) ){
+	    Warning( "deviating exemplar weight in:\n" + 
+		     Buffer + "\nIgnoring the new weight" );
+	  }
+	  ++sit;
+	}
+	++fit;
       }
-      delete outInstanceBase;
-      outInstanceBase = 0;
+      if ( outInstanceBase ){
+	if ( !InstanceBase->MergeSub( outInstanceBase ) ){
+	  FatalError( "Merging InstanceBases failed. PANIC" );
+	  return false;
+	}
+	delete outInstanceBase;
+	outInstanceBase = 0;
+      }
     }
     return true;
   }
@@ -1584,6 +1638,13 @@ namespace Timbl {
     TestInstance( Inst, base, offset );
   }
 
+  void TimblExperiment::testInstance( const Instance& Inst,
+				      NewIBroot *base,
+				      size_t offset ) {
+    initExperiment();
+    TestInstance( Inst, base, offset );
+  }
+
   const TargetValue *TimblExperiment::LocalClassify( const Instance& Inst,
 						     double& Distance,
 						     bool& exact ){
@@ -1602,7 +1663,10 @@ namespace Timbl {
       Res = ExResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
     }
     else {
-      testInstance( Inst, InstanceBase );
+      if ( NewIB )
+	testInstance( Inst, NewIB );
+      else
+	testInstance( Inst, InstanceBase );
       bestArray.initNeighborSet( nSet );
       ResultDist = getBestDistribution( );
       Res = ResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
@@ -1611,7 +1675,10 @@ namespace Timbl {
     if ( Tie && recurse ){
       bool Tie2 = true;
       ++num_of_neighbors;
-      testInstance( Inst, InstanceBase );
+      if ( NewIB )
+	testInstance( Inst, NewIB );
+      else
+	testInstance( Inst, InstanceBase );
       bestArray.addToNeighborSet( nSet, num_of_neighbors );
       WValueDistribution *ResultDist2 = getBestDistribution();
       const TargetValue *Res2 = ResultDist2->BestTarget( Tie2, (RandomSeed() >= 0) );
@@ -1624,6 +1691,7 @@ namespace Timbl {
       else
 	delete ResultDist2;
     }
+
     exact = fabs(Distance) < Epsilon ;
     if ( ResultDist ){
       bestResult.addDisposable( ResultDist );
@@ -1671,7 +1739,10 @@ namespace Timbl {
   }
   
   const neighborSet *TimblExperiment::LocalClassify( const Instance& Inst ){
-    testInstance( Inst, InstanceBase );
+    if ( NewIB )
+      testInstance( Inst, NewIB );
+    else
+      testInstance( Inst, InstanceBase );
     bestArray.initNeighborSet( nSet );
     nSet.setShowDistance( Verbosity(DISTANCE) );
     nSet.setShowDistribution( Verbosity(DISTRIB) );
@@ -2219,9 +2290,14 @@ namespace Timbl {
     srand( RandomSeed() );
     set_order();
     runningPhase = TrainWords;
-    InstanceBase = new IB_InstanceBase( EffectiveFeatures(), 
-					ibCount,
-					(RandomSeed()>=0) );
+    if ( speedTraining )
+      NewIB = new NewIBroot( EffectiveFeatures(), 
+			     (RandomSeed()>=0),
+			     KeepDistributions() );
+    else
+      InstanceBase = new IB_InstanceBase( EffectiveFeatures(), 
+					  ibCount,
+					  (RandomSeed()>=0) );
   }
   
   bool TimblExperiment::GetCurrentWeights( vector<double>& res ) {
