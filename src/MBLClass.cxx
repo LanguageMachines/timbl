@@ -1805,6 +1805,7 @@ namespace Timbl {
 							  ib_offset,
 							  effective_feats );
     //    cerr << "start test Instance = " << &Inst << " met " << toString(CurrentFV) << endl;
+    //    cerr << "best_distrib = " << best_distrib << endl;
     tester->init( Inst, effective_feats, ib_offset );
     size_t CurPos = 0;
     while ( best_distrib ){

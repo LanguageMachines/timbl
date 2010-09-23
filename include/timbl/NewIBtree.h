@@ -136,6 +136,10 @@ namespace Timbl {
 			   const ValueDistribution *&, 
 			   size_t& ); 
 
+    NewIBroot *TRIBL2_test( const Instance&,
+			    const ValueDistribution *&, 
+			    size_t& ); 
+
     const ValueDistribution *initTest( std::vector<FeatureValue *>&,
 				       const Instance *,
 				       size_t, size_t );
@@ -167,6 +171,9 @@ namespace Timbl {
     IBiter *SkipSearch;
     IBiter *InstPath;
   };
+
+  std::ostream& operator<< ( std::ostream&, const NewIBroot& );
+  std::ostream& operator<< ( std::ostream&, const NewIBroot* );
 
 }
 #endif

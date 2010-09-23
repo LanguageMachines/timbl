@@ -430,9 +430,7 @@ namespace Timbl{
   }
 
   NewIBroot* NewIBroot::IBPartition( NewIBTree *sub, size_t dep ) const {
-    //    cerr << "creating an IB partition:" << endl;
-    // put( cerr );
-    // cerr << endl;
+    // cerr << "creating an IB partition from :" << sub << endl;
     // cerr << "+++++++++++++++++++++++++++++++++++++++++++"<< endl;
     NewIBroot *result = new NewIBroot( _depth-dep, _random, _keepDist );
     result->_nodeCount = _nodeCount;
@@ -442,9 +440,7 @@ namespace Timbl{
       delete result->topDist;
       result->assignDefaults();
     }
-    // cerr << "created an IB partition:" << endl;
-    // result->put( cerr );
-    // cerr << endl;
+    //    cerr << "created an IB partition:" << result << endl;
     return result;
   }
 
@@ -707,6 +703,41 @@ namespace Timbl{
       }
     }
     return subt;
+  }
+
+  NewIBroot *NewIBroot::TRIBL2_test( const Instance& Inst, 
+				     const ValueDistribution *& dist,
+				     size_t &level ){
+    // The Test function for the TRIBL2 algorithm, returns a pointer to the
+    // the subtree Instance Base necessary for IB1
+    assignDefaults();
+    dist = 0;
+    int pos = 0;
+    NewIBroot *subtree = 0;
+    NewIBTree *pnt = _root;
+    NewIBTree *last_match = 0;;
+    while ( pnt ){
+      last_match = pnt;
+      // a match, go deeper
+      if ( pos < _depth ){
+	pnt = pnt->find( Inst.FV[pos] );
+      }
+      else {
+	// at the end, an exact match
+	dist = pnt->TDistribution;
+	pnt = 0;
+	last_match = 0;
+      }
+      if ( pnt ){
+	//	cerr << "matched " <<  Inst.FV[pos]<< endl;
+	pos++;
+      }
+    }
+    if ( last_match ){
+      subtree = IBPartition( last_match, pos );
+      level = pos;
+    }
+    return subtree;
   }
     
 }
