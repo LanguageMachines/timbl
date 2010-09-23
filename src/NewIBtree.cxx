@@ -279,6 +279,21 @@ namespace Timbl{
     }
   }
   
+  std::ostream& operator<< ( std::ostream& os, 
+			     const NewIBroot& o ){
+    o.put( os );
+    return os;
+  }
+  
+  std::ostream& operator<< ( std::ostream& os, 
+			     const NewIBroot *o ){
+    if ( o )
+      o->put( os );
+    else
+      os << "røøt";
+    return os;
+  }
+
   bool NewIBroot::addInstance( const Instance& I ){
     bool result = true;
     if ( !_root ){

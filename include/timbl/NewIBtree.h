@@ -21,7 +21,7 @@ namespace Timbl {
   class NewIBTree {
     friend class NewIBroot;
     friend std::ostream& operator<< ( std::ostream&, const NewIBTree& );
-    friend std::ostream& operator<< ( std::ostream&, const NewIBTree * );
+    friend std::ostream& operator<< ( std::ostream&, const NewIBTree* );
   public:
     typedef std::map<FeatureValue *, NewIBTree *, rfCmp> IBmap;
   NewIBTree(): TValue(0), TDistribution(0){};
@@ -106,6 +106,8 @@ namespace Timbl {
 
 
   class NewIBroot {
+    friend std::ostream& operator<< ( std::ostream&, const NewIBTree& );
+    friend std::ostream& operator<< ( std::ostream&, const NewIBTree* );
   public:
     NewIBroot( int, bool, bool );
     ~NewIBroot();
@@ -115,7 +117,7 @@ namespace Timbl {
     bool addInstance( const Instance & );
     void deleteInstance( const Instance & );
     void save( std::ostream &, bool );
-    void put( std::ostream &  ) const;
+    void put( std::ostream & ) const;
     void prune( const TargetValue * = 0 ); 
     bool isPruned() const { return _pruned; };
     bool persistentD() const { return _keepDist; };
