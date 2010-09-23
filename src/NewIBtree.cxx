@@ -61,13 +61,7 @@ namespace Timbl{
   }  
 
   ValueDistribution *NewIBbranch::getDistribution( bool keep ){
-    ValueDistribution *result;
-    if ( !TDistribution ){
-      result = new ValueDistribution();
-    }
-    else {
-      result = TDistribution;
-    }
+    ValueDistribution *result = TDistribution;
     if ( !keep ){
       TDistribution = 0;
     }
@@ -77,11 +71,13 @@ namespace Timbl{
   ValueDistribution *NewIBbranch::sum_distributions( bool keep ){
     // create a new distribution at this level by summing up the
     // distibutions of all branches.
-    ValueDistribution *result = getDistribution( keep );
+    ValueDistribution *result = 0;
     std::map<FeatureValue *, NewIBTree*, rfCmp>::iterator it = _mmap.begin();
     while ( it != _mmap.end() ){
       ValueDistribution *tmp = it->second->getDistribution( keep );
       if ( tmp ){
+	if ( !result )
+	  result = new ValueDistribution();
 	result->Merge( *tmp );
 	if ( !keep )
 	  delete tmp;
@@ -222,7 +218,7 @@ namespace Timbl{
     if ( TDistribution )
       os << TDistribution->Save();
     else
-      os << "{}";
+      os << "{null}";
     std::map<FeatureValue*,NewIBTree *,rfCmp>::const_iterator it = _mmap.begin();
     while ( it != _mmap.end() ){
       os << it->first << " ";
@@ -339,12 +335,12 @@ namespace Timbl{
       if ( _root ){
 	if ( !_root->TDistribution ){
 	  _root->assign_defaults( _defAss, _random, _keepDist, _depth );
-	  _root->TDistribution = _root->sum_distributions( _keepDist );
+	  _root->TDistribution = _root->sum_distributions( true );
 	}
 	_root->TValue = _root->TDistribution->BestTarget( dummy, _random );
 	topTV = _root->TValue;
 	topDist = _root->TDistribution;
-    }
+      }
     }
     _defAss = true;
     _defValid = true;
