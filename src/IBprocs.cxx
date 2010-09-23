@@ -49,7 +49,12 @@ namespace Timbl {
 
   bool MBLClass::HideInstance( const Instance& Inst ){
     bool result = true;
-    InstanceBase->RemoveInstance( Inst );
+    if ( NewIB ){
+      NewIB->deleteInstance( Inst );
+    }
+    else {
+      InstanceBase->RemoveInstance( Inst );
+    }
     MBL_init = do_sloppy_loo; // must be only true if you are REALY sure
     for ( size_t i=0; i < effective_feats && result; ++i ){
       PermFeatures[i]->clear_matrix();
@@ -66,7 +71,12 @@ namespace Timbl {
   
   bool MBLClass::UnHideInstance( const Instance& Inst ){
     bool result = true;
-    InstanceBase->AddInstance( Inst );
+    if ( NewIB ){
+      NewIB->addInstance( Inst );
+    }
+    else {
+      InstanceBase->AddInstance( Inst );
+    }
     MBL_init = do_sloppy_loo; // must be only true if you are REALY sure
     for ( size_t i=0; i < effective_feats && result; ++i ){
       PermFeatures[i]->clear_matrix();

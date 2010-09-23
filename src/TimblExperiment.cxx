@@ -861,10 +861,19 @@ namespace Timbl {
 	do {
 	  // The next Instance to store. 
 	  chopped_to_instance( TrainLearnWords );
-	  if ( !InstanceBase->AddInstance( CurrInst ) ){
-	    Warning( "deviating exemplar weight in line #" + 
-		     toString<int>(stats.totalLines() ) + ":\n" +
-		     Buffer + "\nIgnoring the new weight" );	
+	  if ( NewIB ){
+	    if ( !NewIB->addInstance( CurrInst ) ){
+	      Warning( "deviating exemplar weight in line #" + 
+		       toString<int>(stats.totalLines() ) + ":\n" +
+		       Buffer + "\nIgnoring the new weight" );	
+	    }
+	  }
+	  else {
+	    if ( !InstanceBase->AddInstance( CurrInst ) ){
+	      Warning( "deviating exemplar weight in line #" + 
+		       toString<int>(stats.totalLines() ) + ":\n" +
+		       Buffer + "\nIgnoring the new weight" );	
+	    }
 	  }
 	  // Progress update.
 	  //
