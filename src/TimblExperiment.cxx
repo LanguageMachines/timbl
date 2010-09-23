@@ -1289,7 +1289,14 @@ namespace Timbl {
 	  while( go_on ){ 
 	    // The next Instance to store. 
 	    chopped_to_instance( TrainWords );
-	    if ( !InstanceBase->AddInstance( CurrInst ) ){
+	    if ( NewIB ){
+	      if ( !NewIB->addInstance( CurrInst ) ){
+		Warning( "deviating exemplar weight in line #" +
+			 toString<int>(stats.totalLines()) + ":\n" +
+			 Buffer + "\nIgnoring the new weight" );
+	      }
+	    }
+	    else if ( !InstanceBase->AddInstance( CurrInst ) ){
 	      Warning( "deviating exemplar weight in line #" +
 		       toString<int>(stats.totalLines()) + ":\n" +
 		       Buffer + "\nIgnoring the new weight" );
@@ -1419,11 +1426,19 @@ namespace Timbl {
 	    stats = stats_keep;
 	    if ( ResultTarget != CurrInst.TV ) {
 	      chopped_to_instance( TrainLearnWords );
-	      if ( !InstanceBase->AddInstance( CurrInst ) ){
-		Warning( "deviating exemplar weight in line #" + 
-			 toString<int>(stats.totalLines() ) + ":\n" +
-			 Buffer + "\nIgnoring the new weight" );
+	      if ( NewIB ){
+		if ( !NewIB->addInstance( CurrInst ) ){
+		  Warning( "deviating exemplar weight in line #" + 
+			   toString<int>(stats.totalLines() ) + ":\n" +
+			   Buffer + "\nIgnoring the new weight" );
+		}
 	      }
+	      else
+		if ( !InstanceBase->AddInstance( CurrInst ) ){
+		  Warning( "deviating exemplar weight in line #" + 
+			   toString<int>(stats.totalLines() ) + ":\n" +
+			   Buffer + "\nIgnoring the new weight" );
+		}
 	      ++Added;
 	      ++TotalAdded;
 	      MBL_init = true; // avoid recalculations in LocalClassify
