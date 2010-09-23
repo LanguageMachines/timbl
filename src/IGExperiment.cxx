@@ -216,9 +216,9 @@ namespace Timbl {
       time_stamp( "Finished:  ", totalDone );
       if ( NewIB ){
 	NewIB->prune( );
-	ofstream tt( "TREE_TEST" );
-	NewIB->save( tt, KeepDistributions() );
-	cerr << "wrote TREE_TEST" << endl;
+	// ofstream tt( "TREE_TEST" );
+	// NewIB->save( tt, KeepDistributions() );
+	// cerr << "wrote TREE_TEST" << endl;
       }
       instances.clear();
       learnT.stop();
