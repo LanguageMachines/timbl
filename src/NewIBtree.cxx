@@ -125,8 +125,12 @@ namespace Timbl{
 			   unsigned int,
 			   unsigned int&,
 			   unsigned int& ){
-    if ( !TDistribution )
-      TDistribution = new ValueDistribution();
+    if ( !TDistribution ){
+      if ( abs( v.ExemplarWeight() ) > Common::Epsilon )
+	TDistribution = new WValueDistribution();
+      else
+	TDistribution = new ValueDistribution;
+    }
     return TDistribution->IncFreq( v.TV, v.ExemplarWeight() );
   }
   
