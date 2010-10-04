@@ -29,11 +29,17 @@ namespace Timbl {
     virtual void put( std::ostream&, int ) const;
     virtual void assign_defaults( bool, bool, bool, size_t ) = 0; 
     virtual ValueDistribution *sum_distributions( bool ) = 0;
+    virtual void redoDistributions() = 0;
     virtual ValueDistribution *getDistribution( bool ) = 0;
     virtual const ValueDistribution *match( const Instance&,
 					    unsigned int ) const = 0;
     virtual NewIBTree *find( FeatureValue * ) const = 0;
     virtual void save( std::ostream & ) const = 0;
+    virtual void saveHashed( std::ostream & ) const = 0;
+    virtual void readMap( std::istream &,
+			  std::vector<Feature*>&, Target *, int ) = 0;
+    virtual void readMapHashed( std::istream &,
+				std::vector<Feature*>&, Target *, int ) = 0;
     virtual void prune( const TargetValue *, unsigned int& ) = 0;
     virtual bool addInst( const Instance &, 
 			  unsigned int,
@@ -43,6 +49,11 @@ namespace Timbl {
     virtual void delInst( const Instance&, unsigned int, unsigned int& ) =0;
     virtual unsigned int size() const = 0;
     virtual IBmap *getMap() = 0;
+    static NewIBTree *readTree( std::istream&, std::vector<Feature *>&, 
+			     Target *, int );
+    static NewIBTree *readTreeHashed( std::istream &, 
+				   std::vector<Feature *>&, Target *, int );
+
     const TargetValue *TValue;
     ValueDistribution *TDistribution;
   };
@@ -58,8 +69,14 @@ namespace Timbl {
 		  unsigned int&, unsigned int& );
     void delInst( const Instance&, unsigned int, unsigned int& );
     void save( std::ostream & ) const;
+    void saveHashed( std::ostream & ) const;
+    void readMap( std::istream &,
+		  std::vector<Feature*>&, Target *, int ) {};
+    void readMapHashed( std::istream &,
+			std::vector<Feature*>&, Target *, int ) {};
     void assign_defaults( bool, bool, bool, size_t ){}; 
-    ValueDistribution *sum_distributions( bool ){};
+    void redoDistributions();
+    ValueDistribution *sum_distributions( bool ){ return 0; };
     const ValueDistribution *match( const Instance&, unsigned int ) const;
     NewIBTree *find( FeatureValue * ) const { return 0; };
     void prune( const TargetValue *, unsigned int& );
@@ -75,6 +92,11 @@ namespace Timbl {
     IBmap *getMap() { return &_mmap; };
   private:
     void save( std::ostream & ) const;
+    void saveHashed( std::ostream & ) const;
+    void readMap( std::istream &,
+		  std::vector<Feature*>&, Target *, int );
+    void readMapHashed( std::istream &,
+			std::vector<Feature*>&, Target *, int );
     bool addInst( const Instance&,
 		  unsigned int, 
 		  unsigned int, 
@@ -82,6 +104,7 @@ namespace Timbl {
 		  unsigned int& );
     void delInst( const Instance&, unsigned int, unsigned int& );
     void assign_defaults( bool, bool, bool, size_t );
+    void redoDistributions();
     ValueDistribution *sum_distributions( bool );
     const ValueDistribution *match( const Instance&, unsigned int ) const;
     NewIBTree *find( FeatureValue * ) const;
@@ -103,8 +126,7 @@ namespace Timbl {
     NewIBTree::IBmap::const_iterator mit;
     NewIBTree::IBmap *_map;
   };
-
-
+  
   class NewIBroot {
     friend std::ostream& operator<< ( std::ostream&, const NewIBTree& );
     friend std::ostream& operator<< ( std::ostream&, const NewIBTree* );
@@ -113,10 +135,16 @@ namespace Timbl {
     ~NewIBroot();
     NewIBroot* IBPartition( NewIBTree *sub, size_t dep ) const;
     void assignDefaults();
+    void redoDistributions();
     void assignDefaults( size_t );
     bool addInstance( const Instance & );
     void deleteInstance( const Instance & );
     void save( std::ostream &, bool );
+    void saveHashed( std::ostream &, StringHash *, StringHash *, bool );
+    bool read( std::istream&, std::vector<Feature *>&, 
+	       Target *, int );
+    bool readHashed( std::istream &, std::vector<Feature *>&, Target *,
+		     StringHash *, StringHash *, int );
     void put( std::ostream & ) const;
     void prune( const TargetValue * = 0 ); 
     bool isPruned() const { return _pruned; };

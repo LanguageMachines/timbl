@@ -438,7 +438,9 @@ namespace Timbl {
       }
       os << "# Bin_Size: " << Bin_Size << endl;
       if ( hashed_trees ){
-	NewIB->save( os, keep_distributions );
+	NewIB->saveHashed( os, 
+			   TargetStrings, FeatureStrings, 
+			   keep_distributions );
       }
       else
 	NewIB->save( os, keep_distributions );

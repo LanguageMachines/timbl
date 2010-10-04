@@ -2247,9 +2247,6 @@ namespace Timbl {
       }
       else {
 	srand( RandomSeed() );
-	InstanceBase = new IB_InstanceBase( EffectiveFeatures(), 
-					    ibCount,
-					    (RandomSeed()>=0) );
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	  Features[i]->SetWeight( 1.0 );
@@ -2258,15 +2255,34 @@ namespace Timbl {
 	  else 
 	    PermFeatures[pos++] = Features[permutation[i]];
 	}
-	if ( Hashed )
-	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 Targets, 
-					 TargetStrings, FeatureStrings,
-					 Version ); 
-	else
-	  result = InstanceBase->ReadIB( is, PermFeatures, 
-					 Targets, 
-					 Version ); 
+	if ( speedTraining ){
+	  NewIB = new NewIBroot( EffectiveFeatures(), 
+				 (RandomSeed()>=0),
+				 KeepDistributions() );
+	  if ( Hashed )
+	    result = NewIB->readHashed( is, PermFeatures,
+					Targets, 
+					TargetStrings, FeatureStrings,
+					Version ); 
+	  else
+	    result = NewIB->read( is, PermFeatures, 
+				  Targets, 
+				  Version ); 
+	}
+	else {
+	  InstanceBase = new IB_InstanceBase( EffectiveFeatures(), 
+					      ibCount,
+					      (RandomSeed()>=0) );
+	  if ( Hashed )
+	    result = InstanceBase->ReadIB( is, PermFeatures,
+					   Targets, 
+					   TargetStrings, FeatureStrings,
+					   Version ); 
+	  else
+	    result = InstanceBase->ReadIB( is, PermFeatures, 
+					   Targets, 
+					   Version ); 
+	}
       }
     }
     return result;

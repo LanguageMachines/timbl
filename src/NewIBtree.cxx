@@ -173,6 +173,11 @@ namespace Timbl{
     os << TValue << " " << TDistribution->Save();
   }
   
+  void NewIBleaf::saveHashed( std::ostream& os ) const {
+    // part of saving a tree in a recoverable manner
+    os << TValue->Index() << " " << TDistribution->SaveHashed();
+  }
+  
   void NewIBbranch::save( std::ostream& os ) const {
     // part of saving a tree in a recoverable manner
     os << TValue << " ";
@@ -184,6 +189,27 @@ namespace Timbl{
       while ( it != _mmap.end() ){
 	os << it->first << " (";
 	it->second->save( os );
+	os << " )";
+	++it;
+	if ( it != _mmap.end() ){
+	  os << "\n,";
+	}
+      }
+      os << "\n]\n";
+    }
+  }
+
+  void NewIBbranch::saveHashed( std::ostream& os ) const {
+    // part of saving a tree in a recoverable manner
+    os << TValue->Index() << " ";
+    if ( TDistribution )
+      os << TDistribution->SaveHashed();
+    if ( _mmap.size() > 0 ){
+      os << "[";
+      std::map<FeatureValue*,NewIBTree *,rfCmp>::const_iterator it = _mmap.begin();
+      while ( it != _mmap.end() ){
+	os << it->first->Index() << " (";
+	it->second->saveHashed( os );
 	os << " )";
 	++it;
 	if ( it != _mmap.end() ){
@@ -246,6 +272,7 @@ namespace Timbl{
     bool dummy;
     while ( it != _mmap.end() ){
       if ( redo ){
+	assert( 4==5 );
 	delete it->second->TDistribution;
 	it->second->TDistribution = 0;
       }
@@ -257,6 +284,24 @@ namespace Timbl{
       it->second->TValue = it->second->TDistribution->BestTarget( dummy, random );
       ++it;
     }
+  }
+
+  void NewIBleaf::redoDistributions(){
+  }
+
+  void NewIBbranch::redoDistributions(){
+    delete TDistribution;
+    TDistribution = 0;
+    std::map<FeatureValue*,NewIBTree*, rfCmp>::iterator it = _mmap.begin();
+    while ( it != _mmap.end() ){
+      it->second->redoDistributions();
+      if ( it->first->ValFreq() > 0 )
+	// also we have to update the targetinformation of the featurevalue
+	// so we can recalculate the statistics later on.
+	it->first->ReconstructDistribution( *(it->second->TDistribution) );
+      ++it;
+    }
+    TDistribution = sum_distributions( false );
   }
 
   void NewIBleaf::prune( const TargetValue* top, unsigned int& cnt ){ }
@@ -323,10 +368,20 @@ namespace Timbl{
 	_root->TValue = _root->TDistribution->BestTarget( dummy, _random );
 	topTV = _root->TValue;
 	topDist = _root->TDistribution;
-    }
+      }
     }
     _defAss = true;
     _defValid = true;
+  }
+
+  void NewIBroot::redoDistributions(){
+    // recursively gather Distribution information up to the top.
+    // removing old info...
+    // at each node we also Reconstruct Feature distributions
+    // we keep the Target value that was given!
+    if ( _root ){
+      _root->redoDistributions( );
+    }
   }
 
   void NewIBroot::assignDefaults( size_t treshold ){
@@ -406,6 +461,327 @@ namespace Timbl{
     os << ")\n";
     os.setf( OldFlg );
     _keepDist = temp_persist;
+  }
+  
+  void saveHash( ostream &os, StringHash *cats, StringHash *feats ){
+    int Size = cats->NumOfEntries();
+    os << "Classes" << endl;
+    for ( int i=1; i <= Size; ++i )
+      os << i << "\t" << cats->ReverseLookup( i ) << endl;
+    Size = feats->NumOfEntries();
+    os << "Features" << endl;
+    for ( int i=1; i <= Size; ++i )
+      os << i << "\t" << feats->ReverseLookup( i ) << endl;
+    os << endl;
+  }  
+
+  void NewIBroot::saveHashed( ostream &os, 
+			StringHash *cats, 
+			StringHash *feats,
+			bool persist ) {
+    // save an IBtree for later use.
+    bool temp_persist = _keepDist;
+    _keepDist = persist;
+    assignDefaults();
+    bool dummy;
+    ios::fmtflags OldFlg = os.setf( ios::fixed, ios::floatfield );
+    os << "# Version " << _version << " (Hashed)\n#\n";
+    saveHash( os , cats, feats );
+    os << "(";
+    if ( _root ){
+      _root->saveHashed( os );
+    }
+    os << ")\n";
+    os.setf( OldFlg );
+    _keepDist = temp_persist;
+  }
+  
+  void NewIBbranch::readMap( istream &is,
+			     std::vector<Feature*>& Feats,
+			     Target  *Targ,
+			     int level ){
+    bool goon = true;
+    char delim;
+    while ( is && goon ) {
+      is >> delim;    // skip the opening `[` or separating ','
+      string buf;
+      is >> ws >> buf;
+      FeatureValue *FV = Feats[level]->add_value( buf, NULL );
+      NewIBTree *tmp = readTree( is, Feats, Targ, level );
+      if ( tmp ){
+	_mmap[FV] = tmp;
+      }
+      goon = ( Common::look_ahead(is) == ',' );
+    }
+    is >> delim;    // skip closing `]`
+  }
+  
+  void NewIBbranch::readMapHashed( istream &is,
+				   std::vector<Feature*>& Feats,
+				   Target  *Targ,
+				   int level ){
+    bool goon = true;
+    char delim;
+    while ( is && goon ) {
+      is >> delim;    // skip the opening `[` or separating ','
+      string buf;
+      int index;
+      is >> index;
+      FeatureValue *FV = Feats[level]->add_value( index, NULL );
+      NewIBTree *tmp = readTreeHashed( is, Feats, Targ, level );
+      if ( tmp ){
+	_mmap[FV] = tmp;
+      }
+      goon = ( Common::look_ahead(is) == ',' );
+    }
+    is >> delim;    // skip closing `]`
+  }
+  
+  NewIBTree *NewIBTree::readTree( std::istream& is,
+				  vector<Feature*>& Feats,
+				  Target *Targ,
+				  int level ){
+    if ( !is ) 
+      return 0;
+    string buf;
+    char delim;
+    is >> delim;
+    if ( !is || delim != '(' ){
+      cerr << "missing `(` in Instance Base file" << endl;
+      return 0;
+    }
+    is >> ws >> buf;
+    TargetValue *TV = Targ->Lookup( buf );
+    ValueDistribution *TD = 0;
+    int nxt = Common::look_ahead(is);
+    if ( nxt == '{' ){
+      try {
+	TD = ValueDistribution::read_distribution( is, Targ, false );
+      }
+      catch ( const string what ){
+	cerr << "problems reading a distribution from InstanceBase file"
+	     << what << endl;
+	return 0;
+      }
+    }
+    NewIBTree *result = 0;
+    if ( Common::look_ahead(is) == '[' ){
+      //  a branch
+      result = new NewIBbranch();
+      result->TValue = TV;
+      result->readMap( is, Feats, Targ, level+1 );
+    }
+    else if ( Common::look_ahead(is) == ')' && TD ){
+      result = new NewIBleaf();
+      result->TValue = TV;
+      result->TDistribution = TD;
+    }
+    is >> delim;
+    if ( delim != ')' ){
+      cerr << "missing `)` in Instance Base file" << endl;
+      delete result;
+      return 0;
+    }
+    return result;
+  }
+  
+
+  NewIBTree *NewIBTree::readTreeHashed( std::istream &is, 
+					std::vector<Feature *>& Feats, 
+					Target *Targ, 
+					int level ){
+    if ( !is ) 
+      return 0;
+    string buf;
+    char delim;
+    int index;
+    is >> delim;
+    if ( !is || delim != '(' ){
+      cerr << "missing `(` in Instance Base file" << endl;
+      return 0;
+    }
+    is >> index;
+    TargetValue *TV = Targ->ReverseLookup( index );
+    ValueDistribution *TD = 0;
+    int nxt = Common::look_ahead(is);
+    if ( nxt == '{' ){
+      try {
+	TD = ValueDistribution::read_distribution_hashed( is, Targ, false );
+      }
+      catch ( const string what ){
+	cerr << "problems reading a distribution from InstanceBase file"
+	     << what << endl;
+	return 0;
+      }
+    }
+    NewIBTree *result = 0;
+    if ( Common::look_ahead(is) == '[' ){
+      //  a branch
+      result = new NewIBbranch();
+      result->TValue = TV;
+      result->readMapHashed( is, Feats, Targ, level+1 );
+    }
+    else if ( Common::look_ahead(is) == ')' && TD ){
+      result = new NewIBleaf();
+      result->TValue = TV;
+      result->TDistribution = TD;
+    }
+    is >> delim;
+    if ( delim != ')' ){
+      cerr << "missing `)` in Instance Base file" << endl;
+      delete result;
+      return 0;
+    }
+    return result;
+  }
+  
+
+  bool NewIBroot::read( std::istream& is, std::vector<Feature *>& Feats, 
+			Target *Targs, int expectedVersion ){
+    string buf;
+    _defAss = true;  // always for a restored tree
+    _defValid = true; // always for a restored tree
+    _version = expectedVersion;
+    char delim;
+    is >> delim;
+    if ( !is || delim != '(' ){
+      cerr << "missing first `(` in Instance Base file" << endl;
+    }
+    else {
+      // first we get the value of the TopTarget. It's in the file
+      // for backward compability
+      is >> ws >> buf;
+      delete topDist;
+      topDist = 0;
+      if ( Common::look_ahead(is) == '{' ){
+	// Now read the TopDistribution, to get the Targets
+	// in the right order in Targ
+	try {
+	  topDist 
+	    = ValueDistribution::read_distribution( is, Targs, true );
+	}
+	catch ( const string& what ){
+	  cerr << "read_distribution failed: " << what << endl;
+	}
+      }
+      if ( !topDist )
+	cerr << "problems reading Top Distribution from Instance Base file" 
+	     << endl;
+      else {
+	topTV = Targs->Lookup( buf );
+	if ( Common::look_ahead( is ) == '[' ){
+	  _root = new NewIBbranch();
+	  _root->TDistribution = topDist;
+	  _root->TValue = topTV;
+	  _root->readMap( is, Feats, Targs, 0 );
+	}
+	if ( _root ){
+	  is >> ws >> buf;
+	  if ( buf.empty() || buf[0] != ')' )
+	    cerr << "missing last `)` in Instance base file, found "
+		 << buf << endl;
+	  else {
+	    redoDistributions();
+	    return true;
+	  }
+	}
+      }
+    }
+    return false;
+  }
+  
+  bool readHash( istream &is, 
+		 StringHash *cats,
+		 StringHash *feats ){
+    string line;
+    is >> ws;
+    is >> line;
+    if ( !compare_nocase( line, "Classes" ) ){
+      cerr << "missing 'Classes' keyword in Hashinfo" << endl;
+      return false;
+    }
+    is >> ws;
+    vector<string> vals;
+    while ( getline( is, line ) ){
+      size_t i = split( line, vals );
+      if ( i == 2 )
+	// just ignore index!
+	cats->Hash( vals[1] );
+      else
+	break;
+      is >> ws;
+    }
+    if ( !compare_nocase( line, "Features" ) ){
+      cerr << "missing 'Features' keyword in Hashinfo" << endl;
+      return false;
+    }
+    while ( getline( is, line ) ){
+      size_t i = split( line, vals );
+      if ( i == 2 )
+	// just ignore index!
+	feats->Hash( vals[1] );
+      else
+	break;
+    }
+    return true;
+  }
+
+  bool NewIBroot::readHashed( std::istream &is, std::vector<Feature *>& Feats, 
+			      Target *Targs,
+			      StringHash *cats, StringHash *feats, 
+			      int expectedVersion ){
+    char delim;
+    int dum;
+    _defAss = true;  // always for a restored tree
+    _defValid = true; // always for a restored tree
+    _version = expectedVersion;
+    readHash( is, cats, feats );
+    is >> delim;
+    if ( !is || delim != '(' ){
+      cerr << "missing first `(` in Instance Base file" << endl;
+    }
+    else {
+      // first we get the value of the TopTarget. 
+      int index;
+      is >> index;
+      delete topDist;
+      topDist = 0;
+      if ( Common::look_ahead(is) == '{' ){
+	// Now read the TopDistribution, to get the Targets
+	// in the right order in Targ
+	try {
+	  topDist 
+	    = ValueDistribution::read_distribution_hashed( is, Targs, true );
+	}
+	catch ( const string& what ){
+	  cerr << "read_distribution failed: " << what << endl;
+	}
+      }
+      if ( !topDist ){
+	cerr << "problems reading Top Distribution from Instance Base file" 
+	     << endl;
+      }
+      else {
+	topTV = Targs->ReverseLookup( index );
+	if ( Common::look_ahead( is ) == '[' ){
+	  _root = new NewIBbranch();
+	  _root->TDistribution = topDist;
+	  _root->TValue = topTV;
+	  _root->readMapHashed( is, Feats, Targs, 0 );
+	}
+	if ( _root ){
+	  is >> delim;
+	  if ( delim != ')' )
+	    cerr << "missing last `)` in Instance base file, found '"
+		 << delim << "'" << endl;
+	  else {
+	    redoDistributions();
+	    return true;
+	  }
+	}
+      }
+    }
+    return false;
   }
   
   void NewIBroot::prune( const TargetValue *top ) {
