@@ -50,6 +50,9 @@ namespace Timbl {
     virtual unsigned int size() const = 0;
     virtual IBmap *getMap() = 0;
     virtual bool isLeaf() const = 0;
+    virtual void countBranches( unsigned int l, 
+			   std::vector<unsigned int>& terminals,
+			   std::vector<unsigned int>& nonTerminals ) = 0;
     static NewIBTree *readTree( std::istream&, std::vector<Feature *>&, 
 			     Target *, int );
     static NewIBTree *readTreeHashed( std::istream &, 
@@ -83,6 +86,9 @@ namespace Timbl {
     void prune( const TargetValue *, unsigned int& );
     unsigned int size() const { return 0; } ;
     bool isLeaf() const { return true; };
+    void countBranches( unsigned int, 
+			std::vector<unsigned int>&,
+			std::vector<unsigned int>& );
   };
   
   class NewIBbranch: public NewIBTree {
@@ -113,6 +119,9 @@ namespace Timbl {
     void prune( const TargetValue *, unsigned int& );
     unsigned int size() const {return _mmap.size(); };
     bool isLeaf() const { return _mmap.empty(); };
+    void countBranches( unsigned int, 
+			std::vector<unsigned int>&,
+			std::vector<unsigned int>& );
     IBmap _mmap;
   };
 
@@ -153,6 +162,7 @@ namespace Timbl {
     bool isPruned() const { return _pruned; };
     bool persistentD() const { return _keepDist; };
     unsigned long int getSizeInfo( unsigned long int&, double & ) const;
+    void summarizeNodes( std::vector<unsigned int>&, std::vector<unsigned int>& );
     void deleteCopy( bool );
     NewIBroot *copy() const;
     const ValueDistribution *exactMatch( const Instance& ) const;

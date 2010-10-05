@@ -118,42 +118,74 @@ namespace Timbl {
     int OldPrec = os.precision(2);
     os << "\nSize of InstanceBase = " << CurSize << " Nodes, (" << CurBytes
        << " bytes), " << Compres << " % compression" << endl;
-    if ( !NewIB && Verbosity(BRANCHING) ) {
+    if ( Verbosity(BRANCHING) ) {
       vector<unsigned int> terminals;
       vector<unsigned int> nonTerminals;
-      InstanceBase->summarizeNodes( terminals, nonTerminals );
-      os << "branching info:" << endl;
-      unsigned int i = 0;
-      vector<unsigned int>::const_iterator nIt = nonTerminals.begin();
-      vector<unsigned int>::const_iterator tIt = terminals.begin();
       unsigned int summedNodes = 0;
       unsigned int endNodes = 0;
+      os << "branching info:" << endl;
       os << "   level | feature |     nodes |  nonterms | terminals |  b-factor | b-factor-n" << endl;
-      while ( nIt != nonTerminals.end() ){
-	endNodes += *tIt;
-	int nodes;
-	if ( i == 0 ){
-	  nodes = 1;
-	  os << setw(8) << 0 << " |" << setw(8) << "top" << " |" 
-	     << setw(10) << 1 << " |"
-	     << setw(10) << 1 << " |" << setw(10) << 0 << " |"
-	     << setw(10) << double(*nIt + *tIt) << " |"
-	     << setw(10) << double(*nIt + *tIt) << endl;
-	}
-	else {
-	  nodes = *(nIt-1) + *(tIt-1);
+      if ( NewIB ){
+	NewIB->summarizeNodes( terminals, nonTerminals );
+	unsigned int i = 0;
+	vector<unsigned int>::const_iterator nIt = nonTerminals.begin();
+	vector<unsigned int>::const_iterator tIt = terminals.begin();
+	while ( nIt != nonTerminals.end() ){
+	  endNodes += *tIt;
+	  int nodes = *(nIt) + *(tIt);
 	  if ( nodes == 0 )
 	    break;
-	  os << setw(8) << i << " |"<< setw(8) << permutation[i-1] + 1 << " |"
-	     << setw(10) << nodes << " |"
-	     << setw(10) << *(nIt-1) << " |" << setw(10) << *(tIt-1) << " |"
-	     << setw(10) << (*nIt + *tIt)/double(nodes) << " |"
-	     << setw(10) << (*nIt?(*nIt)/double(*(nIt-1)):0) << endl;
+	  if ( i == 0 )
+	    os << setw(8) << 0 << " |" << setw(8) << "top" << " |";
+	  else
+	    os << setw(8) << i << " |"<< setw(8) << permutation[i-1] + 1 << " |";
+	  os << setw(10) << nodes << " |"
+	     << setw(10) << *nIt << " |" << setw(10) << *tIt << " |";
+	  ++tIt;
+	  if ( tIt != terminals.end() ){
+	    os << setw(10) << (*(nIt+1) + *tIt)/double(nodes) << " |"
+	       << setw(10) << (*nIt?(*(nIt+1))/double(*nIt):0) << endl;
+	  }
+	  else {
+	    os << setw(10) << 0.0 << " |"
+	       << setw(10) << 0.0 << endl;
+	  }
+	  summedNodes += nodes;
+	  ++i;
+	  ++nIt;
 	}
- 	summedNodes += nodes;
-	++i;
-	++nIt;
-	++tIt;
+      }
+      else {
+	InstanceBase->summarizeNodes( terminals, nonTerminals );
+	unsigned int i = 0;
+	vector<unsigned int>::const_iterator nIt = nonTerminals.begin();
+	vector<unsigned int>::const_iterator tIt = terminals.begin();
+	while ( nIt != nonTerminals.end() ){
+	  endNodes += *tIt;
+	  int nodes;
+	  if ( i == 0 ){
+	    nodes = 1;
+	    os << setw(8) << 0 << " |" << setw(8) << "top" << " |" 
+	       << setw(10) << 1 << " |"
+	       << setw(10) << 1 << " |" << setw(10) << 0 << " |"
+	       << setw(10) << double(*nIt + *tIt) << " |"
+	       << setw(10) << double(*nIt) << endl;
+	  }
+	  else {
+	    nodes = *(nIt-1) + *(tIt-1);
+	    if ( nodes == 0 )
+	      break;
+	    os << setw(8) << i << " |"<< setw(8) << permutation[i-1] + 1 << " |"
+	       << setw(10) << nodes << " |"
+	       << setw(10) << *(nIt-1) << " |" << setw(10) << *(tIt-1) << " |"
+	       << setw(10) << (*nIt + *tIt)/double(nodes) << " |"
+	       << setw(10) << (*nIt?(*nIt)/double(*(nIt-1)):0) << endl;
+	  }
+	  summedNodes += nodes;
+	  ++i;
+	  ++nIt;
+	  ++tIt;
+	}
       }
       os << "total: nodes = " << summedNodes 
 	 << " endnodes = " << endNodes 

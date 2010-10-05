@@ -418,7 +418,7 @@ namespace Timbl{
   NewIBroot::NewIBroot( int depth, bool random, bool keep ): 
     _depth(depth), _random(random), _keepDist(keep), _root(0), _version(4), 
     _defValid(false), _defAss(false), _pruned(false), _treshold(depth),
-    _nodeCount(1), _leafCount(0), topTV(0), tiedTop( false ), topDist(0), 
+    _nodeCount(0), _leafCount(0), topTV(0), tiedTop( false ), topDist(0), 
     WTop(0) {
     RestartSearch = new bool[depth];
     SkipSearch = new IBiter[depth];
@@ -783,6 +783,40 @@ namespace Timbl{
     }
     return false;
   }
+
+  void NewIBbranch::countBranches( unsigned int l, 
+				   std::vector<unsigned int>& terminals,
+				   std::vector<unsigned int>& nonTerminals ){
+    
+    if ( _mmap.empty() )
+      ++terminals[l];
+    else {
+      ++nonTerminals[l];
+      IBmap::const_iterator it = _mmap.begin();
+      while ( it != _mmap.end() ){
+	it->second->countBranches( l+1, terminals, nonTerminals );
+	++it;
+      }
+    }
+  }
+  
+  void NewIBleaf::countBranches( unsigned int l, 
+				 std::vector<unsigned int>& terminals,
+				 std::vector<unsigned int>& nonTerminals ){
+    ++terminals[l];
+  }
+  
+  void NewIBroot::summarizeNodes( std::vector<unsigned int>& terminals,
+				  std::vector<unsigned int>& nonTerminals ){
+    terminals.clear();
+    nonTerminals.clear();
+    terminals.resize( _depth+1, 0 );
+    nonTerminals.resize( _depth+1, 0 );
+    if ( _root ){
+      _root->countBranches( 0, terminals, nonTerminals );
+    }
+  }
+
   
   void NewIBroot::prune( const TargetValue *top ) {
     assignDefaults( );
