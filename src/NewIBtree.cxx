@@ -1019,11 +1019,14 @@ namespace Timbl{
 	if ( _keepDist )
 	  Dist = pnt->TDistribution;
 	++pos;
-	if ( pos < _depth )
+	if ( pos < _depth ){
+	  leaf = pnt->isLeaf();
 	  pnt = pnt->find( Inst.FV[pos] );
-	else
+	}
+	else {
 	  pnt = 0;
-	leaf = (pnt == 0 );
+	  leaf = true;
+	}
       }
       end_level = pos;
       if ( end_level == 0 ){

@@ -49,6 +49,7 @@ namespace Timbl {
     virtual void delInst( const Instance&, unsigned int, unsigned int& ) =0;
     virtual unsigned int size() const = 0;
     virtual IBmap *getMap() = 0;
+    virtual bool isLeaf() const = 0;
     static NewIBTree *readTree( std::istream&, std::vector<Feature *>&, 
 			     Target *, int );
     static NewIBTree *readTreeHashed( std::istream &, 
@@ -81,6 +82,7 @@ namespace Timbl {
     NewIBTree *find( FeatureValue * ) const { return 0; };
     void prune( const TargetValue *, unsigned int& );
     unsigned int size() const { return 0; } ;
+    bool isLeaf() const { return true; };
   };
   
   class NewIBbranch: public NewIBTree {
@@ -110,6 +112,7 @@ namespace Timbl {
     NewIBTree *find( FeatureValue * ) const;
     void prune( const TargetValue *, unsigned int& );
     unsigned int size() const {return _mmap.size(); };
+    bool isLeaf() const { return _mmap.empty(); };
     IBmap _mmap;
   };
 
