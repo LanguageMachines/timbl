@@ -519,31 +519,25 @@ namespace Timbl {
   bool TimblExperiment::SpeedLearn( const string& FileName ){
     bool result = true;
     Common::Timer learnT;
-    if ( ExpInvalid() ||
-	 !ConfirmOptions() ){
-      result = false;
+    if ( is_synced ){
+      CurrentDataFile = FileName; // assume magic!
     }
-    else {
-      if ( is_synced ){
-	CurrentDataFile = FileName; // assume magic!
-      }
-      if ( CurrentDataFile == "" )
-	if ( FileName == "" ){
-	  Warning( "unable to build an InstanceBase: No datafile defined yet" );
-	  result = false;
-	}
-	else {
-	  if ( !Prepare( FileName ) || ExpInvalid() ){
-	    result = false;
-	  }
-	}
-      else if ( FileName != "" &&
-		CurrentDataFile != FileName ){
-	Error( "Unable to Learn from file '" + FileName + "'\n"
-	       "while previously instantiated from file '" + 
-	       CurrentDataFile + "'" );
+    if ( CurrentDataFile == "" )
+      if ( FileName == "" ){
+	Warning( "unable to build an InstanceBase: No datafile defined yet" );
 	result = false;
       }
+      else {
+	if ( !Prepare( FileName ) || ExpInvalid() ){
+	  result = false;
+	}
+      }
+    else if ( FileName != "" &&
+	      CurrentDataFile != FileName ){
+      Error( "Unable to Learn from file '" + FileName + "'\n"
+	     "while previously instantiated from file '" + 
+	     CurrentDataFile + "'" );
+      result = false;
     }
     if ( result ) {
       Common::Timer learnT;
@@ -652,31 +646,25 @@ namespace Timbl {
   bool TimblExperiment::ClassicLearn( const string& FileName ){
     bool result = true;
     Common::Timer learnT;
-    if ( ExpInvalid() ||
-	 !ConfirmOptions() ){
-      result = false;
+    if ( is_synced ){
+      CurrentDataFile = FileName; // assume magic!
     }
-    else {
-      if ( is_synced ){
-	CurrentDataFile = FileName; // assume magic!
-      }
-      if ( CurrentDataFile == "" )
-	if ( FileName == "" ){
-	  Warning( "unable to build an InstanceBase: No datafile defined yet" );
-	  result = false;
-	}
-	else {
-	  if ( !Prepare( FileName ) || ExpInvalid() ){
-	    result = false;
-	  }
-	}
-      else if ( FileName != "" &&
-		CurrentDataFile != FileName ){
-	Error( "Unable to Learn from file '" + FileName + "'\n"
-	       "while previously instantiated from file '" + 
-	       CurrentDataFile + "'" );
+    if ( CurrentDataFile == "" )
+      if ( FileName == "" ){
+	Warning( "unable to build an InstanceBase: No datafile defined yet" );
 	result = false;
       }
+      else {
+	if ( !Prepare( FileName ) || ExpInvalid() ){
+	  result = false;
+	}
+      }
+    else if ( FileName != "" &&
+	      CurrentDataFile != FileName ){
+      Error( "Unable to Learn from file '" + FileName + "'\n"
+	     "while previously instantiated from file '" + 
+	     CurrentDataFile + "'" );
+      result = false;
     }
     if ( result ) {
       Common::Timer learnT;
@@ -751,7 +739,11 @@ namespace Timbl {
   }
 
   bool TimblExperiment::Learn( const std::string& s ){
-    if ( speedTraining )
+    if ( ExpInvalid() ||
+	 !ConfirmOptions() ){
+      return false;
+    }
+    else if ( speedTraining )
       return SpeedLearn( s );
     else
       return ClassicLearn( s );

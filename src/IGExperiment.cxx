@@ -163,32 +163,26 @@ namespace Timbl {
 
   bool IG_Experiment::SpeedLearn( const string& FileName ){
     bool result = true;
-    if ( ExpInvalid() ||
-	 !ConfirmOptions() ){
-      result = false;
+    if ( is_synced ) {
+      CurrentDataFile = FileName;
     }
-    else {
-      if ( is_synced ) {
-	CurrentDataFile = FileName;
-      }
-      if ( CurrentDataFile == "" ){
-	if ( FileName == "" ){
-	  Warning( "unable to build an InstanceBase: No datafile defined yet" );
-	  result = false;
-	}
-	else {
-	  if ( !Prepare( FileName ) || ExpInvalid() ){
-	    result = false;
-	  }
-	}
-      }
-      else if ( FileName != "" &&
-		CurrentDataFile != FileName ){
-	Error( "Unable to Learn from file '" + FileName + "'\n"
-	       "while previously instantiated from file '" + 
-	       CurrentDataFile + "'" );
+    if ( CurrentDataFile == "" ){
+      if ( FileName == "" ){
+	Warning( "unable to build an InstanceBase: No datafile defined yet" );
 	result = false;
       }
+      else {
+	if ( !Prepare( FileName ) || ExpInvalid() ){
+	  result = false;
+	}
+      }
+    }
+    else if ( FileName != "" &&
+	      CurrentDataFile != FileName ){
+      Error( "Unable to Learn from file '" + FileName + "'\n"
+	     "while previously instantiated from file '" + 
+	     CurrentDataFile + "'" );
+      result = false;
     }
     if ( result ) {
       Common::Timer learnT;
@@ -461,32 +455,26 @@ namespace Timbl {
 //     Common::Timer pruneT;
 //     Common::Timer subPruneT;
 //     Common::Timer totalT;
-    if ( ExpInvalid() ||
-	 !ConfirmOptions() ){
-      result = false;
+    if ( is_synced ) {
+      CurrentDataFile = FileName;
     }
-    else {
-      if ( is_synced ) {
-	CurrentDataFile = FileName;
+    if ( CurrentDataFile == "" ){
+      if ( FileName == "" ){
+	Warning( "unable to build an InstanceBase: No datafile defined yet" );
+	result = false;
       }
-      if ( CurrentDataFile == "" ){
-	if ( FileName == "" ){
-	  Warning( "unable to build an InstanceBase: No datafile defined yet" );
-	  result = false;
-	}
-	else {
+      else {
 	if ( !Prepare( FileName ) || ExpInvalid() ){
 	  result = false;
 	}
-	}
       }
-      else if ( FileName != "" &&
-		CurrentDataFile != FileName ){
-	Error( "Unable to Learn from file '" + FileName + "'\n"
-	       "while previously instantiated from file '" + 
-	       CurrentDataFile + "'" );
-	result = false;
-      }
+    }
+    else if ( FileName != "" &&
+	      CurrentDataFile != FileName ){
+      Error( "Unable to Learn from file '" + FileName + "'\n"
+	     "while previously instantiated from file '" + 
+	     CurrentDataFile + "'" );
+      result = false;
     }
     if ( result ) {
       InitInstanceBase();
