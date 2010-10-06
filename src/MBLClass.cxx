@@ -277,10 +277,14 @@ namespace Timbl {
       err_count = 0;
       MBL_init = false;
       need_all_weights = false;
-      if ( m.NewIB )
+      if ( m.NewIB ){
 	NewIB = m.NewIB->copy();
-      else
+	InstanceBase = 0;
+      }
+      else {
+	NewIB = 0;
 	InstanceBase = m.InstanceBase->Copy();
+      }
       TargetStrings = m.TargetStrings;
       FeatureStrings = m.FeatureStrings;
       effective_feats = m.effective_feats;
