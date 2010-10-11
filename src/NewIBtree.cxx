@@ -125,13 +125,19 @@ namespace Timbl{
 			   unsigned int,
 			   unsigned int&,
 			   unsigned int& ){
-    if ( !TDistribution ){
-      if ( abs( v.ExemplarWeight() ) > Common::Epsilon )
+    if ( abs( v.ExemplarWeight() ) > Common::Epsilon ){
+      if ( !TDistribution ){
 	TDistribution = new WValueDistribution();
-      else
-	TDistribution = new ValueDistribution();
+      }
+      return !TDistribution->IncFreq( v.TV, v.ExemplarWeight() );
     }
-    return !TDistribution->IncFreq( v.TV, v.ExemplarWeight() );
+    else {
+      if ( !TDistribution ){
+	TDistribution = new WValueDistribution();
+      }
+      TDistribution->IncFreq( v.TV );
+      return true;
+    }
   }
   
   void NewIBleaf::delInst( const Instance& v, 
@@ -496,10 +502,11 @@ namespace Timbl{
     _keepDist = temp_persist;
   }
   
-  void NewIBbranch::readMap( istream &is,
-			     std::vector<Feature*>& Feats,
-			     Target  *Targ,
-			     int level ){
+  void NewIBroot::readMap( istream &is,
+			   NewIBbranch *node,
+			   std::vector<Feature*>& Feats,
+			   Target  *Targ,
+			   int level ){
     bool goon = true;
     char delim;
     while ( is && goon ) {
@@ -509,17 +516,18 @@ namespace Timbl{
       FeatureValue *FV = Feats[level]->add_value( buf, NULL );
       NewIBTree *tmp = readTree( is, Feats, Targ, level );
       if ( tmp ){
-	_mmap[FV] = tmp;
+	node->assign(FV, tmp );
       }
       goon = ( Common::look_ahead(is) == ',' );
     }
     is >> delim;    // skip closing `]`
   }
   
-  void NewIBbranch::readMapHashed( istream &is,
-				   std::vector<Feature*>& Feats,
-				   Target  *Targ,
-				   int level ){
+  void NewIBroot::readMapHashed( istream &is,
+				 NewIBbranch *node,
+				 std::vector<Feature*>& Feats,
+				 Target  *Targ,
+				 int level ){
     bool goon = true;
     char delim;
     while ( is && goon ) {
@@ -530,14 +538,14 @@ namespace Timbl{
       FeatureValue *FV = Feats[level]->add_value( index, NULL );
       NewIBTree *tmp = readTreeHashed( is, Feats, Targ, level );
       if ( tmp ){
-	_mmap[FV] = tmp;
+	node->assign( FV, tmp );
       }
       goon = ( Common::look_ahead(is) == ',' );
     }
     is >> delim;    // skip closing `]`
   }
   
-  NewIBTree *NewIBTree::readTree( std::istream& is,
+  NewIBTree *NewIBroot::readTree( std::istream& is,
 				  vector<Feature*>& Feats,
 				  Target *Targ,
 				  int level ){
@@ -567,12 +575,16 @@ namespace Timbl{
     NewIBTree *result = 0;
     if ( Common::look_ahead(is) == '[' ){
       //  a branch
-      result = new NewIBbranch();
-      result->TValue = TV;
-      result->readMap( is, Feats, Targ, level+1 );
+      NewIBbranch *tmp = new NewIBbranch();
+      ++_nodeCount;
+      tmp->TValue = TV;
+      readMap( is, tmp, Feats, Targ, level+1 );
+      result = tmp;
     }
     else if ( Common::look_ahead(is) == ')' && TD ){
       result = new NewIBleaf();
+      ++_nodeCount;
+      ++_leafCount;
       result->TValue = TV;
       result->TDistribution = TD;
     }
@@ -586,7 +598,7 @@ namespace Timbl{
   }
   
 
-  NewIBTree *NewIBTree::readTreeHashed( std::istream &is, 
+  NewIBTree *NewIBroot::readTreeHashed( std::istream &is, 
 					std::vector<Feature *>& Feats, 
 					Target *Targ, 
 					int level ){
@@ -617,12 +629,16 @@ namespace Timbl{
     NewIBTree *result = 0;
     if ( Common::look_ahead(is) == '[' ){
       //  a branch
-      result = new NewIBbranch();
-      result->TValue = TV;
-      result->readMapHashed( is, Feats, Targ, level+1 );
+      NewIBbranch *tmp = new NewIBbranch();
+      ++_nodeCount;
+      tmp->TValue = TV;
+      readMapHashed( is, tmp, Feats, Targ, level+1 );
+      result = tmp;
     }
     else if ( Common::look_ahead(is) == ')' && TD ){
       result = new NewIBleaf();
+      ++_nodeCount;
+      ++_leafCount;
       result->TValue = TV;
       result->TDistribution = TD;
     }
@@ -670,10 +686,12 @@ namespace Timbl{
       else {
 	topTV = Targs->Lookup( buf );
 	if ( Common::look_ahead( is ) == '[' ){
-	  _root = new NewIBbranch();
-	  _root->TDistribution = topDist;
-	  _root->TValue = topTV;
-	  _root->readMap( is, Feats, Targs, 0 );
+	  NewIBbranch *tmp = new NewIBbranch();
+	  ++_nodeCount;
+	  tmp->TDistribution = topDist;
+	  tmp->TValue = topTV;
+	  readMap( is, tmp, Feats, Targs, 0 );
+	  _root = tmp;
 	}
 	if ( _root ){
 	  is >> ws >> buf;
@@ -764,10 +782,12 @@ namespace Timbl{
       else {
 	topTV = Targs->ReverseLookup( index );
 	if ( Common::look_ahead( is ) == '[' ){
-	  _root = new NewIBbranch();
-	  _root->TDistribution = topDist;
-	  _root->TValue = topTV;
-	  _root->readMapHashed( is, Feats, Targs, 0 );
+	  NewIBbranch *tmp = new NewIBbranch();
+	  ++_nodeCount;
+	  tmp->TDistribution = topDist;
+	  tmp->TValue = topTV;
+	  readMapHashed( is, tmp, Feats, Targs, 0 );
+	  _root = tmp;
 	}
 	if ( _root ){
 	  is >> delim;

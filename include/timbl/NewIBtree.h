@@ -36,10 +36,6 @@ namespace Timbl {
     virtual NewIBTree *find( FeatureValue * ) const = 0;
     virtual void save( std::ostream & ) const = 0;
     virtual void saveHashed( std::ostream & ) const = 0;
-    virtual void readMap( std::istream &,
-			  std::vector<Feature*>&, Target *, int ) = 0;
-    virtual void readMapHashed( std::istream &,
-				std::vector<Feature*>&, Target *, int ) = 0;
     virtual void prune( const TargetValue *, unsigned int& ) = 0;
     virtual bool addInst( const Instance &, 
 			  unsigned int,
@@ -53,11 +49,6 @@ namespace Timbl {
     virtual void countBranches( unsigned int l, 
 			   std::vector<unsigned int>& terminals,
 			   std::vector<unsigned int>& nonTerminals ) = 0;
-    static NewIBTree *readTree( std::istream&, std::vector<Feature *>&, 
-			     Target *, int );
-    static NewIBTree *readTreeHashed( std::istream &, 
-				   std::vector<Feature *>&, Target *, int );
-
     const TargetValue *TValue;
     ValueDistribution *TDistribution;
   };
@@ -74,10 +65,6 @@ namespace Timbl {
     void delInst( const Instance&, unsigned int, unsigned int& );
     void save( std::ostream & ) const;
     void saveHashed( std::ostream & ) const;
-    void readMap( std::istream &,
-		  std::vector<Feature*>&, Target *, int ) {};
-    void readMapHashed( std::istream &,
-			std::vector<Feature*>&, Target *, int ) {};
     void assign_defaults( bool, bool, bool, size_t ){}; 
     void redoDistributions();
     ValueDistribution *sum_distributions( bool ){ return 0; };
@@ -98,13 +85,11 @@ namespace Timbl {
     void put( std::ostream&, int ) const;
     ValueDistribution *getDistribution( bool );
     IBmap *getMap() { return &_mmap; };
+    void assign( FeatureValue* fv, NewIBTree *t ) {
+      _mmap[fv] = t; };
   private:
     void save( std::ostream & ) const;
     void saveHashed( std::ostream & ) const;
-    void readMap( std::istream &,
-		  std::vector<Feature*>&, Target *, int );
-    void readMapHashed( std::istream &,
-			std::vector<Feature*>&, Target *, int );
     bool addInst( const Instance&,
 		  unsigned int, 
 		  unsigned int, 
@@ -193,6 +178,14 @@ namespace Timbl {
     bool _keepDist;
     NewIBTree *_root;
   private:
+    NewIBTree *readTree( std::istream&, std::vector<Feature *>&, 
+			 Target *, int );
+    NewIBTree *readTreeHashed( std::istream &, 
+			       std::vector<Feature *>&, Target *, int );
+    void readMapHashed( std::istream &, NewIBbranch *, 
+			std::vector<Feature*>&, Target *, int );
+    void readMap( std::istream &, NewIBbranch *,
+		  std::vector<Feature*>&, Target *, int );
     int _version;
     bool _defValid;
     bool _defAss;
