@@ -129,9 +129,9 @@ namespace Timbl{
       if ( abs( v.ExemplarWeight() ) > Common::Epsilon )
 	TDistribution = new WValueDistribution();
       else
-	TDistribution = new ValueDistribution;
+	TDistribution = new ValueDistribution();
     }
-    return TDistribution->IncFreq( v.TV, v.ExemplarWeight() );
+    return !TDistribution->IncFreq( v.TV, v.ExemplarWeight() );
   }
   
   void NewIBleaf::delInst( const Instance& v, 
@@ -421,7 +421,7 @@ namespace Timbl{
     _nodeCount(0), _leafCount(0), topTV(0), tiedTop( false ), topDist(0), 
     WTop(0) {
     RestartSearch = new bool[depth];
-    SkipSearch = new IBiter[depth];
+    SkipSearch = new NewIBTree*[depth];
     InstPath = new IBiter[depth];
   };
   
@@ -874,46 +874,35 @@ namespace Timbl{
   }
   
   void IBiter::init( NewIBTree *tree ){
-    if ( tree ){
-      _map = tree->getMap();
-      if ( _map )
-	mit = _map->begin();
-    }
-    else {
-      _map = 0;
-    }
+    _map = tree->getMap();
+    mit = _map->begin();
   }
   
   NewIBTree *IBiter::value() {
-    if ( _map && mit != _map->end() )
+    if ( mit != _map->end() )
       return mit->second;
     else
       return 0;
   }
 
   FeatureValue *IBiter::FValue() {
-    if ( _map && mit != _map->end() )
+    if ( mit != _map->end() )
       return mit->first;
     else
       return 0;
   }
 
   NewIBTree *IBiter::find( FeatureValue *fv ) {
-    if ( _map ){
-      //      cerr << "iter search " << fv << endl;
-      mit = _map->find( fv );
-      if ( mit != _map->end() ){
-	//	cerr << "found! " << mit->first << endl;
-	return mit->second;
-      }
+    mit = _map->find( fv );
+    if ( mit != _map->end() ){
+      return mit->second;
     }
-    return 0;
+    else
+      return 0;
   }
   
   void IBiter::reset( ) {
-    if ( _map ){
-      mit = _map->begin();
-    }
+    mit = _map->begin();
   }
 
   const ValueDistribution *NewIBroot::initTest( vector<FeatureValue *>& Path,
@@ -932,24 +921,22 @@ namespace Timbl{
     for ( unsigned int i = 0; i < _depth; ++i ){
       NewIBTree *pnt = InstPath[i].find( testInst->FV[i+offSet] );
       if ( pnt ){
-	//	cerr << "found " << testInst->FV[i+offSet] << endl;
-	SkipSearch[i] = InstPath[i];
-	Path[i] = testInst->FV[i+offSet];
+	SkipSearch[i] = pnt;
 	RestartSearch[i] = true;
       }
       else {
-	//	cerr << "didn't find " << testInst->FV[i+offSet] << endl;	
 	RestartSearch[i] = false;
-	SkipSearch[i].init(0);
+	SkipSearch[i] = 0;
 	InstPath[i].reset();
-	Path[i] = InstPath[i].FValue();
+	pnt = InstPath[i].value();
       }
+      Path[i] = InstPath[i].FValue();
       //      cerr << "set Path[" << i << "] to " << Path[i] << endl;
       if ( i == _depth-1 ){
-	result = InstPath[i].value()->TDistribution;
+	result = pnt->TDistribution;
       }
       else {
-	InstPath[i+1].init( InstPath[i].value() );
+	InstPath[i+1].init( pnt );
       }
     }
     if ( result && result->ZeroDist() ){
@@ -963,7 +950,7 @@ namespace Timbl{
   const ValueDistribution *NewIBroot::nextTest( vector<FeatureValue *>& Path, 
 						size_t& pos ){
     const ValueDistribution *result = 0;
-    const NewIBTree *pnt = 0;
+    NewIBTree *pnt = 0;
     while ( !pnt  ){
       if ( !RestartSearch[pos] ) {
 	// No exact match here, so no real problems
@@ -975,14 +962,14 @@ namespace Timbl{
 	//	cerr << "restart with " << InstPath[pos].FValue() << endl;	
 	RestartSearch[pos] = false;
       }
-      if ( InstPath[pos].value() != 0 &&
-	   InstPath[pos].value() == SkipSearch[pos].value() ){
+      pnt = InstPath[pos].value();
+      if ( pnt && pnt == SkipSearch[pos] ){
 	//	cerr << "hit on Skip" << endl;
 	InstPath[pos].increment();
-	SkipSearch[pos].init(0);
+	pnt = InstPath[pos].value();
+	SkipSearch[pos] = 0;
 	//	cerr << "go to next: " << InstPath[pos].FValue() << endl;	
       }
-      pnt = InstPath[pos].value();
       if ( !pnt ) {
 	if ( pos == 0 )
 	  break;
@@ -996,27 +983,28 @@ namespace Timbl{
       Path[pos] = InstPath[pos].FValue();
       //      cerr << "set Path[" << pos << "] to " << Path[pos] << endl;
       if ( pos < _depth-1 ){
-	InstPath[pos+1].init( InstPath[pos].value() );
+	InstPath[pos+1].init( pnt );
 	for (  size_t j=pos+1; j < _depth; ++j ){
-	  NewIBTree *tmp = InstPath[j].find( testInst->FV[j+offSet] );
-	  if ( tmp ){ // we found an exact match, so mark Restart
-	    SkipSearch[j] = InstPath[j];
+	  NewIBTree *pnt2 = InstPath[j].find( testInst->FV[j+offSet] );
+	  if ( pnt2 ){ // we found an exact match, so mark Restart
+	    SkipSearch[j] = pnt2;
 	    RestartSearch[j] = true;
 	  }
 	  else { // no exact match at this level. Just start with the first....
-	    RestartSearch[j] = false;
-	    SkipSearch[j].init(0);
+	    SkipSearch[j] = 0;
 	    InstPath[j].reset();
+	    pnt2 = InstPath[j].value();
+	    RestartSearch[j] = false;
 	  }
 	  Path[j] = InstPath[j].FValue();
 	  //	  cerr << "set Path[" << j << "] to " << Path[j] << endl;
 	  //	  cerr << "using InstPath[" << j << "] = " << InstPath[j].value() << endl;
 	  if ( j == _depth-1 ){
-	    result = InstPath[j].value()->TDistribution;
+	    result = pnt2->TDistribution;
 	    //	    cerr << "assign result:" << result << endl;
 	  }
 	  else {
-	    InstPath[j+1].init( InstPath[j].value() );
+	    InstPath[j+1].init( pnt2 );
 	  }
 	}
       }

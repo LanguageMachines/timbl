@@ -209,7 +209,7 @@ namespace Timbl {
     unsigned int offSet;
     unsigned int effFeat;
     bool *RestartSearch;
-    IBiter *SkipSearch;
+    NewIBTree **SkipSearch;
     IBiter *InstPath;
   };
 
