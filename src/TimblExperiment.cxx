@@ -2292,6 +2292,7 @@ namespace Timbl {
 	  Info( "Reading Instance-Base from: " + FileName );
 	if ( GetInstanceBase( infile ) ){
 	  if ( !Verbosity(SILENT) ){
+	    IBInfo( cout );
 	    writePermutation( cout );
 	  }
 	  result = true;
