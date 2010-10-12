@@ -401,8 +401,6 @@ namespace Timbl {
   protected:
     TimblExperiment *clone() const { 
       return new IG_Experiment( MaxFeats(), "", false ); };
-    bool learnFromFileIndex( const fileIndex&, std::istream&, 
-			     const TargetValue* );
     bool learnFromSpeedIndex( const fileIndexNT&,  const TargetValue*,
 			      unsigned int& );
     bool SpeedLearn( const std::string& = "" );
@@ -421,6 +419,7 @@ namespace Timbl {
     friend std::ostream& operator<< ( std::ostream&, const featureMultiIndex& );
     friend std::ostream& operator<< ( std::ostream&, const MultiIndex& );
     bool build_file_index( const std::string&, featureMultiIndex&  );
+    bool build_file_index( const std::string&, MultiIndex& );
     void compressIndex( const featureMultiIndex&, featureMultiIndex& );
     bool GetInstanceBase( std::istream& );
   };
