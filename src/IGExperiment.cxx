@@ -450,11 +450,6 @@ namespace Timbl {
 
   bool IG_Experiment::ClassicLearn( const string& FileName ){
     bool result = true;
-//     Common::Timer mergeT;
-//     Common::Timer subMergeT;
-//     Common::Timer pruneT;
-//     Common::Timer subPruneT;
-//     Common::Timer totalT;
     if ( is_synced ) {
       CurrentDataFile = FileName;
     }
@@ -479,20 +474,13 @@ namespace Timbl {
     if ( result ) {
       InitInstanceBase();
       featureMultiIndex fmIndexRaw;
-      //      Common::Timer t;
-      //      t.start();
       result = build_file_index( CurrentDataFile, fmIndexRaw );
-      //      t.stop();
       //      cerr << "indexing took " << t << endl;
-      //      totalT.start();
       if ( result ){
 	featureMultiIndex fmIndex;
-	//	Common::Timer t;
-	//	t.start();
 	//	cerr << "compressing index " << fmIndexRaw << endl;
 	compressIndex( fmIndexRaw, fmIndex );
 	//	cerr << "resulting index " << fmIndex << endl;
-	//	t.stop();
 	//	cerr << "compressing took " << t << endl;
 	stats.clear();
 	if ( !Verbosity(SILENT) ) {
@@ -510,8 +498,8 @@ namespace Timbl {
 	//
 	featureMultiIndex::const_iterator it = fmIndex.begin();
 	while ( it != fmIndex.end() ){
-	  //	  FeatureValue *the_fv = (FeatureValue*)(it->first);
-	  //	  cerr << "handle feature " << the_fv << " met index " << the_fv->Index() << endl;
+	  FeatureValue *the_fv = (FeatureValue*)(it->first);
+	  //	  cerr << "handle feature '" << the_fv << "' met index " << the_fv->Index() << endl;
 	  MultiIndex::const_iterator fmIt = it->second.begin();
 	  if ( fmIt == it->second.end() ){
 	    FatalError( "panic" );
@@ -532,6 +520,7 @@ namespace Timbl {
 	      typedef MultiIndex::const_iterator mit;
 	      pair<mit,mit> b = it->second.equal_range( the2fv );
 	      for ( mit i = b.first; i != b.second; ++i ){
+		datafile.clear();
 		datafile.seekg( i->second );
 		nextLine( datafile, Buffer );
 		chopLine( Buffer );
@@ -551,20 +540,16 @@ namespace Timbl {
 		PartInstanceBase->AddInstance( CurrInst );
 	      }
 	      if ( PartInstanceBase ){
-		//  		cerr << "finished handling secondary feature:" << the2fv << endl;
-		//		time_stamp( "Start Pruning:    " );
-		//		cerr << PartInstanceBase << endl;
-		//		subPruneT.start();
+		//		cerr << "finished handling secondary feature:" << the2fv << endl;
+		time_stamp( "Start Pruning:    " );
+		cerr << PartInstanceBase << endl;
 		PartInstanceBase->Prune( TopTarget, 2 );
-		//		subPruneT.stop();
-		//		time_stamp( "Finished Pruning: " );
-		//		cerr << PartInstanceBase << endl;
-		//		subMergeT.start();
+		time_stamp( "Finished Pruning: " );
+		cerr << PartInstanceBase << endl;
 		if ( !TmpInstanceBase->MergeSub( PartInstanceBase ) ){
 		  FatalError( "Merging InstanceBases failed. PANIC" );
 		  return false;
 		}
-		//		subMergeT.stop();
 		//		cerr << "after Merge: intermediate result" << endl;
 		//		cerr << TmpInstanceBase << endl;
 		delete PartInstanceBase;
@@ -577,17 +562,13 @@ namespace Timbl {
 	    }
 	    //	    time_stamp( "Start Final Pruning: " );
 	    //	    cerr << TmpInstanceBase << endl;
-	    //	    specialPruneT.start();
 	    TmpInstanceBase->specialPrune( TopTarget );
-	    //	    specialPruneT.start();
 	    //	    time_stamp( "Finished Final Pruning: " );
 	    //	    cerr << TmpInstanceBase << endl;
-	    //	    totMergeT.start();
 	    if ( !InstanceBase->MergeSub( TmpInstanceBase ) ){
 	      FatalError( "Merging InstanceBases failed. PANIC" );
 	      return false;
 	    }
-	    //	    totMergeT.start();
 	    //	    cerr << "finale Merge gave" << endl;
 	    //	    cerr << InstanceBase << endl;
 	    delete TmpInstanceBase;
@@ -596,6 +577,7 @@ namespace Timbl {
 	    //	    cerr << "other case!" << endl;
 	    MultiIndex::const_iterator mIt = it->second.begin();
 	    while ( mIt != it->second.end() ){
+	      datafile.clear();
 	      datafile.seekg( mIt->second );
 	      nextLine( datafile, Buffer );
 	      chopLine( Buffer );
@@ -618,19 +600,15 @@ namespace Timbl {
 	      //	      cerr << "Out Instance Base" << endl;
 	      //	      time_stamp( "Start Pruning:    " );
 	      //	      cerr << outInstanceBase << endl;
-	      //	      pruneT.start();
 	      outInstanceBase->Prune( TopTarget );
-	      //	      pruneT.stop();
 	      //	      time_stamp( "Finished Pruning: " );
 	      //	      cerr << outInstanceBase << endl;
 	      //	      time_stamp( "Before Merge: " );
 	      //	      cerr << InstanceBase << endl;
-	      //	      mergeT.start();
 	      if ( !InstanceBase->MergeSub( outInstanceBase ) ){
 		FatalError( "Merging InstanceBases failed. PANIC" );
 		return false;
 	      }
-	      //	      mergeT.stop();
 	      delete outInstanceBase;
 	      outInstanceBase = 0;
 	    }
@@ -642,14 +620,6 @@ namespace Timbl {
 	  IBInfo( *mylog );
       }
     }
-//     totalT.stop();
-//     cerr << "normal pruning took " << pruneT << endl;
-//     cerr << "sub pruning took " << subPruneT << endl;
-//     cerr << "special pruning took " <<  specialPruneT << endl;
-//     cerr << "normal merging took " << mergeT << endl;
-//     cerr << "submerging took " << subMergeT << endl;
-//     cerr << "final merging took " << totMergeT << endl;
-//     cerr << "In total learning took " << totalT << endl;
     return result;
   }
   
