@@ -133,7 +133,7 @@ namespace Timbl{
     }
     else {
       if ( !TDistribution ){
-	TDistribution = new WValueDistribution();
+	TDistribution = new ValueDistribution();
       }
       TDistribution->IncFreq( v.TV );
       return true;
