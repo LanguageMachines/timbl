@@ -101,65 +101,37 @@ namespace Timbl {
     return os;
   }  
 
+#ifdef OLD
   bool IG_Experiment::learnFromSpeedIndex( const fileIndexNT& fIndex, 
 					   const TargetValue* TopTarget,
 					   unsigned int& totalDone ){
-    if ( NewIB ){
-      streamsize pos = fIndex.next();
-      while ( pos != 0 ){
-	pos--;
-	if (( totalDone % Progress() ) == 0) 
-	  time_stamp( "Learning:  ", totalDone );
-	Instance tmp = instances[pos]; 
-	tmp.permute( permutation );
-	NewIB->addInstance( tmp );
-	++totalDone;
-	pos = fIndex.next();
-      }
-    }
-    else {
-      IG_InstanceBase *PartInstanceBase = 0;
-      unsigned int partialDone = 0;
-      streamsize pos = fIndex.next();
-      while ( pos != 0 ){
-	pos--;
-	if (( totalDone % Progress() ) == 0) 
-	  time_stamp( "Learning:  ", totalDone );
-	if ( !PartInstanceBase ){
-	  PartInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
-						  ibCount,
-						  (RandomSeed()>=0), 
-						  false, 
-						  true );
-	}
-	Instance tmp = instances[pos]; 
-	tmp.permute( permutation );
-	PartInstanceBase->AddInstance( tmp );
-	++partialDone;
-	++totalDone;
-	pos = fIndex.next();
-      }
-      if ( PartInstanceBase ){
-	// time_stamp( "Final  Pruning:    " );
-	// cerr << PartInstanceBase << endl;
-	PartInstanceBase->Prune( TopTarget );
-	// time_stamp( "Finished Pruning: " );
-	// cerr << PartInstanceBase << endl;
-	// cerr << "merge into " << endl;
-	// cerr << InstanceBase << endl;
-	if ( !InstanceBase->MergeSub( PartInstanceBase ) ){
-	  FatalError( "Merging InstanceBases failed. PANIC" );
-	  return false;
-	}
-	// cerr << "Final result" << endl;
-	// cerr << "intermediate mismatch: " << PartInstanceBase->mismatch << endl;
-	delete PartInstanceBase;
-	PartInstanceBase = 0;
-      }
+    streamsize pos = fIndex.next();
+    while ( pos != 0 ){
+      pos--;
+      if (( totalDone % Progress() ) == 0) 
+	time_stamp( "Learning:  ", totalDone );
+      Instance tmp = instances[pos]; 
+      tmp.permute( permutation );
+      NewIB->addInstance( tmp );
+      ++totalDone;
+      pos = fIndex.next();
     }
     return true;
   }
-
+  
+#else
+  bool IG_Experiment::learnSpeedy( unsigned int& totalDone ){
+    for ( unsigned int pos = 0; pos < instances.size(); ++pos ){
+      if (( totalDone % Progress() ) == 0) 
+	time_stamp( "Learning:  ", totalDone );
+      Instance tmp = instances[pos]; 
+      tmp.permute( permutation );
+      NewIB->addInstance( tmp );
+      ++totalDone;
+    }
+    return true;
+  }
+#endif
 
   bool IG_Experiment::SpeedLearn( const string& FileName ){
     bool result = true;
@@ -193,12 +165,9 @@ namespace Timbl {
       TargetValue *TopTarget = Targets->MajorityClass();
       //	  cerr << "MAJORITY CLASS = " << TopTarget << endl;
       unsigned int totalDone = 0;
+#ifdef OLD
       fileIndexNT fmIndex(EffectiveFeatures());
-      //      Common::Timer t;
-      //      t.start();
       result = build_speed_index( fmIndex );
-      //      t.stop();
-      //      cerr << "indexing took " << t << endl;
       if ( result ){
 	//	cerr << "index = " << fmIndex << endl;
 	if ( !Verbosity(SILENT) ) {
@@ -207,18 +176,20 @@ namespace Timbl {
 	}
 	result = learnFromSpeedIndex( fmIndex, TopTarget, totalDone );
       }
-      time_stamp( "Finished:  ", totalDone );
-      if ( NewIB ){
-	NewIB->prune( );
-	// ofstream tt( "TREE_TEST" );
-	// NewIB->save( tt, KeepDistributions() );
-	// cerr << "wrote TREE_TEST" << endl;
+#else
+      if ( !Verbosity(SILENT) ) {
+	Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
+	time_stamp( "Start:     ", 0 );
       }
+      result = learnSpeedy( totalDone );
+      NewIB->prune();
+#endif
+      time_stamp( "Finished:  ", totalDone );
       instances.clear();
       learnT.stop();
       if ( !Verbosity(SILENT) ){
 	IBInfo( *mylog );
-	Info( "Learning took " + learnT.toString() );
+	Info( "SpeedLearning took " + learnT.toString() );
       }
     }
     return result;

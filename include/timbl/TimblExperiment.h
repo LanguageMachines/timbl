@@ -80,7 +80,7 @@ namespace Timbl {
   std::ostream& operator<< ( std::ostream&, const fileIndex& );
   std::ostream& operator<< ( std::ostream&, const fileDoubleIndex& );
 
-  typedef rootIndexClass<FeatureValue*,std::streamsize, fCmp> fileIndexNT;
+  //  typedef rootIndexClass<FeatureValue*,std::streamsize, fCmp> fileIndexNT;
 
   class TimblExperiment: public MBLClass {
     friend class TimblAPI;
@@ -198,7 +198,8 @@ namespace Timbl {
     virtual void showTestingInfo( std::ostream& );
     virtual bool checkTestFile();
     bool learnFromFileIndex( const fileIndex&, std::istream& );
-    bool learnFromSpeedIndex( const fileIndexNT&, unsigned int& );
+    //    bool learnFromSpeedIndex( const fileIndexNT&, unsigned int& );
+    bool learnSpeedy( unsigned int& );
     bool initTestFiles( const std::string&, const std::string& );
     void show_results( std::ostream&,
 		       const std::string&, 
@@ -228,7 +229,7 @@ namespace Timbl {
 
     bool build_file_index( const std::string&, fileIndex&  );
     bool build_file_multi_index( const std::string&, fileDoubleIndex&  );
-    bool build_speed_index( fileIndexNT&  );
+    //    bool build_speed_index( fileIndexNT&  );
 
     bool Initialized;
     GetOptClass *OptParams;
@@ -401,8 +402,9 @@ namespace Timbl {
   protected:
     TimblExperiment *clone() const { 
       return new IG_Experiment( MaxFeats(), "", false ); };
-    bool learnFromSpeedIndex( const fileIndexNT&,  const TargetValue*,
-			      unsigned int& );
+    /* bool learnFromSpeedIndex( const fileIndexNT&,  const TargetValue*, */
+    /* 			      unsigned int& ); */
+    bool learnSpeedy( unsigned int& );
     bool SpeedLearn( const std::string& = "" );
     bool ClassicLearn( const std::string& = "" );
     bool checkTestFile();

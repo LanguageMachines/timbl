@@ -456,65 +456,45 @@ namespace Timbl {
     return os;
   }
 
+#ifdef OLD
   bool TimblExperiment::learnFromSpeedIndex( const fileIndexNT& sIndex, 
 					     unsigned int& totalDone ){
-    if ( NewIB ){
-      streamsize pos = sIndex.next();      
-      while ( pos != 0 ){
-	pos--;
-	// Progress update.
-	//
-	if (( totalDone % Progress() ) == 0) 
-	  time_stamp( "Learning:  ", totalDone );
-	Instance tmp =  instances[pos];
-	tmp.permute( permutation );
-	if ( !NewIB->addInstance( tmp ) ){
-	  Warning( "deviating exemplar weight in:\n" + 
-		   toString(&instances[pos]) + "\nIgnoring the new weight" );
-	}
-	++totalDone;
-	pos = sIndex.next();
+    streamsize pos = sIndex.next();      
+    while ( pos != 0 ){
+      pos--;
+      // Progress update.
+      //
+      if (( totalDone % Progress() ) == 0) 
+	time_stamp( "Learning:  ", totalDone );
+      Instance tmp =  instances[pos];
+      tmp.permute( permutation );
+      if ( !NewIB->addInstance( tmp ) ){
+	Warning( "deviating exemplar weight in:\n" + 
+		 toString(&instances[pos]) + "\nIgnoring the new weight" );
       }
-    }
-    else {
-      InstanceBase_base  *OutInstanceBase = 0;
-      streamsize pos = sIndex.next();
-      
-      while ( pos != 0 ){
-	pos--;
-	// Progress update.
-	//
-	if (( totalDone % Progress() ) == 0) 
-	  time_stamp( "Learning:  ", totalDone );
-	if ( !OutInstanceBase ){
-	  OutInstanceBase = InstanceBase->clone();
-	}
-	Instance tmp =  instances[pos];
-	tmp.permute( permutation );
-	if ( !OutInstanceBase->AddInstance( tmp ) ){
-	  Warning( "deviating exemplar weight in:\n" + 
-		   toString(&instances[pos]) + "\nIgnoring the new weight" );
-	}
-	++totalDone;
-	pos = sIndex.next();
-      }
-      if ( OutInstanceBase ){
-	//	    cerr << OutInstanceBase << endl;
-	//	    cerr << "merge into " << endl;
-	//cerr << InstanceBase << endl;
-	if ( !InstanceBase->MergeSub( OutInstanceBase ) ){
-	  FatalError( "Merging InstanceBases failed. PANIC" );
-	  return false;
-	}
-	//		subMergeT.stop();
-	//	    cerr << "Final result" << endl;
-	//	    cerr << "intermediate mismatches: " << OutInstanceBase->mismatch << endl;
-	delete OutInstanceBase;
-	OutInstanceBase = 0;
-      } 
+      ++totalDone;
+      pos = sIndex.next();
     }
     return true;
   }
+#else
+  bool TimblExperiment::learnSpeedy( unsigned int& totalDone ){
+    for ( unsigned int pos = 0; pos < instances.size(); ++pos ){
+      // Progress update.
+      //
+      if (( totalDone % Progress() ) == 0) 
+	time_stamp( "Learning:  ", totalDone );
+      Instance tmp = instances[pos];
+      tmp.permute( permutation );
+      if ( !NewIB->addInstance( tmp ) ){
+	Warning( "deviating exemplar weight in:\n" + 
+		 toString(&instances[pos]) + "\nIgnoring the new weight" );
+      }
+      ++totalDone;
+    }
+    return true;
+  }
+#endif
 
   bool TimblExperiment::SpeedLearn( const string& FileName ){
     bool result = true;
@@ -546,13 +526,9 @@ namespace Timbl {
       if ( ExpInvalid() )
 	return false;
       unsigned int totalDone = 0;
+#ifdef OLD
       fileIndexNT fmIndex(EffectiveFeatures());
-      //      Common::Timer t;
-      //      t.start();
       result = build_speed_index( fmIndex );
-      //      t.stop();
-      //      cerr << "indexing took " << t << endl;
-      //      totalT.start();
       if ( result ){
 	//	cerr << "index = " << fmIndex << endl;
 	if ( !Verbosity(SILENT) ) {
@@ -561,6 +537,13 @@ namespace Timbl {
 	}
 	result = learnFromSpeedIndex( fmIndex, totalDone );
       }
+#else
+      if ( !Verbosity(SILENT) ) {
+	Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
+	time_stamp( "Start:     ", 0 );
+      }
+      result = learnSpeedy( totalDone );
+#endif
       time_stamp( "Finished:  ", totalDone );
       instances.clear();
       learnT.stop();
@@ -2346,6 +2329,7 @@ namespace Timbl {
     return true;
   }
 
+#ifdef OLD
   bool TimblExperiment::build_speed_index( fileIndexNT& fmIndex ){
     bool result = true;
     string Buffer;
@@ -2394,6 +2378,7 @@ namespace Timbl {
     return result;
   }
   */
+#endif
 
   bool TimblExperiment::build_file_index( const string& file_name, 
 					  fileIndex& fmIndex ){
