@@ -101,25 +101,6 @@ namespace Timbl {
     return os;
   }  
 
-#ifdef OLD
-  bool IG_Experiment::learnFromSpeedIndex( const fileIndexNT& fIndex, 
-					   const TargetValue* TopTarget,
-					   unsigned int& totalDone ){
-    streamsize pos = fIndex.next();
-    while ( pos != 0 ){
-      pos--;
-      if (( totalDone % Progress() ) == 0) 
-	time_stamp( "Learning:  ", totalDone );
-      Instance tmp = instances[pos]; 
-      tmp.permute( permutation );
-      NewIB->addInstance( tmp );
-      ++totalDone;
-      pos = fIndex.next();
-    }
-    return true;
-  }
-  
-#else
   bool IG_Experiment::learnSpeedy( unsigned int& totalDone ){
     for ( unsigned int pos = 0; pos < instances.size(); ++pos ){
       if (( totalDone % Progress() ) == 0) 
@@ -131,7 +112,6 @@ namespace Timbl {
     }
     return true;
   }
-#endif
 
   bool IG_Experiment::SpeedLearn( const string& FileName ){
     bool result = true;
@@ -165,25 +145,12 @@ namespace Timbl {
       TargetValue *TopTarget = Targets->MajorityClass();
       //	  cerr << "MAJORITY CLASS = " << TopTarget << endl;
       unsigned int totalDone = 0;
-#ifdef OLD
-      fileIndexNT fmIndex(EffectiveFeatures());
-      result = build_speed_index( fmIndex );
-      if ( result ){
-	//	cerr << "index = " << fmIndex << endl;
-	if ( !Verbosity(SILENT) ) {
-	  Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
-	  time_stamp( "Start:     ", 0 );
-	}
-	result = learnFromSpeedIndex( fmIndex, TopTarget, totalDone );
-      }
-#else
       if ( !Verbosity(SILENT) ) {
-	Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
+	Info( "\nPhase 2: Learning from Datafile: " + CurrentDataFile );
 	time_stamp( "Start:     ", 0 );
       }
       result = learnSpeedy( totalDone );
       NewIB->prune();
-#endif
       time_stamp( "Finished:  ", totalDone );
       instances.clear();
       learnT.stop();
@@ -195,6 +162,7 @@ namespace Timbl {
     return result;
   }
 
+#ifdef OLD
   bool IG_Experiment::build_file_index( const string& file_name, 
 					featureMultiIndex& fmIndex ){
     bool result = true;
@@ -375,7 +343,46 @@ namespace Timbl {
     }
   }
 
+#endif
 
+  void IG_Experiment::compressIndex( const fileDoubleIndex& fIndex,
+				     fileDoubleIndex& res ){
+    res.clear();
+    fileDoubleIndex::const_iterator dit = fIndex.begin();
+    while ( dit != fIndex.end() ){
+      set<streamsize> out;
+      FeatureValue *fv = 0;
+      size_t totalCnt = 0;
+      fileIndex::const_iterator fit = dit->second.begin();
+      while ( fit != dit->second.end() ){
+	size_t cnt = fit->second.size();
+	if ( cnt > igOffset() ){
+	  res[dit->first][fit->first].insert( fit->second.begin(),
+					      fit->second.end() );
+	}
+	else {
+	  if ( !fv ){
+	    fv = fit->first;
+	  }
+	  out.insert( fit->second.begin(), fit->second.end() );
+	  totalCnt += cnt;
+	  if ( totalCnt > igOffset() ){
+	    totalCnt = 0;
+	    res[dit->first][fv].insert( out.begin(), out.end() );
+	    fv = 0;
+	    out.clear();
+	  }
+	}
+	++fit;
+      }
+      if ( !out.empty() ){
+	res[dit->first][fv].insert( out.begin(), out.end() );
+      }
+      ++dit;
+    }
+  }
+  
+  
   bool IG_Experiment::ClassicLearn( const string& FileName ){
     bool result = true;
     if ( is_synced ) {
@@ -402,7 +409,7 @@ namespace Timbl {
     if ( result ) {
       InitInstanceBase();
       if ( EffectiveFeatures() < 2 ){
-	MultiIndex fmIndex;
+	fileIndex fmIndex;
 	result = build_file_index( CurrentDataFile, fmIndex );
 	if ( result ){
 	  stats.clear();
@@ -418,27 +425,31 @@ namespace Timbl {
 	  //
 	  ifstream datafile( CurrentDataFile.c_str(), ios::in);
 	  //
-	  MultiIndex::const_iterator it = fmIndex.begin();
-	  while ( it != fmIndex.end() ){
-	    datafile.clear();
-	    datafile.seekg( it->second );
-	    nextLine( datafile, Buffer );
-	    chopLine( Buffer );
-	    // Progress update.
-	    //
-	    if (( stats.dataLines() % Progress() ) == 0) 
-	      time_stamp( "Learning:  ", stats.dataLines() );
-	    chopped_to_instance( TrainWords );
-	    if ( !outInstanceBase ){
-	      outInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
-						     ibCount,
-						     (RandomSeed()>=0), 
-						     false, 
-						     true );
+	  fileIndex::const_iterator fit = fmIndex.begin();
+	  while ( fit != fmIndex.end() ){
+	    set<streamsize>::const_iterator sit = fit->second.begin();
+	    while ( sit != fit->second.end() ){
+	      datafile.clear();
+	      datafile.seekg( *sit );
+	      nextLine( datafile, Buffer );
+	      chopLine( Buffer );
+	      // Progress update.
+	      //
+	      if (( stats.dataLines() % Progress() ) == 0) 
+		time_stamp( "Learning:  ", stats.dataLines() );
+	      chopped_to_instance( TrainWords );
+	      if ( !outInstanceBase ){
+		outInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
+						       ibCount,
+						       (RandomSeed()>=0), 
+						       false, 
+						       true );
+	      }
+	      //		cerr << "add instance " << &CurrInst << endl;
+	      outInstanceBase->AddInstance( CurrInst );
+	      ++sit;
 	    }
-	    //		cerr << "add instance " << &CurrInst << endl;
-	    outInstanceBase->AddInstance( CurrInst );
-	    ++it;
+	    ++fit;
 	  }
 	  if ( outInstanceBase ){
 	    //	      cerr << "Out Instance Base" << endl;
@@ -459,14 +470,14 @@ namespace Timbl {
 	}
       }
       else {
-	featureMultiIndex fmIndexRaw;
-	result = build_file_index( CurrentDataFile, fmIndexRaw );
+	fileDoubleIndex fmIndexRaw;
+	result = build_file_multi_index( CurrentDataFile, fmIndexRaw );
 	//      cerr << "indexing took " << t << endl;
 	if ( result ){
-	  featureMultiIndex fmIndex;
-	  //	cerr << "compressing index " << fmIndexRaw << endl;
+	  fileDoubleIndex fmIndex;
+	  //	  cerr << "compressing index " << fmIndexRaw << endl;
 	  compressIndex( fmIndexRaw, fmIndex );
-	  //	cerr << "resulting index " << fmIndex << endl;
+	  //	  cerr << "resulting index " << fmIndex << endl;
 	  //	cerr << "compressing took " << t << endl;
 	  stats.clear();
 	  if ( !Verbosity(SILENT) ) {
@@ -482,15 +493,14 @@ namespace Timbl {
 	  //
 	  ifstream datafile( CurrentDataFile.c_str(), ios::in);
 	  //
-	  featureMultiIndex::const_iterator it = fmIndex.begin();
-	  while ( it != fmIndex.end() ){
-	    FeatureValue *the_fv = (FeatureValue*)(it->first);
+	  fileDoubleIndex::const_iterator dit = fmIndex.begin();
+	  while ( dit != fmIndex.end() ){
+	    FeatureValue *the_fv = (FeatureValue*)(dit->first);
 	    //	  cerr << "handle feature '" << the_fv << "' met index " << the_fv->Index() << endl;
-	    MultiIndex::const_iterator fmIt = it->second.begin();
-	    if ( fmIt == it->second.end() ){
+	    if ( dit->second.size() < 1 ){
 	      FatalError( "panic" );
 	    }
-	    if ( igOffset() > 0 && it->second.size() > igOffset() ){
+	    if ( igOffset() > 0 && dit->second.size() > igOffset() ){
 	      //	    cerr << "within offset!" << endl;
 	      IVCmaptype::const_iterator it2
 		= Features[permutation[1]]->ValuesMap.begin();
@@ -502,28 +512,31 @@ namespace Timbl {
 						     true );
 	      while ( it2 != Features[permutation[1]]->ValuesMap.end() ){
 		FeatureValue *the2fv = (FeatureValue*)(it2->second);
-		//	      cerr << "handle secondary feature " << the2fv << endl;
-		typedef MultiIndex::const_iterator mit;
-		pair<mit,mit> b = it->second.equal_range( the2fv );
-		for ( mit i = b.first; i != b.second; ++i ){
-		  datafile.clear();
-		  datafile.seekg( i->second );
-		  nextLine( datafile, Buffer );
-		  chopLine( Buffer );
-		  // Progress update.
-		  //
-		  if (( stats.dataLines() % Progress() ) == 0) 
-		    time_stamp( "Learning:  ", stats.dataLines() );
-		  chopped_to_instance( TrainWords );
-		  if ( !PartInstanceBase ){
-		    PartInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
-							    ibCount,
-							    (RandomSeed()>=0), 
-							    false, 
-							    true );
+		//		cerr << "handle secondary feature " << the2fv << endl;
+		fileIndex::const_iterator fit = dit->second.find( the2fv );
+		if ( fit !=  dit->second.end() ) {
+		  set<streamsize>::const_iterator sit = fit->second.begin();
+		  while ( sit != fit->second.end() ){
+		    datafile.clear();
+		    datafile.seekg( *sit );
+		    nextLine( datafile, Buffer );
+		    chopLine( Buffer );
+		    // Progress update.
+		    //
+		    if (( stats.dataLines() % Progress() ) == 0) 
+		      time_stamp( "Learning:  ", stats.dataLines() );
+		    chopped_to_instance( TrainWords );
+		    if ( !PartInstanceBase ){
+		      PartInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
+							      ibCount,
+							      (RandomSeed()>=0), 
+							      false, 
+							      true );
+		    }
+		    //		cerr << "add instance " << &CurrInst << endl;
+		    PartInstanceBase->AddInstance( CurrInst );
+		    ++sit;
 		  }
-		  //		cerr << "add instance " << &CurrInst << endl;
-		  PartInstanceBase->AddInstance( CurrInst );
 		}
 		if ( PartInstanceBase ){
 		  //		cerr << "finished handling secondary feature:" << the2fv << endl;
@@ -561,26 +574,30 @@ namespace Timbl {
 	    }
 	    else {
 	      //	    cerr << "other case!" << endl;
-	      MultiIndex::const_iterator mIt = it->second.begin();
-	      while ( mIt != it->second.end() ){
-		datafile.clear();
-		datafile.seekg( mIt->second );
-		nextLine( datafile, Buffer );
-		chopLine( Buffer );
-		// Progress update.
-		//
-		if (( stats.dataLines() % Progress() ) == 0) 
-		  time_stamp( "Learning:  ", stats.dataLines() );
-		chopped_to_instance( TrainWords );
-		if ( !outInstanceBase )
-		  outInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
-							 ibCount,
-							 (RandomSeed()>=0), 
-							 false, 
-							 true );
-		//	      cerr << "add instance " << &CurrInst << endl;
-		outInstanceBase->AddInstance( CurrInst );
-		++mIt;
+	      fileIndex::const_iterator fit = dit->second.begin();
+	      while ( fit != dit->second.end() ){
+		set<streamsize>::const_iterator sit = fit->second.begin();
+		while ( sit != fit->second.end() ){
+		  datafile.clear();
+		  datafile.seekg( *sit );
+		  nextLine( datafile, Buffer );
+		  chopLine( Buffer );
+		  // Progress update.
+		  //
+		  if (( stats.dataLines() % Progress() ) == 0) 
+		    time_stamp( "Learning:  ", stats.dataLines() );
+		  chopped_to_instance( TrainWords );
+		  if ( !outInstanceBase )
+		    outInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
+							   ibCount,
+							   (RandomSeed()>=0), 
+							   false, 
+							   true );
+		  //	      cerr << "add instance " << &CurrInst << endl;
+		  outInstanceBase->AddInstance( CurrInst );
+		  ++sit;
+		}
+		++fit;
 	      }
 	      if ( outInstanceBase ){
 		//	      cerr << "Out Instance Base" << endl;
@@ -599,7 +616,7 @@ namespace Timbl {
 		outInstanceBase = 0;
 	      }
 	    }
-	    ++it;
+	    ++dit;
 	  }
 	}
       }

@@ -456,28 +456,6 @@ namespace Timbl {
     return os;
   }
 
-#ifdef OLD
-  bool TimblExperiment::learnFromSpeedIndex( const fileIndexNT& sIndex, 
-					     unsigned int& totalDone ){
-    streamsize pos = sIndex.next();      
-    while ( pos != 0 ){
-      pos--;
-      // Progress update.
-      //
-      if (( totalDone % Progress() ) == 0) 
-	time_stamp( "Learning:  ", totalDone );
-      Instance tmp =  instances[pos];
-      tmp.permute( permutation );
-      if ( !NewIB->addInstance( tmp ) ){
-	Warning( "deviating exemplar weight in:\n" + 
-		 toString(&instances[pos]) + "\nIgnoring the new weight" );
-      }
-      ++totalDone;
-      pos = sIndex.next();
-    }
-    return true;
-  }
-#else
   bool TimblExperiment::learnSpeedy( unsigned int& totalDone ){
     for ( unsigned int pos = 0; pos < instances.size(); ++pos ){
       // Progress update.
@@ -494,7 +472,6 @@ namespace Timbl {
     }
     return true;
   }
-#endif
 
   bool TimblExperiment::SpeedLearn( const string& FileName ){
     bool result = true;
@@ -526,24 +503,11 @@ namespace Timbl {
       if ( ExpInvalid() )
 	return false;
       unsigned int totalDone = 0;
-#ifdef OLD
-      fileIndexNT fmIndex(EffectiveFeatures());
-      result = build_speed_index( fmIndex );
-      if ( result ){
-	//	cerr << "index = " << fmIndex << endl;
-	if ( !Verbosity(SILENT) ) {
-	  Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
-	  time_stamp( "Start:     ", 0 );
-	}
-	result = learnFromSpeedIndex( fmIndex, totalDone );
-      }
-#else
       if ( !Verbosity(SILENT) ) {
-	Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
+	Info( "\nPhase 2: Learning from Datafile: " + CurrentDataFile );
 	time_stamp( "Start:     ", 0 );
       }
       result = learnSpeedy( totalDone );
-#endif
       time_stamp( "Finished:  ", totalDone );
       instances.clear();
       learnT.stop();
@@ -2328,57 +2292,6 @@ namespace Timbl {
     }
     return true;
   }
-
-#ifdef OLD
-  bool TimblExperiment::build_speed_index( fileIndexNT& fmIndex ){
-    bool result = true;
-    string Buffer;
-    if ( !Verbosity(SILENT) ) {
-      Info( "Phase 2: Building fast index for Datafile: " + CurrentDataFile );
-      time_stamp( "Start:     ", 0 );
-    }
-    for ( unsigned int nextPos = 0; nextPos < instances.size(); ++nextPos ){
-      // The next Instance to store. 
-      //	cerr << "Instance[" << nextPos << "]=" << instances[nextPos] << endl;
-      Instance tmp = instances[nextPos];
-      tmp.permute( permutation );
-      fmIndex.add( tmp.FV, nextPos+1 );
-      if (( nextPos % Progress() ) == 0) {
-	time_stamp( "Indexing:  ", nextPos );
-      }
-    }
-    time_stamp( "Finished:  ", instances.size() );
-    return result;
-  }
-  /*
-  bool TimblExperiment::build_speed_multi_index( fileDoubleIndex& fmIndex ){
-    bool result = true;
-    if ( !Verbosity(SILENT) ) {
-      Info( "Phase 2: Building fast multi index for Datafile: " + CurrentDataFile );
-      time_stamp( "Start:     ", 0 );
-    }
-    for ( unsigned int nextPos=0; nextPos < instances.size(); ++nextPos ){
-      // The next Instance to store. 
-      //	cerr << "Instance[" << nextPos << "] = " << instancec[nextPos] << endl;
-      FeatureValue *fv0 = instances[nextPos].FV[permutation[0]];
-      FeatureValue *fv1 = instances[nextPos].FV[permutation[1]];
-      fileDoubleIndex::iterator it = fmIndex.find( fv0 );
-      if ( it != fmIndex.end() ){
-	it->second[fv1].insert( nextPos );
-      }
-      else {
-	fileIndex mi;
-	mi[fv1].insert( nextPos );
-	fmIndex[fv0] = mi;
-      }
-      if (( nextPos % Progress() ) == 0) 
-	time_stamp( "Indexing:  ", nextPos );
-    }
-    time_stamp( "Finished:  ", instances.size() );
-    return result;
-  }
-  */
-#endif
 
   bool TimblExperiment::build_file_index( const string& file_name, 
 					  fileIndex& fmIndex ){
