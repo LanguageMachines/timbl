@@ -62,11 +62,6 @@ using namespace std;
 
 namespace Timbl {
 
-  const int DefaultTargetNumber  = 20;
-  const int DefaultFeatureNumber = 50;
-  const int TargetIncrement      = 50;
-  const int FeatureIncrement     = 100;  
-
   void MBLClass::fill_table(){
     Options.Add( new IntegerOption( "FLENGTH",
 				    &F_length, 0, 1, 32 ) );
@@ -2189,13 +2184,9 @@ namespace Timbl {
     PermFeatures.resize(num_of_features,NULL);
     FeatureStrings = new StringHash(); // all features share the same hash
     TargetStrings = new StringHash(); // targets has it's own hash
-    Targets = new Target( DefaultTargetNumber, 
-			  TargetIncrement,
-			  TargetStrings );
+    Targets = new Target( TargetStrings );
     for ( size_t i=0; i< num_of_features; ++i ){
-      Features[i] = new Feature( DefaultFeatureNumber,
-				 FeatureIncrement,
-				 FeatureStrings );
+      Features[i] = new Feature( FeatureStrings );
       PermFeatures[i] = NULL; //Features[i];
     }
     CurrInst.Init( num_of_features );

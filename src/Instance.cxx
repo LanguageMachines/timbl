@@ -654,8 +654,8 @@ namespace Timbl {
     return best;
   }
 
-  Feature::Feature( int a, int b, StringHash *T ): 
-    BaseFeatTargClass(a,b,T),
+  Feature::Feature( StringHash *T ): 
+    BaseFeatTargClass(T),
     metric_matrix( 0 ),
     metric( 0 ),
     ignore( false ),
@@ -1386,17 +1386,13 @@ namespace Timbl {
       return false;
   }
 
-  BaseFeatTargClass::BaseFeatTargClass( int Size, int Inc, StringHash *T ):
-    CurSize( Size ),
-    Increment( Inc ),
+  BaseFeatTargClass::BaseFeatTargClass( StringHash *T ):
     TokenTree( T ),
     is_copy(false){
   }
   
   BaseFeatTargClass::BaseFeatTargClass( const BaseFeatTargClass& in ):
     MsgClass( in ),
-    CurSize( in.CurSize ),
-    Increment( in.Increment ),
     TokenTree( in.TokenTree ){
     ValuesArray = in.ValuesArray;
     ValuesMap = in.ValuesMap;

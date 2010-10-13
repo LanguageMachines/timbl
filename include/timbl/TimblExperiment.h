@@ -397,7 +397,6 @@ namespace Timbl {
   protected:
     TimblExperiment *clone() const { 
       return new IG_Experiment( MaxFeats(), "", false ); };
-    bool learnSpeedy( unsigned int& );
     bool SpeedLearn( const std::string& = "" );
     bool ClassicLearn( const std::string& = "" );
     bool checkTestFile();

@@ -511,8 +511,6 @@ namespace Timbl {
       time_stamp( "Finished:  ", totalDone );
       instances.clear();
       learnT.stop();
-      // cerr << "Endresult " << endl;
-      // cerr << InstanceBase << endl;
       if ( !Verbosity(SILENT) ){
 	IBInfo( *mylog );
 	Info( "SpeedLearning took " + learnT.toString() );
@@ -526,66 +524,39 @@ namespace Timbl {
   
   bool TimblExperiment::learnFromFileIndex( const fileIndex& fi, 
 					    istream& datafile ){
-    if ( NewIB ){
-      fileIndex::const_iterator fit = fi.begin();
-      while ( fit != fi.end() ){
-	set<streamsize>::const_iterator sit = fit->second.begin();
-	while ( sit != fit->second.end() ){
-	  datafile.clear();
-	  datafile.seekg( *sit );
-	  string Buffer;
-	  nextLine( datafile, Buffer );
-	  chopLine( Buffer );
-	  // Progress update.
-	  //
-	  if (( stats.dataLines() % Progress() ) == 0) 
-	    time_stamp( "SpeedLearning:  ", stats.dataLines() );
-	  chopped_to_instance( TrainWords );
-	  //		  cerr << "add instance " << &CurrInst << endl;
-	  if ( !NewIB->addInstance( CurrInst ) ){
-	    Warning( "deviating exemplar weight in:\n" + 
-		     Buffer + "\nIgnoring the new weight" );
-	  }
-	  ++sit;
+    InstanceBase_base *outInstanceBase = 0;
+    fileIndex::const_iterator fit = fi.begin();
+    while ( fit != fi.end() ){
+      set<streamsize>::const_iterator sit = fit->second.begin();
+      while ( sit != fit->second.end() ){
+	datafile.clear();
+	datafile.seekg( *sit );
+	string Buffer;
+	nextLine( datafile, Buffer );
+	chopLine( Buffer );
+	// Progress update.
+	//
+	if (( stats.dataLines() % Progress() ) == 0) 
+	  time_stamp( "Learning:  ", stats.dataLines() );
+	chopped_to_instance( TrainWords );
+	if ( !outInstanceBase )
+	  outInstanceBase =InstanceBase->clone();
+	//		  cerr << "add instance " << &CurrInst << endl;
+	if ( !outInstanceBase->AddInstance( CurrInst ) ){
+	  Warning( "deviating exemplar weight in:\n" + 
+		   Buffer + "\nIgnoring the new weight" );
 	}
-	++fit;
+	++sit;
       }
+      ++fit;
     }
-    else {
-      InstanceBase_base *outInstanceBase = 0;
-      fileIndex::const_iterator fit = fi.begin();
-      while ( fit != fi.end() ){
-	set<streamsize>::const_iterator sit = fit->second.begin();
-	while ( sit != fit->second.end() ){
-	  datafile.clear();
-	  datafile.seekg( *sit );
-	  string Buffer;
-	  nextLine( datafile, Buffer );
-	  chopLine( Buffer );
-	  // Progress update.
-	  //
-	  if (( stats.dataLines() % Progress() ) == 0) 
-	    time_stamp( "Learning:  ", stats.dataLines() );
-	  chopped_to_instance( TrainWords );
-	  if ( !outInstanceBase )
-	    outInstanceBase =InstanceBase->clone();
-	  //		  cerr << "add instance " << &CurrInst << endl;
-	  if ( !outInstanceBase->AddInstance( CurrInst ) ){
-	    Warning( "deviating exemplar weight in:\n" + 
-		     Buffer + "\nIgnoring the new weight" );
-	  }
-	  ++sit;
-	}
-	++fit;
+    if ( outInstanceBase ){
+      if ( !InstanceBase->MergeSub( outInstanceBase ) ){
+	FatalError( "Merging InstanceBases failed. PANIC" );
+	return false;
       }
-      if ( outInstanceBase ){
-	if ( !InstanceBase->MergeSub( outInstanceBase ) ){
-	  FatalError( "Merging InstanceBases failed. PANIC" );
-	  return false;
-	}
-	delete outInstanceBase;
-	outInstanceBase = 0;
-      }
+      delete outInstanceBase;
+      outInstanceBase = 0;
     }
     return true;
   }
@@ -800,19 +771,17 @@ namespace Timbl {
 	do {
 	  // The next Instance to store. 
 	  chopped_to_instance( TrainLearnWords );
+	  bool happy;
 	  if ( NewIB ){
-	    if ( !NewIB->addInstance( CurrInst ) ){
-	      Warning( "deviating exemplar weight in line #" + 
-		       toString<int>(stats.totalLines() ) + ":\n" +
-		       Buffer + "\nIgnoring the new weight" );	
-	    }
+	    happy = NewIB->addInstance( CurrInst );
 	  }
 	  else {
-	    if ( !InstanceBase->AddInstance( CurrInst ) ){
-	      Warning( "deviating exemplar weight in line #" + 
-		       toString<int>(stats.totalLines() ) + ":\n" +
-		       Buffer + "\nIgnoring the new weight" );	
-	    }
+	    happy = InstanceBase->AddInstance( CurrInst );
+	  }
+	  if ( !happy ){
+	    Warning( "deviating exemplar weight in line #" + 
+		     toString<int>(stats.totalLines() ) + ":\n" +
+		     Buffer + "\nIgnoring the new weight" );	
 	  }
 	  // Progress update.
 	  //
@@ -1228,14 +1197,14 @@ namespace Timbl {
 	  while( go_on ){ 
 	    // The next Instance to store. 
 	    chopped_to_instance( TrainWords );
+	    bool happy;
 	    if ( NewIB ){
-	      if ( !NewIB->addInstance( CurrInst ) ){
-		Warning( "deviating exemplar weight in line #" +
-			 toString<int>(stats.totalLines()) + ":\n" +
-			 Buffer + "\nIgnoring the new weight" );
-	      }
+	      happy = NewIB->addInstance( CurrInst );
 	    }
-	    else if ( !InstanceBase->AddInstance( CurrInst ) ){
+	    else {
+	      happy = InstanceBase->AddInstance( CurrInst );
+	    }
+	    if ( !happy ){
 	      Warning( "deviating exemplar weight in line #" +
 		       toString<int>(stats.totalLines()) + ":\n" +
 		       Buffer + "\nIgnoring the new weight" );
@@ -1365,19 +1334,18 @@ namespace Timbl {
 	    stats = stats_keep;
 	    if ( ResultTarget != CurrInst.TV ) {
 	      chopped_to_instance( TrainLearnWords );
+	      bool happy;
 	      if ( NewIB ){
-		if ( !NewIB->addInstance( CurrInst ) ){
-		  Warning( "deviating exemplar weight in line #" + 
-			   toString<int>(stats.totalLines() ) + ":\n" +
-			   Buffer + "\nIgnoring the new weight" );
-		}
+		happy = NewIB->addInstance( CurrInst );
 	      }
-	      else
-		if ( !InstanceBase->AddInstance( CurrInst ) ){
-		  Warning( "deviating exemplar weight in line #" + 
-			   toString<int>(stats.totalLines() ) + ":\n" +
-			   Buffer + "\nIgnoring the new weight" );
-		}
+	      else {
+		happy = InstanceBase->AddInstance( CurrInst );
+	      }
+	      if ( !happy ){
+		Warning( "deviating exemplar weight in line #" + 
+			 toString<int>(stats.totalLines() ) + ":\n" +
+			 Buffer + "\nIgnoring the new weight" );
+	      }
 	      ++Added;
 	      ++TotalAdded;
 	      MBL_init = true; // avoid recalculations in LocalClassify

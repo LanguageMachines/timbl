@@ -206,7 +206,7 @@ namespace Timbl {
 
   class BaseFeatTargClass: public MsgClass {
   public:
-    BaseFeatTargClass( int, int, StringHash * );
+    BaseFeatTargClass( StringHash * );
     virtual ~BaseFeatTargClass();
     size_t EffectiveValues() const;
     size_t TotalValues() const;
@@ -214,8 +214,6 @@ namespace Timbl {
     IVCmaptype ValuesMap;
     virtual ValueClass *Lookup( const std::string& ) const = 0;
   protected:
-    int CurSize;
-    int Increment;
     StringHash *TokenTree;
     bool is_copy;
     BaseFeatTargClass( const BaseFeatTargClass& );
@@ -226,7 +224,7 @@ namespace Timbl {
   
   class Target: public BaseFeatTargClass {
   public:
-    Target( int a, int b, StringHash *T ): BaseFeatTargClass(a,b,T) {};
+    Target( StringHash *T ): BaseFeatTargClass(T) {};
     TargetValue *add_value( const std::string&, int freq = 1 );
     TargetValue *add_value( unsigned int, int freq = 1 );
     TargetValue *Lookup( const std::string& ) const;
@@ -241,7 +239,7 @@ namespace Timbl {
   class Feature: public BaseFeatTargClass {
     friend class MBLClass;
   public:
-    Feature( int a, int b, StringHash *T );
+    Feature( StringHash *T );
     ~Feature();
     bool Ignore() const { return ignore; };
     void Ignore( const bool val ){ ignore = val; };
