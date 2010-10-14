@@ -266,44 +266,37 @@ namespace Timbl {
 	    }
 	    if ( igOffset() > 0 && dit->second.size() > igOffset() ){
 	      //	    cerr << "within offset!" << endl;
-	      IVCmaptype::const_iterator it2
-		= Features[permutation[1]]->ValuesMap.begin();
 	      IG_InstanceBase *TmpInstanceBase = 0;
 	      TmpInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
 						     ibCount,
 						     (RandomSeed()>=0), 
 						     false, 
 						     true );
-	      while ( it2 != Features[permutation[1]]->ValuesMap.end() ){
-		FeatureValue *the2fv = (FeatureValue*)(it2->second);
-		//		cerr << "handle secondary feature " << the2fv << endl;
-		fileIndex::const_iterator fit = dit->second.find( the2fv );
-		if ( fit !=  dit->second.end() ) {
-		  set<streamsize>::const_iterator sit = fit->second.begin();
-		  while ( sit != fit->second.end() ){
-		    datafile.clear();
-		    datafile.seekg( *sit );
-		    nextLine( datafile, Buffer );
-		    chopLine( Buffer );
-		    // Progress update.
-		    //
-		    if (( stats.dataLines() % Progress() ) == 0) 
-		      time_stamp( "Learning:  ", stats.dataLines() );
-		    chopped_to_instance( TrainWords );
-		    if ( !PartInstanceBase ){
-		      PartInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
-							      ibCount,
-							      (RandomSeed()>=0), 
-							      false, 
-							      true );
-		    }
-		    //		cerr << "add instance " << &CurrInst << endl;
-		    PartInstanceBase->AddInstance( CurrInst );
-		    ++sit;
+	      fileIndex::const_iterator fit = dit->second.begin();
+	      while ( fit !=  dit->second.end() ) {
+		set<streamsize>::const_iterator sit = fit->second.begin();
+		while ( sit != fit->second.end() ){
+		  datafile.clear();
+		  datafile.seekg( *sit );
+		  nextLine( datafile, Buffer );
+		  chopLine( Buffer );
+		  // Progress update.
+		  //
+		  if (( stats.dataLines() % Progress() ) == 0) 
+		    time_stamp( "Learning:  ", stats.dataLines() );
+		  chopped_to_instance( TrainWords );
+		  if ( !PartInstanceBase ){
+		    PartInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
+							    ibCount,
+							    (RandomSeed()>=0), 
+							    false, 
+							    true );
 		  }
+		  //		cerr << "add instance " << &CurrInst << endl;
+		  PartInstanceBase->AddInstance( CurrInst );
+		  ++sit;
 		}
 		if ( PartInstanceBase ){
-		  //		cerr << "finished handling secondary feature:" << the2fv << endl;
 		  //		time_stamp( "Start Pruning:    " );
 		  //		cerr << PartInstanceBase << endl;
 		  PartInstanceBase->Prune( TopTarget, 2 );
@@ -321,7 +314,7 @@ namespace Timbl {
 		else {
 		  //		cerr << "Partial IB is empty" << endl;
 		}
-		++it2;
+		++fit;
 	      }
 	      //	    time_stamp( "Start Final Pruning: " );
 	      //	    cerr << TmpInstanceBase << endl;
