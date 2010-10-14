@@ -36,7 +36,7 @@ namespace Timbl {
     virtual NewIBTree *find( FeatureValue * ) const = 0;
     virtual void save( std::ostream & ) const = 0;
     virtual void saveHashed( std::ostream & ) const = 0;
-    virtual void prune( const TargetValue *, unsigned int& ) = 0;
+    virtual void prune( unsigned int& ) = 0;
     virtual bool addInst( const Instance &, 
 			  unsigned int,
 			  unsigned int,
@@ -70,7 +70,7 @@ namespace Timbl {
     ValueDistribution *sum_distributions( bool ){ return 0; };
     const ValueDistribution *match( const Instance&, unsigned int ) const;
     NewIBTree *find( FeatureValue * ) const { return 0; };
-    void prune( const TargetValue *, unsigned int& );
+    void prune( unsigned int& ){ };
     unsigned int size() const { return 0; } ;
     bool isLeaf() const { return true; };
     void countBranches( unsigned int, 
@@ -101,7 +101,7 @@ namespace Timbl {
     ValueDistribution *sum_distributions( bool );
     const ValueDistribution *match( const Instance&, unsigned int ) const;
     NewIBTree *find( FeatureValue * ) const;
-    void prune( const TargetValue *, unsigned int& );
+    void prune( unsigned int& );
     unsigned int size() const {return _mmap.size(); };
     bool isLeaf() const { return _mmap.empty(); };
     void countBranches( unsigned int, 
@@ -143,7 +143,7 @@ namespace Timbl {
     bool readHashed( std::istream &, std::vector<Feature *>&, Target *,
 		     StringHash *, StringHash *, int );
     void put( std::ostream & ) const;
-    void prune( const TargetValue * = 0 ); 
+    void prune( ); 
     bool isPruned() const { return _pruned; };
     bool persistentD() const { return _keepDist; };
     unsigned long int getSizeInfo( unsigned long int&, double & ) const;

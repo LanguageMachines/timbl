@@ -306,12 +306,10 @@ namespace Timbl{
     TDistribution = sum_distributions( false );
   }
 
-  void NewIBleaf::prune( const TargetValue*, unsigned int& ){ }
-
-  void NewIBbranch::prune( const TargetValue* top, unsigned int& cnt ){
+  void NewIBbranch::prune( unsigned int& cnt ){
     std::map<FeatureValue*,NewIBTree*, rfCmp>::iterator it = _mmap.begin();
     while ( it != _mmap.end() ){
-      it->second->prune( TValue, cnt );
+      it->second->prune( cnt );
       ++it;
     }
     it = _mmap.begin();
@@ -829,16 +827,12 @@ namespace Timbl{
       _root->countBranches( 0, terminals, nonTerminals );
     }
   }
-
   
-  void NewIBroot::prune( const TargetValue *top ) {
+  void NewIBroot::prune() {
     assignDefaults( );
     if ( !_pruned ) {
       if ( _root ){
-	if ( top )
-	  _root->prune( top, _nodeCount );
-	else
-	  _root->prune( topTV, _nodeCount );	  
+	_root->prune( _nodeCount );
       }
       _pruned = true;
     }
@@ -849,7 +843,7 @@ namespace Timbl{
     result->_defAss = _defAss;
     result->_defValid = _defValid;
     result->_nodeCount = _nodeCount;
-    result->_leafCount = _leafCount; // only usefull for Server???
+    result->_leafCount = _leafCount;
     result->_pruned = _pruned;
     result->_root = _root;
     result->topDist = topDist;
@@ -857,17 +851,14 @@ namespace Timbl{
   }
 
   NewIBroot* NewIBroot::IBPartition( NewIBTree *sub, size_t dep ) const {
-    // cerr << "creating an IB partition from :" << sub << endl;
-    // cerr << "+++++++++++++++++++++++++++++++++++++++++++"<< endl;
     NewIBroot *result = new NewIBroot( _depth-dep, _random, _keepDist );
     result->_nodeCount = _nodeCount;
-    result->_leafCount = _leafCount; // only usefull for Server???
+    result->_leafCount = _leafCount;
     result->_root = sub;
     if ( _root ){
       delete result->topDist;
       result->assignDefaults();
     }
-    //    cerr << "created an IB partition:" << result << endl;
     return result;
   }
 
