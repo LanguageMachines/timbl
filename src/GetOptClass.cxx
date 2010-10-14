@@ -78,8 +78,8 @@ namespace Timbl {
     do_sloppy_loo = false;
     do_silly = false;
     do_diversify = false;
-    do_speed_train = false;
     do_daemon = true;
+    do_speed_train = false;
     if ( MaxFeats == -1 ){
       MaxFeats = Max;
       LocalInputFormat = UnknownInputFormat; // InputFormat and verbosity
@@ -162,8 +162,8 @@ namespace Timbl {
     do_sloppy_loo( false ),
     do_silly( in.do_silly ),
     do_diversify( in.do_diversify ),
-    do_speed_train( in.do_speed_train ),
     do_daemon( in.do_daemon ),
+    do_speed_train( in.do_speed_train ),
     metricsArray( in.metricsArray ),
     parent_socket_os( in.parent_socket_os ),
     outPath( in.outPath ),

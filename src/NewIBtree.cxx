@@ -18,10 +18,6 @@ using namespace std;
 
 namespace Timbl{
 
-  void NewIBTree::put( std::ostream& os, int level ) const {
-    os << "raar!" << std::endl;
-  }
-  
   std::ostream& operator<< ( std::ostream& os, 
 			     const NewIBTree& o ){
     o.put( os, 0 );
@@ -154,8 +150,8 @@ namespace Timbl{
       return 0;
   }
 
-  const ValueDistribution *NewIBleaf::match( const Instance& I, 
-					     unsigned int pos ) const {
+  const ValueDistribution *NewIBleaf::match( const Instance& , 
+					     unsigned int ) const {
     if ( TDistribution->ZeroDist() ) // a deleted instance
       return 0;
     return TDistribution;
@@ -310,7 +306,7 @@ namespace Timbl{
     TDistribution = sum_distributions( false );
   }
 
-  void NewIBleaf::prune( const TargetValue* top, unsigned int& cnt ){ }
+  void NewIBleaf::prune( const TargetValue*, unsigned int& ){ }
 
   void NewIBbranch::prune( const TargetValue* top, unsigned int& cnt ){
     std::map<FeatureValue*,NewIBTree*, rfCmp>::iterator it = _mmap.begin();
@@ -458,7 +454,6 @@ namespace Timbl{
     bool temp_persist = _keepDist;
     _keepDist = persist;
     assignDefaults();
-    bool dummy;
     ios::fmtflags OldFlg = os.setf( ios::fixed, ios::floatfield );
     os << "# Version " << _version << "\n#\n(";
     if ( _root ){
@@ -489,7 +484,6 @@ namespace Timbl{
     bool temp_persist = _keepDist;
     _keepDist = persist;
     assignDefaults();
-    bool dummy;
     ios::fmtflags OldFlg = os.setf( ios::fixed, ios::floatfield );
     os << "# Version " << _version << " (Hashed)\n#\n";
     saveHash( os , cats, feats );
@@ -749,7 +743,6 @@ namespace Timbl{
 			      StringHash *cats, StringHash *feats, 
 			      int expectedVersion ){
     char delim;
-    int dum;
     _defAss = true;  // always for a restored tree
     _defValid = true; // always for a restored tree
     _version = expectedVersion;
@@ -822,7 +815,7 @@ namespace Timbl{
   
   void NewIBleaf::countBranches( unsigned int l, 
 				 std::vector<unsigned int>& terminals,
-				 std::vector<unsigned int>& nonTerminals ){
+				 std::vector<unsigned int>& ){
     ++terminals[l];
   }
   
@@ -1052,7 +1045,7 @@ namespace Timbl{
     // in the Instance Base and the default TargetValue
     result = 0;
     ValueDistribution *Dist = 0;
-    int pos = 0;
+    unsigned int pos = 0;
     leaf = false;
     if ( _root ){
       const NewIBTree *pnt = _root->find( Inst.FV[0] );
@@ -1137,7 +1130,7 @@ namespace Timbl{
     // the subtree Instance Base necessary for IB1
     assignDefaults();
     dist = 0;
-    int pos = 0;
+    unsigned int pos = 0;
     NewIBroot *subtree = 0;
     NewIBTree *pnt = _root;
     NewIBTree *last_match = 0;;

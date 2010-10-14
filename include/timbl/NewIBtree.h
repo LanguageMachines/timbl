@@ -26,7 +26,7 @@ namespace Timbl {
     typedef std::map<FeatureValue *, NewIBTree *, rfCmp> IBmap;
   NewIBTree(): TValue(0), TDistribution(0){};
     virtual ~NewIBTree(){};
-    virtual void put( std::ostream&, int ) const;
+    virtual void put( std::ostream&, int ) const = 0;
     virtual void assign_defaults( bool, bool, bool, size_t ) = 0; 
     virtual ValueDistribution *sum_distributions( bool ) = 0;
     virtual void redoDistributions() = 0;
@@ -173,7 +173,7 @@ namespace Timbl {
 				       size_t& );
 
   protected:
-    int _depth;
+    unsigned int _depth;
     bool _random;
     bool _keepDist;
     NewIBTree *_root;

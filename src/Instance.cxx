@@ -1511,7 +1511,6 @@ namespace Timbl {
       store[i] = val;
       sum += val;
     }
-    double mean = sum /  ValuesArray.size();
     double total = 0.0;
     for ( unsigned int i=0; i < ValuesArray.size(); ++i ){
       double diff = sum - store[i];

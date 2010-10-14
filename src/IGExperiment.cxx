@@ -259,7 +259,7 @@ namespace Timbl {
 	  //
 	  fileDoubleIndex::const_iterator dit = fmIndex.begin();
 	  while ( dit != fmIndex.end() ){
-	    FeatureValue *the_fv = (FeatureValue*)(dit->first);
+	    //	    FeatureValue *the_fv = (FeatureValue*)(dit->first);
 	    //	  cerr << "handle feature '" << the_fv << "' met index " << the_fv->Index() << endl;
 	    if ( dit->second.size() < 1 ){
 	      FatalError( "panic" );
@@ -454,8 +454,8 @@ namespace Timbl {
     }
     Distance = sum_remaining_weights( match_depth );
     if ( ResultDist &&
-	 ( NewIB && NewIB->persistentD() ) ||
-	 ( InstanceBase && InstanceBase->PersistentD() ) ){
+	 ( ( NewIB && NewIB->persistentD() ) ||
+	   ( InstanceBase && InstanceBase->PersistentD() ) ) ){
       if ( match_depth == 0 )
 	bestResult.addTop( ResultDist );
       else

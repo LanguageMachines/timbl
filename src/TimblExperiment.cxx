@@ -183,8 +183,8 @@ namespace Timbl {
     confusionInfo( 0 ),
     match_depth(-1),
     last_leaf(true),
-    estimate( 0 ),
-    speedTraining( false )
+    speedTraining( false ),
+    estimate( 0 )
   {
     Weighting = GR_w;
   }
@@ -625,13 +625,11 @@ namespace Timbl {
 	    time_stamp( "Start:     ", 0 );
 	  }
 	  string Buffer;
-	  InstanceBase_base *outInstanceBase = 0;
 	  // Open the file.
 	  //
 	  ifstream datafile( CurrentDataFile.c_str(), ios::in);
 	  //
 	  fileDoubleIndex::const_iterator mit = fIndex.begin();
-	  unsigned int totalCount = 0;
 	  while ( mit != fIndex.end() ){
 	    learnFromFileIndex( mit->second, datafile );
 	    ++mit;
