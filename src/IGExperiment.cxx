@@ -148,44 +148,6 @@ namespace Timbl {
     return result;
   }
 
-  void IG_Experiment::compressIndex( const fileDoubleIndex& fIndex,
-				     fileDoubleIndex& res ){
-    res.clear();
-    fileDoubleIndex::const_iterator dit = fIndex.begin();
-    while ( dit != fIndex.end() ){
-      set<streamsize> out;
-      FeatureValue *fv = 0;
-      size_t totalCnt = 0;
-      fileIndex::const_iterator fit = dit->second.begin();
-      while ( fit != dit->second.end() ){
-	size_t cnt = fit->second.size();
-	if ( cnt > igOffset() ){
-	  res[dit->first][fit->first].insert( fit->second.begin(),
-					      fit->second.end() );
-	}
-	else {
-	  if ( !fv ){
-	    fv = fit->first;
-	  }
-	  out.insert( fit->second.begin(), fit->second.end() );
-	  totalCnt += cnt;
-	  if ( totalCnt > igOffset() ){
-	    totalCnt = 0;
-	    res[dit->first][fv].insert( out.begin(), out.end() );
-	    fv = 0;
-	    out.clear();
-	  }
-	}
-	++fit;
-      }
-      if ( !out.empty() ){
-	res[dit->first][fv].insert( out.begin(), out.end() );
-      }
-      ++dit;
-    }
-  }
-  
-  
   bool IG_Experiment::ClassicLearn( const string& FileName ){
     bool result = true;
     if ( is_synced ) {
@@ -210,7 +172,11 @@ namespace Timbl {
       result = false;
     }
     if ( result ) {
+      Common::Timer learnT;
+      learnT.start();
       InitInstanceBase();
+      if ( ExpInvalid() )
+	return false;
       if ( EffectiveFeatures() < 2 ){
 	fileIndex fmIndex;
 	result = build_file_index( CurrentDataFile, fmIndex );
@@ -273,15 +239,10 @@ namespace Timbl {
 	}
       }
       else {
-	fileDoubleIndex fmIndexRaw;
-	result = build_file_multi_index( CurrentDataFile, fmIndexRaw );
+	fileDoubleIndex fmIndex;
+	result = build_file_multi_index( CurrentDataFile, fmIndex );
 	//      cerr << "indexing took " << t << endl;
 	if ( result ){
-	  fileDoubleIndex fmIndex;
-	  //	  cerr << "compressing index " << fmIndexRaw << endl;
-	  compressIndex( fmIndexRaw, fmIndex );
-	  //	  cerr << "resulting index " << fmIndex << endl;
-	  //	cerr << "compressing took " << t << endl;
 	  stats.clear();
 	  if ( !Verbosity(SILENT) ) {
 	    Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
@@ -424,8 +385,14 @@ namespace Timbl {
 	}
       }
       time_stamp( "Finished:  ", stats.dataLines() );
-      if ( !Verbosity(SILENT) )
+      learnT.stop();
+      if ( !Verbosity(SILENT) ){
 	IBInfo( *mylog );
+	Info( "Learning took " + learnT.toString() );
+      }
+#ifdef IBSTATS
+      cerr << "final mismatches: " << InstanceBase->mismatch << endl;
+#endif
     }
     return result;
   }

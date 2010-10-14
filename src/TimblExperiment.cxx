@@ -515,9 +515,6 @@ namespace Timbl {
 	IBInfo( *mylog );
 	Info( "SpeedLearning took " + learnT.toString() );
       }
-#ifdef IBSTATS
-      cerr << "final mismatches: " << InstanceBase->mismatch << endl;
-#endif
     }
     return result;
   }

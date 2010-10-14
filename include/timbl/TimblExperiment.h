@@ -408,7 +408,6 @@ namespace Timbl {
 				      bool& );
   private:
     
-    void compressIndex( const fileDoubleIndex&, fileDoubleIndex& );
     bool GetInstanceBase( std::istream& );
   };
   
