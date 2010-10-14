@@ -264,7 +264,7 @@ namespace Timbl {
       for ( unsigned int i=0; i < Features.size(); ++i ){
 	Features[i] = new Feature( *m.Features[i] );
 	if ( m.PermFeatures[i] )
-	  PermFeatures[i] = new Feature( *m.PermFeatures[i] );
+	  PermFeatures[i] = Features[permutation[i]]; 
 	else
 	  PermFeatures[i] = 0;
       }
@@ -318,9 +318,6 @@ namespace Timbl {
     }
     for ( unsigned int i=0; i < Features.size(); ++i ){
       delete Features[i];
-      if ( is_copy && !is_synced ){
-	delete PermFeatures[i];
-      }
     }
     delete sock_os;
     delete GlobalMetric;
