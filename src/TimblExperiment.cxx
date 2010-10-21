@@ -690,10 +690,14 @@ namespace Timbl {
       else {	
 	chopped_to_instance( TrainLearnWords );
 	MBL_init = false;
-	if ( !InstanceBase->AddInstance( CurrInst ) ){
+	bool happy;
+	if ( NewIB )
+	  happy = NewIB->addInstance( CurrInst );
+	else
+	  happy = InstanceBase->AddInstance( CurrInst );
+	if ( !happy )
 	  Warning( "deviating exemplar weight in:\n" + 
 		   InstanceString + "\nIgnoring the new weight" );
-	}
       }
     }
     return result;
