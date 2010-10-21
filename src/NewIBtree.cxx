@@ -863,9 +863,10 @@ namespace Timbl{
     result->_nodeCount = _nodeCount;
     result->_leafCount = _leafCount;
     result->_root = sub;
-    if ( _root ){
-      delete result->topDist;
-      result->assignDefaults();
+    if ( result->_root ){
+      if ( !result->_root->TDistribution )
+	result->_root->TDistribution = result->_root->sum_distributions( _keepDist );
+      result->topDist = result->_root->TDistribution;
     }
     return result;
   }
