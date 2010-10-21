@@ -1256,7 +1256,6 @@ namespace Timbl {
 	pnt = &((*pnt)->link);
       }
       LastInstBasePos = InstBase;
-      //      cerr << "LastInstBasePos at start:\n" << LastInstBasePos << endl;
     }
     else {
       for ( unsigned int i = 0; i < Depth; ++i ){
@@ -1269,7 +1268,6 @@ namespace Timbl {
 	  LastInstBasePos = hlp;
 	pnt = &(hlp->link);
       }
-      //      cerr << "LastInstBasePos after add:\n" << LastInstBasePos << endl;
     }
     if ( *pnt == NULL ){
       *pnt = new IBtree();
@@ -1478,6 +1476,8 @@ namespace Timbl {
     return result;
   }
 
+  //#define DEBUGTESTS
+
   const ValueDistribution *IB_InstanceBase::InitGraphTest( vector<FeatureValue *>& Path,
 							   const vector<FeatureValue *> *inst,
 							   size_t off,
@@ -1487,6 +1487,9 @@ namespace Timbl {
     testInst = inst;
     offSet = off;
     effFeat = eff;
+#ifdef DEBUGTESTS
+    cerr << "initTest for " << *inst << endl;
+#endif
     pnt = InstBase;
     for ( unsigned int i = 0; i < Depth; ++i ){
       InstPath[i] = pnt;
@@ -1507,6 +1510,9 @@ namespace Timbl {
 	pnt = InstPath[i];
       }
       Path[i] = pnt->FValue;
+#ifdef DEBUGTESTS
+      cerr << "set Path[" << i << "] to " << Path[i] << endl;
+#endif
       pnt = pnt->link;
       if ( pnt && pnt->link == NULL ){
 	result = pnt->TDistribution;
@@ -1518,6 +1524,9 @@ namespace Timbl {
       size_t TmpPos = effFeat-1;
       result = NextGraphTest( Path, TmpPos );
     }
+#ifdef DEBUGTESTS
+    cerr << "Start test" << Path << endl;
+#endif
     return result;
   }
   
@@ -1536,9 +1545,14 @@ namespace Timbl {
       if ( RestartSearch[pos] == NULL ) {
 	// No exact match here, so no real problems
 	pnt = InstPath[pos]->next;
+	//	cerr << "NO MATCH increment ";
+	// if ( pnt )
+	//   cerr << pnt->FValue;
+	// cerr << endl;
       }
       else {
 	pnt = RestartSearch[pos];
+	//	cerr << "restart met " << pnt->FValue << endl;
 	RestartSearch[pos] = NULL;
       }
       if ( pnt && pnt == SkipSearch[pos] ){
@@ -1547,13 +1561,18 @@ namespace Timbl {
       if ( !pnt ) {
 	if ( pos == 0 )
 	  goon = false;
-	else
+	else {
 	  pos--;
+	  //	  cerr << "decremented pos to " << pos << endl;
+	}
       }
     }
     if ( pnt && goon ) {
       InstPath[pos] = pnt;
       Path[pos] = pnt->FValue;
+#ifdef DEBUGTESTS
+      cerr << "set Path[" << pos<< "] to " << Path[pos] << endl;
+#endif
       pnt = pnt->link;
       for (  size_t j=pos+1; j < Depth; ++j ){
 	const IBtree *tmp = pnt->search_node( (*testInst)[offSet+j] );
@@ -1574,6 +1593,9 @@ namespace Timbl {
 	  Path[j] = pnt->FValue;
 	  pnt = pnt->link;
 	}
+#ifdef DEBUGTESTS
+	cerr << "set Path[" << j<< "] to " << Path[j] << endl;
+#endif
       }
       if ( pnt )
 	result = pnt->TDistribution;
@@ -1586,6 +1608,9 @@ namespace Timbl {
 	pos = TmpPos;
       }
     }
+#ifdef DEBUGTESTS
+    cerr << "try next " << Path << " pos = " << pos << endl;
+#endif
     return result;
   }
   
