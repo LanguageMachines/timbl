@@ -63,7 +63,7 @@ namespace Timbl{
     }
     return result;
   }  
-  
+
   ValueDistribution *NewIBbranch::sum_distributions( bool keep ){
     // create a new distribution at this level by summing up the
     // distibutions of all branches.
@@ -96,10 +96,15 @@ namespace Timbl{
       }
       else {
 	NewIBTree *o = createNewIBTree( I, pos+1, _depth, ncnt, lcnt );
-	_mmap[I.FV[pos]] = o;
-      }
+	assign( I.FV[pos], o );      }
     }
     return result;
+  }
+
+  void NewIBleaf::delInst( const Instance& I,
+			   unsigned int,
+			   unsigned int& ){
+    TDistribution->DecFreq( I.TV );
   }
 
   void NewIBbranch::delInst( const Instance& I, 
@@ -115,7 +120,7 @@ namespace Timbl{
       }
     }
   }
-  
+
   bool NewIBleaf::addInst( const Instance& v, 
 			   unsigned int,
 			   unsigned int,
@@ -136,12 +141,6 @@ namespace Timbl{
     }
   }
   
-  void NewIBleaf::delInst( const Instance& v, 
-			   unsigned int,
-			   unsigned int& ){
-    TDistribution->DecFreq( v.TV );
-  }
-
   NewIBTree *NewIBbranch::find( FeatureValue *fv ) const {
     IBmap::const_iterator mit = _mmap.find( fv );
     if ( mit != _mmap.end() )
@@ -156,12 +155,13 @@ namespace Timbl{
       return 0;
     return TDistribution;
   }
-
+  
   const ValueDistribution *NewIBbranch::match( const Instance& I, 
 					       unsigned int pos ) const {
     std::map<FeatureValue *,NewIBTree*,rfCmp>::const_iterator it = _mmap.find( I.FV[pos] );
     if ( it != _mmap.end() ){
-      if ( it->first->ValFreq() == 0 ) // a deleted Instance
+      if ( it->second->FValue &&
+	   it->second->FValue->ValFreq() == 0 ) // a deleted Instance
 	return 0;
       else
 	return it->second->match( I, pos+1 );
@@ -189,7 +189,9 @@ namespace Timbl{
       os << "[";
       std::map<FeatureValue*,NewIBTree *,rfCmp>::const_iterator it = _mmap.begin();
       while ( it != _mmap.end() ){
-	os << it->first << " (";
+	if ( it->second->FValue )
+	  os << it->second->FValue;
+	os << " (";
 	it->second->save( os );
 	os << " )";
 	++it;
@@ -210,7 +212,9 @@ namespace Timbl{
       os << "[";
       std::map<FeatureValue*,NewIBTree *,rfCmp>::const_iterator it = _mmap.begin();
       while ( it != _mmap.end() ){
-	os << it->first->Index() << " (";
+	if ( it->second->FValue )
+	  os << it->second->FValue->Index();
+	os << " (";
 	it->second->saveHashed( os );
 	os << " )";
 	++it;
@@ -220,13 +224,6 @@ namespace Timbl{
       }
       os << "\n]\n";
     }
-  }
-
-  void NewIBleaf::put( std::ostream& os, int level ) const{
-    int l = level;
-    while ( l-- > 0 )
-      os << "\t";
-    os << TValue << " " << TDistribution->Save() << endl;
   }
 
   NewIBleaf::~NewIBleaf(){
@@ -241,7 +238,14 @@ namespace Timbl{
     }
     delete TDistribution;
   }
-  
+
+  void NewIBleaf::put( std::ostream& os, int level ) const{
+    int l = level;
+    while ( l-- > 0 )
+      os << "\t";
+    os << TValue << " " << TDistribution->Save() << endl;
+  }
+
   void NewIBbranch::put( std::ostream& os, int level ) const{
     int l = level;
     while ( l-- > 0 )
@@ -253,7 +257,7 @@ namespace Timbl{
       os << "{null}";
     std::map<FeatureValue*,NewIBTree *,rfCmp>::const_iterator it = _mmap.begin();
     while ( it != _mmap.end() ){
-      os << it->first << " ";
+      os << it->second->FValue << " ";
       it->second->put( os, level+1 );
       ++it;
       if ( it != _mmap.end() ){
@@ -273,8 +277,7 @@ namespace Timbl{
     std::map<FeatureValue*,NewIBTree*, rfCmp>::iterator it = _mmap.begin();
     bool dummy;
     while ( it != _mmap.end() ){
-      if ( redo ){
-	assert( 4==5 );
+      if ( it->second->TDistribution && level > 1 ){
 	delete it->second->TDistribution;
 	it->second->TDistribution = 0;
       }
@@ -287,7 +290,7 @@ namespace Timbl{
       ++it;
     }
   }
-
+  
   void NewIBleaf::redoDistributions(){
   }
 
@@ -297,10 +300,11 @@ namespace Timbl{
     std::map<FeatureValue*,NewIBTree*, rfCmp>::iterator it = _mmap.begin();
     while ( it != _mmap.end() ){
       it->second->redoDistributions();
-      if ( it->first->ValFreq() > 0 )
+      if ( it->second->FValue &&
+	   it->second->FValue->ValFreq() > 0 )
 	// also we have to update the targetinformation of the featurevalue
 	// so we can recalculate the statistics later on.
-	it->first->ReconstructDistribution( *(it->second->TDistribution) );
+	it->second->FValue->ReconstructDistribution( *(it->second->TDistribution) );
       ++it;
     }
     TDistribution = sum_distributions( false );
@@ -323,7 +327,7 @@ namespace Timbl{
 	++it;
     }
   }
-  
+
   std::ostream& operator<< ( std::ostream& os, 
 			     const NewIBroot& o ){
     o.put( os );
@@ -346,11 +350,13 @@ namespace Timbl{
     }
     else
       result = _root->addInst( I, 0, _depth, _nodeCount, _leafCount );
+    _defValid = false;    
     return result;
   }
 
   void NewIBroot::deleteInstance( const Instance& I ){
     if ( _root ){
+      _defValid = false;
       _root->delInst( I, 0, _nodeCount );
       if ( topDist )
 	topDist->DecFreq(I.TV);
@@ -361,10 +367,12 @@ namespace Timbl{
     if ( !_defValid ){
       bool dummy;
       if ( _root ){
-	if ( !_root->TDistribution ){
-	  _root->assign_defaults( _defAss, _random, _keepDist, _depth );
-	  _root->TDistribution = _root->sum_distributions( _keepDist );
+	if ( _root->TDistribution ){
+	  delete _root->TDistribution;
+	  _root->TDistribution = 0;
 	}
+	_root->assign_defaults( _defAss, _random, _keepDist, _depth );
+	_root->TDistribution = _root->sum_distributions( _keepDist );
 	_root->TValue = _root->TDistribution->BestTarget( dummy, _random );
 	topTV = _root->TValue;
 	topDist = _root->TDistribution;
@@ -475,9 +483,9 @@ namespace Timbl{
   }  
 
   void NewIBroot::saveHashed( ostream &os, 
-			StringHash *cats, 
-			StringHash *feats,
-			bool persist ) {
+			      StringHash *cats, 
+			      StringHash *feats,
+			      bool persist ) {
     // save an IBtree for later use.
     bool temp_persist = _keepDist;
     _keepDist = persist;
@@ -810,7 +818,7 @@ namespace Timbl{
       }
     }
   }
-  
+
   void NewIBleaf::countBranches( unsigned int l, 
 				 std::vector<unsigned int>& terminals,
 				 std::vector<unsigned int>& ){
@@ -876,37 +884,28 @@ namespace Timbl{
     else
       return 0;
   }
-  
-  void IBiter::init( NewIBTree *tree ){
-    _map = tree->getMap();
-    mit = _map->begin();
+
+  void NewIBbranch::initIt( IBiter& uit ){
+    uit._map = &_mmap;
+    uit.mit = uit._map->begin();
   }
   
-  NewIBTree *IBiter::value() {
-    if ( mit != _map->end() )
-      return mit->second;
-    else
-      return 0;
+  void NewIBbranch::assign( FeatureValue* fv, NewIBTree *t ){
+    t->FValue = fv;
+    _mmap[fv] = t;
   }
 
-  FeatureValue *IBiter::FValue() {
-    if ( mit != _map->end() )
-      return mit->first;
-    else
-      return 0;
-  }
-
-  NewIBTree *IBiter::find( FeatureValue *fv ) {
+  inline NewIBTree *IBiter::find( FeatureValue *fv ) {
+    //      cerr << "iter:map_find zoek " <<  fv << endl;
     mit = _map->find( fv );
     if ( mit != _map->end() ){
+      //	cerr << "FOUND! " << endl;
       return mit->second;
     }
-    else
+    else {
+      //	cerr << "missed! " << endl;
       return 0;
-  }
-  
-  void IBiter::reset( ) {
-    mit = _map->begin();
+    }
   }
 
   const ValueDistribution *NewIBroot::initTest( vector<FeatureValue *>& Path,
@@ -915,32 +914,35 @@ namespace Timbl{
 						size_t eff ){
     const ValueDistribution *result = NULL;
     testInst = inst;
-    // cerr << "initTest for " << inst << endl;
+    //    cerr << "initTest for '" << inst << "'" << endl;
     // cerr << "offset = " << off << endl;
     // cerr << "effFeat = " << eff << endl;
     // cerr << "_depth = " << _depth << endl;
     offSet = off;
     effFeat = eff;
-    InstPath[0].init( _root );
+    _root->initIt( InstPath[0] );
     for ( unsigned int i = 0; i < _depth; ++i ){
+      //      cerr << "voor find " << testInst->FV[i+offSet] << endl;
       NewIBTree *pnt = InstPath[i].find( testInst->FV[i+offSet] );
       if ( pnt ){
+	//	cerr << "NewIBroot found " << testInst->FV[i+offSet] << endl;
 	SkipSearch[i] = pnt;
 	RestartSearch[i] = true;
       }
       else {
+	//	cerr << "NewIBroot missed " << testInst->FV[i+offSet] << endl;
 	RestartSearch[i] = false;
 	SkipSearch[i] = 0;
 	InstPath[i].reset();
 	pnt = InstPath[i].value();
       }
-      Path[i] = InstPath[i].FValue();
+      Path[i] = pnt->FValue;
       //      cerr << "set Path[" << i << "] to " << Path[i] << endl;
       if ( i == _depth-1 ){
 	result = pnt->TDistribution;
       }
       else {
-	InstPath[i+1].init( pnt );
+	pnt->initIt( InstPath[i+1] );
       }
     }
     if ( result && result->ZeroDist() ){
@@ -948,6 +950,7 @@ namespace Timbl{
       size_t TmpPos = effFeat-1;
       result = nextTest( Path, TmpPos );
     }
+    //    cerr << "Start " << Path << endl;
     return result;
   }
 
@@ -959,11 +962,14 @@ namespace Timbl{
       if ( !RestartSearch[pos] ) {
 	// No exact match here, so no real problems
 	InstPath[pos].increment();
-	//	cerr << "no match before so just increment " << InstPath[pos].FValue() << endl;
+	//	cerr << "no match before so just increment ";
+	// if ( InstPath[pos]->value() )
+	//   cerr << InstPath[pos]->value()->FValue;
+	// cerr << endl;
       }
       else {
 	InstPath[pos].reset();
-	//	cerr << "restart with " << InstPath[pos].FValue() << endl;	
+	//	cerr << "restart at " << InstPath[pos]->value()->FValue << endl;	
 	RestartSearch[pos] = false;
       }
       pnt = InstPath[pos].value();
@@ -984,11 +990,14 @@ namespace Timbl{
       }
     }
     if ( pnt ) {
-      Path[pos] = InstPath[pos].FValue();
+      Path[pos] = pnt->FValue;
       //      cerr << "set Path[" << pos << "] to " << Path[pos] << endl;
       if ( pos < _depth-1 ){
-	InstPath[pos+1].init( pnt );
+	pnt->initIt( InstPath[pos+1] );
+	//	cerr << "Initialised pos = " << pos+1 << endl;
 	for (  size_t j=pos+1; j < _depth; ++j ){
+	  //	  cerr << "loop j = " << j << endl;
+	  //	  cerr << InstPath[j]->value() << endl;
 	  NewIBTree *pnt2 = InstPath[j].find( testInst->FV[j+offSet] );
 	  if ( pnt2 ){ // we found an exact match, so mark Restart
 	    SkipSearch[j] = pnt2;
@@ -1000,7 +1009,7 @@ namespace Timbl{
 	    pnt2 = InstPath[j].value();
 	    RestartSearch[j] = false;
 	  }
-	  Path[j] = InstPath[j].FValue();
+	  Path[j] = pnt2->FValue;
 	  //	  cerr << "set Path[" << j << "] to " << Path[j] << endl;
 	  //	  cerr << "using InstPath[" << j << "] = " << InstPath[j].value() << endl;
 	  if ( j == _depth-1 ){
@@ -1008,7 +1017,7 @@ namespace Timbl{
 	    //	    cerr << "assign result:" << result << endl;
 	  }
 	  else {
-	    InstPath[j+1].init( pnt2 );
+	    pnt2->initIt( InstPath[j+1] );
 	  }
 	}
       }
@@ -1024,6 +1033,7 @@ namespace Timbl{
 	pos = TmpPos;
       }
     }
+    //    cerr << "try next " << Path << " pos = " << pos << endl;
     return result;
   }
 

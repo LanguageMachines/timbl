@@ -17,6 +17,7 @@ namespace Timbl {
   };  
   
   class NewIBroot;
+  class IBiter;
 
   class NewIBTree {
     friend class NewIBroot;
@@ -24,7 +25,7 @@ namespace Timbl {
     friend std::ostream& operator<< ( std::ostream&, const NewIBTree* );
   public:
     typedef std::map<FeatureValue *, NewIBTree *, rfCmp> IBmap;
-  NewIBTree(): TValue(0), TDistribution(0){};
+  NewIBTree(): TValue(0), FValue(0), TDistribution(0){};
     virtual ~NewIBTree(){};
     virtual void put( std::ostream&, int ) const = 0;
     virtual void assign_defaults( bool, bool, bool, size_t ) = 0; 
@@ -44,12 +45,13 @@ namespace Timbl {
 			  unsigned int& ) =0;
     virtual void delInst( const Instance&, unsigned int, unsigned int& ) =0;
     virtual unsigned int size() const = 0;
-    virtual IBmap *getMap() = 0;
+    virtual void initIt( IBiter & ) = 0;
     virtual bool isLeaf() const = 0;
     virtual void countBranches( unsigned int l, 
 			   std::vector<unsigned int>& terminals,
 			   std::vector<unsigned int>& nonTerminals ) = 0;
     const TargetValue *TValue;
+    FeatureValue *FValue;
     ValueDistribution *TDistribution;
   };
 
@@ -58,7 +60,7 @@ namespace Timbl {
     ~NewIBleaf();
     void put( std::ostream&, int ) const;
     ValueDistribution *getDistribution( bool );
-    IBmap *getMap() { return 0; };
+    void initIt( IBiter& ){ };
   private:
     bool addInst( const Instance &, unsigned int, unsigned int,
 		  unsigned int&, unsigned int& );
@@ -79,14 +81,12 @@ namespace Timbl {
   };
   
   class NewIBbranch: public NewIBTree {
-    friend class IBiter;
   public:
     ~NewIBbranch();
     void put( std::ostream&, int ) const;
     ValueDistribution *getDistribution( bool );
-    IBmap *getMap() { return &_mmap; };
-    void assign( FeatureValue* fv, NewIBTree *t ) {
-      _mmap[fv] = t; };
+    void initIt( IBiter& );
+    void assign( FeatureValue* , NewIBTree * );
   private:
     void save( std::ostream & ) const;
     void saveHashed( std::ostream & ) const;
@@ -109,21 +109,23 @@ namespace Timbl {
 			std::vector<unsigned int>& );
     IBmap _mmap;
   };
-
+  
   class IBiter {
+    friend class NewIBbranch;
   public:
   IBiter(): _map(0){};
-    void init( NewIBTree * );
-    void reset();
+    void reset(){ mit = _map->begin(); };
     void increment() { ++mit; };
     NewIBTree* find( FeatureValue * );
-    NewIBTree* value();
-    FeatureValue* FValue();
+    NewIBTree* value(){ 
+      if ( mit == _map->end() ) return 0;
+      else return mit->second; 
+    };
   private:
     NewIBTree::IBmap::const_iterator mit;
     NewIBTree::IBmap *_map;
   };
-  
+
   class NewIBroot {
     friend std::ostream& operator<< ( std::ostream&, const NewIBTree& );
     friend std::ostream& operator<< ( std::ostream&, const NewIBTree* );
