@@ -79,7 +79,7 @@ namespace Timbl {
     do_silly = false;
     do_diversify = false;
     do_daemon = true;
-    do_speed_train = true;
+    do_speed_train = false;
     if ( MaxFeats == -1 ){
       MaxFeats = Max;
       LocalInputFormat = UnknownInputFormat; // InputFormat and verbosity
