@@ -32,10 +32,10 @@
 namespace Timbl {
   
   class CL_item {
-    friend std::ostream& operator<<( std::ostream&, CL_item& );
+    friend std::ostream& operator<<( std::ostream&, const CL_item& );
   public:
-  CL_item( const std::string& s, const std::string& o, bool m=false ): 
-    opt_word(s), option( o ), mood( m ), longOpt(true) {};
+  CL_item( const std::string& s, const std::string& o ): 
+    opt_word(s), option( o ), mood( false ), longOpt(true) {};
   CL_item( char c, const std::string& o, bool m=false ): 
     option( o ), mood( m ), longOpt(false){ opt_word = c; };
   CL_item( const CL_item& in ):
@@ -47,6 +47,8 @@ namespace Timbl {
     char OptChar() const { return opt_word[0]; };
     const std::string& OptWord() const { return opt_word; };
     const std::string& Option() const { return option; };
+    bool isLong() const { return longOpt; };
+    bool getMood() const { return mood; };
   private:
     std::string opt_word;
     std::string option;
@@ -54,9 +56,7 @@ namespace Timbl {
     bool longOpt;
   };
 
-  typedef std::list<CL_item> CommandLine;
-
-  CommandLine *Split_Command_Line( const int, const char * const * ); 
+  //  typedef std::list<CL_item> CommandLine;
 
   class CL_Options {
     friend std::ostream& operator<<( std::ostream&, const CL_Options& );
@@ -66,12 +66,13 @@ namespace Timbl {
     ~CL_Options();
     bool Present( const char ) const;
     bool Find( const char, std::string&, bool& ) const;
-    bool Find( const std::string&, std::string&, bool& ) const;
+    bool Find( const std::string&, std::string& ) const;
     bool Delete( const char, bool = false );
     bool Delete( const std::string& );
     void Add( const char, const std::string&, bool );
-    void Add( const std::string&, const std::string&, bool );
-    CommandLine *Opts;
+    void Add( const std::string&, const std::string& );
+    std::list<CL_item> Opts;
+    void Split_Command_Line( const int, const char * const * ); 
   private:
     CL_Options( const CL_Options& );
     CL_Options& operator=( const CL_Options& );

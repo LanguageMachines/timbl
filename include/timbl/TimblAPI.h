@@ -53,11 +53,11 @@ namespace Timbl{
     TimblOpts( const std::string& );
     ~TimblOpts();
     bool Find( char, std::string&, bool& ) const;
-    bool Find( const char *, std::string&, bool& ) const;
+    bool Find( const std::string&, std::string& ) const;
     bool Find( const std::string&, std::string&, bool& ) const;
     void Add( char, const std::string&, bool );
+    void Add( const std::string&, const std::string& );
     bool Delete( char );
-    bool Delete( const char * );
     bool Delete( const std::string& );
     CL_Options *getPimpl()const { return pimpl; };
   private:

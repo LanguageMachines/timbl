@@ -65,24 +65,29 @@ namespace Timbl {
     return pimpl->Find( c, opt, mood );
   }
   
-  bool TimblOpts::Find( const char *s, string& opt, bool& mood ) const{
-    return pimpl->Find( string(s), opt, mood );
+  bool TimblOpts::Find( const string& s, string& opt ) const{
+    return pimpl->Find( s, opt );
   }
-  
+
   bool TimblOpts::Find( const string& s, string& opt, bool& mood ) const{
-    return pimpl->Find( s, opt, mood );
+    //
+    // DEPRECATED
+    // is here only for backward compatibility
+    //
+    mood=false;
+    return pimpl->Find( s, opt );
   }
   
   void TimblOpts::Add( char c, const string& opt, bool mood ){
     pimpl->Add( c, opt, mood );
   }
   
-  bool TimblOpts::Delete( char c ){
-    return pimpl->Delete( c );
+  void TimblOpts::Add( const string& opt, const string& val ){
+    pimpl->Add( opt, val );
   }
   
-  bool TimblOpts::Delete( const char *s ){
-    return pimpl->Delete( string(s) );
+  bool TimblOpts::Delete( char c ){
+    return pimpl->Delete( c );
   }
   
   bool TimblOpts::Delete( const string& s ){

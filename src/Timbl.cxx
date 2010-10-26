@@ -441,11 +441,11 @@ bool get_file_names( TimblOpts& Opts ){
     NamesFile = correct_path( value, O_Path, true );
     Opts.Delete( 'n' );
   }
-  if ( Opts.Find( "matrixout", value, mood ) ){
+  if ( Opts.Find( "matrixout", value ) ){
     MatrixOutFile = correct_path( value, O_Path, true );
     Opts.Delete( "matrixout" );
   }
-  if ( Opts.Find( "matrixin", value, mood ) ){
+  if ( Opts.Find( "matrixin", value ) ){
     MatrixInFile = correct_path( value, I_Path, true );
     Opts.Delete( "matrixin" );
   }
@@ -457,7 +457,7 @@ bool get_file_names( TimblOpts& Opts ){
     OutputFile = correct_path( value, O_Path, true );
     Opts.Delete( 'o' );
   }
-  if ( Opts.Find( "IL", value, mood ) ){
+  if ( Opts.Find( "IL", value ) ){
     vector<string> vec;
     int num = split_at( value, vec, ":" );
     if ( num > 1 ){

@@ -38,37 +38,40 @@ using namespace std;
 namespace Timbl {
 
   CL_Options::CL_Options( const int argc, const char * const *argv ){
-    Opts = Split_Command_Line( argc, argv );
+    Split_Command_Line( argc, argv );
   }
   
   CL_Options::CL_Options( const string& args ){
     const char *argstr = args.c_str();
-    Opts = Split_Command_Line( 0, &argstr );
+    Split_Command_Line( 0, &argstr );
   }
   
   CL_Options::~CL_Options(){
-    delete Opts;
   }
   
-  ostream& operator<<( ostream& os, CL_item& it ){
-    if ( it.longOpt )
-      os << (it.mood ? " +": "-" ) << it.opt_word << "=" << it.option;
+  ostream& operator<<( ostream& os, const CL_item& it ){
+    if ( it.longOpt ){
+      os << "--" << it.opt_word;
+      if ( !it.option.empty() )
+	os << "=" << it.option;
+    }
     else
-      os << (it.mood ? " +": "-" ) << it.opt_word << it.option;
+      os << (it.mood ? "+": "-" ) << it.opt_word << it.option;
     return os;
   }
 
   ostream& operator<<( ostream& os, const CL_Options& cl ){
-    list<CL_item>::iterator pos;
-    for ( pos = cl.Opts->begin(); pos != cl.Opts->end(); ++pos ){
+    list<CL_item>::const_iterator pos = cl.Opts.begin();
+    while ( pos != cl.Opts.end() ){
       os << *pos << " ";
+      ++pos;
     }
     return os;
   }
 
   bool CL_Options::Present( const char c ) const {
     list<CL_item>::const_iterator pos;
-    for ( pos = Opts->begin(); pos != Opts->end(); ++pos ){
+    for ( pos = Opts.begin(); pos != Opts.end(); ++pos ){
       if ( pos->OptChar() == c ){
 	return true;
       }
@@ -78,7 +81,7 @@ namespace Timbl {
   
   bool CL_Options::Find( const char c, string &opt, bool& mood ) const {
     list<CL_item>::const_iterator pos;
-    for ( pos = Opts->begin(); pos != Opts->end(); ++pos ){
+    for ( pos = Opts.begin(); pos != Opts.end(); ++pos ){
       if ( pos->OptChar() == c ){
 	opt = pos->Option();
 	mood = pos->Mood();
@@ -88,12 +91,11 @@ namespace Timbl {
     return false;
   }
   
-  bool CL_Options::Find( const string& w, string &opt, bool& mood ) const {
+  bool CL_Options::Find( const string& w, string &opt ) const {
     list<CL_item>::const_iterator pos;
-    for ( pos = Opts->begin(); pos != Opts->end(); ++pos ){
+    for ( pos = Opts.begin(); pos != Opts.end(); ++pos ){
       if ( pos->OptWord() == w ){
 	opt = pos->Option();
-	mood = pos->Mood();
 	return true;
       }
     }
@@ -102,9 +104,9 @@ namespace Timbl {
   
   bool CL_Options::Delete( const char c, bool all ){
     list<CL_item>::iterator pos;
-    for ( pos = Opts->begin(); pos != Opts->end(); ){
+    for ( pos = Opts.begin(); pos != Opts.end(); ){
       if ( pos->OptChar() == c ){
-	pos = Opts->erase(pos);
+	pos = Opts.erase(pos);
 	if ( !all )
 	  return true;
       }
@@ -115,23 +117,23 @@ namespace Timbl {
   
   bool CL_Options::Delete( const string& w ){
     list<CL_item>::iterator pos;
-    for ( pos = Opts->begin(); pos != Opts->end(); ++pos ){
+    for ( pos = Opts.begin(); pos != Opts.end(); ++pos ){
       if ( pos->OptWord() == w ){
-	Opts->erase(pos);
+	Opts.erase(pos);
 	return true;
       }
     }
     return false;
   }
   
-  void CL_Options::Add( const string& s, const string& line, bool mood ){
-    CL_item cl( s, line, mood );
-    Opts->push_front( cl );
+  void CL_Options::Add( const string& s, const string& line ){
+    CL_item cl( s, line );
+    Opts.push_front( cl );
   }
 
   void CL_Options::Add( const char c, const string& line, bool mood ){
     CL_item cl( c, line, mood );
-    Opts->push_front( cl );
+    Opts.push_front( cl );
   }
 
   inline bool p_or_m( char k )
@@ -169,9 +171,9 @@ namespace Timbl {
     return argc;
   }
   
-  CommandLine *Split_Command_Line( const int Argc, 
-				   const char * const *Argv ){
-    CommandLine *result = new CommandLine();
+  void CL_Options::Split_Command_Line( const int Argc, 
+				       const char * const *Argv ){
+    Opts.clear();
     int local_argc = 0;
     vector<string> local_argv;
     char Optchar;
@@ -184,7 +186,7 @@ namespace Timbl {
 	local_argc = opt_split( Argv[0], local_argv );
       }
       else
-	return result;
+	return;
     else {
       local_argc = Argc-1;
       for( int i=1; i < Argc; ++i ){
@@ -241,15 +243,14 @@ namespace Timbl {
 	}
       }
       if ( longOpt ){
-	CL_item cl( Optword, Option, Mood );
-	result->push_front( cl );
+	CL_item cl( Optword, Option );
+	Opts.push_front( cl );
       }
       else {
 	CL_item cl( Optchar, Option, Mood );
-	result->push_front( cl );
+	Opts.push_front( cl );
       }
     }
-    return result;
   }    
 }
 
