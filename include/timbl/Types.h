@@ -30,6 +30,7 @@
 #include <string>
 #include <set>
 #include <vector>
+#include <map>
 #include <exception>
 #include <stdexcept>
 #include <ostream>
@@ -64,6 +65,34 @@ namespace Timbl {
 	os << ",";
     }
     os << "]";
+    return os;
+  }
+
+  template< typename S, typename T >
+    std::ostream& operator<< ( std::ostream& os, const std::map<S,T>& s ){
+    os << "{";
+    typename std::map<S,T>::const_iterator it = s.begin();
+    while ( it != s.end() ){
+      os << "<" << it->first << "," << it->second << ">";
+      ++it;
+      if ( it != s.end() )
+	os << ",";
+    }
+    os << "}";
+    return os;
+  }
+
+  template< typename S, typename T, typename U >
+    std::ostream& operator<< ( std::ostream& os, const std::map<S,T,U>& s ){
+    os << "{";
+    typename std::map<S,T,U>::const_iterator it = s.begin();
+    while ( it != s.end() ){
+      os << "<" << it->first << "," << it->second << ">";
+      ++it;
+      if ( it != s.end() )
+	os << ",";
+    }
+    os << "}";
     return os;
   }
 
