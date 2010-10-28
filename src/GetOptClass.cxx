@@ -79,7 +79,7 @@ namespace Timbl {
     do_silly = false;
     do_diversify = false;
     do_daemon = true;
-    do_speed_train = false;
+    do_speed_train = true;
     if ( MaxFeats == -1 ){
       MaxFeats = Max;
       LocalInputFormat = UnknownInputFormat; // InputFormat and verbosity
@@ -1065,7 +1065,7 @@ namespace Timbl {
 	      int val = stringTo<int>( myoptarg );
 	      if ( val == 0 ){
 		do_ignore_samples = true;
-		do_ignore_samples_test = true;
+		do_ignore_samples_test = false;
 		do_sample_weights = true;
 	      }
 	      else if ( val == 1 ){
