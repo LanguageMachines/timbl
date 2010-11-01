@@ -27,6 +27,7 @@ namespace Timbl {
     typedef std::map<FeatureValue *, NewIBTree *, rfCmp> IBmap;
   NewIBTree(): TValue(0), FValue(0), TDistribution(0){};
     virtual ~NewIBTree(){};
+    virtual void assign( FeatureValue* , NewIBTree * ) = 0;
     virtual void put( std::ostream&, int ) const = 0;
     virtual void assign_defaults( bool, bool, bool, size_t ) = 0; 
     virtual ValueDistribution *sum_distributions( bool ) = 0;
@@ -61,6 +62,8 @@ namespace Timbl {
     void put( std::ostream&, int ) const;
     ValueDistribution *getDistribution( bool );
     void initIt( IBiter& ){ };
+    void assign( FeatureValue* , NewIBTree * ){
+      throw( std::logic_error( "illegal call of NewIBleaf::assign()" ) ); };
   private:
     bool addInst( const Instance &, unsigned int, unsigned int,
 		  unsigned int&, unsigned int& );
@@ -184,9 +187,9 @@ namespace Timbl {
 			 Target *, int );
     NewIBTree *readTreeHashed( std::istream &, 
 			       std::vector<Feature *>&, Target *, int );
-    void readMapHashed( std::istream &, NewIBbranch *, 
+    void readMapHashed( std::istream &, NewIBTree *, 
 			std::vector<Feature*>&, Target *, int );
-    void readMap( std::istream &, NewIBbranch *,
+    void readMap( std::istream &, NewIBTree *,
 		  std::vector<Feature*>&, Target *, int );
     int _version;
     bool _defValid;

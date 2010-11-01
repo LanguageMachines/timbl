@@ -503,7 +503,7 @@ namespace Timbl{
   }
   
   void NewIBroot::readMap( istream &is,
-			   NewIBbranch *node,
+			   NewIBTree *node,
 			   std::vector<Feature*>& Feats,
 			   Target  *Targ,
 			   int level ){
@@ -524,7 +524,7 @@ namespace Timbl{
   }
   
   void NewIBroot::readMapHashed( istream &is,
-				 NewIBbranch *node,
+				 NewIBTree *node,
 				 std::vector<Feature*>& Feats,
 				 Target  *Targ,
 				 int level ){
