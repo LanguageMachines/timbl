@@ -29,7 +29,7 @@ namespace Timbl {
     virtual ~NewIBTree(){};
     virtual void assign( FeatureValue* , NewIBTree * ) = 0;
     virtual void put( std::ostream&, int ) const = 0;
-    virtual void assign_defaults( bool, bool, bool, size_t ) = 0; 
+    virtual void assign_defaults( bool, bool, size_t ) = 0; 
     virtual ValueDistribution *sum_distributions( bool ) = 0;
     virtual void redoDistributions() = 0;
     virtual ValueDistribution *getDistribution( bool ) = 0;
@@ -38,7 +38,7 @@ namespace Timbl {
     virtual NewIBTree *find( FeatureValue * ) const = 0;
     virtual void save( std::ostream & ) const = 0;
     virtual void saveHashed( std::ostream & ) const = 0;
-    virtual void prune( unsigned int& ) = 0;
+    virtual NewIBTree *prune( unsigned int& ) = 0;
     virtual bool addInst( const Instance &, 
 			  unsigned int,
 			  unsigned int,
@@ -70,12 +70,12 @@ namespace Timbl {
     void delInst( const Instance&, unsigned int, unsigned int& );
     void save( std::ostream & ) const;
     void saveHashed( std::ostream & ) const;
-    void assign_defaults( bool, bool, bool, size_t ){}; 
+    void assign_defaults( bool, bool, size_t ){}; 
     void redoDistributions();
     ValueDistribution *sum_distributions( bool ){ return 0; };
     const ValueDistribution *match( const Instance&, unsigned int ) const;
     NewIBTree *find( FeatureValue * ) const { return 0; };
-    void prune( unsigned int& ){ };
+    NewIBTree *prune( unsigned int& ){ return this; };
     unsigned int size() const { return 0; } ;
     bool isLeaf() const { return true; };
     void countBranches( unsigned int, 
@@ -99,12 +99,12 @@ namespace Timbl {
 		  unsigned int&, 
 		  unsigned int& );
     void delInst( const Instance&, unsigned int, unsigned int& );
-    void assign_defaults( bool, bool, bool, size_t );
+    void assign_defaults( bool, bool, size_t );
     void redoDistributions();
     ValueDistribution *sum_distributions( bool );
     const ValueDistribution *match( const Instance&, unsigned int ) const;
     NewIBTree *find( FeatureValue * ) const;
-    void prune( unsigned int& );
+    NewIBTree *prune( unsigned int& );
     unsigned int size() const {return _mmap.size(); };
     bool isLeaf() const { return _mmap.empty(); };
     void countBranches( unsigned int, 

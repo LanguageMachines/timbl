@@ -172,28 +172,26 @@ namespace Timbl{
   
   void NewIBleaf::save( std::ostream& os ) const {
     // part of saving a tree in a recoverable manner
-    os << TValue << " " << TDistribution->Save();
+    os << FValue << " (" << TValue << " " << TDistribution->Save() << ")";
   }
   
   void NewIBleaf::saveHashed( std::ostream& os ) const {
     // part of saving a tree in a recoverable manner
-    os << TValue->Index() << " " << TDistribution->SaveHashed();
+    os << FValue->Index() << "(" << TValue->Index() << TDistribution->SaveHashed() << ")" ;
   }
   
   void NewIBbranch::save( std::ostream& os ) const {
     // part of saving a tree in a recoverable manner
-    os << TValue << " ";
+    if ( FValue )
+      os << FValue;
+    os << " (" << TValue << " ";
     if ( TDistribution )
       os << TDistribution->Save();
     if ( _mmap.size() > 0 ){
       os << "[";
       std::map<FeatureValue*,NewIBTree *,rfCmp>::const_iterator it = _mmap.begin();
       while ( it != _mmap.end() ){
-	if ( it->second->FValue )
-	  os << it->second->FValue;
-	os << " (";
 	it->second->save( os );
-	os << " )";
 	++it;
 	if ( it != _mmap.end() ){
 	  os << "\n,";
@@ -201,22 +199,21 @@ namespace Timbl{
       }
       os << "\n]\n";
     }
+    os << ")";
   }
 
   void NewIBbranch::saveHashed( std::ostream& os ) const {
     // part of saving a tree in a recoverable manner
-    os << TValue->Index() << " ";
+    if ( FValue )
+      os << FValue->Index();
+    os << "(" << TValue->Index();
     if ( TDistribution )
       os << TDistribution->SaveHashed();
     if ( _mmap.size() > 0 ){
       os << "[";
       std::map<FeatureValue*,NewIBTree *,rfCmp>::const_iterator it = _mmap.begin();
       while ( it != _mmap.end() ){
-	if ( it->second->FValue )
-	  os << it->second->FValue->Index();
-	os << " (";
 	it->second->saveHashed( os );
-	os << " )";
 	++it;
 	if ( it != _mmap.end() ){
 	  os << "\n,";
@@ -224,6 +221,7 @@ namespace Timbl{
       }
       os << "\n]\n";
     }
+    os << ")";
   }
 
   NewIBleaf::~NewIBleaf(){
@@ -270,7 +268,7 @@ namespace Timbl{
     os << "]";
   }
 
-  void NewIBbranch::assign_defaults( bool redo, bool random, bool persist, size_t level ){
+  void NewIBbranch::assign_defaults( bool random, bool persist, size_t level ){
     // recursively gather Distribution information up to the top.
     // at each Node we use that info to calculate the Default target.
     // when level > 1 the info might be persistent for IGTREE use
@@ -282,7 +280,7 @@ namespace Timbl{
 	it->second->TDistribution = 0;
       }
       if ( !it->second->TDistribution ){
-	it->second->assign_defaults( redo, random, persist, level-1 );
+	it->second->assign_defaults( random, persist, level-1 );
 	it->second->TDistribution = it->second->sum_distributions( level > 1
 								   && persist );
       }
@@ -310,10 +308,10 @@ namespace Timbl{
     TDistribution = sum_distributions( false );
   }
 
-  void NewIBbranch::prune( unsigned int& cnt ){
+  NewIBTree *NewIBbranch::prune( unsigned int& cnt ){
     std::map<FeatureValue*,NewIBTree*, rfCmp>::iterator it = _mmap.begin();
     while ( it != _mmap.end() ){
-      it->second->prune( cnt );
+      it->second = it->second->prune( cnt );
       ++it;
     }
     it = _mmap.begin();
@@ -326,6 +324,7 @@ namespace Timbl{
       else
 	++it;
     }
+    return this;
   }
 
   std::ostream& operator<< ( std::ostream& os, 
@@ -371,7 +370,7 @@ namespace Timbl{
 	  delete _root->TDistribution;
 	  _root->TDistribution = 0;
 	}
-	_root->assign_defaults( _defAss, _random, _keepDist, _depth );
+	_root->assign_defaults( _random, _keepDist, _depth );
 	_root->TDistribution = _root->sum_distributions( _keepDist );
 	_root->TValue = _root->TDistribution->BestTarget( dummy, _random );
 	topTV = _root->TValue;
@@ -401,7 +400,7 @@ namespace Timbl{
       bool dummy;
       if ( _root ){
 	if ( !_root->TDistribution ){
-	  _root->assign_defaults( _defAss, _random, _keepDist, _depth );
+	  _root->assign_defaults( _random, _keepDist, _depth );
 	  _root->TDistribution = _root->sum_distributions( true );
 	}
 	_root->TValue = _root->TDistribution->BestTarget( dummy, _random );
@@ -461,11 +460,11 @@ namespace Timbl{
     _keepDist = persist;
     assignDefaults();
     ios::fmtflags OldFlg = os.setf( ios::fixed, ios::floatfield );
-    os << "# Version " << _version << "\n#\n(";
+    os << "# Version " << _version << "\n#\n";
     if ( _root ){
       _root->save( os );
     }
-    os << ")\n";
+    os << "\n";
     os.setf( OldFlg );
     _keepDist = temp_persist;
   }
@@ -493,11 +492,10 @@ namespace Timbl{
     ios::fmtflags OldFlg = os.setf( ios::fixed, ios::floatfield );
     os << "# Version " << _version << " (Hashed)\n#\n";
     saveHash( os , cats, feats );
-    os << "(";
     if ( _root ){
       _root->saveHashed( os );
     }
-    os << ")\n";
+    os << "\n";
     os.setf( OldFlg );
     _keepDist = temp_persist;
   }
@@ -590,7 +588,8 @@ namespace Timbl{
     }
     is >> delim;
     if ( delim != ')' ){
-      cerr << "missing `)` in Instance Base file" << endl;
+      cerr << "missing `)` in Instance Base file, found: '" 
+	   << delim << "'" << endl;
       delete result;
       return 0;
     }
@@ -644,7 +643,8 @@ namespace Timbl{
     }
     is >> delim;
     if ( delim != ')' ){
-      cerr << "missing `)` in Instance Base file" << endl;
+      cerr << "missing `)` in Instance Base file, found '" 
+	   << delim << "'" << endl;
       delete result;
       return 0;
     }
@@ -840,7 +840,7 @@ namespace Timbl{
     assignDefaults( );
     if ( !_pruned ) {
       if ( _root ){
-	_root->prune( _nodeCount );
+	_root = _root->prune( _nodeCount );
       }
       _pruned = true;
     }
