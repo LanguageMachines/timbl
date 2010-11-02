@@ -45,8 +45,8 @@ namespace Timbl{
       result = new NewIBbranch( );
     }
     ++ncnt;
-    result->addInst( I, pos, _depth, ncnt, lcnt );
-    return result;
+    bool dummy; // addInst can't fail here
+    return result->addInst( I, pos, _depth, ncnt, lcnt, dummy );
   }
   
   ValueDistribution *NewIBleaf::getDistribution( bool keep ){
@@ -83,16 +83,17 @@ namespace Timbl{
     return result;
   }  
   
-  bool NewIBbranch::addInst( const Instance& I, 
-			     unsigned int pos,
-			     unsigned int _depth,
-			     unsigned int& ncnt,
-			     unsigned int& lcnt ){
-    bool result = true;
+  NewIBTree *NewIBbranch::addInst( const Instance& I, 
+				   unsigned int pos,
+				   unsigned int _depth,
+				   unsigned int& ncnt,
+				   unsigned int& lcnt,
+				   bool& conflict ){
+    NewIBTree *result = this;
     if ( pos < _depth ){
       std::map<FeatureValue *,NewIBTree*,rfCmp>::iterator it = _mmap.find( I.FV[pos] );
       if ( it != _mmap.end() ){
-	result = it->second->addInst( I, pos+1, _depth, ncnt, lcnt );
+	it->second = it->second->addInst( I, pos+1, _depth, ncnt, lcnt, conflict );
       }
       else {
 	NewIBTree *o = createNewIBTree( I, pos+1, _depth, ncnt, lcnt );
@@ -121,24 +122,26 @@ namespace Timbl{
     }
   }
 
-  bool NewIBleaf::addInst( const Instance& v, 
-			   unsigned int,
-			   unsigned int,
-			   unsigned int&,
-			   unsigned int& ){
+  NewIBTree *NewIBleaf::addInst( const Instance& v, 
+				 unsigned int,
+				 unsigned int,
+				 unsigned int&,
+				 unsigned int&,
+				 bool& conflict ){
     if ( abs( v.ExemplarWeight() ) > Common::Epsilon ){
       if ( !TDistribution ){
 	TDistribution = new WValueDistribution();
       }
-      return !TDistribution->IncFreq( v.TV, v.ExemplarWeight() );
+      conflict = TDistribution->IncFreq( v.TV, v.ExemplarWeight() );
     }
     else {
       if ( !TDistribution ){
 	TDistribution = new ValueDistribution();
       }
       TDistribution->IncFreq( v.TV );
-      return true;
+      conflict = false;
     }
+    return this;
   }
   
   NewIBTree *NewIBbranch::find( FeatureValue *fv ) const {
@@ -343,14 +346,15 @@ namespace Timbl{
   }
 
   bool NewIBroot::addInstance( const Instance& I ){
-    bool result = true;
+    bool conflict = false;
     if ( !_root ){
       _root = createNewIBTree( I, 0, _depth, _nodeCount, _leafCount );
     }
-    else
-      result = _root->addInst( I, 0, _depth, _nodeCount, _leafCount );
+    else {
+      _root = _root->addInst( I, 0, _depth, _nodeCount, _leafCount, conflict );
+    }
     _defValid = false;    
-    return result;
+    return !conflict;
   }
 
   void NewIBroot::deleteInstance( const Instance& I ){

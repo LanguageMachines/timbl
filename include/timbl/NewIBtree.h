@@ -39,11 +39,12 @@ namespace Timbl {
     virtual void save( std::ostream & ) const = 0;
     virtual void saveHashed( std::ostream & ) const = 0;
     virtual NewIBTree *prune( unsigned int& ) = 0;
-    virtual bool addInst( const Instance &, 
-			  unsigned int,
-			  unsigned int,
-			  unsigned int&,
-			  unsigned int& ) =0;
+    virtual NewIBTree *addInst( const Instance &, 
+				unsigned int,
+				unsigned int,
+				unsigned int&,
+				unsigned int&,
+				bool& ) =0;
     virtual void delInst( const Instance&, unsigned int, unsigned int& ) =0;
     virtual unsigned int size() const = 0;
     virtual void initIt( IBiter & ) = 0;
@@ -65,8 +66,8 @@ namespace Timbl {
     void assign( FeatureValue* , NewIBTree * ){
       throw( std::logic_error( "illegal call of NewIBleaf::assign()" ) ); };
   private:
-    bool addInst( const Instance &, unsigned int, unsigned int,
-		  unsigned int&, unsigned int& );
+    NewIBTree *addInst( const Instance &, unsigned int, unsigned int,
+			unsigned int&, unsigned int&, bool& );
     void delInst( const Instance&, unsigned int, unsigned int& );
     void save( std::ostream & ) const;
     void saveHashed( std::ostream & ) const;
@@ -93,11 +94,12 @@ namespace Timbl {
   private:
     void save( std::ostream & ) const;
     void saveHashed( std::ostream & ) const;
-    bool addInst( const Instance&,
-		  unsigned int, 
-		  unsigned int, 
-		  unsigned int&, 
-		  unsigned int& );
+    NewIBTree *addInst( const Instance&,
+			unsigned int, 
+			unsigned int, 
+			unsigned int&, 
+			unsigned int&,
+			bool& );
     void delInst( const Instance&, unsigned int, unsigned int& );
     void assign_defaults( bool, bool, size_t );
     void redoDistributions();
