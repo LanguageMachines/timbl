@@ -1861,12 +1861,17 @@ namespace Timbl {
   
   ostream& operator<<(ostream& os, const Instance *I ){
     if ( I ){
-      for ( unsigned int i=0; i < I->FV.size(); ++i )
-	os << I->FV[i] << ", ";
-      os << I->TV << " " << I->sample_weight;
+      os << *I;
     }
     else
       os << " Empty Instance";
+    return os;
+  }
+  
+  ostream& operator<<(ostream& os, const Instance& I ){
+    for ( unsigned int i=0; i < I.FV.size(); ++i )
+      os << I.FV[i] << ", ";
+    os << I.TV << " " << I.sample_weight;
     return os;
   }
   

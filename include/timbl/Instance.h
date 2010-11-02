@@ -323,6 +323,7 @@ namespace Timbl {
   };
   
   class Instance {
+    friend std::ostream& operator<<(std::ostream&, const Instance& );
     friend std::ostream& operator<<(std::ostream&, const Instance * );
   public:
     Instance();
