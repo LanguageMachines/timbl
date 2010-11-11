@@ -1,2 +1,2 @@
-* updating docs
-* bump dates to 2008 where/when applicable
+* Move LogStream and LogBuffer back in from TimblServer package
+  It is of general interest.
