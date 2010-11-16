@@ -41,7 +41,6 @@
 #include "timbl/Tree.h"
 #include "timbl/Instance.h"
 #include "timbl/IBtree.h"
-#include "timbl/NewIBtree.h"
 #include "timbl/TimblExperiment.h"
 
 namespace Timbl {
@@ -52,15 +51,10 @@ namespace Timbl {
     default_order();
     set_order();
     runningPhase = TrainWords;
-    if ( speedTraining )
-      NewIB = new NewIBroot( EffectiveFeatures(), 
-			     (RandomSeed()>=0),
-			     KeepDistributions() );
-    else
-      InstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
-					  ibCount,
-					  (RandomSeed()>=0), 
-					  false, KeepDistributions() );
+    InstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
+					ibCount,
+					(RandomSeed()>=0), 
+					false, KeepDistributions() );
   }
   
   void IG_Experiment::initExperiment( bool ){ 
@@ -100,53 +94,6 @@ namespace Timbl {
     os << "]";
     return os;
   }  
-
-  bool IG_Experiment::SpeedLearn( const string& FileName ){
-    bool result = true;
-    if ( is_synced ) {
-      CurrentDataFile = FileName;
-    }
-    if ( CurrentDataFile == "" ){
-      if ( FileName == "" ){
-	Warning( "unable to build an InstanceBase: No datafile defined yet" );
-	result = false;
-      }
-      else {
-	if ( !Prepare( FileName ) || ExpInvalid() ){
-	  result = false;
-	}
-      }
-    }
-    else if ( FileName != "" &&
-	      CurrentDataFile != FileName ){
-      Error( "Unable to Learn from file '" + FileName + "'\n"
-	     "while previously instantiated from file '" + 
-	     CurrentDataFile + "'" );
-      result = false;
-    }
-    if ( result ) {
-      Common::Timer learnT;
-      learnT.start();
-      InitInstanceBase();
-      if ( ExpInvalid() )
-	return false;
-      if ( !Verbosity(SILENT) ) {
-	Info( "\nPhase 2: Learning from Datafile: " + CurrentDataFile );
-	time_stamp( "Start:     ", 0 );
-      }
-      unsigned int totalDone = 0;
-      result = learnSpeedy( totalDone );
-      NewIB->prune();
-      time_stamp( "Finished:  ", totalDone );
-      instances.clear();
-      learnT.stop();
-      if ( !Verbosity(SILENT) ){
-	IBInfo( *mylog );
-	Info( "SpeedLearning took " + learnT.toString() );
-      }
-    }
-    return result;
-  }
 
   bool IG_Experiment::ClassicLearn( const string& FileName ){
     bool result = true;
@@ -431,24 +378,14 @@ namespace Timbl {
     bestResult.reset( beamSize, normalisation, norm_factor, Targets );
     const TargetValue *TV = NULL;
     const ValueDistribution *ResultDist; 
-    if ( NewIB ){
-      ResultDist = NewIB->IG_test( Inst, match_depth, last_leaf, TV );
-      if ( match_depth == 0 ){
-	// when level 0, ResultDist == TopDistribution
-	TV = NewIB->topTarget( Tie );
-      }
-    }
-    else {
-      ResultDist = InstanceBase->IG_test( Inst, match_depth, last_leaf, TV );
-      if ( match_depth == 0 ){
-	// when level 0, ResultDist == TopDistribution
-	TV = InstanceBase->TopTarget( Tie );
-      }
+    ResultDist = InstanceBase->IG_test( Inst, match_depth, last_leaf, TV );
+    if ( match_depth == 0 ){
+      // when level 0, ResultDist == TopDistribution
+      TV = InstanceBase->TopTarget( Tie );
     }
     Distance = sum_remaining_weights( match_depth );
     if ( ResultDist &&
-	 ( ( NewIB && NewIB->persistentD() ) ||
-	   ( InstanceBase && InstanceBase->PersistentD() ) ) ){
+	 InstanceBase && InstanceBase->PersistentD() ){
       if ( match_depth == 0 )
 	bestResult.addTop( ResultDist );
       else

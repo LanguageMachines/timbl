@@ -37,7 +37,6 @@
 #include "timbl/StringOps.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
-#include "timbl/NewIBtree.h"
 #include "timbl/Options.h"
 #include "timbl/BestArray.h"
 #include "timbl/MBLClass.h"
@@ -49,12 +48,7 @@ namespace Timbl {
 
   bool MBLClass::HideInstance( const Instance& Inst ){
     bool result = true;
-    if ( NewIB ){
-      NewIB->deleteInstance( Inst );
-    }
-    else {
-      InstanceBase->RemoveInstance( Inst );
-    }
+    InstanceBase->RemoveInstance( Inst );
     MBL_init = do_sloppy_loo; // must be only true if you are REALY sure
     for ( size_t i=0; i < effective_feats && result; ++i ){
       PermFeatures[i]->clear_matrix();
@@ -71,12 +65,7 @@ namespace Timbl {
   
   bool MBLClass::UnHideInstance( const Instance& Inst ){
     bool result = true;
-    if ( NewIB ){
-      NewIB->addInstance( Inst );
-    }
-    else {
-      InstanceBase->AddInstance( Inst );
-    }
+    InstanceBase->AddInstance( Inst );
     MBL_init = do_sloppy_loo; // must be only true if you are REALY sure
     for ( size_t i=0; i < effective_feats && result; ++i ){
       PermFeatures[i]->clear_matrix();
@@ -92,13 +81,7 @@ namespace Timbl {
   }
   
   MBLClass::IB_Stat MBLClass::IBStatus() const {
-    if ( NewIB ){
-      if ( NewIB->isPruned() )
-	return Pruned;
-      else
-	return Normal;
-    }
-    else if (!InstanceBase )
+    if (!InstanceBase )
       return Invalid;
     else if (InstanceBase->IsPruned() )
       return Pruned;
@@ -110,10 +93,7 @@ namespace Timbl {
     double Compres;
     unsigned long int CurSize;
     unsigned long int CurBytes;
-    if ( NewIB )
-      CurBytes = NewIB->getSizeInfo( CurSize, Compres );
-    else
-      CurBytes = InstanceBase->GetSizeInfo( CurSize, Compres );
+    CurBytes = InstanceBase->GetSizeInfo( CurSize, Compres );
     ios::fmtflags OldFlg = os.setf( ios::fixed, ios::floatfield );
     int OldPrec = os.precision(2);
     os << "\nSize of InstanceBase = " << CurSize << " Nodes, (" << CurBytes
@@ -125,67 +105,35 @@ namespace Timbl {
       unsigned int endNodes = 0;
       os << "branching info:" << endl;
       os << "   level | feature |     nodes |  nonterms | terminals |  b-factor | b-factor-n" << endl;
-      if ( NewIB ){
-	NewIB->summarizeNodes( terminals, nonTerminals );
-	unsigned int i = 0;
-	vector<unsigned int>::const_iterator nIt = nonTerminals.begin();
-	vector<unsigned int>::const_iterator tIt = terminals.begin();
-	while ( nIt != nonTerminals.end() ){
-	  endNodes += *tIt;
-	  int nodes = *(nIt) + *(tIt);
+      InstanceBase->summarizeNodes( terminals, nonTerminals );
+      unsigned int i = 0;
+      vector<unsigned int>::const_iterator nIt = nonTerminals.begin();
+      vector<unsigned int>::const_iterator tIt = terminals.begin();
+      while ( nIt != nonTerminals.end() ){
+	endNodes += *tIt;
+	int nodes;
+	if ( i == 0 ){
+	  nodes = 1;
+	  os << setw(8) << 0 << " |" << setw(8) << "top" << " |" 
+	     << setw(10) << 1 << " |"
+	     << setw(10) << 1 << " |" << setw(10) << 0 << " |"
+	     << setw(10) << double(*nIt + *tIt) << " |"
+	     << setw(10) << double(*nIt) << endl;
+	}
+	else {
+	  nodes = *(nIt-1) + *(tIt-1);
 	  if ( nodes == 0 )
 	    break;
-	  if ( i == 0 )
-	    os << setw(8) << 0 << " |" << setw(8) << "top" << " |";
-	  else
-	    os << setw(8) << i << " |"<< setw(8) << permutation[i-1] + 1 << " |";
-	  os << setw(10) << nodes << " |"
-	     << setw(10) << *nIt << " |" << setw(10) << *tIt << " |";
-	  ++tIt;
-	  if ( tIt != terminals.end() ){
-	    os << setw(10) << (*(nIt+1) + *tIt)/double(nodes) << " |"
-	       << setw(10) << (*nIt?(*(nIt+1))/double(*nIt):0) << endl;
-	  }
-	  else {
-	    os << setw(10) << 0.0 << " |"
-	       << setw(10) << 0.0 << endl;
-	  }
-	  summedNodes += nodes;
-	  ++i;
-	  ++nIt;
+	  os << setw(8) << i << " |"<< setw(8) << permutation[i-1] + 1 << " |"
+	     << setw(10) << nodes << " |"
+	     << setw(10) << *(nIt-1) << " |" << setw(10) << *(tIt-1) << " |"
+	     << setw(10) << (*nIt + *tIt)/double(nodes) << " |"
+	     << setw(10) << (*nIt?(*nIt)/double(*(nIt-1)):0) << endl;
 	}
-      }
-      else {
-	InstanceBase->summarizeNodes( terminals, nonTerminals );
-	unsigned int i = 0;
-	vector<unsigned int>::const_iterator nIt = nonTerminals.begin();
-	vector<unsigned int>::const_iterator tIt = terminals.begin();
-	while ( nIt != nonTerminals.end() ){
-	  endNodes += *tIt;
-	  int nodes;
-	  if ( i == 0 ){
-	    nodes = 1;
-	    os << setw(8) << 0 << " |" << setw(8) << "top" << " |" 
-	       << setw(10) << 1 << " |"
-	       << setw(10) << 1 << " |" << setw(10) << 0 << " |"
-	       << setw(10) << double(*nIt + *tIt) << " |"
-	       << setw(10) << double(*nIt) << endl;
-	  }
-	  else {
-	    nodes = *(nIt-1) + *(tIt-1);
-	    if ( nodes == 0 )
-	      break;
-	    os << setw(8) << i << " |"<< setw(8) << permutation[i-1] + 1 << " |"
-	       << setw(10) << nodes << " |"
-	       << setw(10) << *(nIt-1) << " |" << setw(10) << *(tIt-1) << " |"
-	       << setw(10) << (*nIt + *tIt)/double(nodes) << " |"
-	       << setw(10) << (*nIt?(*nIt)/double(*(nIt-1)):0) << endl;
-	  }
-	  summedNodes += nodes;
-	  ++i;
-	  ++nIt;
-	  ++tIt;
-	}
+	summedNodes += nodes;
+	++i;
+	++nIt;
+	++tIt;
       }
       os << "total: nodes = " << summedNodes 
 	 << " endnodes = " << endNodes 
@@ -433,49 +381,8 @@ namespace Timbl {
     if ( ExpInvalid() ){
       result = false;
     }
-    else if ( NewIB == 0 && InstanceBase == 0 ){
+    else if ( InstanceBase == 0 ){
       Warning( "unable to write an Instance Base, nothing learned yet" );
-    }
-    else if ( NewIB ){
-      os << "# Status: " 
-	      << (NewIB->isPruned()?"pruned":"complete") << endl;
-      os << "# Permutation: "; 
-      writePermSpecial( os );
-      os << "# Numeric: "; 
-      bool first = true;
-      for ( size_t i=0; i < num_of_features; ++i )
-	if ( !Features[i]->Ignore() &&
-	     Features[i]->isNumerical() ){
-	  if ( !first )
-	    os << ", ";
-	  else
-	    first = false;
-	  os << i+1;
-	}
-      os << '.' << endl;
-      if ( NumNumFeatures() > 0 ){
-	os << "# Ranges: "; 
-	first = true;
-	for ( size_t j=0; j < num_of_features; ++j )
-	  if ( !Features[j]->Ignore() &&
-	       Features[j]->isNumerical() ){
-	    if ( !first )
-	      os << " , ";
-	    else
-	      first = false;
-	    os << j+1 << " [" << Features[j]->Min() 
-		    << "-" << Features[j]->Max() << "]";
-	  }
-	os << " ." << endl;
-      }
-      os << "# Bin_Size: " << Bin_Size << endl;
-      if ( hashed_trees ){
-	NewIB->saveHashed( os, 
-			   TargetStrings, FeatureStrings, 
-			   keep_distributions );
-      }
-      else
-	NewIB->save( os, keep_distributions );
     }
     else {
       os << "# Status: " 

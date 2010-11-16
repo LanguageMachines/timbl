@@ -79,7 +79,6 @@ namespace Timbl {
     do_silly = false;
     do_diversify = false;
     do_daemon = true;
-    do_speed_train = false;
     if ( MaxFeats == -1 ){
       MaxFeats = Max;
       LocalInputFormat = UnknownInputFormat; // InputFormat and verbosity
@@ -163,7 +162,6 @@ namespace Timbl {
     do_silly( in.do_silly ),
     do_diversify( in.do_diversify ),
     do_daemon( in.do_daemon ),
-    do_speed_train( in.do_speed_train ),
     metricsArray( in.metricsArray ),
     parent_socket_os( in.parent_socket_os ),
     outPath( in.outPath ),
@@ -283,10 +281,6 @@ namespace Timbl {
 	  Exp->setOutPath( outPath );
 	}
       }
-      if ( do_speed_train )
-	Exp->DoSpeedTrain( true );
-      else
-	Exp->DoSpeedTrain( false );
       if ( estimate < 10 )
 	Exp->Estimate( 0 );
       else
@@ -1033,15 +1027,6 @@ namespace Timbl {
 	    }
 	    do_sloppy_loo = val;
 	  }
-	  else if ( long_option == "speedtrain" ){
-	    bool val;
-	    if ( !isBoolOrEmpty(myoptarg,val) ){
-	      Error( "invalid value for speedtrain: '" 
-		     + myoptarg + "'" );
-	      return false;
-	    }
-	    do_speed_train = val;
-	  }
 	  else if ( long_option == "silly" ){
 	    bool val;
 	    if ( !isBoolOrEmpty(myoptarg,val) ){
@@ -1052,7 +1037,7 @@ namespace Timbl {
 	    do_silly = val;
 	  }
 	  else {
-	    Error( "invalid option: Did you mean '--sloppy, --silly or --speedtrain' ?" );
+	    Error( "invalid option: Did you mean '--sloppy or --silly' ?" );
 	    return false;
 	  }
 	}

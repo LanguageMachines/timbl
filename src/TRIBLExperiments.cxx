@@ -44,7 +44,6 @@
 #include "timbl/neighborSet.h"
 #include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
-#include "timbl/NewIBtree.h"
 #include "timbl/MBLClass.h"
 #include "timbl/TimblExperiment.h"
 
@@ -56,15 +55,10 @@ namespace Timbl {
     default_order();
     set_order();
     runningPhase = TrainWords;
-    if ( speedTraining )
-      NewIB = new NewIBroot( EffectiveFeatures(), 
-			     (RandomSeed()>=0),
-			     KeepDistributions() );
-    else
-      InstanceBase = new TRIBL_InstanceBase( EffectiveFeatures(), 
-					     ibCount,
-					     (RandomSeed()>=0),
-					     KeepDistributions() );
+    InstanceBase = new TRIBL_InstanceBase( EffectiveFeatures(), 
+					   ibCount,
+					   (RandomSeed()>=0),
+					   KeepDistributions() );
   }
   
   void TRIBL2_Experiment::InitInstanceBase(){
@@ -72,15 +66,10 @@ namespace Timbl {
     default_order();
     set_order();
     runningPhase = TrainWords;
-    if ( speedTraining )
-      NewIB = new NewIBroot( EffectiveFeatures(), 
-			     (RandomSeed()>=0),
-			     KeepDistributions() );
-    else
-      InstanceBase = new TRIBL2_InstanceBase( EffectiveFeatures(), 
-					      ibCount,
-					      (RandomSeed()>=0),
-					      KeepDistributions() );
+    InstanceBase = new TRIBL2_InstanceBase( EffectiveFeatures(), 
+					    ibCount,
+					    (RandomSeed()>=0),
+					    KeepDistributions() );
   }
   
   bool TRIBL_Experiment::checkTestFile(){
@@ -128,97 +117,49 @@ namespace Timbl {
       size_t level = 0;
       const ValueDistribution *TrResultDist = 0;
       initExperiment();
-      if ( NewIB ){
-	NewIBroot *SubTree 
-	  = NewIB->TRIBL_test( Inst, TRIBL_offset(), 
-			       Res, TrResultDist,
-			       level );
-	if ( !SubTree ){
-	  match_depth = level;
-	  last_leaf = false;
-	  Distance = sum_remaining_weights(level);
-	  if ( TrResultDist ){
-	    if ( level == 0 )
-	      bestResult.addTop( TrResultDist );
-	    else
-	      bestResult.addConstant( TrResultDist );
-	  }
-	}
-	else {
-	  testInstance( Inst, SubTree, TRIBL_offset() );
-	  bestArray.initNeighborSet( nSet );
-	  WValueDistribution *ResultDist = getBestDistribution();
-	  Res = ResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
-	  if ( Tie ){
-	    ++num_of_neighbors;
-	    testInstance( Inst, SubTree, TRIBL_offset() );
-	    bestArray.addToNeighborSet( nSet, num_of_neighbors );
-	    WValueDistribution *ResultDist2 = getBestDistribution();
-	    bool Tie2 = false;
-	    const TargetValue *Res2 = ResultDist2->BestTarget( Tie2, (RandomSeed() >= 0) );
-	    --num_of_neighbors;
-	    if ( !Tie2 ){
-	      delete ResultDist;
-	      bestResult.addDisposable( ResultDist2 );
-	      Res = Res2;
-	    }
-	    else {
-	      delete ResultDist2;
-	      bestResult.addDisposable( ResultDist );
-	    }
-	  }
-	  else {
-	    bestResult.addDisposable( ResultDist );
-	  }
-	  SubTree->deleteCopy( true );
-	  Distance = getBestDistance();
+      IB_InstanceBase *SubTree 
+	= InstanceBase->TRIBL_test( Inst, TRIBL_offset(), 
+				    Res, TrResultDist,
+				    level );
+      if ( !SubTree ){
+	match_depth = level;
+	last_leaf = false;
+	Distance = sum_remaining_weights(level);
+	if ( TrResultDist ){
+	  if ( level == 0 )
+	    bestResult.addTop( TrResultDist );
+	  else
+	    bestResult.addConstant( TrResultDist );
 	}
       }
       else {
-	IB_InstanceBase *SubTree 
-	  = InstanceBase->TRIBL_test( Inst, TRIBL_offset(), 
-				      Res, TrResultDist,
-				      level );
-	if ( !SubTree ){
-	  match_depth = level;
-	  last_leaf = false;
-	  Distance = sum_remaining_weights(level);
-	  if ( TrResultDist ){
-	    if ( level == 0 )
-	      bestResult.addTop( TrResultDist );
-	    else
-	      bestResult.addConstant( TrResultDist );
+	testInstance( Inst, SubTree, TRIBL_offset() );
+	bestArray.initNeighborSet( nSet );
+	WValueDistribution *ResultDist = getBestDistribution();
+	Res = ResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
+	if ( Tie ){
+	  ++num_of_neighbors;
+	  testInstance( Inst, SubTree, TRIBL_offset() );
+	  bestArray.addToNeighborSet( nSet, num_of_neighbors );
+	  WValueDistribution *ResultDist2 = getBestDistribution();
+	  bool Tie2 = false;
+	  const TargetValue *Res2 = ResultDist2->BestTarget( Tie2, (RandomSeed() >= 0) );
+	  --num_of_neighbors;
+	  if ( !Tie2 ){
+	    delete ResultDist;
+	    bestResult.addDisposable( ResultDist2 );
+	    Res = Res2;
+	  }
+	  else {
+	    delete ResultDist2;
+	    bestResult.addDisposable( ResultDist );
 	  }
 	}
 	else {
-	  testInstance( Inst, SubTree, TRIBL_offset() );
-	  bestArray.initNeighborSet( nSet );
-	  WValueDistribution *ResultDist = getBestDistribution();
-	  Res = ResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
-	  if ( Tie ){
-	    ++num_of_neighbors;
-	    testInstance( Inst, SubTree, TRIBL_offset() );
-	    bestArray.addToNeighborSet( nSet, num_of_neighbors );
-	    WValueDistribution *ResultDist2 = getBestDistribution();
-	    bool Tie2 = false;
-	    const TargetValue *Res2 = ResultDist2->BestTarget( Tie2, (RandomSeed() >= 0) );
-	    --num_of_neighbors;
-	    if ( !Tie2 ){
-	      delete ResultDist;
-	      bestResult.addDisposable( ResultDist2 );
-	      Res = Res2;
-	    }
-	    else {
-	      delete ResultDist2;
-	      bestResult.addDisposable( ResultDist );
-	    }
-	  }
-	  else {
-	    bestResult.addDisposable( ResultDist );
-	  }
-	  SubTree->CleanPartition( true );
-	  Distance = getBestDistance();
+	  bestResult.addDisposable( ResultDist );
 	}
+	SubTree->CleanPartition( true );
+	Distance = getBestDistance();
       }
     }
     if ( confusionInfo )
@@ -274,89 +215,45 @@ namespace Timbl {
       exact = Do_Exact();
     }
     else {
-      if ( NewIB ){
-	NewIBroot *SubTree = NULL;
-	size_t level = 0;
-	const ValueDistribution *TrResultDist = 0;
-	SubTree = NewIB->TRIBL2_test( Inst, TrResultDist, level );
-	if ( SubTree ){
+      IB_InstanceBase *SubTree = NULL;
+      size_t level = 0;
+      const ValueDistribution *TrResultDist = 0;
+      SubTree = InstanceBase->TRIBL2_test( Inst, TrResultDist, level );
+      if ( SubTree ){
+	testInstance( Inst, SubTree, level );
+	bestArray.initNeighborSet( nSet );
+	WValueDistribution *ResultDist1 = getBestDistribution();
+	Res = ResultDist1->BestTarget( Tie, (RandomSeed() >= 0) );
+	if ( Tie ){
+	  ++num_of_neighbors;
 	  testInstance( Inst, SubTree, level );
-	  bestArray.initNeighborSet( nSet );
-	  WValueDistribution *ResultDist1 = getBestDistribution();
-	  Res = ResultDist1->BestTarget( Tie, (RandomSeed() >= 0) );
-	  if ( Tie ){
-	    ++num_of_neighbors;
-	    testInstance( Inst, SubTree, level );
-	    bestArray.addToNeighborSet( nSet, num_of_neighbors );
-	    WValueDistribution *ResultDist2 = getBestDistribution();
-	    bool Tie2 = false;
-	    const TargetValue *Res2 = ResultDist2->BestTarget( Tie2, (RandomSeed() >= 0) );
-	    --num_of_neighbors;
-	    if ( !Tie2 ){
-	      delete ResultDist1;
-	      bestResult.addDisposable( ResultDist2 );
-	      Res = Res2;
-	    }
-	    else {
-	      delete ResultDist2;
-	      bestResult.addDisposable( ResultDist1 );
-	    }
+	  bestArray.addToNeighborSet( nSet, num_of_neighbors );
+	  WValueDistribution *ResultDist2 = getBestDistribution();
+	  bool Tie2 = false;
+	  const TargetValue *Res2 = ResultDist2->BestTarget( Tie2, (RandomSeed() >= 0) );
+	  --num_of_neighbors;
+	  if ( !Tie2 ){
+	    delete ResultDist1;
+	    bestResult.addDisposable( ResultDist2 );
+	    Res = Res2;
 	  }
 	  else {
+	    delete ResultDist2;
 	    bestResult.addDisposable( ResultDist1 );
 	  }
-	  SubTree->deleteCopy( true );
-	  match_depth = level;
-	  Distance = getBestDistance();
 	}
 	else {
-	  // an exact match
-	  Distance = 0.0;
-	  Res = TrResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
-	  bestResult.addConstant( TrResultDist );
+	  bestResult.addDisposable( ResultDist1 );
 	}
+	SubTree->CleanPartition( true );
+	match_depth = level;
+	Distance = getBestDistance();
       }
       else {
-	IB_InstanceBase *SubTree = NULL;
-	size_t level = 0;
-	const ValueDistribution *TrResultDist = 0;
-	SubTree = InstanceBase->TRIBL2_test( Inst, TrResultDist, level );
-	if ( SubTree ){
-	  testInstance( Inst, SubTree, level );
-	  bestArray.initNeighborSet( nSet );
-	  WValueDistribution *ResultDist1 = getBestDistribution();
-	  Res = ResultDist1->BestTarget( Tie, (RandomSeed() >= 0) );
-	  if ( Tie ){
-	    ++num_of_neighbors;
-	    testInstance( Inst, SubTree, level );
-	    bestArray.addToNeighborSet( nSet, num_of_neighbors );
-	    WValueDistribution *ResultDist2 = getBestDistribution();
-	    bool Tie2 = false;
-	    const TargetValue *Res2 = ResultDist2->BestTarget( Tie2, (RandomSeed() >= 0) );
-	    --num_of_neighbors;
-	    if ( !Tie2 ){
-	      delete ResultDist1;
-	      bestResult.addDisposable( ResultDist2 );
-	      Res = Res2;
-	    }
-	    else {
-	      delete ResultDist2;
-	      bestResult.addDisposable( ResultDist1 );
-	    }
-	  }
-	  else {
-	  bestResult.addDisposable( ResultDist1 );
-	  }
-	  SubTree->CleanPartition( true );
-	  match_depth = level;
-	  Distance = getBestDistance();
-	}
-	else {
-	  // an exact match
-	  Distance = 0.0;
-	  Res = TrResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
-	  bestResult.addConstant( TrResultDist );
-	}
+	// an exact match
+	Distance = 0.0;
+	Res = TrResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
+	bestResult.addConstant( TrResultDist );
       }
     }
     if ( confusionInfo )

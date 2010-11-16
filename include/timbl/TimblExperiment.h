@@ -108,7 +108,6 @@ namespace Timbl {
     bool WriteInstanceBaseXml( const std::string& );
     bool WriteInstanceBaseLevels( const std::string&, unsigned int );
     bool WriteNamesFile( const std::string& ) const;
-    void DoSpeedTrain( bool b ) { speedTraining = b; };
     virtual bool Learn( const std::string& = "" );
     int Estimate() const { return estimate; };
     void Estimate( int e ){ estimate = e; };
@@ -185,7 +184,6 @@ namespace Timbl {
   protected:
     TimblExperiment( const AlgorithmType, const std::string& = "" );
     virtual bool checkLine( const std::string& );
-    virtual bool SpeedLearn( const std::string& = "" );
     virtual bool ClassicLearn( const std::string& = "" );
     virtual const TargetValue *LocalClassify( const Instance& , 
 					      double&,
@@ -195,7 +193,6 @@ namespace Timbl {
     virtual void showTestingInfo( std::ostream& );
     virtual bool checkTestFile();
     bool learnFromFileIndex( const fileIndex&, std::istream& );
-    bool learnSpeedy( unsigned int& );
     bool initTestFiles( const std::string&, const std::string& );
     void show_results( std::ostream&,
 		       const std::string&, 
@@ -203,9 +200,6 @@ namespace Timbl {
 		       const double ) ;
     void testInstance( const Instance&,
 		       InstanceBase_base *,
-		       size_t = 0 );
-    void testInstance( const Instance&,
-		       NewIBroot *,
 		       size_t = 0 );
     void normalizeResult();
     const neighborSet *LocalClassify( const Instance&  );
@@ -243,7 +237,6 @@ namespace Timbl {
     resultStore bestResult;
     size_t match_depth;
     bool last_leaf;
-    bool speedTraining;
 
   private:
     TimblExperiment( const TimblExperiment& );
@@ -397,7 +390,6 @@ namespace Timbl {
   protected:
     TimblExperiment *clone() const { 
       return new IG_Experiment( MaxFeats(), "", false ); };
-    bool SpeedLearn( const std::string& = "" );
     bool ClassicLearn( const std::string& = "" );
     bool checkTestFile();
     void showTestingInfo( std::ostream& );

@@ -57,7 +57,6 @@
 #include "timbl/neighborSet.h"
 #include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
-#include "timbl/NewIBtree.h"
 #include "timbl/MBLClass.h"
 #include "timbl/CommandLine.h"
 #include "timbl/GetOptClass.h"
@@ -183,7 +182,6 @@ namespace Timbl {
     confusionInfo( 0 ),
     match_depth(-1),
     last_leaf(true),
-    speedTraining( false ),
     estimate( 0 )
   {
     Weighting = GR_w;
@@ -203,7 +201,6 @@ namespace Timbl {
       CurrentDataFile = in.CurrentDataFile;
       WFileName = in.WFileName;
       estimate = in.estimate;
-      speedTraining = in.speedTraining;
       Weighting = in.Weighting;
       confusionInfo = 0;
     }
@@ -229,14 +226,8 @@ namespace Timbl {
     }
     result->WFileName = WFileName;
     result->CurrentDataFile = "";
-    if ( result->NewIB ){
-      result->NewIB->deleteCopy( false );
-      result->NewIB = 0;
-    }
-    else {
-      result->InstanceBase->CleanPartition( false );
-      result->InstanceBase = 0;
-    }
+    result->InstanceBase->CleanPartition( false );
+    result->InstanceBase = 0;
     result->is_synced = true;
     return result;
   }  
@@ -381,8 +372,6 @@ namespace Timbl {
 	      }
 	      while( go_on ){
 		chopped_to_instance( LearnWords );
-		if ( speedTraining )
-		  instances.push_back( CurrInst );
 		// Progress update.
 		//
 		if (( stats.dataLines() % Progress() ) == 0)
@@ -456,69 +445,6 @@ namespace Timbl {
     return os;
   }
 
-  bool TimblExperiment::learnSpeedy( unsigned int& totalDone ){
-    for ( unsigned int pos = 0; pos < instances.size(); ++pos ){
-      // Progress update.
-      //
-      if (( totalDone % Progress() ) == 0) 
-	time_stamp( "Learning:  ", totalDone );
-      Instance tmp = instances[pos];
-      tmp.permute( permutation );
-      if ( !NewIB->addInstance( tmp ) ){
-	Warning( "deviating exemplar weight in:\n" + 
-		 toString(&instances[pos]) + "\nIgnoring the new weight" );
-      }
-      ++totalDone;
-    }
-    return true;
-  }
-
-  bool TimblExperiment::SpeedLearn( const string& FileName ){
-    bool result = true;
-    Common::Timer learnT;
-    if ( is_synced ){
-      CurrentDataFile = FileName; // assume magic!
-    }
-    if ( CurrentDataFile == "" )
-      if ( FileName == "" ){
-	Warning( "unable to build an InstanceBase: No datafile defined yet" );
-	result = false;
-      }
-      else {
-	if ( !Prepare( FileName ) || ExpInvalid() ){
-	  result = false;
-	}
-      }
-    else if ( FileName != "" &&
-	      CurrentDataFile != FileName ){
-      Error( "Unable to Learn from file '" + FileName + "'\n"
-	     "while previously instantiated from file '" + 
-	     CurrentDataFile + "'" );
-      result = false;
-    }
-    if ( result ) {
-      Common::Timer learnT;
-      learnT.start();
-      InitInstanceBase();
-      if ( ExpInvalid() )
-	return false;
-      unsigned int totalDone = 0;
-      if ( !Verbosity(SILENT) ) {
-	Info( "\nPhase 2: Learning from Datafile: " + CurrentDataFile );
-	time_stamp( "Start:     ", 0 );
-      }
-      result = learnSpeedy( totalDone );
-      time_stamp( "Finished:  ", totalDone );
-      instances.clear();
-      learnT.stop();
-      if ( !Verbosity(SILENT) ){
-	IBInfo( *mylog );
-	Info( "SpeedLearning took " + learnT.toString() );
-      }
-    }
-    return result;
-  }
-  
   bool TimblExperiment::learnFromFileIndex( const fileIndex& fi, 
 					    istream& datafile ){
     InstanceBase_base *outInstanceBase = 0;
@@ -656,10 +582,7 @@ namespace Timbl {
 	 !ConfirmOptions() ){
       return false;
     }
-    else if ( speedTraining )
-      return SpeedLearn( s );
-    else
-      return ClassicLearn( s );
+    return ClassicLearn( s );
   }
   
   IB1_Experiment::IB1_Experiment( const size_t N,
@@ -691,10 +614,7 @@ namespace Timbl {
 	chopped_to_instance( TrainLearnWords );
 	MBL_init = false;
 	bool happy;
-	if ( NewIB )
-	  happy = NewIB->addInstance( CurrInst );
-	else
-	  happy = InstanceBase->AddInstance( CurrInst );
+	happy = InstanceBase->AddInstance( CurrInst );
 	if ( !happy )
 	  Warning( "deviating exemplar weight in:\n" + 
 		   InstanceString + "\nIgnoring the new weight" );
@@ -771,12 +691,7 @@ namespace Timbl {
 	  // The next Instance to store. 
 	  chopped_to_instance( TrainLearnWords );
 	  bool happy;
-	  if ( NewIB ){
-	    happy = NewIB->addInstance( CurrInst );
-	  }
-	  else {
-	    happy = InstanceBase->AddInstance( CurrInst );
-	  }
+	  happy = InstanceBase->AddInstance( CurrInst );
 	  if ( !happy ){
 	    Warning( "deviating exemplar weight in line #" + 
 		     toString<int>(stats.totalLines() ) + ":\n" +
@@ -1197,12 +1112,7 @@ namespace Timbl {
 	    // The next Instance to store. 
 	    chopped_to_instance( TrainWords );
 	    bool happy;
-	    if ( NewIB ){
-	      happy = NewIB->addInstance( CurrInst );
-	    }
-	    else {
-	      happy = InstanceBase->AddInstance( CurrInst );
-	    }
+	    happy = InstanceBase->AddInstance( CurrInst );
 	    if ( !happy ){
 	      Warning( "deviating exemplar weight in line #" +
 		       toString<int>(stats.totalLines()) + ":\n" +
@@ -1334,12 +1244,7 @@ namespace Timbl {
 	    if ( ResultTarget != CurrInst.TV ) {
 	      chopped_to_instance( TrainLearnWords );
 	      bool happy;
-	      if ( NewIB ){
-		happy = NewIB->addInstance( CurrInst );
-	      }
-	      else {
-		happy = InstanceBase->AddInstance( CurrInst );
-	      }
+	      happy = InstanceBase->AddInstance( CurrInst );
 	      if ( !happy ){
 		Warning( "deviating exemplar weight in line #" + 
 			 toString<int>(stats.totalLines() ) + ":\n" +
@@ -1568,13 +1473,6 @@ namespace Timbl {
     TestInstance( Inst, base, offset );
   }
 
-  void TimblExperiment::testInstance( const Instance& Inst,
-				      NewIBroot *base,
-				      size_t offset ) {
-    initExperiment();
-    TestInstance( Inst, base, offset );
-  }
-
   const TargetValue *TimblExperiment::LocalClassify( const Instance& Inst,
 						     double& Distance,
 						     bool& exact ){
@@ -1593,10 +1491,7 @@ namespace Timbl {
       Res = ExResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
     }
     else {
-      if ( NewIB )
-	testInstance( Inst, NewIB );
-      else
-	testInstance( Inst, InstanceBase );
+      testInstance( Inst, InstanceBase );
       bestArray.initNeighborSet( nSet );
       ResultDist = getBestDistribution( );
       Res = ResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
@@ -1605,10 +1500,7 @@ namespace Timbl {
     if ( Tie && recurse ){
       bool Tie2 = true;
       ++num_of_neighbors;
-      if ( NewIB )
-	testInstance( Inst, NewIB );
-      else
-	testInstance( Inst, InstanceBase );
+      testInstance( Inst, InstanceBase );
       bestArray.addToNeighborSet( nSet, num_of_neighbors );
       WValueDistribution *ResultDist2 = getBestDistribution();
       const TargetValue *Res2 = ResultDist2->BestTarget( Tie2, (RandomSeed() >= 0) );
@@ -1669,10 +1561,7 @@ namespace Timbl {
   }
   
   const neighborSet *TimblExperiment::LocalClassify( const Instance& Inst ){
-    if ( NewIB )
-      testInstance( Inst, NewIB );
-    else
-      testInstance( Inst, InstanceBase );
+    testInstance( Inst, InstanceBase );
     bestArray.initNeighborSet( nSet );
     nSet.setShowDistance( Verbosity(DISTANCE) );
     nSet.setShowDistribution( Verbosity(DISTRIB) );
@@ -2161,34 +2050,18 @@ namespace Timbl {
 	  else 
 	    PermFeatures[pos++] = Features[permutation[i]];
 	}
-	if ( speedTraining ){
-	  NewIB = new NewIBroot( EffectiveFeatures(), 
-				 (RandomSeed()>=0),
-				 KeepDistributions() );
-	  if ( Hashed )
-	    result = NewIB->readHashed( is, PermFeatures,
-					Targets, 
-					TargetStrings, FeatureStrings,
-					Version ); 
-	  else
-	    result = NewIB->read( is, PermFeatures, 
-				  Targets, 
-				  Version ); 
-	}
-	else {
-	  InstanceBase = new IB_InstanceBase( EffectiveFeatures(), 
-					      ibCount,
-					      (RandomSeed()>=0) );
-	  if ( Hashed )
-	    result = InstanceBase->ReadIB( is, PermFeatures,
-					   Targets, 
-					   TargetStrings, FeatureStrings,
-					   Version ); 
-	  else
-	    result = InstanceBase->ReadIB( is, PermFeatures, 
-					   Targets, 
-					   Version ); 
-	}
+	InstanceBase = new IB_InstanceBase( EffectiveFeatures(), 
+					    ibCount,
+					    (RandomSeed()>=0) );
+	if ( Hashed )
+	  result = InstanceBase->ReadIB( is, PermFeatures,
+					 Targets, 
+					 TargetStrings, FeatureStrings,
+					 Version ); 
+	else
+	  result = InstanceBase->ReadIB( is, PermFeatures, 
+					 Targets, 
+					 Version ); 
       }
     }
     return result;
@@ -2237,14 +2110,9 @@ namespace Timbl {
     srand( RandomSeed() );
     set_order();
     runningPhase = TrainWords;
-    if ( speedTraining )
-      NewIB = new NewIBroot( EffectiveFeatures(), 
-			     (RandomSeed()>=0),
-			     KeepDistributions() );
-    else
-      InstanceBase = new IB_InstanceBase( EffectiveFeatures(), 
-					  ibCount,
-					  (RandomSeed()>=0) );
+    InstanceBase = new IB_InstanceBase( EffectiveFeatures(), 
+					ibCount,
+					(RandomSeed()>=0) );
   }
   
   bool TimblExperiment::GetCurrentWeights( vector<double>& res ) {
