@@ -1,3 +1,13 @@
+6.3.1 - 2010-11-17
+- Little API change in TimblOptions (more clear i hope)
+- Little bug fixes and improvement (logging mostly)
+- Moved LogStream stuff back in from TimblServer
+
+6.2.3
+  forgot to edit this file
+6.2.2 
+  forgot to edit this file
+
 6.2.1 - 2009-11-30
 
 - Fixed compilation problem on Cygwin
