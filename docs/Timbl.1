@@ -1,0 +1,405 @@
+.TH Timbl 1 "2010 november 17"
+
+.SH NAME
+Timbl - Tilburg Memory Based Learner
+.SH SYNOPSYS
+Timbl [options]
+
+Timbl -f data-file -t test-file
+
+.SH DESCRIPTION
+TiMBL is meant to be a versatile tool for Memory Based Learning. It implements the k-nn search algorithm and a lot of metrics. bla die bla.
+
+.SH OPTIONS
+.B -a
+<n>
+or
+.B -a
+<string>
+.RS
+determines the classification algorithm.
+
+Possible values are:
+
+.B 0
+or
+.B IB
+ the ib1 (k-NN) algorithm (this is the default). 
+
+.B 1
+or
+.B IGTREE
+ use a decision-tree-based optimization.
+
+.B 2
+or
+.B TRIBL
+ a hybrid of ib1 and igtree.
+
+.B 3
+or
+.B IB2
+ incremental edited memory-based learning.
+
+.B 4
+or
+.B TRIBL2
+ a non-parameteric version of tribl.
+.RE
+
+.B -b
+n
+.RS
+number of lines used for bootstrapping (IB2 only)
+.RE
+
+.B -B
+n
+.RS
+number of bins used for discretization of numeric feature values
+.RE
+
+.B --Beam
+=<n>
+.RS
+limit +v db output to n highest-vote classes
+.RE
+
+.B -c
+n
+.RS
+clipping frequency for prestoring MVDM matrices
+.RE
+
+.B +D
+.RS
+store distributions on all nodes (necessary for 
+using +v db with IGTree, but wastes memory otherwise)
+.RE
+
+.B --Diversify
+.RS
+rescale weight (see docs)
+.RE
+
+.B -d
+val
+.RS
+weight neighbors as function of their distance:
+ Z      : equal weights to all (default)
+ ID     : Inverse Distance
+ IL     : Inverse Linear
+ ED:a   : Exponential Decay with factor a (no whitespace!)
+ ED:a:b : Exponential Decay with factor a and b (no whitespace!)
+.RE
+
+.B -e
+n
+.RS
+estimate time until n patterns tested
+.RE
+
+.B -f
+file
+.RS
+read from Datafile 'file' OR use filenames from 'file' for CV test
+.RE
+
+.B -F
+format
+.RS
+Assume the specified inputformat
+(Compact, C4.5, ARFF, Columns, Binary, Sparse )
+.RE
+
+.B -G
+.RS
+normalize distibutions (+vdb option only)
+ O     : normalize between 0 and 1
+ 1:<f> : add f to all possible targets
+            then normalize between 0 and 1 (default f=1.0)
+.RE
+
+.B +H
+or
+.B -H
+.RS
+write hashed trees (default +H)
+.RE
+
+.B -i
+file
+.RS
+read the InstanceBase from 'file' (skips phase 1 & 2 )
+.RE
+
+.B -I
+file
+.RS
+dump the InstanceBase in 'file'
+.RE
+
+.B -k
+n
+.RS
+search 'n' nearest neighbors (default n = 1)
+.RE
+
+.B -L
+n
+.RS
+MVDM treshold at level n
+.RE
+
+.B -l
+n
+.RS
+length of Features (Compact format only)
+.RE
+
+.B -m
+string
+.RS
+use feature metrics as specified in' string':
+ The format is : GlobalMetric:MetricRange:MetricRange
+         e.g.: mO:N3:I2,5-7
+
+ C: Cosine distance. (Global only. numeric features implied)
+ D: Dot product. (Global only. numeric features implied)
+ DC: Dice Coefficient
+ O: weighted Overlap (default)
+ L: Levenshtein distance
+ M: Modified value difference
+ J: Jeffrey Divergence
+ N: numeric values
+ I: Ignore named  values
+.RE
+
+.BR --matrixin =file
+.RS
+read ValueDifference Matrices from file 'file'
+.RE
+
+.BR --matrixout =file
+.RS
+store ValueDifference Matrices in 'file'
+.RE
+
+.B -n
+file
+.RS
+create a C45 names 'file'
+.RE
+
+.B -M
+n
+.RS
+size of MaxBests Array
+.RE
+
+.B -N
+n
+.RS
+ Number of features (default 2500)
+.RE
+
+.B -o
+s
+.RS
+use s as output filename
+.RE
+
+.B -O
+path
+.RS
+save output using 'path'
+.RE
+
+.B -p
+n
+.RS
+show progress every n lines (default p = 100,000)
+.RE
+
+.B -P
+path
+.RS
+read data using 'path'
+.RE
+
+.B -q
+n
+.RS
+TRIBL treshold at level n
+.RE
+
+.B -R
+n
+.RS
+solve ties at random with seed n
+.RE
+
+.B -s
+.RS
+use the exemplar weights from the input file
+.RE
+
+.B -s0
+.RS
+silently ignore the exemplar weights from the input file
+.RE
+
+.B -T
+n
+.RS
+use input field 'n' as the target. (default is: the last field)
+.RE
+
+.B -t
+file
+.RS
+test using 'file'
+.RE
+
+.B -t
+leave_one_out
+.RS
+test with Leave One Out,using IB1
+ you may add --sloppy to speed up Leave One Out testing (see docs)
+.RE
+
+.B -t
+cross_validate
+.RS
+Cross Validate Test,using IB1
+.RE
+
+.B -t
+@file
+.RS
+test using files and options described in ;file'
+Supported options: d e F k m o p q R t u v w x % -
+.RE
+
+.B -T
+n
+.RS
+ordering of the Tree:
+ DO: none
+ GRO: using GainRatio
+ IGO: using InformationGain
+ 1/V: using 1/# of Values
+ G/V: using GainRatio/# of Valuess
+ I/V: using InfoGain/# of Valuess
+ X2O: using X-square
+ X/V: using X-square/# of Values
+ SVO: using Shared Variance
+ S/V: using Shared Variance/# of Values
+ GxE: using GainRatio * SplitInfo
+ IxE: using InformationGain * SplitInfo
+ 1/S: using 1/SplitInfo
+.RE
+
+.B -u
+file
+.RS
+read value_class probabilities from 'file'
+.RE
+
+.B -U
+file
+.RS
+save value_class probabilities in 'file'
+.RE
+
+.B -V
+.RS
+Show VERSION
+.RE
+
+.B +v
+level or
+.B -v
+level
+.RS
+set or unset verbosity level, where level is:
+
+ s:  work silently
+ o:  show all options set
+ b:  show node/branch count and branching factor
+ f:  show Calculated Feature Weights (default)
+ p:  show Value Difference matrices
+ e:  show exact matches
+ as: show advanced statistics (memory consuming)
+ cm: show Confusion Matrix (implies +vas)
+ cs: show per Class Statistics (implies +vas)
+ di: add distance to output file
+ db: add distribution of best matched to output file
+ md: add matching depth to output file.
+ k:  add a summary for all k neigbors to output file (sets -x)
+ n:  add nearest neigbors to output file (sets -x)
+
+  You may combine levels using '+' e.g. +v p+db or -v o+di
+.RE
+
+.B -w
+n
+.RS
+Weighting
+ 0 or nw: No Weighting
+ 1 or gr: Weight using GainRatio (default)
+ 2 or ig: Weight using InfoGain
+ 3 or x2: Weight using Chi-square
+ 4 or sv: Weight using Shared Variance
+.RE
+
+.B -w
+file
+.RS
+read Weights from 'file'
+.RE
+
+.B -w
+file:n
+.RS
+read Weight n from 'file'
+.RE
+
+.B -W
+file
+.RS
+calculate and save all Weights in 'file'
+.RE
+
+.B +%
+or
+.B -%
+.RS
+do or don't save test result (%) to file
+.RE
+
+.B +x
+or
+.B -x
+.RS
+Do or don't use the exact match shortcut 
+            (IB1 and IB2 only, default is -x)
+.RE
+
+.BR -X " file"
+.RS
+dump the InstanceBase as XML in 'file'
+.RE
+
+.SH BUGS
+possibly
+
+.SH AUTHORS
+Ko van der Sloot Timbl@uvt.nl
+
+Antal van den Bosch Timbl@uvt.nl
+
+.SH SEE ALSO
+.BR TimblServer (1)
+
+
