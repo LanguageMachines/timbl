@@ -1,3 +1,9 @@
+2010-11-17 13:31  sloot
+
+	* [r6899] ChangeLog, NEWS, include/timbl/Makefile.am,
+	  src/Makefile.am: updated NEWS
+	  LogStreams are back in from TimblServer
+
 2010-11-17 10:48  sloot
 
 	* [r6895] docs/Makefile.am, docs/Timbl.1: now we provide a man page
