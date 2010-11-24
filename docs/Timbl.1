@@ -117,7 +117,7 @@ assume the specified input format
 normalize distibutions (+v db option only)
  O     : normalize between 0 and 1
  1:<f> : add f to all possible targets
-            then normalize between 0 and 1 (default f=1.0)
+         then normalize between 0 and 1 (default f=1.0)
 .RE
 
 .B +H
@@ -162,7 +162,7 @@ string
 .RS
 use feature metrics as specified in' string':
  The format is : GlobalMetric:MetricRange:MetricRange
-         e.g.: mO:N3:I2,5-7
+           e.g.: mO:N3:I2,5-7
 
  C: cosine distance. (Global only. numeric features implied)
  D: dot product. (Global only. numeric features implied)
@@ -171,6 +171,7 @@ use feature metrics as specified in' string':
  L: Levenshtein distance
  M: modified value difference
  J: Jeffrey divergence
+ S: Jensen-Shannon divergence
  N: numeric values
  I: Ignore named  values
 .RE
@@ -265,7 +266,7 @@ test using 'file'
 leave_one_out
 .RS
 test with the leave-one-out testing regimen (IB1 only).
- you may add --sloppy to speed up leave-one-out testing (but see docs)
+you may add --sloppy to speed up leave-one-out testing (but see docs)
 .RE
 
 .B -t
@@ -383,7 +384,7 @@ or
 .B -x
 .RS
 do or don't use the exact match shortcut 
-            (IB1 and IB2 only, default is -x)
+   (IB1 and IB2 only, default is -x)
 .RE
 
 .BR -X " file"
