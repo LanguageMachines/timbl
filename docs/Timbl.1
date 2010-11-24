@@ -8,7 +8,7 @@ Timbl [options]
 Timbl -f data-file -t test-file
 
 .SH DESCRIPTION
-TiMBL is meant to be a versatile tool for Memory Based Learning. It implements the k-nn search algorithm and a lot of metrics. bla die bla.
+TiMBL is an open source software package implementing several memory-based learning algorithms, among which IB1-IG, an implementation of k-nearest neighbor classification with feature weighting suitable for symbolic feature spaces, and IGTree, a decision-tree approximation of IB1-IG. All implemented algorithms have in common that they store some representation of the training set explicitly in memory. During testing, new cases are classified by extrapolation from the most similar stored cases.
 
 .SH OPTIONS
 .B -a
@@ -24,27 +24,27 @@ Possible values are:
 .B 0
 or
 .B IB
- the ib1 (k-NN) algorithm (this is the default). 
+ the IB1 (k-NN) algorithm (default)
 
 .B 1
 or
 .B IGTREE
- use a decision-tree-based optimization.
+ a decision-tree-based approximation of IB1
 
 .B 2
 or
 .B TRIBL
- a hybrid of ib1 and igtree.
+ a hybrid of IB1 and IGTREE
 
 .B 3
 or
 .B IB2
- incremental edited memory-based learning.
+ an incremental editing version of IB1
 
 .B 4
 or
 .B TRIBL2
- a non-parameteric version of tribl.
+ a non-parameteric version of TRIBL
 .RE
 
 .B -b
@@ -85,7 +85,7 @@ rescale weight (see docs)
 .B -d
 val
 .RS
-weight neighbors as function of their distance:
+weigh neighbors as function of their distance:
  Z      : equal weights to all (default)
  ID     : Inverse Distance
  IL     : Inverse Linear
@@ -102,19 +102,19 @@ estimate time until n patterns tested
 .B -f
 file
 .RS
-read from Datafile 'file' OR use filenames from 'file' for CV test
+read from data file 'file' OR use filenames from 'file' for cross validation test
 .RE
 
 .B -F
 format
 .RS
-Assume the specified inputformat
+assume the specified input format
 (Compact, C4.5, ARFF, Columns, Binary, Sparse )
 .RE
 
 .B -G
 .RS
-normalize distibutions (+vdb option only)
+normalize distibutions (+v db option only)
  O     : normalize between 0 and 1
  1:<f> : add f to all possible targets
             then normalize between 0 and 1 (default f=1.0)
@@ -148,13 +148,13 @@ search 'n' nearest neighbors (default n = 1)
 .B -L
 n
 .RS
-MVDM treshold at level n
+set value frequency treshold to back off from MVDM to Overlap at level n
 .RE
 
 .B -l
 n
 .RS
-length of Features (Compact format only)
+fixed feature value length (Compact format only)
 .RE
 
 .B -m
@@ -164,13 +164,13 @@ use feature metrics as specified in' string':
  The format is : GlobalMetric:MetricRange:MetricRange
          e.g.: mO:N3:I2,5-7
 
- C: Cosine distance. (Global only. numeric features implied)
- D: Dot product. (Global only. numeric features implied)
- DC: Dice Coefficient
- O: weighted Overlap (default)
+ C: cosine distance. (Global only. numeric features implied)
+ D: dot product. (Global only. numeric features implied)
+ DC: Dice coefficient
+ O: weighted overlap (default)
  L: Levenshtein distance
- M: Modified value difference
- J: Jeffrey Divergence
+ M: modified value difference
+ J: Jeffrey divergence
  N: numeric values
  I: Ignore named  values
 .RE
@@ -188,7 +188,7 @@ store ValueDifference Matrices in 'file'
 .B -n
 file
 .RS
-create a C45 names 'file'
+create a C4.5-style names file 'file'
 .RE
 
 .B -M
@@ -200,7 +200,7 @@ size of MaxBests Array
 .B -N
 n
 .RS
- Number of features (default 2500)
+number of features (default 2500)
 .RE
 
 .B -o
@@ -230,7 +230,7 @@ read data using 'path'
 .B -q
 n
 .RS
-TRIBL treshold at level n
+set TRIBL treshold at level n
 .RE
 
 .B -R
@@ -246,13 +246,13 @@ use the exemplar weights from the input file
 
 .B -s0
 .RS
-silently ignore the exemplar weights from the input file
+ignore the exemplar weights from the input file
 .RE
 
 .B -T
 n
 .RS
-use input field 'n' as the target. (default is: the last field)
+use feature n as the class label. (default: the last feature)
 .RE
 
 .B -t
@@ -264,20 +264,20 @@ test using 'file'
 .B -t
 leave_one_out
 .RS
-test with Leave One Out,using IB1
- you may add --sloppy to speed up Leave One Out testing (see docs)
+test with the leave-one-out testing regimen (IB1 only).
+ you may add --sloppy to speed up leave-one-out testing (but see docs)
 .RE
 
 .B -t
 cross_validate
 .RS
-Cross Validate Test,using IB1
+perform cross-validation test (IB1 only)
 .RE
 
 .B -t
 @file
 .RS
-test using files and options described in ;file'
+test using files and options described in 'file'
 Supported options: d e F k m o p q R t u v w x % -
 .RE
 
@@ -303,13 +303,13 @@ ordering of the Tree:
 .B -u
 file
 .RS
-read value_class probabilities from 'file'
+read value-class probabilities from 'file'
 .RE
 
 .B -U
 file
 .RS
-save value_class probabilities in 'file'
+save value-class probabilities in 'file'
 .RE
 
 .B -V
@@ -327,12 +327,12 @@ set or unset verbosity level, where level is:
  s:  work silently
  o:  show all options set
  b:  show node/branch count and branching factor
- f:  show Calculated Feature Weights (default)
- p:  show Value Difference matrices
+ f:  show calculated feature weights (default)
+ p:  show value difference matrices
  e:  show exact matches
  as: show advanced statistics (memory consuming)
- cm: show Confusion Matrix (implies +vas)
- cs: show per Class Statistics (implies +vas)
+ cm: show confusion matrix (implies +vas)
+ cs: show per-class statistics (implies +vas)
  di: add distance to output file
  db: add distribution of best matched to output file
  md: add matching depth to output file.
@@ -345,30 +345,30 @@ set or unset verbosity level, where level is:
 .B -w
 n
 .RS
-Weighting
- 0 or nw: No Weighting
- 1 or gr: Weight using GainRatio (default)
- 2 or ig: Weight using InfoGain
- 3 or x2: Weight using Chi-square
- 4 or sv: Weight using Shared Variance
+weighting
+ 0 or nw: no weighting
+ 1 or gr: weigh using gain ratio (default)
+ 2 or ig: weigh using information gain
+ 3 or x2: weigh using the chi-square statistic
+ 4 or sv: weigh using the shared variance statistic
 .RE
 
 .B -w
 file
 .RS
-read Weights from 'file'
+read weights from 'file'
 .RE
 
 .B -w
 file:n
 .RS
-read Weight n from 'file'
+read weight n from 'file'
 .RE
 
 .B -W
 file
 .RS
-calculate and save all Weights in 'file'
+calculate and save all weights in 'file'
 .RE
 
 .B +%
@@ -382,7 +382,7 @@ do or don't save test result (%) to file
 or
 .B -x
 .RS
-Do or don't use the exact match shortcut 
+do or don't use the exact match shortcut 
             (IB1 and IB2 only, default is -x)
 .RE
 
@@ -401,5 +401,3 @@ Antal van den Bosch Timbl@uvt.nl
 
 .SH SEE ALSO
 .BR TimblServer (1)
-
-
