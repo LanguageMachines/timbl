@@ -1842,14 +1842,18 @@ namespace Timbl {
   size_t MBLClass::countFeatures( const string& inBuffer,
 				  const InputFormatType IF ) const {
     size_t result = 0;
-    try {
-      result = Chopper::countFeatures( inBuffer, IF, F_length, chopExamples() );
-    }
-    catch( const runtime_error& e ){
-      Error( e.what() );
-    }
-    catch( const exception& e ){
-      FatalError( e.what() );
+    if ( IF == Sparse  || IF == SparseBin ) 
+      return num_of_features;
+    else {
+      try {
+	result = Chopper::countFeatures( inBuffer, IF, F_length, chopExamples() );
+      }
+      catch( const runtime_error& e ){
+	Error( e.what() );
+      }
+      catch( const exception& e ){
+	FatalError( e.what() );
+      }
     }
     return result;
   }
