@@ -34,29 +34,32 @@
 #include <stdexcept>
 
 namespace Timbl {
-std::string compress( const std::string& );
-size_t split_at( const std::string&, std::vector<std::string>&, 
-	      const std::string& );
-size_t split_at_first_of( const std::string&, std::vector<std::string>&, 
-		       const std::string& );
-inline size_t split( const std::string& s, std::vector<std::string>& vec ){
-  return split_at_first_of( s, vec, " \r\t" );
-}
-
-std::string string_tok( const std::string&, 
-			std::string::size_type&,
-			const std::string& );
-
-bool compare_nocase( const std::string&, const std::string& );
-bool compare_nocase_n( const std::string&, const std::string& );
-
-std::string StrToCode( const std::string& );
-std::string CodeToStr( const std::string& );
-
-void lowercase( std::string& );
-void uppercase( std::string& );
-
-std::string encode( const std::string& );
+  std::string compress( const std::string& );
+  size_t split_at( const std::string&, std::vector<std::string>&, 
+		   const std::string& );
+  size_t split_at_first_of( const std::string&, std::vector<std::string>&, 
+			    const std::string& );
+  inline size_t split( const std::string& s, std::vector<std::string>& vec ){
+    return split_at_first_of( s, vec, " \r\t" );
+  }
+  
+  std::string string_tok( const std::string&, 
+			  std::string::size_type&,
+			  const std::string& );
+  
+  bool compare_nocase( const std::string&, const std::string& );
+  bool compare_nocase_n( const std::string&, const std::string& );
+  
+  std::string StrToCode( const std::string& );
+  std::string CodeToStr( const std::string& );
+  
+  void lowercase( std::string& );
+  void uppercase( std::string& );
+  
+  std::string encode( const std::string& );
+  
+  std::string format_nonascii( const std::string& );
+  
 }
 
 #endif

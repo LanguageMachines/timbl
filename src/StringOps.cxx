@@ -222,5 +222,20 @@ namespace Timbl {
     else
       return false;
   }
-  
+
+  // format weird strings (like UTF8, LATIN1) printable 
+  // useful for debugging
+  string format_nonascii( const string& s ){
+    std::stringstream os;
+    os << std::showbase << std::hex;
+    unsigned int i;
+    for ( i=0; i < s.length(); ++i )
+      if ( isprint(s[i]) && (int)s[i] > 31 )
+	os << s[i];
+      else
+	os << "-" << (short int)s[i] << "-";
+    os << std::noshowbase << std::dec;
+    return os.str();
+  }
+
 } // namespace Timbl
