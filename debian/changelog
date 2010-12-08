@@ -1,3 +1,11 @@
+timbl (6.3.1.1) karmic; urgency=low
+
+  * New Release
+  * some bug fixes
+  * code shuffling with TimblServer continues
+
+ -- Ko van der Sloot <Ko.vanderSloot@uvt.nl>  Wed, 08 Dec 2010 12:24:58 +0100
+
 timbl (6.2.3-1) karmic; urgency=low
 
   * lame attempt
