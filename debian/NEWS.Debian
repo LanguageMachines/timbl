@@ -1,6 +1,6 @@
 # $Id $
 # $URL: $
-timbl (6.3.1) unstable; urgency=low
+timbl (6.3.1-1) unstable; urgency=low
 
   * Bug fix release. last ILK version before getting to Debian
   * Some stuff is moved back in from TimblServer on hindsight
