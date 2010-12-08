@@ -1,10 +1,32 @@
-# $Id$
-# $URL$
- -- Ko van der Sloot
+# $Id $
+# $URL: $
+timbl (6.3.1) unstable; urgency=low
+
+  * Bug fix release. last ILK version before getting to Debian
+  * Some stuff is moved back in from TimblServer on hindsight
+
+-- Ko van der Sloot
+
+timbl (6.3.0) unstable; urgency=low
+
+  * Major release
+
+-- Ko van der Sloot
+
 timbl (6.2.3) unstable; urgency=low
 
   * New release
   * All TimblServer stuff is moved to a separate timblserver package
+
+-- Ko van der Sloot
+
+timbl (6.2.2.1) unstable; urgency=low
+
+  * Bug fix release:
+    - Timbl would fail on old (pre gcc 4) systems
+    - Server would stop after maxConn refused connections
+
+ -- Ko van der Sloot
 
 timbl (6.2.2) unstable; urgency=low
 
