@@ -20,7 +20,7 @@ svn.ilk.uvt.nl/sources/Timbl-pkg% dch -i
 # Zorg ervoor dat het stukje van het versienummer bovenaan debian/changelog wat
 # voor de - staat, overeenkomt met de versie van de tarball.
 # Dus 6.2.0-1 is goed als je 6.2.0.tar.gz wilt packagen.
-# Ook moeje er op letten dat het 'unstable' is :{
+# Ook moet je er op letten dat het 'unstable' is :{
 # Daarna:
 
 svn.ilk.uvt.nl/sources/Timbl-pkg% svn commit -m 'foobar'
@@ -57,18 +57,19 @@ sloot@zeus:/var/www/apt.ticc.uvt.nl/dists/lenny$ gpg --no-random-seed-file -bao 
 #building on other machine/architecture, without changes to source
 #=================================================================
 # e.g to get an i386 version
-# the only i386 machine atm is: portal.ticc.uvt.nl
-# access via ssh port 223:  
+# the only i386 build environment is on syrinx.uvt.nl
 
-$ ssh portal.ticc.uvt.nl -p223
-sloot@portal:/tmp/foobar$ dget http://apt.ticc.uvt.nl/upload/timbl_6.2.0.pre1-1.dsc
-sloot@portal:/tmp/foobar$ dpkg-source -x timbl_6.2.0.pre1-1.dsc 
-sloot@portal:/tmp/foobar$ cd timbl-6.2.0.pre1-1
-sloot@portal:/tmp/foobar/timbl-6.2.0.pre1-1$ debuild -b -uc -us
+# access via ssh
+
+$ ssh syrinx.uvt.nl
+sloot@syrinx:/tmp/foobar$ dget http://apt.ticc.uvt.nl/pool/main/t/timbl/timbl_6.3.0-1.dsc
+sloot@syrinx:/tmp/foobar$ dpkg-source -x timbl_6.3.0-1.dsc
+sloot@syrinx:/tmp/foobar$ cd timbl-6.3.0/
+sloot@syrinx:/tmp/foobar/timbl-6.3.0$ debuild -b -uc -us
 
 #Make sure this creates only .build, .changes and _i386.deb.  (Not .diff.gz, not .dsc.)
 
-#Now upload timbl_6.2.0-pre1-1_i386.* and regenerate the archive index, see above.
+#Now upload timbl_6.3.0-1_i386.* and regenerate the archive index, see above.
 
 
 #more information on Debian packaging
