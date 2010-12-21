@@ -1728,6 +1728,7 @@ namespace Timbl {
 							       effective_feats );
     tester->init( Inst, effective_feats, ib_offset );
     //    cerr << "start test Instance = " << &Inst << " met " << toString(CurrentFV) << endl;
+    //    cerr << "BA at start = " << bestArray << endl;
     size_t CurPos = 0;
     while ( best_distrib ){
       //      cerr << "test:" << toString(CurrentFV) << endl;
@@ -1745,7 +1746,9 @@ namespace Timbl {
 				    ib_offset, 
 				    num_of_features );
 	  }
+	  //	  cerr << "Ok add " << best_distrib << "at distance " << Distance << endl;
 	  Threshold = bestArray.addResult( Distance, best_distrib, origI );
+	  //	  cerr << "BA = " << bestArray << endl;
 	  if ( do_silly_testing )
 	    Threshold = DBL_MAX;
 	}
@@ -1774,6 +1777,7 @@ namespace Timbl {
 	--pos;
       }
     }
+    //    cerr << "BA at end = " << bestArray << endl;
   }
 
   void MBLClass::test_instance_sim( const Instance& Inst,
@@ -1824,9 +1828,6 @@ namespace Timbl {
   void MBLClass::TestInstance( const Instance& Inst, 
 			       InstanceBase_base *SubTree,
 			       size_t level ){
-    bestArray.init( num_of_neighbors, MaxBests,
-		    Verbosity(NEAR_N), Verbosity(DISTANCE),
-		    Verbosity(DISTRIB) ); 
     // must be cleared for EVERY test
     if (  doSamples() ){
       test_instance_ex( Inst, SubTree, level );
