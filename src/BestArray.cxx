@@ -57,6 +57,21 @@ namespace Timbl {
       delete bestArray[i];
   }
 
+  ostream& operator<< ( ostream& os, const BestRec *b ){
+    if ( b ){
+      os << b->aggregateDist.DistToString();
+      int OldPrec = os.precision(DBL_DIG-1);
+      os.setf(ios::showpoint);
+      os << "\t" << b->bestDistance;
+      os.precision(OldPrec);
+      os << endl;
+    }
+    else {
+      os << "bestrec is null!" << endl;
+    }
+    return os;
+  }
+  
   void BestArray::init( unsigned int numN, unsigned int maxB, 
 			bool storeI, bool showDi, bool showDb ){ 
     _storeInstances = storeI;

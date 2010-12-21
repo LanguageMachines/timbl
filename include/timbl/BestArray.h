@@ -32,6 +32,7 @@
 namespace Timbl {
 
   class BestRec {
+    friend std::ostream& operator<< ( std::ostream&, const BestRec * );
   public:
     BestRec();
     ~BestRec();
