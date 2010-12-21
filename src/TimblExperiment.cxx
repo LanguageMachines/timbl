@@ -1483,12 +1483,21 @@ namespace Timbl {
     const ValueDistribution *ExResultDist = ExactMatch( Inst );
     WValueDistribution *ResultDist = 0;
     nSet.clear();
+    bestArray.init( num_of_neighbors, MaxBests,
+		    Verbosity(NEAR_N), Verbosity(DISTANCE),
+		    Verbosity(DISTRIB) ); 
     const TargetValue *Res;
     if ( ExResultDist ){
       Distance = 0.0;
       recurse = !Do_Exact();
       // no retesting when exact match and the user ASKED for them..
       Res = ExResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
+      //
+      // add the exact match to bestArray. Not realy smart, but
+      // this fixes bug 44
+      //
+      bestArray.addResult( Distance, ExResultDist, "exact match" );
+      bestArray.initNeighborSet( nSet );
     }
     else {
       testInstance( Inst, InstanceBase );
