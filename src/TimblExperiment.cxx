@@ -1470,6 +1470,9 @@ namespace Timbl {
 				      InstanceBase_base *base,
 				      size_t offset ) {
     initExperiment();
+    bestArray.init( num_of_neighbors, MaxBests,
+		    Verbosity(NEAR_N), Verbosity(DISTANCE),
+		    Verbosity(DISTRIB) ); 
     TestInstance( Inst, base, offset );
   }
 
@@ -1483,9 +1486,6 @@ namespace Timbl {
     const ValueDistribution *ExResultDist = ExactMatch( Inst );
     WValueDistribution *ResultDist = 0;
     nSet.clear();
-    bestArray.init( num_of_neighbors, MaxBests,
-		    Verbosity(NEAR_N), Verbosity(DISTANCE),
-		    Verbosity(DISTRIB) ); 
     const TargetValue *Res;
     if ( ExResultDist ){
       Distance = 0.0;
@@ -1496,6 +1496,9 @@ namespace Timbl {
       // add the exact match to bestArray. It should be taken into account
       // for Tie resolution. this fixes bug 44
       //
+      bestArray.init( num_of_neighbors, MaxBests,
+		      Verbosity(NEAR_N), Verbosity(DISTANCE),
+		      Verbosity(DISTRIB) ); 
       bestArray.addResult( Distance, ExResultDist, "exact match" );
       bestArray.initNeighborSet( nSet );
     }
@@ -1509,9 +1512,6 @@ namespace Timbl {
     if ( Tie && recurse ){
       bool Tie2 = true;
       ++num_of_neighbors;
-      bestArray.init( num_of_neighbors, MaxBests,
-		      Verbosity(NEAR_N), Verbosity(DISTANCE),
-		      Verbosity(DISTRIB) ); 
       testInstance( Inst, InstanceBase );
       bestArray.addToNeighborSet( nSet, num_of_neighbors );
       WValueDistribution *ResultDist2 = getBestDistribution();
