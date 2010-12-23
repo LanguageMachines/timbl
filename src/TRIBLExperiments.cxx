@@ -133,12 +133,18 @@ namespace Timbl {
 	}
       }
       else {
+	bestArray.init( num_of_neighbors, MaxBests,
+			Verbosity(NEAR_N), Verbosity(DISTANCE),
+			Verbosity(DISTRIB) ); 
 	testInstance( Inst, SubTree, TRIBL_offset() );
 	bestArray.initNeighborSet( nSet );
 	WValueDistribution *ResultDist = getBestDistribution();
 	Res = ResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
 	if ( Tie ){
 	  ++num_of_neighbors;
+	  bestArray.init( num_of_neighbors, MaxBests,
+			  Verbosity(NEAR_N), Verbosity(DISTANCE),
+			  Verbosity(DISTRIB) ); 
 	  testInstance( Inst, SubTree, TRIBL_offset() );
 	  bestArray.addToNeighborSet( nSet, num_of_neighbors );
 	  WValueDistribution *ResultDist2 = getBestDistribution();
@@ -220,12 +226,18 @@ namespace Timbl {
       const ValueDistribution *TrResultDist = 0;
       SubTree = InstanceBase->TRIBL2_test( Inst, TrResultDist, level );
       if ( SubTree ){
+	bestArray.init( num_of_neighbors, MaxBests,
+			Verbosity(NEAR_N), Verbosity(DISTANCE),
+			Verbosity(DISTRIB) ); 
 	testInstance( Inst, SubTree, level );
 	bestArray.initNeighborSet( nSet );
 	WValueDistribution *ResultDist1 = getBestDistribution();
 	Res = ResultDist1->BestTarget( Tie, (RandomSeed() >= 0) );
 	if ( Tie ){
 	  ++num_of_neighbors;
+	  bestArray.init( num_of_neighbors, MaxBests,
+			  Verbosity(NEAR_N), Verbosity(DISTANCE),
+			  Verbosity(DISTRIB) ); 
 	  testInstance( Inst, SubTree, level );
 	  bestArray.addToNeighborSet( nSet, num_of_neighbors );
 	  WValueDistribution *ResultDist2 = getBestDistribution();

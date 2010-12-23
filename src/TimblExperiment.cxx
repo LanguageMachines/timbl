@@ -1493,8 +1493,8 @@ namespace Timbl {
       // no retesting when exact match and the user ASKED for them..
       Res = ExResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
       //
-      // add the exact match to bestArray. Not realy smart, but
-      // this fixes bug 44
+      // add the exact match to bestArray. It should be taken into account
+      // for Tie resolution. this fixes bug 44
       //
       bestArray.addResult( Distance, ExResultDist, "exact match" );
       bestArray.initNeighborSet( nSet );
@@ -1509,6 +1509,9 @@ namespace Timbl {
     if ( Tie && recurse ){
       bool Tie2 = true;
       ++num_of_neighbors;
+      bestArray.init( num_of_neighbors, MaxBests,
+		      Verbosity(NEAR_N), Verbosity(DISTANCE),
+		      Verbosity(DISTRIB) ); 
       testInstance( Inst, InstanceBase );
       bestArray.addToNeighborSet( nSet, num_of_neighbors );
       WValueDistribution *ResultDist2 = getBestDistribution();
