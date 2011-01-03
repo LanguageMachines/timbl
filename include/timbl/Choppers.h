@@ -36,7 +36,10 @@ namespace Timbl{
     virtual bool chop( const std::string&, size_t ) = 0;
     const std::string& getField( size_t i ) const { return choppedInput[i]; };
     virtual double getExW() const { return -1; };
-    virtual void print( std::ostream& ) = 0;
+    virtual std::string getString() const = 0;
+    void print( std::ostream& os ){
+      os << getString();
+    };
     void swapTarget( size_t target_pos ){
       std::string tmp = choppedInput[target_pos];
       for ( size_t i = target_pos+1; i < vSize; ++i )
@@ -68,7 +71,7 @@ namespace Timbl{
   class C45_Chopper : public virtual Chopper {
   public:
     bool chop( const std::string&, size_t );
-    void print( std::ostream& );
+    std::string getString() const;
   };
 
   class C45_ExChopper : public C45_Chopper, public ExChopper {
@@ -85,7 +88,7 @@ namespace Timbl{
   class Bin_Chopper : public virtual Chopper {
   public:
     bool chop( const std::string&, size_t );
-    void print( std::ostream& os );
+    std::string getString() const;
   };
   
   class Bin_ExChopper : public Bin_Chopper, public ExChopper {
@@ -95,7 +98,7 @@ namespace Timbl{
   public:
   Compact_Chopper( int L ): fLen(L){};
     bool chop( const std::string&, size_t );
-    void print( std::ostream& );
+    std::string getString() const;
   private:
     int fLen;
     Compact_Chopper();
@@ -111,7 +114,7 @@ namespace Timbl{
   class Columns_Chopper : public virtual Chopper {
   public:
     bool chop( const std::string&, size_t );
-    void print( std::ostream& );
+    std::string getString() const;
   };
 
   class Columns_ExChopper : public Columns_Chopper, public ExChopper {
@@ -120,7 +123,7 @@ namespace Timbl{
   class Sparse_Chopper : public virtual Chopper {
   public:
     bool chop( const std::string&, size_t );
-    void print( std::ostream& );
+    std::string getString() const;
   };  
 
   class Sparse_ExChopper : public Sparse_Chopper, public ExChopper {

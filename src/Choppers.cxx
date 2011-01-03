@@ -261,10 +261,12 @@ namespace Timbl{
     return true;
   }
   
-  void C45_Chopper::print( ostream& os ){ 
+  string C45_Chopper::getString() const{ 
+    string res;
     for ( size_t i = 0; i < vSize; ++i ) {
-      os << CodeToStr( choppedInput[i] ) << ",";
+      res += CodeToStr( choppedInput[i] ) + ",";
     }
+    return res;
   }
 
   bool ARFF_Chopper::chop( const string& InBuf, size_t len ){
@@ -298,12 +300,14 @@ namespace Timbl{
     return true;
   }
   
-  void Bin_Chopper::print( ostream& os ){ 
+  string Bin_Chopper::getString() const { 
+    string res;
     for ( size_t i = 0; i < vSize-1; ++i ) {
       if ( choppedInput[i][0] == '1' )
-	os << i+1 << ",";
+	res += toString(i+1) + ",";
     }
-    os << choppedInput[vSize-1] << ",";
+    res += choppedInput[vSize-1] + ",";
+    return res;
   }
   
   bool Compact_Chopper::chop( const string& InBuf, size_t leng ){
@@ -330,10 +334,12 @@ namespace Timbl{
     return ( i == vSize ); // Enough?
   }
   
-  void Compact_Chopper::print( ostream& os ){ 
+  string Compact_Chopper::getString() const {
+    string res;
     for ( size_t i = 0; i < vSize; ++i ) {
-      os << CodeToStr( choppedInput[i] );
+      res += CodeToStr( choppedInput[i] );
     }
+    return res;
   };
   
   bool Columns_Chopper::chop( const string& InBuf, size_t len ){
@@ -357,10 +363,12 @@ namespace Timbl{
     return ( i == vSize ); // Enough?
   }
   
-  void Columns_Chopper::print( ostream& os ){ 
+  string Columns_Chopper::getString() const { 
+    string res;
     for ( size_t i = 0; i < vSize; ++i ) {
-      os << choppedInput[i] << " ";
+      res += choppedInput[i] + " ";
     }
+    return res;
   };
   
   bool Sparse_Chopper::chop( const string& InBuf, size_t len ){
@@ -402,12 +410,14 @@ namespace Timbl{
     return !choppedInput[vSize-1].empty();
   }
   
-  void Sparse_Chopper::print( ostream& os ){ 
+  string Sparse_Chopper::getString() const {
+    string res;
     for ( size_t i = 0; i < vSize-1; ++i ) {
       if ( choppedInput[i] != DefaultSparseString )
-	os << "(" << i+1 << "," << CodeToStr(choppedInput[i]) << ")";
+	res += "(" + toString( i+1 ) + "," + CodeToStr(choppedInput[i]) + ")";
     }
-    os << choppedInput[vSize-1] << ",";
+    res += choppedInput[vSize-1] + ",";
+    return res;
   }  
   
 }
