@@ -254,6 +254,11 @@ namespace Timbl {
 	Distance = 0.0;
 	Res = TrResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
 	bestResult.addConstant( TrResultDist );
+	bestArray.init( num_of_neighbors, MaxBests,
+			Verbosity(NEAR_N), Verbosity(DISTANCE),
+			Verbosity(DISTRIB) ); 
+	bestArray.addResult( Distance, TrResultDist, get_org_input() );
+	bestArray.initNeighborSet( nSet );
       }
     }
     if ( confusionInfo )

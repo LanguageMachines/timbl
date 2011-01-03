@@ -137,9 +137,7 @@ namespace Timbl {
 	  bool exact = LocalTest( CurrInst, outStream );
 	  if ( exact ){ // remember that a perfect match may be incorrect!
 	    if ( Verbosity(EXACT) ) {
-	      *mylog << "Exacte match:\n";
-	      show_org_input( *mylog );
-	      *mylog << endl;
+	      *mylog << "Exacte match:\n" << get_org_input() << endl;
 	    }
 	  }
 	  // Display progress counter.

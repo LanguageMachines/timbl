@@ -1015,8 +1015,7 @@ namespace Timbl {
 				      const string& dString,
 				      const TargetValue *Best,
 				      const double Distance ) {
-    show_org_input( outfile );
-    outfile << CodeToStr(Best->Name());
+    outfile << get_org_input() << CodeToStr(Best->Name());
     if ( Verbosity(DISTRIB) ){
       outfile << " " << dString;
     }
@@ -1499,7 +1498,7 @@ namespace Timbl {
       bestArray.init( num_of_neighbors, MaxBests,
 		      Verbosity(NEAR_N), Verbosity(DISTANCE),
 		      Verbosity(DISTRIB) ); 
-      bestArray.addResult( Distance, ExResultDist, "exact match" );
+      bestArray.addResult( Distance, ExResultDist, get_org_input() );
       bestArray.initNeighborSet( nSet );
     }
     else {
@@ -1713,9 +1712,7 @@ namespace Timbl {
 	  bool exact = LocalTest( CurrInst, outStream );
 	  if ( exact ){ // remember that a perfect match may be incorrect!
 	    if ( Verbosity(EXACT) ) {
-	      *mylog << "Exacte match:\n";
-	      show_org_input( *mylog );
-	      *mylog << endl;
+	      *mylog << "Exacte match:\n" << get_org_input() << endl;
 	    }
 	  }
 	  if ( !Verbosity(SILENT) )
@@ -1764,8 +1761,7 @@ namespace Timbl {
 	else {
 	  chopped_to_instance( TestWords );
 	  const neighborSet *res = LocalClassify( CurrInst );
-	  show_org_input( outStream );
-	  outStream << endl << *res;
+	  outStream << get_org_input() << endl << *res;
 	  if ( !Verbosity(SILENT) )
 	    // Display progress counter.
 	    show_progress( *mylog, lStartTime );
