@@ -980,10 +980,10 @@ namespace Timbl {
     return result;
   }
   
-  void MBLClass::show_org_input( ostream& out ) const {
-    ChopInput->print( out );
+  string MBLClass::get_org_input( ) const {
+    return ChopInput->getString();
   }
-  
+
   void MBLClass::LearningInfo( ostream& os ) {
     if ( !ExpInvalid() && !Verbosity(SILENT) ){
       calculate_fv_entropy( !MBL_init );

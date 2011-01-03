@@ -98,7 +98,7 @@ namespace Timbl {
     void TestInstance( const Instance& ,
 		       InstanceBase_base * = NULL,
 		       size_t = 0 );
-    void show_org_input( std::ostream & ) const;
+    std::string get_org_input( ) const;
     const ValueDistribution *ExactMatch( const Instance& ) const;
     void fillNeighborSet( neighborSet& ) const;
     void addToNeighborSet( neighborSet& ns, size_t n ) const;
