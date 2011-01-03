@@ -281,7 +281,7 @@ namespace Timbl {
 	os.setf(ios::showpoint);
 	os << "\t" << best->bestDistance;
 	os.precision(OldPrec);
-	if ( bA.maxBests < totalBests )
+	if ( bA.maxBests <= best->bestInstances.size() )
 	  os << " (only " << bA.maxBests << " shown)";
 	os << endl;
 	for ( unsigned int m=0; m < best->bestInstances.size(); ++m ){
