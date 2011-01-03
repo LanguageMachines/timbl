@@ -333,7 +333,7 @@ namespace Timbl {
     void clear();
     double ExemplarWeight() const { return sample_weight; }; 
     void ExemplarWeight( const double sw ){ sample_weight = sw; }; 
-    size_t size(){ return FV.size(); };
+    size_t size() const { return FV.size(); };
     std::vector<FeatureValue *> FV;
     void permute( const std::vector<size_t> );
     TargetValue *TV;
