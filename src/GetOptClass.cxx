@@ -265,7 +265,19 @@ namespace Timbl {
 	  optline = "BEAM_SIZE: " + toString<int>(BeamSize);
 	  Exp->SetOption( optline );
 	}
-	if ( threshold > 0 ){
+	if ( local_algo == TRIBL_a && threshold < 0 ){
+	  Error( "-q is missing for TRIBL algorithm" );
+	  return false;
+	}
+	if ( threshold >= 0 ){
+	  if ( local_algo != TRIBL_a ){
+	    Error( "-q option only valid for TRIBL algorithm" );	    
+	    return false;
+	  }
+	  if ( threshold == 0 ){
+	    Error( "invalid -q option. Must be > 0 " );	    
+	    return false;
+	  }
 	  optline = "TRIBL_OFFSET: " + toString<int>(threshold);
 	  Exp->SetOption( optline );
 	}
