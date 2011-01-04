@@ -198,12 +198,21 @@ namespace Timbl{
   double innerProduct( FeatureValue *FV,
 		       FeatureValue *G ) {
     double r1, r2, result;
+#ifdef DBGTEST
+    cerr << "innerproduct " << FV << " x " << G << endl;
+#endif
     if ( FV_to_real( FV, r1 ) &&
 	 FV_to_real( G, r2 ) ){
+#ifdef DBGTEST
+      cerr << "innerproduct " << r1 << " x " << r2 << endl;
+#endif
       result = r1 * r2;
     }
     else
       result = 0.0;
+#ifdef DBGTEST
+    cerr << " resultaat == " << result << endl;
+#endif
     return result;
   }
 
@@ -236,11 +245,19 @@ namespace Timbl{
       result = innerProduct( (*FV)[TrueF], G[i] );
       result *= permFeatures[TrueF]->Weight();
       distances[i+1] = distances[i] + result;
+#ifdef DBGTEST
+      cerr << "gewogen result " << result << endl;
+      cerr << "distance[" << i+1 << "]=" <<  distances[i+1] << endl;
+#endif
     }
     return effSize;
   }
 
   double SimilarityTester::getDistance( size_t pos ) const{
+#ifdef DBGTEST
+    cerr << "getDistance, maxSim = " << maxSimilarity << endl;
+    cerr << " distances[" << pos << "]= " <<  distances[pos] << endl;
+#endif
     return maxSimilarity - distances[pos];
   }
   
