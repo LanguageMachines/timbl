@@ -27,10 +27,11 @@
 #ifndef METRICS_H
 #define METRICS_H
 
-namespace Timbl{
-#include <climits> // for INT_MAX
+#include <limits> 
 
-  static const int maxSimilarity = INT_MAX;
+namespace Timbl{
+
+  static const double maxSimilarity = std::numeric_limits<double>::max();
   
   metricClass *getMetricClass( MetricType );
 
