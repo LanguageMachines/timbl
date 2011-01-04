@@ -352,10 +352,10 @@ namespace Timbl {
 	*myerr << "-" << exp_name << "-";
       *myerr << out_line << endl;
       if ( exp_name != "" )
-	*myerr << "Error:-" << exp_name << "-" << out_line
-		    << "stopped" << endl;
+	*myerr << "Error:-" << exp_name << "-" << out_line << endl
+	       << "stopped" << endl;
       else 
-	*myerr << "Error:-" << out_line << "stopped" << endl;
+	*myerr << "Error:-" << out_line << endl << "stopped" << endl;
       throw( "Stopped" );
     }
   }
