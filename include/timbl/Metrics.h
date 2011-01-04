@@ -31,7 +31,7 @@
 
 namespace Timbl{
 
-  static const double maxSimilarity = std::numeric_limits<double>::max();
+  extern const double maxSimilarity;
   
   metricClass *getMetricClass( MetricType );
 
