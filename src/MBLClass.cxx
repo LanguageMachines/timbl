@@ -1809,6 +1809,11 @@ namespace Timbl {
 	  bestArray.addResult( Distance, best_distrib, origI );
 
 	}
+	else if ( GlobalMetric->type() == DotProduct ){
+	  Error( "The Dot Product metric fails on your data: intermediate result too big to handle," );
+	  Info( "you might consider using the Cosine metric '-mC' " );
+	  FatalError( "timbl terminated" );
+	}
 	else {
 	  Error( "DISTANCE == " + toString<double>(Distance) );
 	  FatalError( "we are dead" );
