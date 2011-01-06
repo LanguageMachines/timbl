@@ -1,3 +1,10 @@
+6.3.2
+- fixed bug 44. Segfault in weird cases
+- fixed bug 45. Needless processing of traindata when required option is missing
+- fixed bug 46. Tribl2 sometimes fails to correctly output +v+k+n 
+- fixed bug 47. Uncleer erroe message when InnerProduct fails
+- several small uncritical enhancements
+
 6.3.1 - 2010-11-17
 - Little API change in TimblOptions (more clear i hope)
 - Little bug fixes and improvement (logging mostly)
