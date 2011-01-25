@@ -1272,7 +1272,7 @@ namespace Timbl {
       if ( !result ){
 	Warning( "Unable to retrieve " 
 		 + toString( wanted ) + " Weights" );
-	Warning( "unable to continue" );
+	Error( "unable to continue" );
 	return false;
       }
       // make shure all weights are correct

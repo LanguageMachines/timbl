@@ -793,8 +793,6 @@ int main(int argc, char *argv[]){
 	      if ( levelTreeOutFile != "" )
 		Run->WriteInstanceBaseLevels( levelTreeOutFile, 
 					      levelTreeLevel );
-	      //	      if ( XOutFile != "" )
-	      //		Run->WriteInstanceBaseXml( XOutFile );
 	    }
 	    else 
 	      do_test = false; // no testing because of problems
@@ -809,10 +807,12 @@ int main(int argc, char *argv[]){
       if ( do_test ){
 	Do_Test( Run );
       }
-      if ( XOutFile != "" )
-	Run->WriteInstanceBaseXml( XOutFile );
-      if ( MatrixOutFile != "" ) {
-	Run->WriteMatrices( MatrixOutFile );
+      if ( Run->Valid() ) {
+	if ( XOutFile != "" )
+	  Run->WriteInstanceBaseXml( XOutFile );
+	if ( MatrixOutFile != "" ) {
+	  Run->WriteMatrices( MatrixOutFile );
+	}
       }
       delete Run;
     }
