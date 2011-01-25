@@ -777,6 +777,7 @@ int main(int argc, char *argv[]){
 	       TreeOutFile != "" || // or at least to produce
 	       levelTreeOutFile != "" || // or at least to produce
 	       XOutFile != "" ){ // or at least to produce
+	    bool ok = true;
 	    if ( WgtInFile != "" ){
 	      if ( Run->GetWeights( WgtInFile, WgtType ) ){
 		cerr << "Calculated weights replaced by:" << endl;
@@ -784,10 +785,10 @@ int main(int argc, char *argv[]){
 	      }
 	      else {
 		cerr << "problems reading weights" << endl;
-		do_test = false;
+		ok = do_test = false;
 	      }
 	    }
-	    if ( Run->Learn( dataFile ) ){
+	    if ( ok && Run->Learn( dataFile ) ){
 	      if ( TreeOutFile != "" )
 		Run->WriteInstanceBase( TreeOutFile );
 	      if ( levelTreeOutFile != "" )
