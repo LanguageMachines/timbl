@@ -132,7 +132,7 @@ namespace Timbl {
     Options.Add( new IntegerOption( "MVD_LIMIT", 
 				    &mvd_threshold, 1, 1, 100000 ) );
     Options.Add( new SizeOption( "NEIGHBORS", 
-				 &num_of_neighbors, 1, 1, INT_MAX ) );
+				 &num_of_neighbors, 1, 1, 100000 ) );
     Options.Add( new IntegerOption( "PROGRESS", 
 				    &progress, 10000, 1, INT_MAX ) );
     if ( !Options.Add( new IntegerOption( "CLIP_FACTOR", 
