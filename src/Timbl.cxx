@@ -721,7 +721,7 @@ int main(int argc, char *argv[]){
     if ( !get_file_names( Opts ) )
       return 2;
     TimblAPI *Run = new TimblAPI( &Opts );
-    if ( !Run->Valid() ){
+    if ( !Run->isValid() ){
       delete Run;
       usage();
       return 3;
@@ -807,7 +807,7 @@ int main(int argc, char *argv[]){
       if ( do_test ){
 	Do_Test( Run );
       }
-      if ( Run->Valid() ) {
+      if ( Run->isValid() ) {
 	if ( XOutFile != "" )
 	  Run->WriteInstanceBaseXml( XOutFile );
 	if ( MatrixOutFile != "" ) {

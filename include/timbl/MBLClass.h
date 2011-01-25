@@ -46,9 +46,10 @@ namespace Timbl {
     void ResetVerbosityFlag( VerbosityFlags v ) { verbosity &= ~v; };
     bool MBLInit() const { return MBL_init; };
     void MBLInit( bool b ) { MBL_init = b; };
-    bool ExpInvalid() const { 
+    bool ExpInvalid( bool b = true ) const { 
       if ( err_count > 0 ){
-	InvalidMessage();
+	if ( b )
+	  InvalidMessage();
 	return true;
       }
       else

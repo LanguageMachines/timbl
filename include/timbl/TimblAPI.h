@@ -73,6 +73,7 @@ namespace Timbl{
     TimblAPI( const std::string&,  const std::string& = "" );
     TimblAPI( const TimblAPI& );
     ~TimblAPI();
+    bool isValid() const;
     bool Valid() const;
     bool StartServer( const int, const int=10 );
     bool StartMultiServer( const std::string& );

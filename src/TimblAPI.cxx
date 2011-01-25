@@ -176,6 +176,9 @@ namespace Timbl {
     return i_am_fine && pimpl && !pimpl->ExpInvalid();
   }
   
+  bool TimblAPI::isValid() const {
+    return i_am_fine && pimpl && !pimpl->ExpInvalid(false);
+  }  
   
   const string to_string( const Algorithm A ) {
     string result;
