@@ -1,5 +1,5 @@
 # $Id$
-# $URL: $
+# $URL$
 
 AM_CPPFLAGS = -I@top_srcdir@/include
 

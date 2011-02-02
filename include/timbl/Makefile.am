@@ -1,3 +1,6 @@
+#  $Id$
+#  $URL$
+
 pkginclude_HEADERS = CommandLine.h Common.h GetOptClass.h IBtree.h Matrices.h \
 	Instance.h MBLClass.h MsgClass.h BestArray.h \
 	StringOps.h TimblAPI.h Options.h \
