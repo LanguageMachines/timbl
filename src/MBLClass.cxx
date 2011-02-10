@@ -65,7 +65,7 @@ using namespace std;
 namespace Timbl {
 
   void MBLClass::fill_table(){
-    //    cerr << "fill table() for " << (void*)this << endl;
+    //cerr << "fill table() for " << (void*)this << endl;
     bool stat = 
       Options.Add( new IntegerOption( "FLENGTH",
 				      &F_length, 0, 1, 32 ) )
@@ -229,8 +229,8 @@ namespace Timbl {
       is_synced = false;
       MaxFeatures        = m.MaxFeatures;
       UserOptions.resize(MaxFeatures+1);
-      //      cerr << "do not call fill table() in assign" << endl;
-      //      fill_table();
+      //      cerr << "call fill table() in assign" << endl;
+      fill_table();
       F_length           = m.F_length;
       MaxBests           = m.MaxBests;
       TreeOrder          = m.TreeOrder;
