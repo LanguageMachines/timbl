@@ -855,7 +855,7 @@ namespace Timbl {
   void Feature::NumStatistics( double DBentropy, Target *Targets,
 			       int BinSize, bool full ){
     char dumname[80];
-    vector<FeatureValue *> FVBin(BinSize);;
+    vector<FeatureValue *> FVBin(BinSize);
     for ( int i=0; i < BinSize; ++i ){
       sprintf( dumname, "dum%d", i );
       FVBin[i] = new FeatureValue( dumname );
