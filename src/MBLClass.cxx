@@ -229,6 +229,7 @@ namespace Timbl {
       decay_flag         = m.decay_flag;
       input_format       = m.input_format;
       random_seed        = m.random_seed;
+      beamSize           = m.beamSize;
       decay_alfa         = m.decay_alfa;
       decay_beta         = m.decay_beta;
       normalisation      = m.normalisation;
