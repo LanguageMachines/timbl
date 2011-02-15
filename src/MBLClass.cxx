@@ -369,7 +369,7 @@ namespace Timbl {
 	       << "stopped" << endl;
       else 
 	*myerr << "Error:-" << out_line << endl << "stopped" << endl;
-      throw( "Stopped" );
+      throw( runtime_error("Stopped") );
     }
   }
     
