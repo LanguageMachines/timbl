@@ -40,6 +40,7 @@ namespace Timbl {
     void Increment( const TargetValue*, const TargetValue* );
     void Print( std::ostream&, const Target * ) const;
     void FScore( std::ostream&, const Target *, bool ) const;
+    void merge( const ConfusionMatrix * );
   };
   
   class StatisticsClass {
@@ -61,6 +62,7 @@ namespace Timbl {
     unsigned int tiedCorrect() const { return _tieOk; };
     unsigned int tiedFailure() const { return _tieFalse; };
     unsigned int exactMatches() const { return _exact; };
+    void merge( const StatisticsClass& );
   private:
     unsigned int _data;
     unsigned int _skipped;
