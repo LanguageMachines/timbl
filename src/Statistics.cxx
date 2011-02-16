@@ -56,8 +56,7 @@ namespace Timbl {
     }
     catch( bad_alloc ){
       Error ( "Not enough memory for ConfusionMatrix" );
-      throw;
-      
+      throw;      
     }
   }
   
@@ -236,6 +235,24 @@ namespace Timbl {
     os << "F-Score beta=1, macroav: " << maf << endl;
     os << "AUC, microav:            " << mia << endl;
     os << "AUC, macroav:            " << maa << endl;
+  }
+
+  void ConfusionMatrix::merge( const ConfusionMatrix *cm ){
+    if ( cm ){
+      for ( size_t i=0; i <= size; ++i )
+	for ( size_t j=0; j < size; ++j ){
+	  mat[i][j] += cm->mat[i][j];
+	}
+    }
+  }
+
+  void StatisticsClass::merge( const StatisticsClass& in ){
+    _data += in._data;
+    _skipped += in._skipped;
+    _correct += in._correct;
+    _tieOk += in._tieOk;
+    _tieFalse += in._tieFalse;
+    _exact += in._exact;
   }
   
 }
