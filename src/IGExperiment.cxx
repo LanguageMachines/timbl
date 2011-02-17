@@ -378,7 +378,10 @@ namespace Timbl {
     exact = false;
     bool Tie = false;
     initExperiment();
-    bestResult.reset( beamSize, normalisation, norm_factor, Targets );
+    if ( !bestResult.reset( beamSize, normalisation, norm_factor, Targets ) ){
+      Warning( "no normalisation possible because a BeamSize is specified\n"
+	       "output is NOT normalized!" );
+    }
     const TargetValue *TV = NULL;
     const ValueDistribution *ResultDist; 
     ResultDist = InstanceBase->IG_test( Inst, match_depth, last_leaf, TV );

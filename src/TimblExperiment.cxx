@@ -47,6 +47,7 @@
 
 #include <sys/time.h>
 
+#include "config.h"
 #include "timbl/MsgClass.h"
 #include "timbl/Common.h"
 #include "timbl/StringOps.h"
@@ -66,6 +67,10 @@
 #include "timbl/TimblExperiment.h"
 #include "timbl/XMLtools.h"
 
+#ifdef HAVE_OPENMP
+#include <omp.h>
+#endif
+
 namespace Timbl {
   using namespace std;
   using namespace Timbl;
@@ -74,19 +79,20 @@ namespace Timbl {
     clear();
   }
 
-  void resultStore::reset( int _beam, normType _norm, 
+  bool resultStore::reset( int _beam, normType _norm, 
 			   double _factor, const Target *_targets ) {
     clear();
     beam = _beam;
     norm = _norm;
     factor = _factor;
     targets = _targets;
+    bool result = true;
     if ( norm != noNorm &&
 	 beam != 0 ){
-      Warning( "no normalisation possible because a BeamSize is specified" );
-      Info( "output is NOT normalized!" );
       norm = noNorm;
+      result = false;
     }
+    return result;
   }
   
   void resultStore::clear( ) {
@@ -185,7 +191,8 @@ namespace Timbl {
     confusionInfo( 0 ),
     match_depth(-1),
     last_leaf(true),
-    estimate( 0 )
+    estimate( 0 ),
+    numOfThreads( 2 )
   {
     Weighting = GR_w;
   }
@@ -206,6 +213,7 @@ namespace Timbl {
       estimate = in.estimate;
       Weighting = in.Weighting;
       confusionInfo = 0;
+      numOfThreads = in.numOfThreads;
     }
     return *this;
   }
@@ -242,8 +250,9 @@ namespace Timbl {
 	stats.clear();
 	delete confusionInfo;
 	confusionInfo = 0;
-	if ( Verbosity(ADVANCED_STATS) )
+	if ( Verbosity(ADVANCED_STATS) ){
 	  confusionInfo = new ConfusionMatrix( Targets->ValuesArray.size() );
+	}
 	initDecay();
 	calculate_fv_entropy( true );
 	if ( ib2_offset != 0 ){
@@ -289,15 +298,23 @@ namespace Timbl {
   }
   
   bool TimblExperiment::nextLine( istream& datafile, string& Line ){
+    int dummy;
+    return nextLine( datafile, Line, dummy );
+  }
+
+  bool TimblExperiment::nextLine( istream& datafile, string& Line, int& cnt ){
     // Function that takes a line from a file, skipping comment
     // returns true if some line is found
     //
     bool found = false;
+    cnt = 0;
     while ( !found && getline( datafile, Line ) ){
+      ++cnt;
       if ( empty_line( Line, InputFormat() ) ){
 	stats.addSkipped();
 	continue;
-      } else 
+      } 
+      else 
 	found = true;
     }
     return found;
@@ -313,7 +330,7 @@ namespace Timbl {
       return true;
     }
   }
-
+  
   /*
     First learning Phase:
     Learning of the names of the FeatureValues and TargetValues
@@ -814,7 +831,8 @@ namespace Timbl {
     os << endl << endl;
   }
   
-  void TimblExperiment::show_progress( ostream& os,time_t start ){
+  void TimblExperiment::show_progress( ostream& os, 
+				       time_t start, unsigned int line ){
     char time_string[26];
     struct tm *curtime;
     time_t Time;
@@ -822,7 +840,6 @@ namespace Timbl {
     time_t EstimatedTime;
     double Estimated;
     int local_progress = Progress();
-    unsigned int line = stats.dataLines();
     if ( ( (line % local_progress ) == 0) || ( line <= 10 ) ||
 	 ( line == 100 || line == 1000 || line == 10000 ) ){
       time(&Time);
@@ -1484,7 +1501,10 @@ namespace Timbl {
     bool recurse = true;
     bool Tie = false; 
     exact = false;
-    bestResult.reset( beamSize, normalisation, norm_factor, Targets );
+    if ( !bestResult.reset( beamSize, normalisation, norm_factor, Targets ) ){
+      Warning( "no normalisation possible because a BeamSize is specified\n"
+	       "output is NOT normalized!" );
+    }
     const ValueDistribution *ExResultDist = ExactMatch( Inst );
     WValueDistribution *ResultDist = 0;
     nSet.clear();
@@ -1538,8 +1558,9 @@ namespace Timbl {
     }
     if ( exact )
       stats.addExact();
-    if ( confusionInfo )
+    if ( confusionInfo ){
       confusionInfo->Increment( Inst.TV, Res );
+    }
     bool correct = Inst.TV && ( Res == Inst.TV );
     if ( correct ){
       stats.addCorrect();
@@ -1589,20 +1610,7 @@ namespace Timbl {
     }
     return result;
   }
-  
-  bool TimblExperiment::LocalTest( const Instance& Inst, ostream& outfile ){
-    double final_distance = 0.0;
-    bool exact = false;
-    const TargetValue *ResultTarget = LocalClassify( Inst, 
-						     final_distance,
-						     exact );
-    normalizeResult();
-    string dString = bestResult.getResult();
-    // Write it to the output file for later analysis.
-    show_results( outfile, dString, ResultTarget, final_distance );
-    return exact;
-  }
-  
+    
   void TimblExperiment::show_metric_info( ostream& os ) const {
     os << "Global metric : " << toString( globalMetricOption, true);
     if ( GlobalMetric->isStorable() ){
@@ -1688,6 +1696,110 @@ namespace Timbl {
     }
   }
 
+  class threadData {
+  public:
+    threadData():exp(0), lineNo(0), resultTarget(0), 
+		 exact(false), distance(-1){};
+    bool exec();
+    void show( ostream& ) const;
+    TimblExperiment *exp;
+    string Buffer;
+    unsigned int lineNo;
+    const TargetValue *resultTarget;
+    bool exact;
+    string distrib;
+    double distance;
+  };
+
+  bool threadData::exec(){
+    resultTarget = 0;
+// #pragma omp critical
+//     cerr << "exec " << lineNo << " '" << Buffer << "'" << endl;
+    if ( Buffer.empty() ){
+      return false;
+    }
+    if ( !exp->chopLine( Buffer ) ){
+      exp->Warning( "testfile, skipped line #" + 
+		    toString<int>( lineNo ) +
+		    "\n" + Buffer );
+      return false;
+    }
+    else {
+      exp->chopped_to_instance( TimblExperiment::TestWords );
+      exact = false;
+      resultTarget = exp->LocalClassify( exp->CurrInst,
+					 distance,
+					 exact );
+      exp->normalizeResult();
+      distrib = exp->bestResult.getResult();
+      return true;
+    }
+  }
+
+  void threadData::show( ostream& os ) const {
+    if ( resultTarget != 0 ){
+      exp->show_results( os, distrib, resultTarget, distance );
+      if ( exact ){ // remember that a perfect match may be incorrect!
+	if ( exp->Verbosity(EXACT) ) {
+	  *exp->mylog << "Exacte match:\n" << exp->get_org_input() << endl;
+	}
+      }
+    }
+  }
+
+  class threadBlock {
+  public:
+    threadBlock( TimblExperiment *, int = 1 );
+    unsigned int lineCount() const { return _lineCount; };
+    bool readLines( istream& );
+    bool exec( int i ) { return exps[i].exec(); };
+    void show( int i, ostream& os ) { exps[i].show( os ); };
+    void finalize();
+  private:
+    size_t size;
+    unsigned int _lineCount;
+    vector<threadData> exps;
+  };
+
+  threadBlock::threadBlock( TimblExperiment *parent, int num ){
+    if ( num <= 0 )
+      throw range_error( "threadBlock size cannot be <=0" );
+    size = num;
+    exps.resize( size );
+    exps[0].exp = parent;
+    for ( int i = 1; i < size; ++i ){
+      exps[i].exp = parent->clone();
+      *exps[i].exp = *parent;
+      exps[i].exp->initExperiment();
+    };
+    _lineCount = 0;
+  }
+
+  bool threadBlock::readLines( istream& is  ){
+    bool result = true;
+    bool goon = true;
+    for ( int i=0; i < size; ++i ){
+      exps[i].Buffer = "";
+      int cnt;
+      goon = exps[0].exp->nextLine( is, exps[i].Buffer, cnt );
+      _lineCount += cnt;
+      exps[i].lineNo = _lineCount;
+      if ( !goon && i == 0 )
+	result = false;
+    }
+    return result;
+  }
+
+  void threadBlock::finalize(){
+    for ( int i=1; i < size; ++i ){
+      exps[0].exp->stats.merge( exps[i].exp->stats );
+      if ( exps[0].exp->confusionInfo ){
+	exps[0].exp->confusionInfo->merge( exps[i].exp->confusionInfo );
+      }
+      delete exps[i].exp;
+    }
+  }
+
   bool TimblExperiment::Test( const string& FileName,
 			      const string& OutFile ){
     bool result = false;
@@ -1695,6 +1807,12 @@ namespace Timbl {
       initExperiment();
       stats.clear();
       showTestingInfo( *mylog );
+#ifdef HAVE_OPENMP
+      if ( numOfThreads > 1 ){
+	omp_set_num_threads( numOfThreads );
+      }
+#endif
+      threadBlock experiments( this, numOfThreads );
       // Start time.
       //
       time_t lStartTime;
@@ -1703,26 +1821,45 @@ namespace Timbl {
       gettimeofday( &startTime, 0 );
       if ( InputFormat() == ARFF )
 	skipARFFHeader( testStream );
-      string Buffer;
-      while ( nextLine( testStream, Buffer ) ){
-	if ( !chopLine( Buffer ) ) {
-	  Warning( "testfile, skipped line #" + 
-		   toString<int>( stats.totalLines() ) +
-		   "\n" + Buffer );
+      unsigned int dataCount = 0;
+      while ( experiments.readLines( testStream ) ){
+#ifdef HAVE_OPENMP
+	if ( numOfThreads > 1 ){
+#pragma omp parallel for shared( experiments, dataCount )
+	  for ( int i=0; i < numOfThreads; ++i ){
+	    if ( experiments.exec( i ) &&
+		 !Verbosity(SILENT) )
+	      // Display progress counter.
+#pragma omp critical
+	      show_progress( *mylog, lStartTime, ++dataCount );
+	  }
+	  
+	  for ( int i=0; i < numOfThreads; ++i ){
+	    // Write it to the output file for later analysis.
+	    experiments.show( i, outStream );
+	  }
 	}
 	else {
-	  chopped_to_instance( TestWords );
-	  bool exact = LocalTest( CurrInst, outStream );
-	  if ( exact ){ // remember that a perfect match may be incorrect!
-	    if ( Verbosity(EXACT) ) {
-	      *mylog << "Exacte match:\n" << get_org_input() << endl;
-	    }
-	  }
-	  if ( !Verbosity(SILENT) )
+	  if ( experiments.exec( 0 ) &&
+	       !Verbosity(SILENT) ){
 	    // Display progress counter.
-	    show_progress( *mylog, lStartTime );
+#pragma omp critical
+	    show_progress( *mylog, lStartTime, ++dataCount );
+	  }
+	  // Write it to the output file for later analysis.
+	  experiments.show( 0, outStream );
 	}
-      }// end while.
+#else
+	if ( experiments.exec( 0 ) &&
+	     !Verbosity(SILENT) ){
+	  // Display progress counter.
+	  show_progress( *mylog, lStartTime, ++dataCount );
+	}
+	// Write it to the output file for later analysis.
+	experiments.show( 0, outStream );
+#endif
+      }
+      experiments.finalize();
       if ( !Verbosity(SILENT) ){
 	time_stamp( "Ready:  ", stats.dataLines() );
 	show_speed_summary( *mylog, startTime );
@@ -1767,7 +1904,7 @@ namespace Timbl {
 	  outStream << get_org_input() << endl << *res;
 	  if ( !Verbosity(SILENT) )
 	    // Display progress counter.
-	    show_progress( *mylog, lStartTime );
+	    show_progress( *mylog, lStartTime, stats.dataLines() );
 	}
       }// end while.
       if ( !Verbosity(SILENT) ){

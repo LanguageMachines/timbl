@@ -70,6 +70,7 @@ namespace Timbl {
     int estimate;
     int maxbests;
     int clip_freq;
+    int clones;
     int BinSize;
     int BeamSize;
     int bootstrap_lines;

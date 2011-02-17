@@ -137,14 +137,22 @@ namespace Timbl {
 	else {
 	  chopped_to_instance( TestWords );
 	  Decrement( CurrInst );
-	  bool exact = LocalTest( CurrInst, outStream );
+	  double final_distance = 0.0;
+	  bool exact = false;
+	  const TargetValue *ResultTarget = LocalClassify( CurrInst, 
+							   final_distance,
+							   exact );
+	  normalizeResult();
+	  string dString = bestResult.getResult();
+	  // Write it to the output file for later analysis.
+	  show_results( outStream, dString, ResultTarget, final_distance );
 	  if ( exact ){ // remember that a perfect match may be incorrect!
 	    if ( Verbosity(EXACT) ) {
 	      *mylog << "Exacte match:\n" << get_org_input() << endl;
 	    }
 	  }
 	  // Display progress counter.
-	  show_progress( *mylog, lStartTime );
+	  show_progress( *mylog, lStartTime, stats.dataLines() );
 	  Increment( CurrInst );
 	}
       }// end while.

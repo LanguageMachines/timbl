@@ -48,7 +48,7 @@ namespace Timbl {
   public:
   resultStore(): dist(0), disposable(false), isTop(false), beam(0) {};
     ~resultStore();
-    void reset( int, normType, double, const Target * );
+    bool reset( int, normType, double, const Target * );
     void clear();
     void addConstant( const ValueDistribution * );
     void addTop( const ValueDistribution * );
@@ -84,6 +84,8 @@ namespace Timbl {
 
   class TimblExperiment: public MBLClass {
     friend class TimblAPI;
+    friend class threadData;
+    friend class threadBlock;
   public:
     virtual ~TimblExperiment();
     virtual TimblExperiment *clone() const = 0;
@@ -114,6 +116,8 @@ namespace Timbl {
     virtual bool Learn( const std::string& = "" );
     int Estimate() const { return estimate; };
     void Estimate( int e ){ estimate = e; };
+    int Clones() const { return numOfThreads; };
+    void Clones( int cl ) { numOfThreads = cl; };
     void setOutPath( const std::string& s ){ outPath = s; };
     TimblExperiment *CreateClient( int  ) const;
     TimblExperiment *splitChild() const;
@@ -181,7 +185,6 @@ namespace Timbl {
     
     const neighborSet *NB_Classify( const std::string& );
     
-    bool LocalTest( const Instance& , std::ostream& );    
     virtual void initExperiment( bool = false );
     
   protected:
@@ -191,7 +194,6 @@ namespace Timbl {
     virtual const TargetValue *LocalClassify( const Instance& , 
 					      double&,
 					      bool& );
-    
     virtual bool GetInstanceBase( std::istream& ) = 0;
     virtual void showTestingInfo( std::ostream& );
     virtual bool checkTestFile();
@@ -206,10 +208,11 @@ namespace Timbl {
 		       size_t = 0 );
     void normalizeResult();
     const neighborSet *LocalClassify( const Instance&  );
+    bool nextLine( std::istream &, std::string&, int& );
     bool nextLine( std::istream &, std::string& );
     bool skipARFFHeader( std::istream & );
     
-    void show_progress( std::ostream& os, time_t );
+    void show_progress( std::ostream& os, time_t, unsigned int );
     bool createPercFile( const std::string& = "" ) const;
     
     void show_speed_summary( std::ostream& os,
@@ -244,6 +247,7 @@ namespace Timbl {
   private:
     TimblExperiment( const TimblExperiment& );
     int estimate;
+    int numOfThreads;
     const TargetValue *classifyString( const std::string& , double& );
   }; 
 

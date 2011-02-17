@@ -66,6 +66,7 @@ namespace Timbl {
     BinSize = 0;
     BeamSize = 0;
     clip_freq = 10;
+    clones = 1;
     bootstrap_lines = -1;
     local_progress = 100000;
     seed = -1;
@@ -140,6 +141,7 @@ namespace Timbl {
     estimate( in.estimate ),
     maxbests( in.maxbests ),
     clip_freq( in.clip_freq ),
+    clones( in.clones ),
     BinSize( in.BinSize ),
     BeamSize( in.BeamSize ),
     bootstrap_lines( in.bootstrap_lines ),
@@ -296,6 +298,8 @@ namespace Timbl {
 	  Exp->setOutPath( outPath );
 	}
       }
+      if ( clones > 0 )
+	Exp->Clones( clones );
       if ( estimate < 10 )
 	Exp->Estimate( 0 );
       else
@@ -774,10 +778,22 @@ namespace Timbl {
 	  break;
 	
       case 'c':
-	clip_freq = stringTo<int>( myoptarg );
-	if ( clip_freq < 0 ){
-	  Error( "illegal value for -c option: " + myoptarg );
-	  return false;
+	if ( longOpt ){
+	  if ( long_option == "clones" ){
+	    clones = stringTo<int>( myoptarg );
+	    if ( clones <= 0 ){
+	      Error( "invalid value for " + long_option + ": '" 
+		     + myoptarg + "'" );
+	      return false;
+	    }
+	  }
+	}
+	else {
+	  clip_freq = stringTo<int>( myoptarg );
+	  if ( clip_freq < 0 ){
+	    Error( "illegal value for -c option: " + myoptarg );
+	    return false;
+	  }
 	}
 	break;
 	

@@ -1684,6 +1684,7 @@ namespace Timbl {
     // Target at the last matching position in the Tree, 
     // or the subtree Instance Base necessary for IB1
     IBtree *pnt = InstBase;
+#pragma omp critical
     AssignDefaults( treshold );
     TV = NULL;
     dist = NULL;
@@ -1733,6 +1734,7 @@ namespace Timbl {
     // the subtree Instance Base necessary for IB1
     IBtree *pnt = InstBase;
     dist = NULL;
+#pragma omp critical
     AssignDefaults();
     int pos = 0;
     IB_InstanceBase *subtree = NULL;

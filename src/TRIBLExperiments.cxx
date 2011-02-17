@@ -108,7 +108,10 @@ namespace Timbl {
     const TargetValue *Res = NULL;
     bool Tie = false;
     exact = false;
-    bestResult.reset( beamSize, normalisation, norm_factor, Targets );
+    if ( !bestResult.reset( beamSize, normalisation, norm_factor, Targets ) ){
+      Warning( "no normalisation possible because a BeamSize is specified\n"
+	       "output is NOT normalized!" );
+    }
     const ValueDistribution *ExResultDist = ExactMatch( Inst );
     if ( ExResultDist ){
       Distance = 0.0;
@@ -208,7 +211,10 @@ namespace Timbl {
 						       bool& exact ){
     const TargetValue *Res = NULL;
     exact = false;
-    bestResult.reset( beamSize, normalisation, norm_factor, Targets );
+    if ( !bestResult.reset( beamSize, normalisation, norm_factor, Targets ) ){
+      Warning( "no normalisation possible because a BeamSize is specified\n"
+	       "output is NOT normalized!" );
+    }
     bool Tie = false;
     const ValueDistribution *ExResultDist = ExactMatch( Inst );
     if ( ExResultDist ){
