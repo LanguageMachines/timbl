@@ -4,7 +4,7 @@
 # $URL $
 
 AC_PREREQ(2.61)
-AC_INIT([Timbl],[6.3.3],[timbl@uvt.nl])
+AC_INIT([Timbl],[6.3.4],[timbl@uvt.nl])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_MACRO_DIR([m4])
@@ -60,7 +60,7 @@ AC_FUNC_MALLOC
 AC_CHECK_FUNCS([floor gettimeofday localtime_r pow rint sqrt strchr])
 
 OPENMP_CHECK( [CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
-	       AC_DEFINE(HAVE_OPENMP, 1 , we have OpenMP )],
+	       AC_DEFINE(HAVE_OPENMP, 1 , Define to 1 if you have OpenMP )],
 	      [AC_MSG_NOTICE(We don't have OpenMP. Multithreaded testing is disabled)] )
 	      
 ACX_PTHREAD([],[AC_MSG_ERROR([We need pthread support!])])
