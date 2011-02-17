@@ -65,6 +65,10 @@ using namespace std;
 namespace Timbl {
 
   void MBLClass::fill_table(){
+    if ( tableFilled )
+      return;
+    else
+      tableFilled = true;
     //cerr << "fill table() for " << (void*)this << endl;
     bool stat = 
       Options.Add( new IntegerOption( "FLENGTH",
@@ -193,6 +197,7 @@ namespace Timbl {
     Targets   = NULL;
     err_count = 0;
     MBL_init = false;
+    tableFilled = false;
     need_all_weights = false;
     InstanceBase = NULL;
     TargetStrings = NULL;
@@ -220,6 +225,7 @@ namespace Timbl {
   }
 
   MBLClass::MBLClass( const string& name ){
+    tableFilled = false;
     exp_name = name;
   }
 
@@ -241,6 +247,7 @@ namespace Timbl {
       decay_alfa         = m.decay_alfa;
       decay_beta         = m.decay_beta;
       normalisation      = m.normalisation;
+      norm_factor        = m.norm_factor;
       do_sample_weighting = m.do_sample_weighting;
       do_ignore_samples  = m.do_ignore_samples;
       no_samples_test    = m.no_samples_test;
@@ -327,21 +334,27 @@ namespace Timbl {
   
   
   void MBLClass::Info( const string& out_line ) const {
-    // Info NEVER to socket !
-    if ( exp_name != "" )
-      *mylog << "-" << exp_name << "-" << out_line << endl;
-    else
-      *mylog << out_line << endl;
+#pragma omp critical
+    {
+      // Info NEVER to socket !
+      if ( exp_name != "" )
+	*mylog << "-" << exp_name << "-" << out_line << endl;
+      else
+	*mylog << out_line << endl;
+    }
   }
   
   void MBLClass::Warning( const string& out_line ) const {
-    if ( sock_os )
-      *sock_os << "ERROR { " << out_line << " }" << endl;
-    else {
-      if ( exp_name != "" )
-	*myerr << "Warning:-" << exp_name << "-" << out_line << endl;
-      else 
+#pragma omp critical
+    {
+      if ( sock_os )
+	*sock_os << "ERROR { " << out_line << " }" << endl;
+      else {
+	if ( exp_name != "" )
+	  *myerr << "Warning:-" << exp_name << "-" << out_line << endl;
+	else 
 	*myerr << "Warning:" << out_line << endl;
+      }
     }
   }
   
@@ -896,7 +909,7 @@ namespace Timbl {
     //	Features[j]->store_matrix( mvd_threshold );
     //      }
     //    } // j
-    if ( Verbosity(VD_MATRIX) ) 
+    if ( Verbosity(VD_MATRIX) && !is_copy ) 
       for ( size_t i = 0; i < num_of_features; ++i )
 	if ( !Features[i]->Ignore() ){
 	  bool dummy;
@@ -1301,7 +1314,7 @@ namespace Timbl {
     }
     return true;
   }
-  
+
   void MBLClass::calculate_fv_entropy( bool always ){
     bool realy_first =  DBEntropy < 0.0;
     if ( always || realy_first ){
@@ -1433,7 +1446,7 @@ namespace Timbl {
 	    ostr1 << ff+1;
 	}
       }
-      if ( !first  ){
+      if ( !first && !is_copy ){
 	Warning( ostr1.str() );
       }
       first = true;
