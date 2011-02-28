@@ -62,7 +62,9 @@ AC_CHECK_FUNCS([floor gettimeofday localtime_r pow rint sqrt strchr])
 OPENMP_CHECK( [CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
 	       AC_DEFINE(HAVE_OPENMP, 1 , Define to 1 if you have OpenMP )],
 	      [AC_MSG_NOTICE(We don't have OpenMP. Multithreaded testing is disabled)] )
-	      
+
+AC_SUBST([OPENMPFLAGS],[$OPENMP_CXXFLAGS])
+
 ACX_PTHREAD([],[AC_MSG_ERROR([We need pthread support!])])
 
 if test x"$acx_pthread_ok" = xyes; then
