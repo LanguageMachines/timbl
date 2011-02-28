@@ -10,11 +10,6 @@ AC_CONFIG_SRCDIR([.])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADER([config.h])
 
-# AC_DEFINE_DIR is defined in acinclude.m4
-AC_DEFINE_DIR([BIN_PATH], bindir, bindir)
-AC_DEFINE_DIR([SYSCONF_PATH], sysconfdir, sysconfdir)
-AC_DEFINE_DIR([LOCALSTATE_PATH], localstatedir, localstatedir)
-
 if test x"${CXXFLAGS+set}" = xset; then
   # the user set CXXFLAGS; don't override it.
   cxx_flags_were_set=true
