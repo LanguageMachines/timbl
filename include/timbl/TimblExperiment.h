@@ -82,6 +82,8 @@ namespace Timbl {
   std::ostream& operator<< ( std::ostream&, const fileIndex& );
   std::ostream& operator<< ( std::ostream&, const fileDoubleIndex& );
 
+  class threadData;
+
   class TimblExperiment: public MBLClass {
     friend class TimblAPI;
     friend class threadData;
@@ -188,6 +190,7 @@ namespace Timbl {
     virtual void initExperiment( bool = false );
     
   protected:
+    void runExp( threadData&, unsigned int&, const time_t&  );
     TimblExperiment( const AlgorithmType, const std::string& = "" );
     virtual bool checkLine( const std::string& );
     virtual bool ClassicLearn( const std::string& = "" );

@@ -192,7 +192,7 @@ namespace Timbl {
     match_depth(-1),
     last_leaf(true),
     estimate( 0 ),
-    numOfThreads( 2 )
+    numOfThreads( 1 )
   {
     Weighting = GR_w;
   }
@@ -1874,80 +1874,58 @@ namespace Timbl {
 #else
   class threadData {
   public:
-    threadData( ):exp(0), is(0), os(0), resultTarget(0), 
-		  exact(false), distance(-1){};
+    threadData( ):exp(0), is(0), os(0){};
     ~threadData() { delete is; };
-    bool exec();
-    bool readLine( );
-    void show() const;
+    bool exec( const string& );
+    bool readLine( string& );
     TimblExperiment *exp;
     istream *is;
     ostream *os;
-    string Buffer;
-    const TargetValue *resultTarget;
-    bool exact;
-    string distrib;
-    double distance;
   };
 
-  bool threadData::readLine( ){
-    resultTarget = 0;
+  bool threadData::readLine( string& Buffer ){
     Buffer = "";
     exp->nextLine( *is, Buffer );
     return !Buffer.empty();
   }
   
-  bool threadData::exec(){
-    resultTarget = 0;
-    if ( Buffer.empty() ){
-      return false;
-    }
+  bool threadData::exec( const string& Buffer ){
     if ( !exp->chopLine( Buffer ) ){
       exp->Warning( "testfile, skipped erroneous line:\n" + Buffer );
       return false;
     }
     else {
       exp->chopped_to_instance( TimblExperiment::TestWords );
-      exact = false;
-      resultTarget = exp->LocalClassify( exp->CurrInst,
-					 distance,
-					 exact );
+      bool exact = false;
+      string distrib;
+      double distance;
+      const TargetValue *resultTarget = exp->LocalClassify( exp->CurrInst,
+							    distance,
+							    exact );
       exp->normalizeResult();
       distrib = exp->bestResult.getResult();
-      return true;
-    }
-  }
-
-  void threadData::show( ) const {
-    if ( resultTarget != 0 ){
-      exp->show_results( *os, distrib, resultTarget, distance );
-      if ( exact ){ // remember that a perfect match may be incorrect!
-	if ( exp->Verbosity(EXACT) ) {
-	  *exp->mylog << "Exacte match:\n" << exp->get_org_input() << endl;
+      if ( resultTarget != 0 ){
+	exp->show_results( *os, distrib, resultTarget, distance );
+	if ( exact ){ // remember that a perfect match may be incorrect!
+	  if ( exp->Verbosity(EXACT) ) {
+	    *exp->mylog << "Exacte match:\n" << exp->get_org_input() << endl;
+	  }
 	}
       }
+      return true;
     }
   }
 
   class threadBlock {
   public:
     threadBlock( TimblExperiment * );
-    bool init( int );
-    bool readLine( int i ) { return exps[i].readLine(); };
-    bool exec( int i ) { return exps[i].exec(); };
-    void show( int i ) { exps[i].show( ); };
     void finalize();
-  private:
-    size_t size;
-    TimblExperiment *_parent;
     vector<threadData> exps;
+  private:
+    TimblExperiment *_parent;
   };
 
-  threadBlock::threadBlock( TimblExperiment *exp ): _parent( exp ){
-    size = -1;
-  }
-
-  bool splitFile( const string& fn, vector<threadData>& exps ){
+  bool splitFiles( const string& fn, vector<threadData>& exps ){
     int cnt=0;
     string line;
     ifstream is( fn.c_str() );
@@ -1986,29 +1964,25 @@ namespace Timbl {
     }
     else
       return false;
-  }
-  
-  bool threadBlock::init( int num ){
-    if ( num <= 0 )
-      throw range_error( "threadBlock size cannot be <=0" );
-    size = num;
-    exps.resize( size );
-    for ( int i = 0; i < size; ++i ){
+  }  
+
+  threadBlock::threadBlock( TimblExperiment *exp ): _parent( exp ){
+    int num = _parent->numOfThreads;
+    exps.resize( num );
+    for ( int i = 0; i < num; ++i ){
       exps[i].exp = _parent->clone();
       *exps[i].exp = *_parent;
       exps[i].exp->initExperiment();
     };
-    if ( !splitFile( _parent->testStreamName, exps ) ){
+    if ( !splitFiles( _parent->testStreamName, exps ) ){
       throw runtime_error( "unable to split file " +  _parent->testStreamName );
     }
   }
+
   
   void threadBlock::finalize(){
-    if ( size < 1 ){
-      throw logic_error( "threadBlock not initialized" );
-    }
     string command = "cat ";
-    for ( int i=0; i < size; ++i ){
+    for ( int i=0; i < exps.size(); ++i ){
       _parent->stats.merge( exps[i].exp->stats );
       if ( _parent->confusionInfo ){
 	_parent->confusionInfo->merge( exps[i].exp->confusionInfo );
@@ -2022,6 +1996,17 @@ namespace Timbl {
       throw runtime_error( "system() command failed:" + command );
   }
 
+  void TimblExperiment::runExp( threadData& exp, unsigned int& dataCount,
+				const time_t& lStartTime ){
+    string line;
+    while ( exp.readLine( line ) ){
+      if ( exp.exec( line ) && !Verbosity(SILENT) )
+	// Display progress counter.
+#pragma omp critical
+	show_progress( *mylog, lStartTime, ++dataCount );
+    }
+  }
+
   bool TimblExperiment::Test( const string& FileName,
 			      const string& OutFile ){
     bool result = false;
@@ -2029,11 +2014,6 @@ namespace Timbl {
       initExperiment();
       stats.clear();
       showTestingInfo( *mylog );
-      if ( numOfThreads > 1 ){
-	omp_set_num_threads( numOfThreads );
-      }
-      threadBlock experiments( this );
-      experiments.init( numOfThreads );
       // Start time.
       //
       time_t lStartTime;
@@ -2042,19 +2022,48 @@ namespace Timbl {
       gettimeofday( &startTime, 0 );
       if ( InputFormat() == ARFF )
 	skipARFFHeader( testStream );
-      unsigned int dataCount = 0;
-#pragma omp parallel for ordered shared( experiments, dataCount )
-      for ( int i=0; i < numOfThreads; ++i ){
-	while ( experiments.readLine( i )){
-	  if ( experiments.exec( i ) &&
-	       !Verbosity(SILENT) )
-	    // Display progress counter.
-#pragma omp critical
-	    show_progress( *mylog, lStartTime, ++dataCount );
-	  experiments.show( i );
+#ifdef HAVE_OPENMP
+      if ( numOfThreads > 1 ){
+	threadBlock experiments( this );
+	unsigned int dataCount = 0;
+#pragma omp parallel for num_threads( numOfThreads ) shared( experiments, dataCount) private( lStartTime )
+	for ( int i=0; i < numOfThreads; ++i ){
+	  runExp( experiments.exps[i], dataCount, lStartTime );
 	}
+	experiments.finalize();
       }
-      experiments.finalize();
+      else 
+#endif
+	{
+	  string Buffer;
+	  while ( nextLine( testStream, Buffer ) ){
+	    if ( !chopLine( Buffer ) ) {
+	      Warning( "testfile, skipped line #" + 
+		       toString<int>( stats.totalLines() ) +
+		       "\n" + Buffer );
+	    }
+	    else {
+	      chopped_to_instance( TestWords );
+	      bool exact = false;
+	      string distrib;
+	      double distance;
+	      const TargetValue *resultTarget = LocalClassify( CurrInst,
+							       distance,
+							       exact );
+	      normalizeResult();
+	      distrib = bestResult.getResult();
+	      show_results( outStream, distrib, resultTarget, distance );
+	      if ( exact ){ // remember that a perfect match may be incorrect!
+		if ( Verbosity(EXACT) ) {
+		  *mylog << "Exacte match:\n" << get_org_input() << endl;
+		}
+	      }
+	      if ( !Verbosity(SILENT) )
+		// Display progress counter.
+		show_progress( *mylog, lStartTime, stats.dataLines() );
+	    }
+	  }
+	}
       if ( !Verbosity(SILENT) ){
 	time_stamp( "Ready:  ", stats.dataLines() );
 	show_speed_summary( *mylog, startTime );
