@@ -1696,8 +1696,6 @@ namespace Timbl {
     }
   }
 
-#define OLD_OPENMP_ATTEMPT
-#ifdef OLD_OPENMP_ATTEMPT
   class threadData {
   public:
     threadData():exp(0), lineNo(0), resultTarget(0), 
@@ -1752,15 +1750,11 @@ namespace Timbl {
   class threadBlock {
   public:
     threadBlock( TimblExperiment *, int = 1 );
-    unsigned int lineCount() const { return _lineCount; };
     bool readLines( istream& );
-    bool exec( int i ) { return exps[i].exec(); };
-    void show( int i, ostream& os ) { exps[i].show( os ); };
     void finalize();
+    vector<threadData> exps;
   private:
     size_t size;
-    unsigned int _lineCount;
-    vector<threadData> exps;
   };
 
   threadBlock::threadBlock( TimblExperiment *parent, int num ){
@@ -1774,7 +1768,6 @@ namespace Timbl {
       *exps[i].exp = *parent;
       exps[i].exp->initExperiment();
     };
-    _lineCount = 0;
   }
 
   bool threadBlock::readLines( istream& is  ){
@@ -1784,8 +1777,7 @@ namespace Timbl {
       exps[i].Buffer = "";
       int cnt;
       goon = exps[0].exp->nextLine( is, exps[i].Buffer, cnt );
-      _lineCount += cnt;
-      exps[i].lineNo = _lineCount;
+      exps[i].lineNo += cnt;
       if ( !goon && i == 0 )
 	result = false;
     }
@@ -1802,6 +1794,7 @@ namespace Timbl {
     }
   }
 
+#ifdef HAVE_OPENMP
   bool TimblExperiment::Test( const string& FileName,
 			      const string& OutFile ){
     bool result = false;
@@ -1809,11 +1802,9 @@ namespace Timbl {
       initExperiment();
       stats.clear();
       showTestingInfo( *mylog );
-#ifdef HAVE_OPENMP
       if ( numOfThreads > 1 ){
 	omp_set_num_threads( numOfThreads );
       }
-#endif
       threadBlock experiments( this, numOfThreads );
       // Start time.
       //
@@ -1823,13 +1814,12 @@ namespace Timbl {
       gettimeofday( &startTime, 0 );
       if ( InputFormat() == ARFF )
 	skipARFFHeader( testStream );
-      unsigned int dataCount = 0;
+      unsigned int dataCount = stats.dataLines();
       while ( experiments.readLines( testStream ) ){
-#ifdef HAVE_OPENMP
 	if ( numOfThreads > 1 ){
 #pragma omp parallel for shared( experiments, dataCount )
 	  for ( int i=0; i < numOfThreads; ++i ){
-	    if ( experiments.exec( i ) &&
+	    if ( experiments.exps[i].exec() &&
 		 !Verbosity(SILENT) )
 	      // Display progress counter.
 #pragma omp critical
@@ -1838,28 +1828,18 @@ namespace Timbl {
 	  
 	  for ( int i=0; i < numOfThreads; ++i ){
 	    // Write it to the output file for later analysis.
-	    experiments.show( i, outStream );
+	    experiments.exps[i].show( outStream );
 	  }
 	}
 	else {
-	  if ( experiments.exec( 0 ) &&
+	  if ( experiments.exps[0].exec() &&
 	       !Verbosity(SILENT) ){
 	    // Display progress counter.
-#pragma omp critical
 	    show_progress( *mylog, lStartTime, ++dataCount );
 	  }
 	  // Write it to the output file for later analysis.
-	  experiments.show( 0, outStream );
+	  experiments.exps[0].show( outStream );
 	}
-#else
-	if ( experiments.exec( 0 ) &&
-	     !Verbosity(SILENT) ){
-	  // Display progress counter.
-	  show_progress( *mylog, lStartTime, ++dataCount );
-	}
-	// Write it to the output file for later analysis.
-	experiments.show( 0, outStream );
-#endif
       }
       experiments.finalize();
       if ( !Verbosity(SILENT) ){
@@ -1872,141 +1852,6 @@ namespace Timbl {
     return result;
   }
 #else
-  class threadData {
-  public:
-    threadData( ):exp(0), is(0), os(0){};
-    ~threadData() { delete is; };
-    bool exec( const string& );
-    bool readLine( string& );
-    TimblExperiment *exp;
-    istream *is;
-    ostream *os;
-  };
-
-  bool threadData::readLine( string& Buffer ){
-    Buffer = "";
-    exp->nextLine( *is, Buffer );
-    return !Buffer.empty();
-  }
-  
-  bool threadData::exec( const string& Buffer ){
-    if ( !exp->chopLine( Buffer ) ){
-      exp->Warning( "testfile, skipped erroneous line:\n" + Buffer );
-      return false;
-    }
-    else {
-      exp->chopped_to_instance( TimblExperiment::TestWords );
-      bool exact = false;
-      string distrib;
-      double distance;
-      const TargetValue *resultTarget = exp->LocalClassify( exp->CurrInst,
-							    distance,
-							    exact );
-      exp->normalizeResult();
-      distrib = exp->bestResult.getResult();
-      if ( resultTarget != 0 ){
-	exp->show_results( *os, distrib, resultTarget, distance );
-	if ( exact ){ // remember that a perfect match may be incorrect!
-	  if ( exp->Verbosity(EXACT) ) {
-	    *exp->mylog << "Exacte match:\n" << exp->get_org_input() << endl;
-	  }
-	}
-      }
-      return true;
-    }
-  }
-
-  class threadBlock {
-  public:
-    threadBlock( TimblExperiment * );
-    void finalize();
-    vector<threadData> exps;
-  private:
-    TimblExperiment *_parent;
-  };
-
-  bool splitFiles( const string& fn, vector<threadData>& exps ){
-    int cnt=0;
-    string line;
-    ifstream is( fn.c_str() );
-    while ( getline( is, line ) )
-      ++cnt;
-    if ( cnt ){
-      is.clear();
-      is.seekg(0);
-      int to_do = cnt/exps.size() + 1;
-      for ( int i=0; i < exps.size(); ++i ){
-	string oname = fn + "-" + toString( i+1 );
-	ofstream os( oname.c_str() );
-	if ( os ){
-	  int done = 0;
-	  while ( done < to_do &&
-		  getline( is, line ) ){
-	    os << line << endl;
-	    ++done;
-	  }
-	  if ( i == exps.size()-1 ){
-	    while ( getline( is, line ) ){
-	      os << line << endl;
-	    }
-	  }
-	}
-      }
-      for ( int i=0; i < exps.size(); ++i ){
-	string iname = fn + "-" + toString( i+1 );
-	ifstream *is = new ifstream( iname.c_str() );
-	exps[i].is = is;
-	string oname = fn + "-" + toString( i+1 ) + ".out";
-	ofstream *os = new ofstream( oname.c_str() );
-	exps[i].os = os;
-      }
-      return true;
-    }
-    else
-      return false;
-  }  
-
-  threadBlock::threadBlock( TimblExperiment *exp ): _parent( exp ){
-    int num = _parent->numOfThreads;
-    exps.resize( num );
-    for ( int i = 0; i < num; ++i ){
-      exps[i].exp = _parent->clone();
-      *exps[i].exp = *_parent;
-      exps[i].exp->initExperiment();
-    };
-    if ( !splitFiles( _parent->testStreamName, exps ) ){
-      throw runtime_error( "unable to split file " +  _parent->testStreamName );
-    }
-  }
-
-  
-  void threadBlock::finalize(){
-    string command = "cat ";
-    for ( int i=0; i < exps.size(); ++i ){
-      _parent->stats.merge( exps[i].exp->stats );
-      if ( _parent->confusionInfo ){
-	_parent->confusionInfo->merge( exps[i].exp->confusionInfo );
-      }
-      delete exps[i].exp;
-      string oname = _parent->testStreamName + "-" + toString( i+1 ) + ".out ";
-      command += oname;
-    }
-    command += "> " + _parent->outStreamName;
-    if ( system( command.c_str() ) < 0 )
-      throw runtime_error( "system() command failed:" + command );
-  }
-
-  void TimblExperiment::runExp( threadData& exp, unsigned int& dataCount,
-				const time_t& lStartTime ){
-    string line;
-    while ( exp.readLine( line ) ){
-      if ( exp.exec( line ) && !Verbosity(SILENT) )
-	// Display progress counter.
-#pragma omp critical
-	show_progress( *mylog, lStartTime, ++dataCount );
-    }
-  }
-
   bool TimblExperiment::Test( const string& FileName,
 			      const string& OutFile ){
     bool result = false;
@@ -2022,48 +1867,34 @@ namespace Timbl {
       gettimeofday( &startTime, 0 );
       if ( InputFormat() == ARFF )
 	skipARFFHeader( testStream );
-#ifdef HAVE_OPENMP
-      if ( numOfThreads > 1 ){
-	threadBlock experiments( this );
-	unsigned int dataCount = 0;
-#pragma omp parallel for num_threads( numOfThreads ) shared( experiments, dataCount) private( lStartTime )
-	for ( int i=0; i < numOfThreads; ++i ){
-	  runExp( experiments.exps[i], dataCount, lStartTime );
+      string Buffer;
+      while ( nextLine( testStream, Buffer ) ){
+	if ( !chopLine( Buffer ) ) {
+	  Warning( "testfile, skipped line #" + 
+		   toString<int>( stats.totalLines() ) +
+		   "\n" + Buffer );
 	}
-	experiments.finalize();
-      }
-      else 
-#endif
-	{
-	  string Buffer;
-	  while ( nextLine( testStream, Buffer ) ){
-	    if ( !chopLine( Buffer ) ) {
-	      Warning( "testfile, skipped line #" + 
-		       toString<int>( stats.totalLines() ) +
-		       "\n" + Buffer );
-	    }
-	    else {
-	      chopped_to_instance( TestWords );
-	      bool exact = false;
-	      string distrib;
-	      double distance;
-	      const TargetValue *resultTarget = LocalClassify( CurrInst,
-							       distance,
-							       exact );
-	      normalizeResult();
-	      distrib = bestResult.getResult();
-	      show_results( outStream, distrib, resultTarget, distance );
-	      if ( exact ){ // remember that a perfect match may be incorrect!
-		if ( Verbosity(EXACT) ) {
-		  *mylog << "Exacte match:\n" << get_org_input() << endl;
-		}
-	      }
-	      if ( !Verbosity(SILENT) )
-		// Display progress counter.
-		show_progress( *mylog, lStartTime, stats.dataLines() );
+	else {
+	  chopped_to_instance( TestWords );
+	  bool exact = false;
+	  string distrib;
+	  double distance;
+	  const TargetValue *resultTarget = LocalClassify( CurrInst,
+							   distance,
+							   exact );
+	  normalizeResult();
+	  distrib = bestResult.getResult();
+	  show_results( outStream, distrib, resultTarget, distance );
+	  if ( exact ){ // remember that a perfect match may be incorrect!
+	    if ( Verbosity(EXACT) ) {
+	      *mylog << "Exacte match:\n" << get_org_input() << endl;
 	    }
 	  }
+	  if ( !Verbosity(SILENT) )
+	    // Display progress counter.
+	    show_progress( *mylog, lStartTime, stats.dataLines() );
 	}
+      }
       if ( !Verbosity(SILENT) ){
 	time_stamp( "Ready:  ", stats.dataLines() );
 	show_speed_summary( *mylog, startTime );

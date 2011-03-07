@@ -190,7 +190,6 @@ namespace Timbl {
     virtual void initExperiment( bool = false );
     
   protected:
-    void runExp( threadData&, unsigned int&, const time_t&  );
     TimblExperiment( const AlgorithmType, const std::string& = "" );
     virtual bool checkLine( const std::string& );
     virtual bool ClassicLearn( const std::string& = "" );
