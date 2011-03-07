@@ -806,7 +806,14 @@ int main(int argc, char *argv[]){
       else  {
 	// normal case
 	//   running a testing phase from recovered tree
-	do_test = Run->GetInstanceBase( TreeInFile );
+	if ( TestFile.empty() && !Do_Indirect ){
+	  cerr << "reading an instancebase(-i option) without a testfile (-t option) is useless" << endl;
+	  do_test = false;
+	}
+	else
+	  do_test = true;
+	if ( do_test )
+	  do_test = Run->GetInstanceBase( TreeInFile );
       }
       if ( do_test ){
 	Do_Test( Run );
