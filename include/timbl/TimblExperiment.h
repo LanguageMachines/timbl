@@ -92,7 +92,7 @@ namespace Timbl {
     virtual ~TimblExperiment();
     virtual TimblExperiment *clone() const = 0;
     TimblExperiment& operator=( const TimblExperiment& );
-    virtual bool Prepare( const std::string& = "" );
+    virtual bool Prepare( const std::string& = "", bool = true );
     virtual bool CVprepare( const std::string& = "",
 			    WeightType = GR_w,
 			    const std::string& = "" );
@@ -115,7 +115,7 @@ namespace Timbl {
     bool WriteInstanceBaseXml( const std::string& );
     bool WriteInstanceBaseLevels( const std::string&, unsigned int );
     bool WriteNamesFile( const std::string& ) const;
-    virtual bool Learn( const std::string& = "" );
+    virtual bool Learn( const std::string& = "", bool = true );
     int Estimate() const { return estimate; };
     void Estimate( int e ){ estimate = e; };
     int Clones() const { return numOfThreads; };
@@ -192,7 +192,7 @@ namespace Timbl {
   protected:
     TimblExperiment( const AlgorithmType, const std::string& = "" );
     virtual bool checkLine( const std::string& );
-    virtual bool ClassicLearn( const std::string& = "" );
+    virtual bool ClassicLearn( const std::string& = "", bool = true );
     virtual const TargetValue *LocalClassify( const Instance& , 
 					      double&,
 					      bool& );
@@ -284,10 +284,10 @@ namespace Timbl {
     IB1_Experiment( N, s ) {
       IB2_offset( 0 );
     }; 
-    bool Prepare( const std::string& = "" );
+    bool Prepare( const std::string& = "", bool = false );
     bool Expand( const std::string& );
     bool Remove( const std::string& );
-    bool Learn( const std::string& = "" );
+    bool Learn( const std::string& = "", bool = false );
     AlgorithmType Algorithm() const { return IB2_a; };
   protected:
     bool checkTestFile( );
@@ -317,8 +317,8 @@ namespace Timbl {
     IB1_Experiment( N, s ), NumOfFiles( 0 ), FileNames( NULL )
       { };
     ~CV_Experiment(){ delete [] FileNames; };
-    bool Learn( const std::string& = "" );
-    bool Prepare( const std::string& = "" );
+    bool Learn( const std::string& = "", bool = true );
+    bool Prepare( const std::string& = "", bool = true );
     bool Test( const std::string&,
 	       const std::string& );
     bool CVprepare( const std::string& = "",
@@ -399,7 +399,7 @@ namespace Timbl {
   protected:
     TimblExperiment *clone() const { 
       return new IG_Experiment( MaxFeats(), "", false ); };
-    bool ClassicLearn( const std::string& = "" );
+    bool ClassicLearn( const std::string& = "", bool = true );
     bool checkTestFile();
     void showTestingInfo( std::ostream& );
     bool checkLine( const std::string& );

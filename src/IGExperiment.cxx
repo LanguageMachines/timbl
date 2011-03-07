@@ -98,7 +98,8 @@ namespace Timbl {
     return os;
   }  
 
-  bool IG_Experiment::ClassicLearn( const string& FileName ){
+  bool IG_Experiment::ClassicLearn( const string& FileName, 
+				    bool warnOnSingleTarget ){
     bool result = true;
     if ( is_synced ) {
       CurrentDataFile = FileName;
@@ -109,7 +110,7 @@ namespace Timbl {
 	result = false;
       }
       else {
-	if ( !Prepare( FileName ) || ExpInvalid() ){
+	if ( !Prepare( FileName, warnOnSingleTarget ) || ExpInvalid() ){
 	  result = false;
 	}
       }

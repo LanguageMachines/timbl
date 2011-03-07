@@ -336,7 +336,8 @@ namespace Timbl {
     Learning of the names of the FeatureValues and TargetValues
     also their distribution etc.
   */
-  bool TimblExperiment::Prepare( const string& FileName ){
+  bool TimblExperiment::Prepare( const string& FileName,
+				 bool warnOnSingleTarget ){
     assert( runningPhase == LearnWords );
     bool result = false;
     if ( FileName != "" && ConfirmOptions() ){
@@ -426,6 +427,9 @@ namespace Timbl {
 		  calculate_fv_entropy( false );
 		prepT.stop();
 		Info( "Preparation took " + prepT.toString() );
+		if ( warnOnSingleTarget && Targets->EffectiveValues() <=1 ){
+		  Warning( "Training file contains only 1 class." );
+		}
 		result = true;
 	      }
 	    }
@@ -504,7 +508,8 @@ namespace Timbl {
     return true;
   }
 
-  bool TimblExperiment::ClassicLearn( const string& FileName ){
+  bool TimblExperiment::ClassicLearn( const string& FileName, 
+				      bool warnOnSingleTarget ){
     bool result = true;
     Common::Timer learnT;
     if ( is_synced ){
@@ -516,7 +521,7 @@ namespace Timbl {
 	result = false;
       }
       else {
-	if ( !Prepare( FileName ) || ExpInvalid() ){
+	if ( !Prepare( FileName, warnOnSingleTarget ) || ExpInvalid() ){
 	  result = false;
 	}
       }
@@ -597,12 +602,12 @@ namespace Timbl {
     return result;
   }
 
-  bool TimblExperiment::Learn( const std::string& s ){
+  bool TimblExperiment::Learn( const std::string& s, bool warnOnSingleTarget ){
     if ( ExpInvalid() ||
 	 !ConfirmOptions() ){
       return false;
     }
-    return ClassicLearn( s );
+    return ClassicLearn( s, warnOnSingleTarget );
   }
   
   IB1_Experiment::IB1_Experiment( const size_t N,
@@ -1056,16 +1061,17 @@ namespace Timbl {
     showBestNeighbors( outfile );
   }
   
-  bool IB2_Experiment::Prepare( const string& FileName  ){
+  bool IB2_Experiment::Prepare( const string& FileName, 
+				bool warnOnSingleTarget ){
     if ( ConfirmOptions() && IB2_offset() == 0 ){
       Error( "IB2 learning failed, invalid bootstrap option?" );
       return false;
     }
     else
-      return TimblExperiment::Prepare( FileName );
+      return TimblExperiment::Prepare( FileName, false );
   }
   
-  bool IB2_Experiment::Learn( const string& FileName ){
+  bool IB2_Experiment::Learn( const string& FileName, bool warnOnSingleTarget ){
     if ( IB2_offset() == 0 ){
       Error( "IB2 learning failed, invalid bootstrap option?" );
       return false;
@@ -1087,7 +1093,7 @@ namespace Timbl {
 	    result = false;
 	  }
 	  else {
-	    if ( !Prepare( FileName ) || ExpInvalid() ){
+	    if ( !Prepare( FileName, false ) || ExpInvalid() ){
 	      result = false;
 	    }
 	  }

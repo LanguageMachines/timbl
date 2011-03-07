@@ -54,7 +54,7 @@
 namespace Timbl {
   using namespace std;
 
-  bool CV_Experiment::Prepare( const string& f ){
+  bool CV_Experiment::Prepare( const string& f, bool ){
     cerr << "CV prepare " << f << endl;
     return true;
   }
@@ -68,7 +68,7 @@ namespace Timbl {
     return true;
   }
 
-  bool CV_Experiment::Learn( const string& f ){
+  bool CV_Experiment::Learn( const string& f, bool ){
     cerr << "CV Learn " << f << endl;
     return true;
   }
@@ -177,8 +177,8 @@ namespace Timbl {
       *mylog << "Starting Cross validation test on files:" << endl;
       for ( int i = 0; i < NumOfFiles; ++i )
 	*mylog << FileNames[i] << endl;
-      TimblExperiment::Prepare( FileNames[1] );
-      TimblExperiment::Learn( FileNames[1] );
+      TimblExperiment::Prepare( FileNames[1], false );
+      TimblExperiment::Learn( FileNames[1], false );
       for ( int filenum = 2; filenum < NumOfFiles; ++filenum )
 	Expand( FileNames[filenum] );
       string outName;
