@@ -113,6 +113,9 @@ inline void usage_full(void){
   cerr << "-w f:n    : read Weight n from file 'f'" << endl;
   cerr << "-b n      : number of lines used for bootstrapping (IB2 only)" 
        << endl;
+#ifdef HAVE_OPENMP
+  cerr << "--clones=<num> : use 'n' threads for parallel testing" << endl;
+#endif
   cerr << "--Diversify: rescale weight (see docs)" << endl;
   cerr << "-d val    : weight neighbors as function of their distance:" 
        << endl;

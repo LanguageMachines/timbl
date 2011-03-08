@@ -32,6 +32,7 @@
 
 #include <string>
 #include <vector>
+#include "config.h"
 #include "StringOps.h"
 #include "Common.h"
 #include "MsgClass.h"
