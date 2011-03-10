@@ -337,13 +337,15 @@ namespace Timbl {
     also their distribution etc.
   */
   bool TimblExperiment::Prepare( const string& FileName,
-				 bool warnOnSingleTarget ){
+				 bool warnOnSingleTarget,
+				 bool expand ){
     assert( runningPhase == LearnWords );
     bool result = false;
     if ( FileName != "" && ConfirmOptions() ){
       if ( !ExpInvalid() ){
-	if ( Options.TableFrozen() ||
-	     NumOfFeatures() != 0 ){
+	if ( !expand &&
+	     ( Options.TableFrozen() ||
+	       NumOfFeatures() != 0 ) ){
 	  Error( "couldn't learn from file '" + FileName +
 		 "'\nInstanceBase already filled" );
 	}
@@ -690,6 +692,13 @@ namespace Timbl {
       result = false;
     }
     else {
+      if ( InputFormat() == UnknownInputFormat ){
+	// we may expand from 'nothing'
+	if ( !Prepare( FileName, false, true ) ){
+	  Error( "Unable to expand from file :'" + FileName + "'\n" );
+	  return false;
+	}
+      }
       string Buffer;
       stats.clear();
       // Open the file.
@@ -1062,13 +1071,15 @@ namespace Timbl {
   }
   
   bool IB2_Experiment::Prepare( const string& FileName, 
-				bool warnOnSingleTarget ){
-    if ( ConfirmOptions() && IB2_offset() == 0 ){
+				bool warnOnSingleTarget,
+				bool expand ){
+    if ( !ConfirmOptions() ||
+	 ( IB2_offset() == 0 && InstanceBase == 0 ) ){
       Error( "IB2 learning failed, invalid bootstrap option?" );
       return false;
     }
     else
-      return TimblExperiment::Prepare( FileName, false );
+      return TimblExperiment::Prepare( FileName, false, expand );
   }
   
   bool IB2_Experiment::Learn( const string& FileName, bool warnOnSingleTarget ){
@@ -1182,11 +1193,18 @@ namespace Timbl {
   
   bool IB2_Experiment::Expand( const string& FileName ){
     bool result = false;
-    if ( CurrentDataFile == "" ){
+    if ( CurrentDataFile == "" && InstanceBase == 0 ){
       Warning( "IB2, cannot Append data: No datafile bootstrapped yet" );
     }
     else {
       IB2_offset( 0 );
+      if ( InputFormat() == UnknownInputFormat ){
+	// we may expand from 'nothing'
+	if ( !Prepare( FileName, false, true ) ){
+	  Error( "Unable to expand from file :'" + FileName + "'\n" );
+	  return false;
+	}
+      }
       result = Expand_N( FileName );
     }
     return result;
@@ -1204,7 +1222,7 @@ namespace Timbl {
     if ( ExpInvalid() ){
       result = false;
     }
-    else if ( CurrentDataFile == "" ){
+    else if ( CurrentDataFile == "" && InstanceBase == 0 ){
       Warning( "IB2, cannot Append data: No datafile bootstrapped yet" );
       result = false;
     }

@@ -92,7 +92,7 @@ namespace Timbl {
     virtual ~TimblExperiment();
     virtual TimblExperiment *clone() const = 0;
     TimblExperiment& operator=( const TimblExperiment& );
-    virtual bool Prepare( const std::string& = "", bool = true );
+    virtual bool Prepare( const std::string& = "", bool = true, bool = false );
     virtual bool CVprepare( const std::string& = "",
 			    WeightType = GR_w,
 			    const std::string& = "" );
@@ -284,7 +284,7 @@ namespace Timbl {
     IB1_Experiment( N, s ) {
       IB2_offset( 0 );
     }; 
-    bool Prepare( const std::string& = "", bool = false );
+    bool Prepare( const std::string& = "", bool = false, bool = false );
     bool Expand( const std::string& );
     bool Remove( const std::string& );
     bool Learn( const std::string& = "", bool = false );
@@ -318,7 +318,7 @@ namespace Timbl {
       { };
     ~CV_Experiment(){ delete [] FileNames; };
     bool Learn( const std::string& = "", bool = true );
-    bool Prepare( const std::string& = "", bool = true );
+    bool Prepare( const std::string& = "", bool = true, bool = false );
     bool Test( const std::string&,
 	       const std::string& );
     bool CVprepare( const std::string& = "",

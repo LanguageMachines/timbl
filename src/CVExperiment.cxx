@@ -54,7 +54,7 @@
 namespace Timbl {
   using namespace std;
 
-  bool CV_Experiment::Prepare( const string& f, bool ){
+  bool CV_Experiment::Prepare( const string& f, bool, bool ){
     cerr << "CV prepare " << f << endl;
     return true;
   }

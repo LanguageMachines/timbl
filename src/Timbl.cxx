@@ -806,7 +806,16 @@ int main(int argc, char *argv[]){
 	  }
 	}
       }
-      else  {
+      else if ( !dataFile.empty() && !TreeOutFile.empty() ){
+	// it seems we want to expand our tree
+	do_test = false;
+	if ( Run->GetInstanceBase( TreeInFile ) ) {
+	  if ( Run->Expand( dataFile ) )
+	    Run->WriteInstanceBase( TreeOutFile );
+	  do_test = !TestFile.empty();
+	}
+      }
+      else {
 	// normal case
 	//   running a testing phase from recovered tree
 	if ( TestFile.empty() && !Do_Indirect ){
