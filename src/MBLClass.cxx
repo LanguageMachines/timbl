@@ -353,7 +353,7 @@ namespace Timbl {
 	if ( exp_name != "" )
 	  *myerr << "Warning:-" << exp_name << "-" << out_line << endl;
 	else 
-	*myerr << "Warning:" << out_line << endl;
+	*myerr << "Warning: " << out_line << endl;
       }
     }
   }
@@ -365,7 +365,7 @@ namespace Timbl {
       if ( exp_name != "" )
 	*myerr << "Error:-" << exp_name << "-" << out_line << endl;
       else
-	*myerr << "Error:" << out_line << endl;
+	*myerr << "Error: " << out_line << endl;
     }
     err_count++;
   }
@@ -376,12 +376,10 @@ namespace Timbl {
     else {
       if ( exp_name != "" )
 	*myerr << "-" << exp_name << "-";
-      *myerr << out_line << endl;
       if ( exp_name != "" )
-	*myerr << "Error:-" << exp_name << "-" << out_line << endl
-	       << "stopped" << endl;
+	*myerr << "FatalError:-" << exp_name << "-" << out_line << endl;
       else 
-	*myerr << "Error:-" << out_line << endl << "stopped" << endl;
+	*myerr << "FatalError: " << out_line << endl;
       throw( runtime_error("Stopped") );
     }
   }

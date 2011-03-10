@@ -848,13 +848,11 @@ int main(int argc, char *argv[]){
   catch( softExit& e ){
     return 0;
   }
-  catch(std::string& what){
-    cerr << "an exception was raised: '" << what << "'" << endl;
-    cerr << "Timbl terminated, Sorry for that" << endl; 
+  catch(std::string& what){    
+    cerr << what << ", sorry" << endl; 
   }
   catch(std::exception& e){
-    cerr << "a standard exception was raised: '" << e.what() << "'" << endl;
-    cerr << "Timbl terminated, Sorry for that" << endl; 
+    cerr << e.what() << ", sorry" << endl;
   }
   catch(...){
     cerr << "some exception was raised" << endl;

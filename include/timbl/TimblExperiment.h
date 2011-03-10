@@ -101,7 +101,9 @@ namespace Timbl {
     virtual bool Decrement( const std::string& )
     { FatalError( "Decrement" ); return false; };
     virtual bool Expand( const std::string& ){
-      FatalError( "Expand" ); return false; };
+      FatalError( "Expand not supported for " + toString(algorithm) );
+      return false; 
+    };
     virtual bool Remove( const std::string& ){
     FatalError( "Remove" ); return false;};
     virtual bool Test( const std::string&,
