@@ -142,7 +142,7 @@ namespace Timbl{
     bool ShowStatistics( std::ostream& ) const;
     bool SetOptions( const std::string& );
     bool SetIndirectOptions( const TimblOpts&  );
-    bool Set_Single_Threaded() { return true; };
+    bool SetThreads( int c );
     Algorithm Algo() const;
     InputFormatType getInputFormat() const;
     static int Default_Max_Feats();
