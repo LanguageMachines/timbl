@@ -806,7 +806,8 @@ int main(int argc, char *argv[]){
 	  }
 	}
       }
-      else if ( !dataFile.empty() ){
+      else if ( !dataFile.empty() && 
+		!( TestFile.empty() && TreeOutFile.empty() && levelTreeOutFile.empty() ) ){
 	// it seems we want to expand our tree
 	do_test = false;
 	if ( Run->GetInstanceBase( TreeInFile ) ) {
