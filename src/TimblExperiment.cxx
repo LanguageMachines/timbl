@@ -1071,7 +1071,7 @@ namespace Timbl {
   }
   
   bool IB2_Experiment::Prepare( const string& FileName, 
-				bool warnOnSingleTarget,
+				bool,
 				bool expand ){
     if ( !ConfirmOptions() ||
 	 ( IB2_offset() == 0 && InstanceBase == 0 ) ){
@@ -1082,7 +1082,7 @@ namespace Timbl {
       return TimblExperiment::Prepare( FileName, false, expand );
   }
   
-  bool IB2_Experiment::Learn( const string& FileName, bool warnOnSingleTarget ){
+  bool IB2_Experiment::Learn( const string& FileName, bool ){
     if ( IB2_offset() == 0 ){
       Error( "IB2 learning failed, invalid bootstrap option?" );
       return false;
@@ -1408,7 +1408,7 @@ namespace Timbl {
   bool IB2_Experiment::checkTestFile(){
     if ( !IB1_Experiment::checkTestFile() )
       return false;
-    else if ( IB2_offset() == 0 ){
+    else if ( IB2_offset() == 0 && InstanceBase == 0 ){
       Error( "missing bootstrap information for IB2 algorithm." );
       return false;
     }
@@ -1787,7 +1787,7 @@ namespace Timbl {
     size = num;
     exps.resize( size );
     exps[0].exp = parent;
-    for ( int i = 1; i < size; ++i ){
+    for ( size_t i = 1; i < size; ++i ){
       exps[i].exp = parent->clone();
       *exps[i].exp = *parent;
       exps[i].exp->initExperiment();
@@ -1797,7 +1797,7 @@ namespace Timbl {
   bool threadBlock::readLines( istream& is  ){
     bool result = true;
     bool goon = true;
-    for ( int i=0; i < size; ++i ){
+    for ( size_t i=0; i < size; ++i ){
       exps[i].Buffer = "";
       int cnt;
       goon = exps[0].exp->nextLine( is, exps[i].Buffer, cnt );
@@ -1809,7 +1809,7 @@ namespace Timbl {
   }
 
   void threadBlock::finalize(){
-    for ( int i=1; i < size; ++i ){
+    for ( size_t i=1; i < size; ++i ){
       exps[0].exp->stats.merge( exps[i].exp->stats );
       if ( exps[0].exp->confusionInfo ){
 	exps[0].exp->confusionInfo->merge( exps[i].exp->confusionInfo );
