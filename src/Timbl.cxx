@@ -806,13 +806,18 @@ int main(int argc, char *argv[]){
 	  }
 	}
       }
-      else if ( !dataFile.empty() && !TreeOutFile.empty() ){
+      else if ( !dataFile.empty() ){
 	// it seems we want to expand our tree
 	do_test = false;
 	if ( Run->GetInstanceBase( TreeInFile ) ) {
-	  if ( Run->Expand( dataFile ) )
-	    Run->WriteInstanceBase( TreeOutFile );
-	  do_test = !TestFile.empty();
+	  if ( Run->Expand( dataFile ) ){
+	    if ( !TreeOutFile.empty() )
+	      Run->WriteInstanceBase( TreeOutFile );
+	    if ( levelTreeOutFile != "" )
+	      Run->WriteInstanceBaseLevels( levelTreeOutFile, 
+					    levelTreeLevel );
+	    do_test = !TestFile.empty();
+	  }
 	}
       }
       else {
