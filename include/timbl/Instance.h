@@ -306,7 +306,7 @@ namespace Timbl {
     double gain_ratio;
     double chi_square;
     double shared_variance;
-    double standard_deviation;;
+    double standard_deviation;
     size_t matrix_clip_freq;
     long int *n_dot_j;
     long int* n_i_dot;

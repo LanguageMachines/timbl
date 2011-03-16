@@ -1548,9 +1548,9 @@ namespace Timbl {
     else {
       return false;
     }
-  };
+  }
   
-  MetricType Feature::getMetricType() const { return metric->type(); };
+  MetricType Feature::getMetricType() const { return metric->type(); }
 
   bool Feature::store_matrix( int limit){
     //

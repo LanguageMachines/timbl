@@ -108,7 +108,7 @@ namespace Timbl{
     while ( it != strippedInput.begin() && 
 	    isspace(*it) ) --it;
     strippedInput.erase( ++it , strippedInput.end() );
-  };
+  }
 
   static string stripExemplarWeight( const string& Buffer,
 				     string& wght ) {
@@ -248,7 +248,7 @@ namespace Timbl{
     while ( it != strippedInput.begin() && 
 	    isspace(*it) ) --it;
     strippedInput.erase( ++it , strippedInput.end() );
-  };
+  }
 
   bool C45_Chopper::chop( const string& InBuf, size_t len ){
     // Function that takes a line, and chops it up into substrings,
@@ -343,7 +343,7 @@ namespace Timbl{
       res += CodeToStr( choppedInput[i] );
     }
     return res;
-  };
+  }
   
   bool Columns_Chopper::chop( const string& InBuf, size_t len ){
     // Lines look like this:
@@ -372,7 +372,7 @@ namespace Timbl{
       res += choppedInput[i] + " ";
     }
     return res;
-  };
+  }
   
   bool Sparse_Chopper::chop( const string& InBuf, size_t len ){
     // Lines look like this:
