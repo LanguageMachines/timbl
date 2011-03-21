@@ -3,15 +3,15 @@
 
 AM_CPPFLAGS = -I@top_srcdir@/include
 
-bin_PROGRAMS = Timbl
+bin_PROGRAMS = timbl
 
-LDADD = libTimbl.la
+LDADD = libtimbl.la
 
-Timbl_SOURCES = Timbl.cxx
-lib_LTLIBRARIES = libTimbl.la
-libTimbl_la_LDFLAGS= -version-info 3:0:0
+timbl_SOURCES = Timbl.cxx
+lib_LTLIBRARIES = libtimbl.la
+libtimbl_la_LDFLAGS= -version-info 3:0:0
 
-libTimbl_la_SOURCES = CommandLine.cxx Common.cxx XMLtools.cxx\
+libtimbl_la_SOURCES = CommandLine.cxx Common.cxx XMLtools.cxx\
 	GetOptClass.cxx IBtree.cxx IBprocs.cxx Instance.cxx \
 	MBLClass.cxx MsgClass.cxx LogBuffer.cxx LogStream.cxx \
 	StringOps.cxx TimblAPI.cxx Choppers.cxx\

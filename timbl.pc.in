@@ -4,10 +4,10 @@ libdir=@libdir@
 includedir=@includedir@
 openmpflags=@OPENMPFLAGS@
 
-Name: Timbl
+Name: timbl
 Version: @VERSION@
-Description: Timbl library.
+Description: timbl library.
 Requires: libxml-2.0
-Libs: -L${libdir} -lTimbl
+Libs: -L${libdir} -ltimbl
 Libs.private: @LIBS@
 Cflags: -I${includedir} ${openmpflags}

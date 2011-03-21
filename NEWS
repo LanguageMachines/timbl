@@ -1,3 +1,8 @@
+6.4.0
+- decapped Timbl and libTimbl to timbl and libtimbl
+  this will shake the whole timbl family tree!
+- small fixes to survive -pedantic compiler option without warnings
+
 6.3.4
 - we now support incremental learning from a file on the command line.
 - implemented a --clones option to use multiple threads for testing
