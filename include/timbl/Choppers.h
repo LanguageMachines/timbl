@@ -5,8 +5,8 @@
   $URL$
 
   Copyright (c) 1998 - 2011
-  ILK  -  Tilburg University
-  CNTS -  University of Antwerp
+  ILK   - Tilburg University
+  CliPS - University of Antwerp
  
   This file is part of timbl
 
