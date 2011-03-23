@@ -3,17 +3,17 @@
   $URL$
 
   Copyright (c) 1998 - 2011
-  ILK  -  Tilburg University
-  CNTS -  University of Antwerp
+  ILK   - Tilburg University
+  CliPS - University of Antwerp
  
-  This file is part of Timbl
+  This file is part of timbl
 
-  Timbl is free software; you can redistribute it and/or modify
+  timbl is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 3 of the License, or
   (at your option) any later version.
 
-  Timbl is distributed in the hope that it will be useful,
+  timbl is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
@@ -24,7 +24,7 @@
   For questions and suggestions, see:
       http://ilk.uvt.nl/software.html
   or send mail to:
-      Timbl@uvt.nl
+      timbl@uvt.nl
 */
 
 #include <exception>
@@ -76,7 +76,7 @@ string ProbOutFile = "";
 string NamesFile = "";
 
 inline void usage_full(void){
-  cerr << "usage: Timbl -f data-file {-t test-file} [options]" << endl;
+  cerr << "usage: timbl -f data-file {-t test-file} [options]" << endl;
   cerr << "Algorithm and Metric options:" << endl;
   cerr << "-a n      : algorithm" << endl;
   cerr << "     0 or IB1   : IB1     (default)" << endl;
@@ -234,9 +234,9 @@ inline void usage_full(void){
 }
 
 inline void usage(void){
-  cerr << "usage:  Timbl -f data-file {-t test-file}"
+  cerr << "usage:  timbl -f data-file {-t test-file}"
        << endl;
-  cerr << "or see: Timbl -h" << endl;
+  cerr << "or see: timbl -h" << endl;
   cerr << "        for all possible options" << endl;
   cerr << endl;
 }
@@ -305,8 +305,8 @@ void Preset_Values( TimblOpts& Opts ){
     throw( softExit() );
   }
   if ( Opts.Find( 'S', value, mood ) ){
-    cerr << "Server mode is no longer available in Timbl" << endl;
-    cerr << "Please use the 'TimblServer' command instead." << endl;
+    cerr << "Server mode is no longer available in timbl" << endl;
+    cerr << "Please use the 'timblserver' command instead." << endl;
     throw( softExit() );
   }
   if ( Opts.Find( 'a', value, mood ) ){
@@ -849,7 +849,7 @@ int main(int argc, char *argv[]){
   }
   catch(std::bad_alloc){
     cerr << "ran out of memory somewhere" << endl;
-    cerr << "Timbl terminated, Sorry for that" << endl;
+    cerr << "timbl terminated, Sorry for that" << endl;
   }
   catch( softExit& e ){
     return 0;
@@ -862,6 +862,6 @@ int main(int argc, char *argv[]){
   }
   catch(...){
     cerr << "some exception was raised" << endl;
-    cerr << "Timbl terminated, Sorry for that" << endl; 
+    cerr << "timbl terminated, Sorry for that" << endl; 
   }
 }

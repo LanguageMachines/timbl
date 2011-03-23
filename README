@@ -1,18 +1,22 @@
-Timbl 6.3.0 (c) ILK/CLiPS 1998 - 2011
+TiMBL 6.4.0 (c) ILK/CLiPS 1998 - 2011
 
 Tilburg Memory Based Learner
 
 Induction of Linguistic Knowledge Research Group, Tilburg University and
 Centre for Dutch Language and Speech, University of Antwerp
 
-This is an extension to the sixth main release of Timbl.
+This is a major extension to the sixth main release of TiMBL.
+Most significant change: The main program is now called 'timbl' and not 
+'Timbl' anymore. Be warned!
+This change is part of our effort to get our MBL software into software 
+distributions like Debian, Ubuntu, RedHat and Fink (Mac OSX).
 
 While this is NOT a Beta version it may still contain some bugs or
 behave not exactly as documented or expected. Comments and
-bug-reports are welcome at: Timbl@uvt.nl. Updates and more info
+bug-reports are welcome at: timbl@uvt.nl. Updates and more info
 may be found on http://ilk.uvt.nl/timbl .
 
-Timbl is distributed under the GNU Public Licence (see the file COPYING).
+TiMBL is distributed under the GNU Public Licence (see the file COPYING).
 
 
 This software has been tested on:
@@ -33,7 +37,7 @@ Contents of this distribution:
 - Documentation ( in the docs directory )
 
 Dependencies:
-To be able to succesfully build Timbl from the tarball, you need the
+To be able to succesfully build TiMBL from the tarball, you need the
 following pakages:
 - pkg-config
 - libxml2-dev

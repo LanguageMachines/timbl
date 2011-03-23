@@ -6,14 +6,14 @@
   ILK  -  Tilburg University
   CNTS -  University of Antwerp
  
-  This file is part of Timbl
+  This file is part of timbl
 
-  Timbl is free software; you can redistribute it and/or modify
+  timbl is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 3 of the License, or
   (at your option) any later version.
 
-  Timbl is distributed in the hope that it will be useful,
+  timbl is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
@@ -24,7 +24,7 @@
   For questions and suggestions, see:
       http://ilk.uvt.nl/software.html
   or send mail to:
-      Timbl@uvt.nl
+      timbl@uvt.nl
 */
 #include <iostream>
 #include <iomanip>
@@ -295,7 +295,7 @@ namespace Timbl {
       Error( "A Version " + toString<int>(version) + 
 	     " type InstanceBase file is found:\n"
 	     "        You should recreate it as it is no longer supported"
-	     "\n        in this version of the Timbl package" );
+	     "\n        in this version of the timbl package" );
     }
     Version = version;
     if ( info_ok ){
