@@ -1,3 +1,9 @@
+6.4.1 2011-04-11
+
+[ Ko van der Sloot ]
+- added Version() and VersionName() functions. We want them for every
+  member of the family
+
 6.4.0
 - decapped Timbl and libTimbl to timbl and libtimbl
   this will shake the whole timbl family tree!
