@@ -1416,10 +1416,8 @@ namespace Timbl {
       }
     }
     // Give a warning for singular features, except when it's
-    // a result of a forced recalculation or when the input format is
-    // Sparse ??
-    if ( realy_first &&
-	 ( input_format != Sparse && input_format != SparseBin ) ){
+    // a result of a forced recalculation 
+    if ( realy_first ){
       bool first = true;
       ostringstream ostr1;
       ostringstream ostr2;
