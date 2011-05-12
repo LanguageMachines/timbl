@@ -88,6 +88,16 @@ namespace Timbl {
     distribution.clear(); 
     total_items = 0;
   }
+
+  double ValueDistribution::Confidence( const TargetValue *tv ) const {
+    VDlist::const_iterator it = distribution.begin();
+    while ( it != distribution.end() ){
+      if ( it->second->Value() == tv )
+	return it->second->Weight();
+      ++it;
+    }
+    return 0.0;
+  }
   
   void ValueDistribution::DistToEncodedString( string& DistStr ) const {
     ostringstream oss;

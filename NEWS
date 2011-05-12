@@ -4,6 +4,8 @@
 - added Version() and VersionName() functions. We want them for every
   member of the family
 - fixed a problem with normalization on empty distributions.
+- added a Confidence( class ) function to the instances API.
+  returns the Weight of 'class'. Which is influenced by normalization!
 
 6.4.0
 - decapped Timbl and libTimbl to timbl and libtimbl

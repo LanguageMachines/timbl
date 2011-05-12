@@ -104,6 +104,7 @@ namespace Timbl {
 							Target *, bool );
     const std::string DistToString() const;
     const std::string DistToStringW( int ) const;
+    double Confidence( const TargetValue * ) const;
     virtual const std::string ToEncodedString() const;
     virtual const std::string SaveHashed() const;
     virtual const std::string Save() const;
