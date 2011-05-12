@@ -162,16 +162,19 @@ namespace Timbl {
   }
   
   void resultStore::normalize() {
-    switch ( norm ){
-    case probabilityNorm:
-      dist->Normalize();
-      break;
-    case addFactorNorm:
-      dist->Normalize_1( factor, targets );
-      break;
-    default:
-      break;
+    if ( dist ){
+      switch ( norm ){
+      case probabilityNorm:
+	dist->Normalize();
+	break;
+      case addFactorNorm:
+	dist->Normalize_1( factor, targets );
+	break;
+      default:
+	break;
+      }
     }
+    // silently do nothing when dist == 0;
   }
 
   void TimblExperiment::normalizeResult(){
