@@ -135,6 +135,7 @@ namespace Timbl {
     const std::string Save() const;
     void Normalize();
     void Normalize_1( double, const Target * );
+    void Normalize_2();
     void MergeW( const ValueDistribution&, double );
   private:
     void DistToEncodedString( std::string& ) const;

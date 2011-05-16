@@ -136,6 +136,7 @@ namespace Timbl {
     { "None", "No Normalisation" },
     { "Probability", "Normalise to 100%" },
     { "AddFactor", "Add a factor to all targets, then normalise to 100%" },
+    { "LogProbability", "Take 10log, then Normalise to 100%" }
   };
 
   WeightType charToWeig( char w ){
@@ -180,6 +181,8 @@ namespace Timbl {
       return probabilityNorm;
     case '1':
       return addFactorNorm;
+    case '2':
+      return logProbNorm;
     default:
       return unknownNorm;
     }

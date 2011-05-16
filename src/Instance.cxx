@@ -312,6 +312,15 @@ namespace Timbl {
     Normalize();
   }
   
+  void WValueDistribution::Normalize_2( ) {
+    VDlist::iterator it = distribution.begin();
+    while ( it != distribution.end() ){
+      it->second->SetWeight( log( it->second->Weight() + 1 ));
+      ++it;
+    }
+    Normalize();
+  }
+  
   ValueDistribution *ValueDistribution::to_VD_Copy( ) const {
     ValueDistribution *res = new ValueDistribution();
     size_t key;

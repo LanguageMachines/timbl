@@ -443,7 +443,8 @@ namespace Timbl {
       return SmoothingName[s][0];
   }
 
-  enum normType { unknownNorm, noNorm, probabilityNorm, addFactorNorm, maxNorm };
+  enum normType { unknownNorm, noNorm, probabilityNorm, 
+		  addFactorNorm, logProbNorm, maxNorm };
   
   inline normType& operator++( normType &W ){
     return W = ( maxNorm == W ) ? noNorm : normType(W+1);

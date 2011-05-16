@@ -164,13 +164,19 @@ namespace Timbl {
   void resultStore::normalize() {
     if ( dist ){
       switch ( norm ){
+      case noNorm:
+	break;
       case probabilityNorm:
 	dist->Normalize();
 	break;
       case addFactorNorm:
 	dist->Normalize_1( factor, targets );
 	break;
+      case logProbNorm:
+	dist->Normalize_2();
+	break;
       default:
+	throw runtime_error( "unimplemented case " + toString(norm) );
 	break;
       }
     }
