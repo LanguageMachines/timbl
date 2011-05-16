@@ -1,4 +1,4 @@
-.TH timbl 1 "2011 march 21"
+.TH timbl 1 "2011 may 16"
 
 .SH NAME
 timbl - Tilburg Memory Based Learner
@@ -117,11 +117,31 @@ assume the specified input format
 .RE
 
 .B -G
+normalization
+
 .RS
 normalize distibutions (+v db option only)
- O     : normalize between 0 and 1
- 1:<f> : add f to all possible targets
-         then normalize between 0 and 1 (default f=1.0)
+
+Supported normalizations are:
+
+.B Probability 
+or
+.B 0
+
+normalize between 0 and 1
+
+.BR addFactor :<f>
+or
+.BR 1 :<f>
+
+add f to all possible targets, then normalize between 0 and 1  (default f=1.0).
+
+.B logProbability
+or
+.B 2
+
+Add 1 to the target Weight, take the 10Log and then normalize between 0 and 1
+
 .RE
 
 .B +H
