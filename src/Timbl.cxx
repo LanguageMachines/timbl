@@ -193,9 +193,14 @@ inline void usage_full(void){
   cerr << "  You may combine levels using '+' e.g. +v p+db or -v o+di"
        << endl;
   cerr << "-G        : normalize distibutions (+vdb option only)" << endl
-       << "    O     : normalize between 0 and 1" << endl
-       << "    1:<f> : add f to all possible targets" << endl
-       << "            then normalize between 0 and 1 (default f=1.0)" << endl;
+       << "    Probability    : normalize between 0 and 1" << endl
+       << "             O     : does the same " << endl
+       << "    addFactor:<f>  : add f to all possible targets" << endl
+       << "                     then normalize between 0 and 1 (default f=1.0)" << endl
+       << "             1:<f> : does the same" << endl
+       << "    logProbability : Add 1 to the target Weight, take the 10Log and" << endl
+       << "                     then normalize between 0 and 1 (default f=1.0)" << endl
+       << "             2     : does the same" << endl;
   cerr << "-W f      : calculate and save all Weights in file 'f'" << endl;
   cerr << "+% or -%  : do or don't save test result (%) to file" << endl;
   cerr << "-o s      : use s as output filename" << endl;
