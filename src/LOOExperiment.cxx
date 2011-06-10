@@ -151,14 +151,18 @@ namespace Timbl {
 	      *mylog << "Exacte match:\n" << get_org_input() << endl;
 	    }
 	  }
-	  // Display progress counter.
-	  show_progress( *mylog, lStartTime, stats.dataLines() );
+	  if ( !Verbosity(SILENT) ){
+	    // Display progress counter.
+	    show_progress( *mylog, lStartTime, stats.dataLines() );
+	  }
 	  Increment( CurrInst );
 	}
       }// end while.
-      time_stamp( "Ready:  ", stats.dataLines() );
-      show_speed_summary( *mylog, startTime );
-      showStatistics( *mylog );
+      if ( !Verbosity(SILENT) ){
+	time_stamp( "Ready:  ", stats.dataLines() );
+	show_speed_summary( *mylog, startTime );
+	showStatistics( *mylog );
+      }
       result = true;
     }
     return result;

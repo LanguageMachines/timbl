@@ -406,38 +406,43 @@ namespace Timbl {
 		chopped_to_instance( LearnWords );
 		// Progress update.
 		//
-		if (( stats.dataLines() % Progress() ) == 0)
-		  time_stamp( "Examining: ", stats.dataLines() );
-		  found = false;
-		  while ( !found && 
-			  nextLine( datafile, Buffer ) ){
-		    found = chopLine( Buffer );
-		    if ( !found ){
-		      Warning( "datafile, skipped line #" + 
-			       toString<int>( stats.totalLines() ) +
-			       "\n" + Buffer );
-		    }
+		if ( !Verbosity(SILENT) ){
+		  if (( stats.dataLines() % Progress() ) == 0)
+		    time_stamp( "Examining: ", stats.dataLines() );
+		}
+		found = false;
+		while ( !found && 
+			nextLine( datafile, Buffer ) ){
+		  found = chopLine( Buffer );
+		  if ( !found ){
+		    Warning( "datafile, skipped line #" + 
+			     toString<int>( stats.totalLines() ) +
+			     "\n" + Buffer );
 		  }
-		  go_on = found;
+		}
+		go_on = found;
 	      }
 	      if ( stats.dataLines() < 1 ){
 		Error( "no useful data in: " + FileName );
 	      }
 	      else {
-		time_stamp( "Finished:  ", stats.totalLines() );
-		time_stamp( "Calculating Entropy " );
-		if ( Verbosity(FEAT_W) && !Verbosity(SILENT) ){
-		  *mylog << "Lines of data     : " 
-			 << stats.dataLines() << endl;
-		  if ( stats.skippedLines() != 0 )
-		    *mylog << "SkippedLines      : "
-			   << stats.skippedLines() << endl;
-		  LearningInfo( *mylog );
+		if ( !Verbosity(SILENT) ){
+		  time_stamp( "Finished:  ", stats.totalLines() );
+		  time_stamp( "Calculating Entropy " );
+		  if ( Verbosity(FEAT_W) ){
+		    *mylog << "Lines of data     : " 
+			   << stats.dataLines() << endl;
+		    if ( stats.skippedLines() != 0 )
+		      *mylog << "SkippedLines      : "
+			     << stats.skippedLines() << endl;
+		    LearningInfo( *mylog );
+		  }
 		}
 		else
 		  calculate_fv_entropy( false );
 		prepT.stop();
-		Info( "Preparation took " + prepT.toString() );
+		if ( !Verbosity(SILENT) )
+		  Info( "Preparation took " + prepT.toString() );
 		if ( warnOnSingleTarget && Targets->EffectiveValues() <=1 ){
 		  Warning( "Training file contains only 1 class." );
 		}
@@ -598,7 +603,9 @@ namespace Timbl {
 	  }
 	}
       }
-      time_stamp( "Finished:  ", stats.dataLines() );
+      if ( !Verbosity(SILENT) ){
+	time_stamp( "Finished:  ", stats.dataLines() );
+      }
       learnT.stop();
       // cerr << "Endresult " << endl;
       // cerr << InstanceBase << endl;
@@ -1183,7 +1190,9 @@ namespace Timbl {
 	      go_on = found;
 	    }
 	  }
+	  if ( !Verbosity(SILENT) ){
 	  time_stamp( "Finished:  ", stats.dataLines() );
+	  }
 	  learnT.stop();
 	  if ( !Verbosity(SILENT) ){
 	    IBInfo( *mylog );

@@ -328,7 +328,9 @@ namespace Timbl {
 	  }
 	}
       }
-      time_stamp( "Finished:  ", stats.dataLines() );
+      if ( !Verbosity(SILENT) ){
+	time_stamp( "Finished:  ", stats.dataLines() );
+      }
       learnT.stop();
       if ( !Verbosity(SILENT) ){
 	IBInfo( *mylog );

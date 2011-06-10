@@ -59,7 +59,7 @@ int main(){
   testfile.close();
   delete Exp;
   Exp = new TimblAPI( "-a IB1" );
-  Exp->SetOptions( "-vS" );
+  Exp->SetOptions( "+vS" );
   Exp->ShowOptions( cout );
   Exp->Learn( inf );
   testfile.clear();
@@ -75,7 +75,7 @@ int main(){
   testfile.close();
   delete Exp;
   Exp = new TimblAPI( "-a IGTREE" );
-  Exp->SetOptions( "-vS -N40" );
+  Exp->SetOptions( "+vS -N40" );
   Exp->ShowOptions( cout );
   Exp->Learn( inf );
   Exp->WriteInstanceBase( "dimin.tree" );
@@ -93,7 +93,7 @@ int main(){
   testfile.close();
   delete Exp;
   Exp = new TimblAPI( "-a IGTREE" );
-  Exp->SetOptions( "-vS" );
+  Exp->SetOptions( "+vS" );
   Exp->ShowOptions( cout );
   Exp->GetInstanceBase( "dimin.tree" );
   Exp->GetWeights( "dimin.wgt" );
