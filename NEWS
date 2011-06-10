@@ -7,7 +7,7 @@
 - added a Confidence( class ) function to the instances API.
   returns the Weight of 'class'. Which is influenced by normalization!
 - added logProbability normalization
-
+- the +vS option was not always honoured. Now Timbl shuts it's big mouth better
 
 6.4.0
 - decapped Timbl and libTimbl to timbl and libtimbl
