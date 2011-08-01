@@ -692,9 +692,9 @@ namespace Timbl {
   }
   
   /*
-    Expand  an Instance Base (IB1 only)
+    Expand  an Instance Base
   */
-  bool IB1_Experiment::Expand( const string& FileName ){
+  bool TimblExperiment::Expand( const string& FileName ){
     bool result = true;
     if ( ExpInvalid() ){
       result = false;

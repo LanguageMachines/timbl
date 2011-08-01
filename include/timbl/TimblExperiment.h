@@ -100,10 +100,7 @@ namespace Timbl {
     { FatalError( "Increment" ); return false; };
     virtual bool Decrement( const std::string& )
     { FatalError( "Decrement" ); return false; };
-    virtual bool Expand( const std::string& ){
-      FatalError( "Expand not supported for " + toString(algorithm) );
-      return false; 
-    };
+    virtual bool Expand( const std::string& );
     virtual bool Remove( const std::string& ){
     FatalError( "Remove" ); return false;};
     virtual bool Test( const std::string&,
@@ -262,7 +259,7 @@ namespace Timbl {
 		    const bool init = true );
     bool Increment( const std::string& );
     bool Decrement( const std::string& );
-    bool Expand( const std::string& );
+    //    bool Expand( const std::string& );
     bool Remove( const std::string& );
     AlgorithmType Algorithm() const { return IB1_a; };
     void InitInstanceBase();
@@ -398,6 +395,11 @@ namespace Timbl {
     bool WriteInstanceBase( const std::string& );
     bool ReadInstanceBase( const std::string& );
     void initExperiment( bool = false );
+    bool Expand( const std::string& ){
+      FatalError( "Expand not supported for IGTree" );
+      return false; 
+    };
+    
   protected:
     TimblExperiment *clone() const { 
       return new IG_Experiment( MaxFeats(), "", false ); };

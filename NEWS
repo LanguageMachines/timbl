@@ -8,6 +8,7 @@
   returns the Weight of 'class'. Which is influenced by normalization!
 - added logProbability normalization
 - the +vS option was not always honoured. Now Timbl shuts it's big mouth better
+- Expand() is now also enabled for TRIBL and TRIBL2
 
 6.4.0
 - decapped Timbl and libTimbl to timbl and libtimbl
