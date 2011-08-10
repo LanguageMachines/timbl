@@ -108,10 +108,10 @@ bool XmlSetAttribute( xmlNode *node,
 }
 
 string serialize( const xmlNode& node ){
-  XmlDoc tmp( "root" );
-  xmlAddChild( tmp.getRoot(), xmlCopyNode( const_cast<xmlNode*>(&node), 1 ) );
-  string root = tmp.toString();
-  string::size_type s_pos = root.find( "<root>" );
-  string::size_type e_pos = root.find( "</root>" );
-  return root.substr( s_pos+6, e_pos-s_pos-6 );
+  // serialize to a string (XML fragment)
+  xmlBuffer *buf = xmlBufferCreate();
+  xmlNodeDump( buf, 0, const_cast<xmlNode*>(&node), 0, 0 );
+  string result = (const char*)xmlBufferContent( buf );
+  xmlBufferFree( buf );
+  return result;
 }
