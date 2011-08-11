@@ -181,8 +181,8 @@ namespace Timbl {
 	Warning( "SetOption '" + line + "' failed.\nOption unknown" );
 	break;
       case Opt_Ill_Val:
-	Warning( "SetOption '" + line + 
-		 "' failed.\nillegal value for this option" );
+	Error( "SetOption '" + line + 
+	       "' failed.\nIllegal value for this option" );
 	break;
       }
     }
