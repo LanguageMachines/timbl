@@ -556,7 +556,7 @@ namespace Timbl {
     // and signal if this ties also!
     // OR (if do_rand) take random one of the most frequents
     // signal ties too. 
-    // when do_rand, there is NEVER a tie signaled. Just pick random.
+    // BUT NOT for do_rand case! (see bug43)
     const TargetValue *best = NULL;
     tie = false;
     VDlist::const_iterator It = distribution.begin();
@@ -577,6 +577,7 @@ namespace Timbl {
 	      nof_best++;
 	  ++It;
 	}
+	//	tie = ( nof_best > 1 );
 	pick = random_number( 1, nof_best );
 	It = distribution.begin();
 	nof_best = 0;
@@ -622,7 +623,7 @@ namespace Timbl {
     // and signal if this ties also!
     // OR (if do_rand) take random one of the most frequents
     // signal ties too. 
-    // when do_rand, there is NEVER a tie signaled. Just pick random.
+    // BUT NOT for do_rand case! (see bug43)
     const TargetValue *best = NULL;
     VDlist::const_iterator It = distribution.begin();
     tie = false;
@@ -641,6 +642,7 @@ namespace Timbl {
 	      nof_best++;
 	  ++It;
 	}
+	//	tie = ( nof_best > 1 );
 	pick = random_number( 1, nof_best );
 	It = distribution.begin();
 	nof_best = 0;
