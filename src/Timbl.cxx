@@ -39,6 +39,7 @@
 #include <ctime>
 #include <cctype>
 
+#include "config.h"
 #include "timbl/TimblAPI.h"
 
 using namespace std;

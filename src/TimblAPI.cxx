@@ -47,9 +47,6 @@ using namespace std;
 #include "timbl/TimblExperiment.h"
 namespace Timbl {
   
-  string Version() { return VERSION; };
-  string VersionName() { return PACKAGE_STRING; };
-
   TimblOpts::TimblOpts( const int argc, const char * const *argv ):
     pimpl( new CL_Options( argc, argv ) )
   {}
