@@ -45,8 +45,8 @@
 
 namespace Timbl{
   
-  std::string Version() { return Common::Version(); };
-  std::string VersionName() { return Common::VersionName(); };
+  inline std::string Version() { return Common::Version(); };
+  inline std::string VersionName() { return Common::VersionName(); };
   
   enum Algorithm { UNKNOWN_ALG, IB1, IB2, IGTREE, TRIBL, TRIBL2, LOO, CV };
   enum Weighting { UNKNOWN_W, UD, NW, GR, IG, X2, SV, SD };
