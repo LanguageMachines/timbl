@@ -1,8 +1,9 @@
-6.4.1 2011-08-24
+6.4.1 2011-08-25
 
 [ Ko van der Sloot ]
 - added Version() and VersionName() functions. We want them for every
   member of the family
+- fixed a problem with including 'config'h' in the API
 - fixed a problem with normalization on empty distributions.
 - added a Confidence( class ) function to the instances API.
   returns the Weight of 'class'. Which is influenced by normalization!
