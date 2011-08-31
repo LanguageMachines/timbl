@@ -1062,10 +1062,14 @@ namespace Timbl {
   }
     
   void TimblExperiment::show_results( ostream& outfile, 
+				      const double confidence,
 				      const string& dString,
 				      const TargetValue *Best,
 				      const double Distance ) {
     outfile << get_org_input() << CodeToStr(Best->Name());
+    if ( Verbosity(CONFIDENCE) ){
+      outfile << " [" << confidence << "]";
+    }
     if ( Verbosity(DISTRIB) ){
       outfile << " " << dString;
     }
@@ -1741,7 +1745,7 @@ namespace Timbl {
   class threadData {
   public:
     threadData():exp(0), lineNo(0), resultTarget(0), 
-		 exact(false), distance(-1){};
+		 exact(false), distance(-1), confidence(0) {};
     bool exec();
     void show( ostream& ) const;
     TimblExperiment *exp;
@@ -1751,6 +1755,7 @@ namespace Timbl {
     bool exact;
     string distrib;
     double distance;
+    double confidence;
   };
 
   bool threadData::exec(){
@@ -1774,13 +1779,17 @@ namespace Timbl {
 					 exact );
       exp->normalizeResult();
       distrib = exp->bestResult.getResult();
+      if ( exp->Verbosity(CONFIDENCE) )
+	confidence = exp->bestResult.confidence(resultTarget);
+      else
+	confidence = 0;
       return true;
     }
   }
 
   void threadData::show( ostream& os ) const {
     if ( resultTarget != 0 ){
-      exp->show_results( os, distrib, resultTarget, distance );
+      exp->show_results( os, confidence, distrib, resultTarget, distance );
       if ( exact ){ // remember that a perfect match may be incorrect!
 	if ( exp->Verbosity(EXACT) ) {
 	  *exp->mylog << "Exacte match:\n" << exp->get_org_input() << endl;
@@ -1921,12 +1930,15 @@ namespace Timbl {
 	  bool exact = false;
 	  string distrib;
 	  double distance;
+	  double confidence = 0;
 	  const TargetValue *resultTarget = LocalClassify( CurrInst,
 							   distance,
 							   exact );
 	  normalizeResult();
 	  distrib = bestResult.getResult();
-	  show_results( outStream, distrib, resultTarget, distance );
+	  if ( Verbosity(CONFIDENCE) )
+	    confidence = bestResult.confidence( resultTarget );
+	  show_results( outStream, confidence, distrib, resultTarget, distance );
 	  if ( exact ){ // remember that a perfect match may be incorrect!
 	    if ( Verbosity(EXACT) ) {
 	      *mylog << "Exacte match:\n" << get_org_input() << endl;

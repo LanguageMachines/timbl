@@ -57,6 +57,9 @@ namespace Timbl {
     std::string getResult();
     void prepare();
     void normalize();
+    double confidence( const TargetValue* tv ) const { 
+      return dist->Confidence( tv );
+    };
   private:
     const ValueDistribution *rawDist;
     WValueDistribution *dist;
@@ -201,6 +204,7 @@ namespace Timbl {
     bool learnFromFileIndex( const fileIndex&, std::istream& );
     bool initTestFiles( const std::string&, const std::string& );
     void show_results( std::ostream&,
+		       const double,
 		       const std::string&, 
 		       const TargetValue *,
 		       const double ) ;

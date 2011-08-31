@@ -183,6 +183,7 @@ inline void usage_full(void){
   cerr << "      as: show advanced statistics (memory consuming)" << endl;
   cerr << "      cm: show Confusion Matrix (implies +vas)" << endl;
   cerr << "      cs: show per Class Statistics (implies +vas)" << endl;
+  cerr << "      cf: add confidence to the output file. (needs -G)" << endl;
   cerr << "      di: add distance to output file" << endl;
   cerr << "      db: add distribution of best matched to output file" 
        << endl;

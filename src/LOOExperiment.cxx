@@ -144,8 +144,12 @@ namespace Timbl {
 							   exact );
 	  normalizeResult();
 	  string dString = bestResult.getResult();
+	  double confidence = 0;
+	  if ( Verbosity(CONFIDENCE) )
+	    confidence = bestResult.confidence( ResultTarget );
 	  // Write it to the output file for later analysis.
-	  show_results( outStream, dString, ResultTarget, final_distance );
+	  show_results( outStream, confidence, dString, 
+			ResultTarget, final_distance );
 	  if ( exact ){ // remember that a perfect match may be incorrect!
 	    if ( Verbosity(EXACT) ) {
 	      *mylog << "Exacte match:\n" << get_org_input() << endl;

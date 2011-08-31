@@ -127,6 +127,7 @@ namespace Timbl {
 				     { "K", "All_K_values" },
 				     { "MD", "MatchingDepth" },
 				     { "B", "BranchingFactor" },
+				     { "CF", "Confidence" },
 				     // Verbosity is special!
 				     // should end with "" strings!
 				     { "", "" } };

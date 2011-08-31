@@ -304,6 +304,12 @@ namespace Timbl {
 	Exp->Estimate( 0 );
       else
 	Exp->Estimate( estimate );
+      if ( myVerbosity & CONFIDENCE ){
+	if ( local_normalisation == unknownNorm ){
+	  Error( "Invalid option +vcf, while -G is missing!" );
+	  return false;
+	}
+      }
       if ( myVerbosity & DISTRIB ){
 	if ( !keep_distributions && local_algo == IGTREE_a ){
 	  myVerbosity &= ~DISTRIB;
