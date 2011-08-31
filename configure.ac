@@ -4,7 +4,7 @@
 # $URL $
 
 AC_PREREQ(2.61)
-AC_INIT([timbl],[6.4.1],[timbl@uvt.nl])
+AC_INIT([timbl],[6.4.2],[timbl@uvt.nl])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_MACRO_DIR([m4])
@@ -59,6 +59,13 @@ OPENMP_CHECK( [CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
 	      [AC_MSG_NOTICE(We don't have OpenMP. Multithreaded testing is disabled)] )
 
 AC_SUBST([OPENMPFLAGS],[$OPENMP_CXXFLAGS])
+
+# for GCC we add -lgomp to LIBS. This makes libtimbl depending on libgomp,
+# as we would like to see.
+# do we need a solution for other compilers?????
+if test "$OPENMPFLAGS" = "-fopenmp"; then
+   LIBS="$LIBS -lgomp"
+fi
 
 ACX_PTHREAD([],[AC_MSG_ERROR([We need pthread support!])])
 
