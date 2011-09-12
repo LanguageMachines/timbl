@@ -219,7 +219,7 @@ inline void usage_full(void){
   cerr << "-M n      : size of MaxBests Array" << endl;
   cerr << "-N n      : Number of features (default " 
        << TimblAPI::Default_Max_Feats() << ")" << endl;
-  cerr << "-T n      : ordering of the Tree :" << endl;
+  cerr << "--Treeorder=<value>      : ordering of the Tree :" << endl;
   cerr << "       DO: none" << endl;
   cerr << "       GRO: using GainRatio" << endl;
   cerr << "       IGO: using InformationGain" << endl;

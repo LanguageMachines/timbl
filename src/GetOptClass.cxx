@@ -1119,29 +1119,33 @@ namespace Timbl {
 	      return false;
 	    }
 	  }
+	  else if ( long_option == "Treeorder" ){
+	    if ( !stringTo<OrdeningType>( myoptarg, local_order ) ){
+	      Error( "invalid value for Treeorder: " + myoptarg );
+	      return false;
+	    }
+	  }
 	  else {
-	    Error( "invalid option: Did you mean '--Threshold' ?" );
+	    Error( "invalid option: Did you mean '--Threshold' or --Treeorder ?" );
 	    return false;
 	  }
 	}
-	else if ( myoptarg.find("hreshold") != string::npos ){
+	else if ( myoptarg.find("hreshold") != string::npos ||
+		  myoptarg.find("reeorder") != string::npos ){
 	  Error( "invalid option: Did you mean '--T" + myoptarg + "' ?" );
 	  return false;
 	}
-	else if ( !stringTo<OrdeningType>( myoptarg, local_order ) ){
-	  local_order = UnknownOrdening;
-	  if ( ! stringTo<int>( myoptarg, target_pos ) ){
-	    Error( "invalid option: Did you mean '--Threshold' ?" );
-	    return false;
-	  }
-	  else if ( target_pos <= 0 ){
-	    Error( "illegal value for -T option: " + myoptarg );
-	    return false;
-	  }
+	else if ( ! stringTo<int>( myoptarg, target_pos ) ){
+	  Error( "invalid option: Did you mean '-T value ?" );
+	  return false;
+	}
+	else if ( target_pos <= 0 ){
+	  Error( "illegal value for -T option: " + myoptarg );
+	  return false;
 	}
       }
 	break;
-
+	
       case 'v':{
 	VerbosityFlags Flag = NO_VERB;
 	if ( !stringTo<VerbosityFlags>( myoptarg, Flag ) ){

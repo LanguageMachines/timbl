@@ -1,3 +1,7 @@
+6.4.2 2011-xx-xx
+- implemented +vcf (confidence) output
+- The -T option for TreeOrdening is now named --Treeorder
+
 6.4.1 2011-08-25
 
 [ Ko van der Sloot ]
