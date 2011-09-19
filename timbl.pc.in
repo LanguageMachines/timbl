@@ -7,7 +7,7 @@ openmpflags=@OPENMPFLAGS@
 Name: timbl
 Version: @VERSION@
 Description: timbl library.
-Requires: libxml-2.0
+Requires.private: libxml-2.0
 Libs: -L${libdir} -ltimbl
 Libs.private: @LIBS@
 Cflags: -I${includedir} ${openmpflags}
