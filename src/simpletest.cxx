@@ -26,7 +26,6 @@
 
 #include "timbl/TimblAPI.h"
 #include <cstdlib>
-#include "config.h"
 
 int main(){
   std::string path = std::getenv( "topsrcdir" );
