@@ -49,8 +49,8 @@ namespace Common {
     return result; 
   }
 
-  string Version() { return VERSION; };
-  string VersionName() { return PACKAGE_STRING; };
+  string Version() { return VERSION; }
+  string VersionName() { return PACKAGE_STRING; }
 
   void Timer::stop(){
     timeval now;
