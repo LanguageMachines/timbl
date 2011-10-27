@@ -56,7 +56,6 @@ namespace Timbl {
     ~BestArray();
     void init( unsigned int, unsigned int, bool, bool, bool );
     double addResult( double, const ValueDistribution *, const std::string& );
-    double relativeWeight( unsigned int, const decayStruct& ) const;
     void initNeighborSet( neighborSet& ) const;
     void addToNeighborSet( neighborSet& , size_t ) const;
     xmlNode *toXML() const;

@@ -192,32 +192,6 @@ namespace Timbl {
     return bestArray[size-1]->bestDistance;
   }    
   
-  double BestArray::relativeWeight( unsigned int j, 
-				    const decayStruct& decay ) const {
-    double result = 1.0;
-    switch ( decay.type() ){
-    case Zero:
-      break;
-    case InvDist:
-      result = 1.0/(bestArray[j]->bestDistance + Epsilon);
-      break;
-    case InvLinear:
-      if ( j > 0 &&size != 1 ){
-	double nearest_dist = bestArray[0]->bestDistance;
-	double furthest_dist = bestArray[size-1]->bestDistance;
-	result = (furthest_dist - bestArray[j]->bestDistance) /
-	  (furthest_dist-nearest_dist);
-      }
-      break;
-    case ExpDecay:
-      result = exp(-decay.alpha*pow(bestArray[j]->bestDistance, decay.beta));
-      break;
-    default:
-      throw logic_error( "wrong value in switch" );
-    }
-    return result;
-  }
-
   void BestArray::initNeighborSet( neighborSet& ns ) const {
     ns.clear();
     for ( unsigned int k = 0; k < size; ++k ) {
