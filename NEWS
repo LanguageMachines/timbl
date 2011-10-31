@@ -3,6 +3,8 @@
   * The -T option for TreeOrdening is now named --Treeorder
   * fixed tiebreaking for -R (random) option, closes bug 43, again.
   * some small fixes for '-pedantic'
+  * avoid zero result in Exponential Decay (bug 89).
+  * removed unused relativeWeight() function. (was duplicated)
 
 6.4.1 2011-08-25
 

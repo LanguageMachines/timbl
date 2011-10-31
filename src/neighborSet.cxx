@@ -162,6 +162,11 @@ namespace Timbl {
       break;
     case ExpDecay:
       result = exp(-d->alpha*pow(distances[k], d->beta));
+      if ( result == 0 ){
+	// A result of zero is undesirable. (bug 89)
+	// We optimisticly replace it with Epsilon
+	result = Epsilon;
+      }
       break;
     default:
       throw "wrong value in switch";
