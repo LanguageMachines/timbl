@@ -269,29 +269,29 @@ namespace Timbl {
 	}
 	initDecay();
 	calculate_fv_entropy( true );
-	if ( ib2_offset != 0 ){
-	  //
-	  // isn't this obsolete for the new IB2 implementation?
-	  // You should think so, But I see small differences :{
-	  // So leave this code for now
-	  //
-	  // invalidate MVDM matrices, they might be changing in size
-	  for ( size_t j=0; j < NumOfFeatures(); ++j ){
-	    if ( !Features[j]->Ignore() ){
-	      Features[j]->clear_matrix();
+	if (!is_copy ){
+	  if ( ib2_offset != 0 ){
+	    //
+	    // isn't this obsolete for the new IB2 implementation?
+	    // You should think so, But I see small differences :{
+	    // So leave this code for now
+	    //
+	    // invalidate MVDM matrices, they might be changing in size
+	    for ( size_t j=0; j < NumOfFeatures(); ++j ){
+	      if ( !Features[j]->Ignore() ){
+		Features[j]->clear_matrix();
+	      }
 	    }
 	  }
-	}
-	if ( initProbabilityArrays( all_vd ) )
-	  calculatePrestored();
-	else {
-	  Error( string("not enough memory for Probability Arrays")
-		 + "' in (" 
-		 + __FILE__  + "," + toString(__LINE__) + ")\n"
-		 + "ABORTING now" );
-	  throw std::bad_alloc();
-	}
-	if (!is_copy ){
+	  if ( initProbabilityArrays( all_vd ) )
+	    calculatePrestored();
+	  else {
+	    Error( string("not enough memory for Probability Arrays")
+		   + "' in (" 
+		   + __FILE__  + "," + toString(__LINE__) + ")\n"
+		   + "ABORTING now" );
+	    throw std::bad_alloc();
+	  }
 	  InitWeights();
 	  if ( do_diversify )
 	    diverseWeights();
