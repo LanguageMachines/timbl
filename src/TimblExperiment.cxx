@@ -27,6 +27,8 @@
       timbl@uvt.nl
 */
 
+//#define ANTAL 1
+
 #include <string>
 #include <vector>
 #include <map>
@@ -253,6 +255,9 @@ namespace Timbl {
   }  
 
   void TimblExperiment::initExperiment( bool all_vd ){ 
+#ifdef ANTAL
+    cerr << "initExperiment MBL_init = " << toString( MBL_init ) << endl;
+#endif
     if ( !ExpInvalid() ){
       match_depth = NumOfFeatures();
       if ( !MBL_init ){  // do this only when necessary
@@ -1856,7 +1861,13 @@ namespace Timbl {
       if ( numOfThreads > 1 ){
 	omp_set_num_threads( numOfThreads );
       }
+#ifdef ANTAL
+      cerr << "splitting into " << numOfThreads << " experiments" << endl;
+#endif
       threadBlock experiments( this, numOfThreads );
+#ifdef ANTAL
+      cerr << "splitting done" << endl;
+#endif
       // Start time.
       //
       time_t lStartTime;

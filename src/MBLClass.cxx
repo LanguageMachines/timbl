@@ -873,21 +873,23 @@ namespace Timbl {
 
   bool MBLClass::initProbabilityArrays( bool force ){
     bool result = true;
-    result = allocate_arrays();
-    if ( result ){
-      for ( size_t j = 0; j < num_of_features; ++j ) {
-	if ( !Features[j]->Ignore() &&
-	     !Features[j]->isNumerical() ){
-	  Features[j]->ClipFreq( (int)rint(clip_factor * 
-					   log((double)Features[j]->EffectiveValues())));
-	  if ( !Features[j]->ArrayRead() &&
-	       ( force ||
-		 Features[j]->isStorableMetric() ) ){
-	    Features[j]->InitSparseArrays();
-	  } 
-	}
-      } // j
-    }  
+    if ( !is_copy ){
+      result = allocate_arrays();
+      if ( result ){
+	for ( size_t j = 0; j < num_of_features; ++j ) {
+	  if ( !Features[j]->Ignore() &&
+	       !Features[j]->isNumerical() ){
+	    Features[j]->ClipFreq( (int)rint(clip_factor * 
+					     log((double)Features[j]->EffectiveValues())));
+	    if ( !Features[j]->ArrayRead() &&
+		 ( force ||
+		   Features[j]->isStorableMetric() ) ){
+	      Features[j]->InitSparseArrays();
+	    } 
+	  }
+	} // j
+      }  
+    }
     return result;
   }
   
@@ -895,33 +897,29 @@ namespace Timbl {
     For mvd metric.
   */
   void MBLClass::calculatePrestored(){
-    for ( size_t j = tribl_offset; j < effective_feats; ++j ) {
-      if ( !PermFeatures[j]->Ignore() && 
-	   PermFeatures[j]->isStorableMetric() ){
-	PermFeatures[j]->store_matrix( mvd_threshold );
-      }
-    }
-    //    for ( size_t j = 0; j < num_of_features; ++j ) {
-    //      if ( !Features[j]->Ignore() && 
-    //	   Features[j]->isStorableMetric() ){
-    //	Features[j]->store_matrix( mvd_threshold );
-    //      }
-    //    } // j
-    if ( Verbosity(VD_MATRIX) && !is_copy ) 
-      for ( size_t i = 0; i < num_of_features; ++i )
-	if ( !Features[i]->Ignore() ){
-	  bool dummy;
-	  if (Features[i]->matrixPresent( dummy ) ){
-	    *mylog << "Value matrix of feature # " 
-		   << i+1 << endl;
-	    Features[i]->print_matrix( *mylog, true );
-	    *mylog << endl;
-	  }
-	  else {
-	    *mylog << "Value Difference matrix of feature # " 
-		   << i+1 << endl << "Not available." << endl;
-	  }
+    if ( !is_copy ){
+      for ( size_t j = tribl_offset; j < effective_feats; ++j ) {
+	if ( !PermFeatures[j]->Ignore() && 
+	     PermFeatures[j]->isStorableMetric() ){
+	  PermFeatures[j]->store_matrix( mvd_threshold );
 	}
+      }
+      if ( Verbosity(VD_MATRIX) ) 
+	for ( size_t i = 0; i < num_of_features; ++i )
+	  if ( !Features[i]->Ignore() ){
+	    bool dummy;
+	    if (Features[i]->matrixPresent( dummy ) ){
+	      *mylog << "Value matrix of feature # " 
+		     << i+1 << endl;
+	      Features[i]->print_matrix( *mylog, true );
+	      *mylog << endl;
+	    }
+	    else {
+	      *mylog << "Value Difference matrix of feature # " 
+		     << i+1 << endl << "Not available." << endl;
+	    }
+	  }
+    }
   }
   
   const Instance *MBLClass::chopped_to_instance( PhaseValue phase ){
