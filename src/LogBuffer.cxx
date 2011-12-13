@@ -61,17 +61,14 @@ LogBuffer::LogBuffer( ostream& a, const char *mess, const LogFlag stamp ):
   in_sync( true ),
   level( LogNormal ),
   treshold_level( LogSilent ),
-  ass_mess( NULL )
 {
   if ( mess ){
-    ass_mess = new char[strlen(mess)+1];
-    strcpy( ass_mess, mess );
+    ass_mess = mess;
   }
 }
 
 LogBuffer::~LogBuffer(){
   sync();
-  delete [] ass_mess;
 }
 
 inline long millitm() {
@@ -121,7 +118,7 @@ void LogBuffer::buffer_out(){
       if ( stamp_flag & StampTime ){
 	*ass_stream << time_stamp( time_line, 50 );
       }
-      if ( ass_mess && (stamp_flag & StampMessage) )
+      if ( !ass_mess.empty() && (stamp_flag & StampMessage) )
 	*ass_stream << ass_mess << ":";
       in_sync = false;
     }
@@ -133,17 +130,15 @@ void LogBuffer::buffer_out(){
 //
 
 const char *LogBuffer::Message() const {
-  return ass_mess;
+  return ass_mess.c_str();
 }
 
 void LogBuffer::Message( const char *s ){
-  delete [] ass_mess;
   if ( s ){
-    ass_mess = new char[strlen(s)+1];
-    strcpy( ass_mess, s );
+    ass_mess = s;
   }
   else
-    ass_mess = NULL;
+    ass_mess = "";
 }
 
 void LogBuffer::Treshold( LogLevel l ){ 

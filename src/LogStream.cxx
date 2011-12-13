@@ -29,9 +29,9 @@
 
 #include <ctime>
 #include <cstdlib>
-#include <cstring>
 #include <cstdio>
 
+#include <string>
 #include <typeinfo>
 #include "timbl/LogStream.h"
 #include <pthread.h>
@@ -45,6 +45,7 @@ using std::streambuf;
 using std::cerr;
 using std::endl;
 using std::bad_cast;
+using std::string;
 
 LogStream::LogStream( int ) : 
   ostream( static_cast<streambuf *>(0) ), 
@@ -108,14 +109,9 @@ LogStream::LogStream( const LogStream *ls ):
 
 void LogStream::addmessage( const char *s ){
   if ( s ){
-    const char *tmp = buf.Message();
-    if ( tmp ){
-      char *new_m = (char *)malloc( (strlen(tmp) + strlen(s) + 1 ) );
-      strcpy( new_m, tmp );
-      strcat( new_m, s );
-      buf.Message( new_m );
-      free( new_m );
-    }
+    string tmp = buf.Message();
+    tmp += s;
+    buf.Message( tmp.c_str() );
   }
 }
 

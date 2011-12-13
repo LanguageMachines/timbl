@@ -63,7 +63,7 @@ class LogBuffer : public std::streambuf {
   bool in_sync;
   LogLevel level;
   LogLevel treshold_level;
-  char *ass_mess;
+  std::string ass_mess;
   void buffer_out();
   // prohibit copying and assignment
   LogBuffer( const LogBuffer& );
@@ -73,15 +73,16 @@ class LogBuffer : public std::streambuf {
 #else // __GNUC__
 
 #include <ctime>
-#include <cstring>
 #include <cstdio>
+#include <string>
+#include <cstring>
 #include <typeinfo>
 #include <iomanip>
 #include <iostream>
 #include <sys/time.h>
 
 template <class charT, class traits = std::char_traits<charT> >
-class basic_log_buffer : public std::basic_streambuf<charT, traits> {
+  class basic_log_buffer : public std::basic_streambuf<charT, traits> {
  public:
   basic_log_buffer( std::basic_ostream<charT,traits>&, const char * = NULL, 
 		    const LogFlag = StampBoth );
@@ -107,7 +108,7 @@ class basic_log_buffer : public std::basic_streambuf<charT, traits> {
   bool in_sync;
   LogLevel level;
   LogLevel treshold_level;
-  char *ass_mess;
+  std::string ass_mess;
   void buffer_out();
   // prohibit copying and assignment
   basic_log_buffer( const basic_log_buffer& );
@@ -123,11 +124,10 @@ basic_log_buffer<charT,traits>::basic_log_buffer( std::basic_ostream<charT,trait
 						  const LogFlag stamp ) {
   ass_stream = &a;
   if ( mess ){
-    ass_mess = new char[strlen(mess)+1];
-    strcpy( ass_mess, mess );
+    ass_mess = mess;
   }
   else
-    ass_mess = NULL;
+    ass_mess = "";
   stamp_flag = stamp;
   in_sync = true;
   level = LogNormal;
@@ -137,7 +137,6 @@ basic_log_buffer<charT,traits>::basic_log_buffer( std::basic_ostream<charT,trait
 template <class charT, class traits >
 basic_log_buffer<charT,traits>::~basic_log_buffer(){
   sync();
-  delete [] ass_mess;
 }
 
 inline long millitm() {
@@ -196,7 +195,7 @@ void basic_log_buffer<charT,traits>::buffer_out(){
       if ( stamp_flag & StampTime ){
 	*ass_stream << time_stamp( time_line, 50 );
       }
-      if ( ass_mess && ( stamp_flag & StampMessage ) )
+      if ( !ass_mess.empty() && ( stamp_flag & StampMessage ) )
 	*ass_stream << ass_mess << ":";
       in_sync = false;
     }
@@ -209,18 +208,16 @@ void basic_log_buffer<charT,traits>::buffer_out(){
 
 template <class charT, class traits >
 const char *basic_log_buffer<charT,traits>::Message() const {
-  return ass_mess;
+  return ass_mess.c_str();
 }
 
 template <class charT, class traits >
 void basic_log_buffer<charT,traits>::Message( const char *s ){
-  delete [] ass_mess;
   if ( s ){
-    ass_mess = new char[strlen(s)+1];
-    strcpy( ass_mess, s );
+    ass_mess = s;
   }
   else
-    ass_mess = NULL;
+    ass_mess.clear();
 }
 
 template <class charT, class traits >
