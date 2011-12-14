@@ -61,47 +61,24 @@ inline std::ostream& operator << (std::ostream& os,
   return m.func( os, m.l );
 }
 
-template <class T1, class T2 > class o_manip_2;
-template <class T1, class T2 > std::ostream& operator << (std::ostream&, const o_manip_2<T1,T2>& );
-
-template<class T1, class T2 > class o_manip_2{
-  typedef std::ostream& (*FRM)(std::ostream&, T1, T2 );
-  FRM func;
-  T1 l1;
-  T2 l2;
- public:
-  o_manip_2<T1,T2>( FRM f, T1 ll1, T2 ll2 ): func(f), l1(ll1), l2(ll2) {};
-  friend std::ostream& operator << LTGT (std::ostream&, const o_manip_2<T1,T2>& );
-  o_manip_2<T1,T2>( const o_manip_2<T1,T2>& o ):
-    func(o.func), l1(o.l1), l2(o.l2){};
- private:
-  o_manip_2<T1,T2> operator=( const o_manip_2<T1,T2>& );
-};
-
-template<class T1, class T2>
-inline std::ostream& operator << (std::ostream& os, 
-				  const o_manip_2<T1,T2>& m ){
-  return m.func( os, m.l1, m.l2 );
-}
-
 class LogStream : public std::ostream {
   friend o_manip<LogLevel> setlevel( LogLevel );
   friend o_manip<LogLevel> settreshold( LogLevel );
   friend o_manip<LogFlag> setstamp( LogFlag );
-  friend o_manip<const char *> setmessage( const char * );
-  friend o_manip<const char *> addmessage( const char * );
-  friend o_manip<const char *> addmessage( const int );
-  friend o_manip_2<const char *, const int> write_buf(const char*, const int );
+  friend o_manip<const std::string& > setmessage( const std::string& );
+  friend o_manip<const std::string&> addmessage( const std::string& );
+  friend o_manip<const std::string&> addmessage( const int );
+  friend o_manip<const std::string&> write_buf(const std::string& );
   friend bool IsActive( LogStream & );
   friend bool IsActive( LogStream * );
  public:
   LogStream();
   LogStream( int );
-  LogStream( const char * = NULL, LogFlag = StampBoth );
-  LogStream( std::ostream&, const char * = NULL,
+  LogStream( const std::string& ="", LogFlag = StampBoth );
+  LogStream( std::ostream&, const std::string& = "",
 	     LogFlag = StampBoth ); 
-  LogStream( const LogStream&, const char *, LogFlag ); 
-  LogStream( const LogStream&, const char * ); 
+  LogStream( const LogStream&, const std::string&, LogFlag ); 
+  LogStream( const LogStream&, const std::string& ); 
   LogStream( const LogStream * );
   bool set_single_threaded_mode();
   bool single_threaded() const { return single_threaded_mode; };
@@ -114,9 +91,9 @@ class LogStream : public std::ostream {
   void setstamp( LogFlag f ){ buf.StampFlag( f ); };
   LogFlag getstamp() const { return buf.StampFlag(); };
   void message( const std::string& s ){ buf.Message( s.c_str() ); };
-  void addmessage( const char * );
+  void addmessage( const std::string& );
   void addmessage( const int );
-  const char* message() const { return buf.Message(); };
+  const std::string& message() const { return buf.Message(); };
   static bool Problems();  
  private:
   LogBuffer buf;

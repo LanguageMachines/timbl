@@ -29,49 +29,6 @@
 #ifndef LOGBUFFER_H
 #define LOGBUFFER_H
 
-enum LogLevel{ LogSilent, LogNormal, LogDebug, LogHeavy, LogExtreme };
-enum LogFlag { NoStamp=0, StampTime=1, StampMessage=2, StampBoth=3 };
-
-#if !defined __GNUC__ 
-// braindead gcc
-#include <iomanip>
-#include <iostream>
-
-class LogBuffer : public std::streambuf {
- public:
-  LogBuffer( std::ostream& , const char * = NULL, 
-	     const LogFlag = StampBoth );
-  ~LogBuffer();
-  //
-  // setters/getters
-  LogLevel Level() const;
-  void Level( const LogLevel l );
-  LogLevel Treshold() const;
-  void Treshold( const LogLevel l );
-  const char *Message() const;
-  void Message( const char* );
-  LogFlag StampFlag() const;
-  void StampFlag( const LogFlag );
-  std::ostream& AssocStream() const;
-  void AssocStream( std::ostream & );
- protected:
-  int sync();
-  int overflow( int );
- private:
-  std::ostream *ass_stream;
-  LogFlag stamp_flag;
-  bool in_sync;
-  LogLevel level;
-  LogLevel treshold_level;
-  std::string ass_mess;
-  void buffer_out();
-  // prohibit copying and assignment
-  LogBuffer( const LogBuffer& );
-  LogBuffer& operator=( const LogBuffer& );
-};
-
-#else // __GNUC__
-
 #include <ctime>
 #include <cstdio>
 #include <string>
@@ -81,11 +38,14 @@ class LogBuffer : public std::streambuf {
 #include <iostream>
 #include <sys/time.h>
 
+enum LogLevel{ LogSilent, LogNormal, LogDebug, LogHeavy, LogExtreme };
+enum LogFlag { NoStamp=0, StampTime=1, StampMessage=2, StampBoth=3 };
+
 template <class charT, class traits = std::char_traits<charT> >
   class basic_log_buffer : public std::basic_streambuf<charT, traits> {
  public:
-  basic_log_buffer( std::basic_ostream<charT,traits>&, const char * = NULL, 
-		    const LogFlag = StampBoth );
+ basic_log_buffer( std::basic_ostream<charT,traits>&, const std::string& = "", 
+		   const LogFlag = StampBoth );
   ~basic_log_buffer();
   //
   // setters/getters
@@ -93,8 +53,8 @@ template <class charT, class traits = std::char_traits<charT> >
   void Level( const LogLevel l );
   LogLevel Treshold() const;
   void Treshold( const LogLevel l );
-  const char *Message() const;
-  void Message( const char* );
+ const std::string& Message() const;
+ void Message( const std::string& );
   std::basic_ostream<charT,traits>& AssocStream() const;
   void AssocStream( std::basic_ostream<charT,traits>& );
   LogFlag StampFlag() const;
@@ -120,14 +80,10 @@ typedef basic_log_buffer<wchar_t, std::char_traits<wchar_t> > wLogBuffer;
 
 template <class charT, class traits >
 basic_log_buffer<charT,traits>::basic_log_buffer( std::basic_ostream<charT,traits>& a,
-						  const char *mess, 
+						  const std::string& mess, 
 						  const LogFlag stamp ) {
   ass_stream = &a;
-  if ( mess ){
-    ass_mess = mess;
-  }
-  else
-    ass_mess = "";
+  ass_mess = mess;
   stamp_flag = stamp;
   in_sync = true;
   level = LogNormal;
@@ -145,13 +101,14 @@ inline long millitm() {
   return tp.tv_usec/1000;
 }
 
-inline char *time_stamp( char *time_line, int size ){
+inline std::string time_stamp(){
+  char time_line[50];
   time_t lTime;
   struct tm *curtime;
   time(&lTime);
   struct tm tmp;
   curtime = localtime_r(&lTime,&tmp);
-  strftime( time_line, size-5, "%Y%m%d:%H%M%S", curtime );
+  strftime( time_line, 45, "%Y%m%d:%H%M%S", curtime );
   sprintf( time_line+strlen(time_line), ":%03ld:", millitm() );
   return time_line;
 }
@@ -185,7 +142,6 @@ int basic_log_buffer<charT,traits>::sync() {
 
 template <class charT, class traits >
 void basic_log_buffer<charT,traits>::buffer_out(){
-  char time_line[50];
   if ( level > treshold_level ){
     // only output when we are on a high enough level
     if ( in_sync ) {
@@ -193,7 +149,7 @@ void basic_log_buffer<charT,traits>::buffer_out(){
       // that is: when we have had a newline and NOT when we just
       // overflowed due to a long line
       if ( stamp_flag & StampTime ){
-	*ass_stream << time_stamp( time_line, 50 );
+	*ass_stream << time_stamp();
       }
       if ( !ass_mess.empty() && ( stamp_flag & StampMessage ) )
 	*ass_stream << ass_mess << ":";
@@ -207,17 +163,13 @@ void basic_log_buffer<charT,traits>::buffer_out(){
 //
 
 template <class charT, class traits >
-const char *basic_log_buffer<charT,traits>::Message() const {
-  return ass_mess.c_str();
+  const std::string& basic_log_buffer<charT,traits>::Message() const {
+  return ass_mess;
 }
 
 template <class charT, class traits >
-void basic_log_buffer<charT,traits>::Message( const char *s ){
-  if ( s ){
-    ass_mess = s;
-  }
-  else
-    ass_mess.clear();
+  void basic_log_buffer<charT,traits>::Message( const std::string& s ){
+  ass_mess = s;
 }
 
 template <class charT, class traits >
@@ -265,7 +217,5 @@ template <class charT, class traits >
 LogFlag basic_log_buffer<charT,traits>::StampFlag() const { 
   return stamp_flag;
 }
-
-#endif // __GNUC__
 
 #endif // LOGBUFFER_H

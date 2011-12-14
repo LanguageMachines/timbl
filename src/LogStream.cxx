@@ -61,20 +61,20 @@ LogStream::LogStream() :
   single_threaded_mode(false) {
 }
 
-LogStream::LogStream( const char *message, LogFlag stamp ) : 
+LogStream::LogStream( const string& message, LogFlag stamp ) : 
   ostream( &buf ),
   buf( cerr, message, stamp ),
   single_threaded_mode(false) {
 }
 
-LogStream::LogStream( ostream& as, const char *message, LogFlag stamp ) : 
+LogStream::LogStream( ostream& as, const string& message, LogFlag stamp ) : 
   ostream( &buf ), 
   buf( as, message, stamp ),
   single_threaded_mode(false){
 }
 
 LogStream::LogStream( const LogStream& ls, 
-		      const char *message, LogFlag stamp ): 
+		      const string& message, LogFlag stamp ): 
   ostream( &buf ),  
   buf( ls.buf.AssocStream(), 
        ls.buf.Message(), 
@@ -85,7 +85,7 @@ LogStream::LogStream( const LogStream& ls,
   addmessage( message );
 }
 
-LogStream::LogStream( const LogStream& ls, const char *message ): 
+LogStream::LogStream( const LogStream& ls, const string& message ): 
   ostream( &buf ), 
   buf( ls.buf.AssocStream(), 
        ls.buf.Message(), 
@@ -107,11 +107,11 @@ LogStream::LogStream( const LogStream *ls ):
   buf.Treshold( ls->buf.Treshold() );
 }
 
-void LogStream::addmessage( const char *s ){
-  if ( s ){
+void LogStream::addmessage( const string& s ){
+  if ( !s.empty() ){
     string tmp = buf.Message();
     tmp += s;
-    buf.Message( tmp.c_str() );
+    buf.Message( tmp );
   }
 }
 
@@ -174,7 +174,7 @@ o_manip<LogFlag> setstamp( LogFlag f ){
   return o_manip<LogFlag>( &setstamp_sup, f );
 }
 
-ostream& setmess_sup( ostream& os, const char *m ){
+ostream& setmess_sup( ostream& os, const string& m ){
   try {
     LogStream& tmp = dynamic_cast<LogStream&>(os);
     tmp.message( m );
@@ -184,11 +184,11 @@ ostream& setmess_sup( ostream& os, const char *m ){
   return os;
 }
 
-o_manip<const char *> setmessage( const char *m ){
-  return o_manip<const char*>( &setmess_sup, m );
+o_manip<const string& > setmessage( const string& m ){
+  return o_manip<const string&>( &setmess_sup, m );
 }
 
-ostream& addmess_sup( ostream& os, const char *m ){
+ostream& addmess_sup( ostream& os, const string& m ){
   try {
     LogStream& tmp = dynamic_cast<LogStream&>(os);
     tmp.addmessage( m );
@@ -198,28 +198,28 @@ ostream& addmess_sup( ostream& os, const char *m ){
   return os;
 }
 
-o_manip<const char *> addmessage( const char *m ){
-  return o_manip<const char*>( &addmess_sup, m );
+o_manip<const string&> addmessage( const string& m ){
+  return o_manip<const string&>( &addmess_sup, m );
 }
 
-o_manip<const char *> addmessage( const int i ){
+o_manip<const string&> addmessage( const int i ){
   static char m[32]; // assume we are within the mutex here
   sprintf( m, "-%d", i );
-  return o_manip<const char*>( &addmess_sup, m );
+  return o_manip<const string&>( &addmess_sup, m );
 }
 
-ostream& write_sup( ostream& os, const char *m, const int l ){
+ostream& write_sup( ostream& os, const string& m ){
   try {
     LogStream& tmp = dynamic_cast<LogStream&>(os);
-    tmp.write( m, l );
+    tmp.write( m.data(), m.size() );
   }
   catch ( bad_cast ){
   }
   return os;
 }
 
-o_manip_2<const char *, const int> write_buf( const char *m, const int l ){
-  return o_manip_2<const char*, const int>( &write_sup, m, l );
+o_manip<const string&> write_buf( const string& m ){
+  return o_manip<const string&>( &write_sup, m );
 }
 
 pthread_mutex_t global_logging_mutex = PTHREAD_MUTEX_INITIALIZER;
