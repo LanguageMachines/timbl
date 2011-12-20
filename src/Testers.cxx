@@ -133,7 +133,7 @@ namespace Timbl{
 				  int mvdmThreshold ): 
     TesterClass( feat, perm ){
 #ifdef DBGTEST
-    cerr << "create a tester with treshold = " << mvdmThreshold << endl;
+    cerr << "create a tester with threshold = " << mvdmThreshold << endl;
 #endif
     metricTest = new metricTestFunction*[_size];
     for ( size_t i=0; i < _size; ++i ){

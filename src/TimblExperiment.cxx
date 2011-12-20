@@ -1484,7 +1484,7 @@ namespace Timbl {
       return false;
     }
     else if ( TRIBL_offset() != 0 ){
-      Error( "IB1 algorithm impossible while treshold > 0\n"
+      Error( "IB1 algorithm impossible while threshold > 0\n"
 	     "Please use TRIBL" );
       return false;
     }

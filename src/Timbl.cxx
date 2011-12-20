@@ -128,8 +128,8 @@ inline void usage_full(void){
   cerr << "     ED:a:b : Exponential Decay with factor a and b (no whitespace!)"
        << endl;
   cerr << "-k n      : k nearest neighbors (default n = 1)" << endl;
-  cerr << "-q n      : TRIBL treshold at level n" << endl;
-  cerr << "-L n      : MVDM treshold at level n" << endl;
+  cerr << "-q n      : TRIBL threshold at level n" << endl;
+  cerr << "-L n      : MVDM threshold at level n" << endl;
   cerr << "-R n      : solve ties at random with seed n" << endl;
   cerr << "-t  f     : test using file 'f'" << endl;
   cerr << "-t leave_one_out:"

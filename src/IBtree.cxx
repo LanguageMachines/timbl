@@ -1109,7 +1109,7 @@ namespace Timbl {
 
   TRIBL_InstanceBase *TRIBL_InstanceBase::Copy() const {
     TRIBL_InstanceBase *result = clone();
-    result->Treshold = Treshold;
+    result->Threshold = Threshold;
     result->DefAss = DefAss;
     result->DefaultsValid = DefaultsValid;
     result->NumOfTails = NumOfTails; // only usefull for Server???
@@ -1204,13 +1204,13 @@ namespace Timbl {
     DefaultsValid = true;
   }
 
-  void TRIBL_InstanceBase::AssignDefaults( size_t treshold ){
-    if ( Treshold != treshold ){
-      Treshold = treshold;
+  void TRIBL_InstanceBase::AssignDefaults( size_t threshold ){
+    if ( Threshold != threshold ){
+      Threshold = threshold;
       DefaultsValid = false;
     }
     if ( !DefaultsValid ){
-      InstBase->assign_defaults( Random, PersistentDistributions, Treshold );
+      InstBase->assign_defaults( Random, PersistentDistributions, Threshold );
     }
     DefAss = true;
     DefaultsValid = true;
@@ -1676,7 +1676,7 @@ namespace Timbl {
   }
 
   IB_InstanceBase *TRIBL_InstanceBase::TRIBL_test( const Instance& Inst, 
-						   size_t treshold,
+						   size_t threshold,
 						   const TargetValue *&TV,
 						   const ValueDistribution *&dist,
 						   size_t &level ) {
@@ -1685,12 +1685,12 @@ namespace Timbl {
     // or the subtree Instance Base necessary for IB1
     IBtree *pnt = InstBase;
 #pragma omp critical
-    AssignDefaults( treshold );
+    AssignDefaults( threshold );
     TV = NULL;
     dist = NULL;
     IB_InstanceBase *subt = NULL;
     size_t pos = 0;
-    while ( pnt && pos < treshold ){
+    while ( pnt && pos < threshold ){
       if ( pnt->FValue == Inst.FV[pos] ){
 	dist = pnt->TDistribution;
 	TV = pnt->TValue;
@@ -1704,7 +1704,7 @@ namespace Timbl {
       else
 	pnt = pnt->next;
     }
-    if ( pos == treshold ){
+    if ( pos == threshold ){
       if ( pnt ){
 	subt = IBPartition( pnt );
 	dist = NULL;

@@ -84,7 +84,7 @@ namespace Timbl {
       return false;
     }
     else if ( TRIBL_offset() == 0 ){
-      Error( "TRIBL algorithm impossible while treshold not set\n" );
+      Error( "TRIBL algorithm impossible while threshold not set\n" );
       return false;
     }
     return true;

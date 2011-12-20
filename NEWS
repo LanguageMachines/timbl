@@ -1,6 +1,6 @@
 6.4.2 2011-12-20
   * start to use Requires.private in timbl.pc
-  * added a 'test' target to Make system
+  * added a 'check' target to Make system
   * achieved a considerable speedup for multithreaded testing.
   * fixed a small problem in LogBuffer. Also simplified and cleaned up
     LogBuffer and LogStream code. All dependencies need recompiling!

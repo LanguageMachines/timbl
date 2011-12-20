@@ -63,7 +63,7 @@ inline std::ostream& operator << (std::ostream& os,
 
 class LogStream : public std::ostream {
   friend o_manip<LogLevel> setlevel( LogLevel );
-  friend o_manip<LogLevel> settreshold( LogLevel );
+  friend o_manip<LogLevel> setthreshold( LogLevel );
   friend o_manip<LogFlag> setstamp( LogFlag );
   friend o_manip<const std::string& > setmessage( const std::string& );
   friend o_manip<const std::string&> addmessage( const std::string& );
@@ -82,8 +82,8 @@ class LogStream : public std::ostream {
   LogStream( const LogStream * );
   bool set_single_threaded_mode();
   bool single_threaded() const { return single_threaded_mode; };
-  void settreshold( LogLevel t ){ buf.Treshold( t ); };
-  LogLevel gettreshold() const { return buf.Treshold(); };
+  void setthreshold( LogLevel t ){ buf.Threshold( t ); };
+  LogLevel getthreshold() const { return buf.Threshold(); };
   void setlevel( LogLevel l ){ buf.Level( l ); };
   LogLevel getlevel() const{ return buf.Level(); };
   void associate( std::ostream& os ) { buf.AssocStream( os ); };

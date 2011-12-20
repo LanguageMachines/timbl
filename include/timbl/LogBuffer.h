@@ -51,8 +51,8 @@ template <class charT, class traits = std::char_traits<charT> >
   // setters/getters
   LogLevel Level() const;
   void Level( const LogLevel l );
-  LogLevel Treshold() const;
-  void Treshold( const LogLevel l );
+  LogLevel Threshold() const;
+  void Threshold( const LogLevel l );
  const std::string& Message() const;
  void Message( const std::string& );
   std::basic_ostream<charT,traits>& AssocStream() const;
@@ -67,7 +67,7 @@ template <class charT, class traits = std::char_traits<charT> >
   LogFlag stamp_flag;
   bool in_sync;
   LogLevel level;
-  LogLevel treshold_level;
+  LogLevel threshold_level;
   std::string ass_mess;
   void buffer_out();
   // prohibit copying and assignment
@@ -87,7 +87,7 @@ basic_log_buffer<charT,traits>::basic_log_buffer( std::basic_ostream<charT,trait
   stamp_flag = stamp;
   in_sync = true;
   level = LogNormal;
-  treshold_level = LogSilent;
+  threshold_level = LogSilent;
 }
 
 template <class charT, class traits >
@@ -122,7 +122,7 @@ inline std::string time_stamp(){
 template <class charT, class traits >
 int basic_log_buffer<charT,traits>::overflow( int c ) {
   buffer_out();
-  if ( level > treshold_level && c != '\r' ){
+  if ( level > threshold_level && c != '\r' ){
     if ( c != EOF ){
       char z = static_cast<char>(c);
       ass_stream->put( z );
@@ -142,7 +142,7 @@ int basic_log_buffer<charT,traits>::sync() {
 
 template <class charT, class traits >
 void basic_log_buffer<charT,traits>::buffer_out(){
-  if ( level > treshold_level ){
+  if ( level > threshold_level ){
     // only output when we are on a high enough level
     if ( in_sync ) {
       // stamps and messages are only displayed when in sync
@@ -173,15 +173,15 @@ template <class charT, class traits >
 }
 
 template <class charT, class traits >
-void basic_log_buffer<charT,traits>::Treshold( LogLevel l ){ 
-  if ( treshold_level != l ){
-    treshold_level = l;
+void basic_log_buffer<charT,traits>::Threshold( LogLevel l ){ 
+  if ( threshold_level != l ){
+    threshold_level = l;
   }
 }
 
 template <class charT, class traits >
-LogLevel basic_log_buffer<charT,traits>::Treshold() const { 
-  return treshold_level;
+LogLevel basic_log_buffer<charT,traits>::Threshold() const { 
+  return threshold_level;
 }
 
 template <class charT, class traits >

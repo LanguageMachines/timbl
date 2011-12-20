@@ -81,7 +81,7 @@ LogStream::LogStream( const LogStream& ls,
        stamp ),
   single_threaded_mode( ls.single_threaded_mode ){
   buf.Level( ls.buf.Level() );
-  buf.Treshold( ls.buf.Treshold() );
+  buf.Threshold( ls.buf.Threshold() );
   addmessage( message );
 }
 
@@ -92,7 +92,7 @@ LogStream::LogStream( const LogStream& ls, const string& message ):
        ls.buf.StampFlag() ),
   single_threaded_mode( ls.single_threaded_mode ){
   buf.Level( ls.buf.Level() );
-  buf.Treshold( ls.buf.Treshold() );
+  buf.Threshold( ls.buf.Threshold() );
   addmessage( message );
 }
 
@@ -104,7 +104,7 @@ LogStream::LogStream( const LogStream *ls ):
        ls->buf.StampFlag() ), 
   single_threaded_mode( ls->single_threaded_mode ){
   buf.Level( ls->buf.Level() );
-  buf.Treshold( ls->buf.Treshold() );
+  buf.Threshold( ls->buf.Threshold() );
 }
 
 void LogStream::addmessage( const string& s ){
@@ -146,18 +146,18 @@ o_manip<LogLevel> setlevel( LogLevel l ){
   return o_manip<LogLevel>( &setlevel_sup, l );
 }
 
-ostream& settreshold_sup( ostream& os, LogLevel l ){
+ostream& setthreshold_sup( ostream& os, LogLevel l ){
   try {
     LogStream& tmp = dynamic_cast<LogStream&>(os);
-    tmp.settreshold( l );
+    tmp.setthreshold( l );
   }
   catch ( bad_cast ){
   }
   return os;
 }
 
-o_manip<LogLevel> settreshold( LogLevel l ){
-  return o_manip<LogLevel>( &settreshold_sup, l );
+o_manip<LogLevel> setthreshold( LogLevel l ){
+  return o_manip<LogLevel>( &setthreshold_sup, l );
 }
 
 ostream& setstamp_sup( ostream& os, LogFlag f ){
@@ -321,7 +321,7 @@ inline void mutex_release(){
 
 bool LogStream::IsBlocking(){
   if ( !bad() ){
-    return getlevel() <= gettreshold();
+    return getlevel() <= getthreshold();
   }
   else
     return true;
@@ -341,30 +341,30 @@ Log::Log( LogStream *os ){
     throw( "LogStreams FATAL error: No Stream supplied! " );
   }
   if ( os->single_threaded() || init_mutex() ){
-    my_level = os->gettreshold();
+    my_level = os->getthreshold();
     my_stream = os;
-    os->settreshold( LogSilent );
+    os->setthreshold( LogSilent );
   }
 }
 
 Log::Log( LogStream& os ){
   if ( os.single_threaded() || init_mutex() ){
-    my_level = os.gettreshold();
+    my_level = os.getthreshold();
     my_stream = &os;
-    os.settreshold( LogSilent );
+    os.setthreshold( LogSilent );
   }
 }
 
 Log::~Log(){
   my_stream->flush();
-  my_stream->settreshold( my_level );
+  my_stream->setthreshold( my_level );
   if ( !my_stream->single_threaded() )
     mutex_release();
 } 
 
 LogStream& Log::operator *(){
 #ifdef DARE_TO_OPTIMIZE
-  if ( my_stream->getlevel() > my_stream->gettreshold() )
+  if ( my_stream->getlevel() > my_stream->getthreshold() )
     return *my_stream; 
   else
     return null_stream;
@@ -379,29 +379,29 @@ Dbg::Dbg( LogStream *os ){
   }
   if ( os->single_threaded() || init_mutex() ){
     my_stream = os;
-    my_level = os->gettreshold();
-    os->settreshold( LogNormal );
+    my_level = os->getthreshold();
+    os->setthreshold( LogNormal );
   }
 }
 
 Dbg::Dbg( LogStream& os ){
   if ( os.single_threaded() || init_mutex() ){
     my_stream = &os;
-    my_level = os.gettreshold();
-    os.settreshold( LogNormal );
+    my_level = os.getthreshold();
+    os.setthreshold( LogNormal );
   }
 }
 
 Dbg::~Dbg(){
   my_stream->flush();
-  my_stream->settreshold( my_level );
+  my_stream->setthreshold( my_level );
   if ( !my_stream->single_threaded() )
     mutex_release();
 }
 
 LogStream& Dbg::operator *() { 
 #ifdef DARE_TO_OPTIMIZE
-  if ( my_stream->getlevel() > my_stream->gettreshold() )
+  if ( my_stream->getlevel() > my_stream->getthreshold() )
     return *my_stream; 
   else
     return null_stream;
@@ -416,29 +416,29 @@ xDbg::xDbg( LogStream *os ){
   }
   if ( os->single_threaded() || init_mutex() ){
     my_stream = os;
-    my_level = os->gettreshold();
-    os->settreshold( LogDebug );
+    my_level = os->getthreshold();
+    os->setthreshold( LogDebug );
   }
 }
 
 xDbg::xDbg( LogStream& os ){
   if ( os.single_threaded() || init_mutex() ){
     my_stream = &os;
-    my_level = os.gettreshold();
-    os.settreshold( LogDebug );
+    my_level = os.getthreshold();
+    os.setthreshold( LogDebug );
   }
 }
 
 xDbg::~xDbg(){
   my_stream->flush();
-  my_stream->settreshold( my_level );
+  my_stream->setthreshold( my_level );
   if ( !my_stream->single_threaded() )
     mutex_release();
 } 
 
 LogStream& xDbg::operator *(){
 #ifdef DARE_TO_OPTIMIZE
-  if ( my_stream->getlevel() > my_stream->gettreshold() )
+  if ( my_stream->getlevel() > my_stream->getthreshold() )
     return *my_stream; 
   else
     return null_stream;
@@ -453,29 +453,29 @@ xxDbg::xxDbg( LogStream *os ){
   }
   if ( os->single_threaded() || init_mutex() ){
     my_stream = os;
-    my_level = os->gettreshold();
-    os->settreshold( LogHeavy );
+    my_level = os->getthreshold();
+    os->setthreshold( LogHeavy );
   }
 }
 
 xxDbg::xxDbg( LogStream& os ){
   if ( os.single_threaded() || init_mutex() ){
     my_stream = &os;
-    my_level = os.gettreshold();
-    os.settreshold( LogHeavy );
+    my_level = os.getthreshold();
+    os.setthreshold( LogHeavy );
   }
 }
 
 xxDbg::~xxDbg(){
   my_stream->flush();
-  my_stream->settreshold( my_level );
+  my_stream->setthreshold( my_level );
   if ( !my_stream->single_threaded() )
     mutex_release();
 }
  
 LogStream& xxDbg::operator *(){
 #ifdef DARE_TO_OPTIMIZE
-  if ( my_stream->getlevel() > my_stream->gettreshold() )
+  if ( my_stream->getlevel() > my_stream->getthreshold() )
     return *my_stream; 
   else
     return null_stream;
