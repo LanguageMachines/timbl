@@ -707,19 +707,6 @@ namespace Timbl {
   
   Feature& Feature::operator=( const Feature& in ){
     if ( this != &in ){
-      // if ( in.PrestoreStatus == ps_read ){
-      // 	metric_matrix = in.metric_matrix->copy();
-      // 	metric = 0;
-      // 	setMetricType( in.getMetricType() );
-      // 	PrestoreStatus = in.PrestoreStatus;
-      // 	Prestored_metric = in.Prestored_metric;
-      // }
-      // else {
-      // 	metric_matrix = 0;
-      // 	metric = 0;
-      // 	PrestoreStatus = ps_undef;
-      // 	Prestored_metric = UnknownMetric;
-      // }
       metric_matrix = in.metric_matrix;
       metric = in.metric;
       PrestoreStatus = in.PrestoreStatus;
