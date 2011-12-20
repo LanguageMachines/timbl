@@ -242,7 +242,7 @@ namespace Timbl {
   public:
     TRIBL_InstanceBase( size_t size, unsigned long& cnt, 
 			bool rand, bool keep_dists ):
-      InstanceBase_base( size, cnt, rand, keep_dists ), Treshold(0) {};
+      InstanceBase_base( size, cnt, rand, keep_dists ), Threshold(0) {};
     TRIBL_InstanceBase *clone() const;
     TRIBL_InstanceBase *Copy() const;
     IB_InstanceBase *TRIBL_test( const Instance&,
@@ -253,7 +253,7 @@ namespace Timbl {
   private:
     IB_InstanceBase *IBPartition( IBtree * ) const;
     void AssignDefaults( size_t );
-    size_t Treshold;
+    size_t Threshold;
   };
 
   class TRIBL2_InstanceBase: public InstanceBase_base {
