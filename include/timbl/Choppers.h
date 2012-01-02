@@ -4,7 +4,7 @@
   $Id$
   $URL$
 
-  Copyright (c) 1998 - 2011
+  Copyright (c) 1998 - 2012
   ILK   - Tilburg University
   CLiPS - University of Antwerp
  
