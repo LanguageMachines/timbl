@@ -34,25 +34,24 @@ AC_SUBST([LIBTOOL_DEPS])
 # when running tests, use CXX
 AC_LANG([C++])
 
-PKG_PROG_PKG_CONFIG
-PKG_CHECK_MODULES([XML2], [libxml-2.0 >= 2.6.16] )
-CXXFLAGS="$CXXFLAGS $XML2_CFLAGS"
-LIBS="$LIBS $XML2_LIBS"
+#checks for libraries.
 
 # Checks for header files.
-AC_CHECK_HEADERS([sys/time.h sys/timeb.h unistd.h])
+AC_CHECK_HEADERS([sys/time.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
 AC_C_INLINE
-AC_C_CONST
 AC_TYPE_SIZE_T
-AC_HEADER_TIME
-AC_STRUCT_TM
 
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([floor gettimeofday localtime_r pow rint sqrt strchr])
+
+PKG_PROG_PKG_CONFIG
+PKG_CHECK_MODULES([XML2], [libxml-2.0 >= 2.6.16] )
+CXXFLAGS="$CXXFLAGS $XML2_CFLAGS"
+LIBS="$LIBS $XML2_LIBS"
 
 OPENMP_CHECK( [CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
 	       AC_DEFINE(HAVE_OPENMP, 1 , Define to 1 if you have OpenMP )],
