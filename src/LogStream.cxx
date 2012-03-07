@@ -40,6 +40,8 @@
 #define DARE_TO_OPTIMIZE
 #endif
 
+//#define LSDEBUG
+
 using std::ostream;
 using std::streambuf;
 using std::cerr;
@@ -232,7 +234,9 @@ struct lock_s { pthread_t id; int cnt; time_t tim; };
 lock_s locks[MAX_LOCKS];
 
 bool LogStream::Problems(){
-  //  cerr << "test for problems" << endl;
+#ifdef LSDEBUG
+  cerr << "test for problems" << endl;
+#endif
   bool result = false;
   time_t lTime;
   time(&lTime);
@@ -286,35 +290,47 @@ inline bool init_mutex(){
     }
     static_init = true;
   }
-  //  cerr << "voor Lock door thread " << pthread_self() << endl;
+#ifdef LSDEBUG
+  cerr << "voor Lock door thread " << pthread_self() << endl;
+#endif
   int pos = get_lock( pthread_self() );
   if ( locks[pos].cnt == 0 ){
     pthread_mutex_lock( &global_logging_mutex );
-//      cerr << "Thread " << pthread_self()  << " locked [" << pos 
-//  	 << "]" << endl;
+#ifdef LSDEBUG
+    cerr << "Thread " << pthread_self()  << " locked [" << pos 
+	 << "]" << endl;
+#endif
   }
   locks[pos].cnt++;
+#ifdef LSDEBUG
   if ( locks[pos].cnt > 1 ){
-//      cerr << "Thread " << pthread_self()  << " regained [" << pos 
-//  	 << "] cnt = " << locks[pos].cnt << endl;
+    cerr << "Thread " << pthread_self()  << " regained [" << pos 
+	 << "] cnt = " << locks[pos].cnt << endl;
   }
+#endif
   return static_init;
 }
 
 inline void mutex_release(){
-  //  cerr << "voor UnLock door thread " << pthread_self() << endl;
+#ifdef LSDEBUG
+  cerr << "voor UnLock door thread " << pthread_self() << endl;
+#endif
   int pos = get_lock( pthread_self() );
   locks[pos].cnt--;
   if ( locks[pos].cnt < 0 ){
     throw( "LogStreams FATAL error: mutex_release() failed" );
   }
+#ifdef LSDEBUG
   if ( locks[pos].cnt > 0 ){
-//      cerr << "Thread " << pthread_self()  << " still owns [" << pos 
-//  	 << "] cnt = "<< locks[pos].cnt << endl;
+    cerr << "Thread " << pthread_self()  << " still owns [" << pos 
+	 << "] cnt = "<< locks[pos].cnt << endl;
   }
+#endif
   if ( locks[pos].cnt == 0 ){
     locks[pos].id = 0;
-    //    cerr << "Thread " << pthread_self()  << " unlocked [" << pos << "]" << endl;
+#ifdef LSDEBUG
+    cerr << "Thread " << pthread_self()  << " unlocked [" << pos << "]" << endl;
+#endif
     pthread_mutex_unlock( &global_logging_mutex );
   }
 }
