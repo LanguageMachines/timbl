@@ -156,6 +156,9 @@ inline void usage_full(void){
   cerr << "--matrixin=<f> read ValueDifference Matrices from file 'f'" << endl;
   cerr << "-u f      : read value_class probabilities from file 'f'" 
        << endl;
+  cerr << "--occurrences=train|test|both assume occurrence info in the files."
+       << endl;
+  cerr << "             (train: in the train file, test: in the test file, both: in both)" << endl;
   cerr << "-P d      : read data using path 'd'" << endl;
   cerr << "-s        : use exemplar weights from the input file" << endl;
   cerr << "-s0       : silently ignore the exemplar weights from the input file" << endl;
