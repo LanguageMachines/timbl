@@ -146,6 +146,8 @@ namespace Timbl {
 					&num_of_neighbors, 1, 1, 100000 ) )
 	&& Options.Add( new IntegerOption( "PROGRESS", 
 					   &progress, 10000, 1, INT_MAX ) )
+	&& Options.Add( new IntegerOption( "HANDLE_OCCURRENCES", 
+					   &doOcc, 0, 0, 3 ) )
 	&& Options.Add( new IntegerOption( "CLIP_FACTOR", 
 					   &clip_factor, 10, 0, 1000000 ) );
     }
@@ -927,19 +929,35 @@ namespace Timbl {
     if ( num_of_features != target_pos ) {
       ChopInput->swapTarget( target_pos );
     }
+    int occ = ChopInput->getOcc();
+    if ( occ > 1 ){
+      CurrInst.Occurrences( occ );
+    }
     switch ( phase  ){
     case LearnWords:
       // Add the target.
       CurrInst.TV = Targets->add_value( ChopInput->getField( num_of_features ));
+      if ( occ > 1 ){
+	for ( int i = 1; i < occ; ++i ){
+	  Targets->add_value( ChopInput->getField( num_of_features ));
+	}
+      }
       // Now add the Feature values.
       for ( size_t i = 0; i < num_of_features; ++i ){
 	// when learning, no need to bother about Permutation
 	if ( Features[i]->Ignore() ) // but this might happen, take care!
 	  CurrInst.FV[i] = NULL;
-	else
+	else {
 	  // Add it to the Instance.
 	  CurrInst.FV[i] = Features[i]->add_value( ChopInput->getField(i),
 						   CurrInst.TV ); 
+	  if ( occ > 1 ){
+	    for ( int j = 1; j < occ; ++j ){
+	      Features[i]->add_value( ChopInput->getField(i),
+				      CurrInst.TV ); 
+	    }
+	  }
+	}
       } // i
       break;
     case TrainWords:
@@ -957,12 +975,23 @@ namespace Timbl {
       // Assumes that somehow Permutation and effective_feats are known
       // First the Target
       CurrInst.TV = Targets->add_value( ChopInput->getField(num_of_features ) );
+      if ( occ > 1 ){
+	for ( int i = 1; i < occ; ++i ){
+	  Targets->add_value( ChopInput->getField( num_of_features ));
+	}
+      }
       // Then the Features
       for ( size_t l = 0; l < effective_feats; ++l ){
 	size_t j = permutation[l];
 	CurrInst.FV[l] = Features[j]->add_value( ChopInput->getField(j),
 						 CurrInst.TV ); 
-      } // k
+	if ( occ > 1 ){
+	  for ( int j = 1; j < occ; ++j ){
+	    Features[l]->add_value( ChopInput->getField(l),
+				    CurrInst.TV ); 
+	  }
+	}
+      } // for l
       break;
     case TestWords:
       // Lookup for Testing
@@ -1544,7 +1573,7 @@ namespace Timbl {
       delete ChopInput;
       ChopInput = 0;
     }
-    ChopInput = Chopper::create( IF, chopExamples(), F_length );
+    ChopInput = Chopper::create( IF, chopExamples(), F_length, chopOcc() );
     if ( ChopInput ){
       input_format = IF;
       return true;
@@ -1872,7 +1901,8 @@ namespace Timbl {
       return num_of_features;
     else {
       try {
-	result = Chopper::countFeatures( inBuffer, IF, F_length, chopExamples() );
+	result = Chopper::countFeatures( inBuffer, IF, F_length, 
+					 chopExamples() || chopOcc() );
       }
       catch( const runtime_error& e ){
 	Error( e.what() );
@@ -1885,7 +1915,7 @@ namespace Timbl {
   }
 
   InputFormatType MBLClass::getInputFormat( const string& inBuffer ) const {
-    return Chopper::getInputFormat( inBuffer, chopExamples() );
+    return Chopper::getInputFormat( inBuffer, chopExamples() || chopOcc() );
   }
 
   size_t MBLClass::examineData( const string& FileName ){

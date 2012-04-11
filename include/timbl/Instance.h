@@ -338,12 +338,15 @@ namespace Timbl {
     void clear();
     double ExemplarWeight() const { return sample_weight; }; 
     void ExemplarWeight( const double sw ){ sample_weight = sw; }; 
+    int Occurrences() const { return occ; };
+    void Occurrences( const int o ) { occ = o; };
     size_t size() const { return FV.size(); };
     std::vector<FeatureValue *> FV;
     void permute( const std::vector<size_t> );
     TargetValue *TV;
   private:
     double sample_weight; // relative weight
+    int occ;
   };
   
 }

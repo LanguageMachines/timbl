@@ -85,6 +85,8 @@ namespace Timbl {
   bool CL_Options::Find( const char c, string &opt, bool& mood ) const {
     list<CL_item>::const_iterator pos;
     for ( pos = Opts.begin(); pos != Opts.end(); ++pos ){
+      if ( pos->isLong() )
+	continue;
       if ( pos->OptChar() == c ){
 	opt = pos->Option();
 	mood = pos->Mood();

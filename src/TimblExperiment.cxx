@@ -503,7 +503,7 @@ namespace Timbl {
 	  time_stamp( "Learning:  ", stats.dataLines() );
 	chopped_to_instance( TrainWords );
 	if ( !outInstanceBase )
-	  outInstanceBase =InstanceBase->clone();
+	  outInstanceBase = InstanceBase->clone();
 	//		  cerr << "add instance " << &CurrInst << endl;
 	if ( !outInstanceBase->AddInstance( CurrInst ) ){
 	  Warning( "deviating exemplar weight in:\n" + 
@@ -656,8 +656,7 @@ namespace Timbl {
       else {	
 	chopped_to_instance( TrainLearnWords );
 	MBL_init = false;
-	bool happy;
-	happy = InstanceBase->AddInstance( CurrInst );
+	bool happy = InstanceBase->AddInstance( CurrInst );
 	if ( !happy )
 	  Warning( "deviating exemplar weight in:\n" + 
 		   InstanceString + "\nIgnoring the new weight" );
@@ -740,8 +739,7 @@ namespace Timbl {
 	do {
 	  // The next Instance to store. 
 	  chopped_to_instance( TrainLearnWords );
-	  bool happy;
-	  happy = InstanceBase->AddInstance( CurrInst );
+	  bool happy = InstanceBase->AddInstance( CurrInst );
 	  if ( !happy ){
 	    Warning( "deviating exemplar weight in line #" + 
 		     toString<int>(stats.totalLines() ) + ":\n" +
@@ -1167,8 +1165,7 @@ namespace Timbl {
 	  while( go_on ){ 
 	    // The next Instance to store. 
 	    chopped_to_instance( TrainWords );
-	    bool happy;
-	    happy = InstanceBase->AddInstance( CurrInst );
+	    bool happy = InstanceBase->AddInstance( CurrInst );
 	    if ( !happy ){
 	      Warning( "deviating exemplar weight in line #" +
 		       toString<int>(stats.totalLines()) + ":\n" +
@@ -1308,8 +1305,7 @@ namespace Timbl {
 	    stats = stats_keep;
 	    if ( ResultTarget != CurrInst.TV ) {
 	      chopped_to_instance( TrainLearnWords );
-	      bool happy;
-	      happy = InstanceBase->AddInstance( CurrInst );
+	      bool happy = InstanceBase->AddInstance( CurrInst );
 	      if ( !happy ){
 		Warning( "deviating exemplar weight in line #" + 
 			 toString<int>(stats.totalLines() ) + ":\n" +

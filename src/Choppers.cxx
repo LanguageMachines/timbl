@@ -40,43 +40,54 @@ using namespace std;
 
 namespace Timbl{
 
-  Chopper *Chopper::create( InputFormatType IF, bool doEx, int fLen ){
+  Chopper *Chopper::create( InputFormatType IF, bool doEx, 
+			    int fLen, bool doOcc ){
     Chopper *result = 0;
     switch ( IF ){
     case C4_5:
-      if ( doEx )
+      if ( doOcc )
+	result = new C45_OccChopper();
+      else if ( doEx )
 	result = new C45_ExChopper();
       else
 	result = new C45_Chopper();
       break;
     case ARFF:
-      if ( doEx )
+      if ( doOcc )
+	result = new ARFF_OccChopper();
+      else if ( doEx )
 	result = new ARFF_ExChopper();
       else
 	result = new ARFF_Chopper();
       break;
     case SparseBin:
-      if ( doEx )
+      if ( doOcc )
+	result = new Bin_OccChopper();
+      else if ( doEx )
 	result = new Bin_ExChopper();
       else
 	result = new Bin_Chopper();
-      //      do_sparse = true;
       break;
     case Sparse:
-      if ( doEx )
+      if ( doOcc )
+	result = new Sparse_OccChopper();
+      else if ( doEx )
 	result = new Sparse_ExChopper();
       else
 	result = new Sparse_Chopper();
-      //      do_sparse = true;
       break;
     case Columns:
-      if ( doEx )
+      if ( doOcc )
+	result = new Columns_OccChopper();
+      else if ( doEx )
 	result = new Columns_ExChopper();
       else
 	result = new Columns_Chopper();
       break;
     case Compact:
-      if ( doEx )
+      if ( doOcc )
+	result = new Compact_OccChopper( fLen );
+      else if ( doEx )
 	result = new Compact_ExChopper( fLen );
       else
 	result = new Compact_Chopper( fLen );
@@ -129,14 +140,18 @@ namespace Timbl{
     return string( Buffer, 0, e_pos+1 );
   }
 
+  static string stripOcc( const string& Buffer,
+			  string& wght ) {
+    return stripExemplarWeight( Buffer, wght );
+  }
 
   size_t Chopper::countFeatures( const string& inBuffer, 
 				 InputFormatType IF,  
 				 int F_length,
-				 bool chopEx ) {
+				 bool chopTail ) {
     size_t result = 0;
     string buffer;
-    if ( chopEx ){
+    if ( chopTail ){
       string dummy;
       buffer = stripExemplarWeight( inBuffer, dummy );
     }
@@ -179,10 +194,10 @@ namespace Timbl{
   
  
   InputFormatType Chopper::getInputFormat( const string& inBuffer,
-					   bool stripEx ) {
+					   bool stripTail ) {
     InputFormatType IF = UnknownInputFormat;
     string buffer;
-    if ( stripEx ){
+    if ( stripTail ){
       string dummy;
       buffer = stripExemplarWeight( inBuffer, dummy );
     }
@@ -235,6 +250,44 @@ namespace Timbl{
       }
       else {
 	exW = tmp;
+      }
+    }
+    it = strippedInput.end();
+    --it;
+    if ( stripDot ){
+      // first trim trailing dot
+      if ( it != strippedInput.begin() && *it == '.' )
+	--it;
+    }
+    // strip remaining trailing spaces
+    while ( it != strippedInput.begin() && 
+	    isspace(*it) ) --it;
+    strippedInput.erase( ++it , strippedInput.end() );
+  }
+
+  void OccChopper::init( const string& s, size_t len, bool stripDot ) {
+    occ = 1;
+    strippedInput = s;
+    vSize = len+1;
+    choppedInput.resize(vSize);
+    string::iterator it = strippedInput.end();
+    --it;
+    // first trim trailing spaces 
+    while ( it != strippedInput.begin() && 
+	    isspace(*it) ) --it;
+    strippedInput.erase( ++it , strippedInput.end() );
+    string occS;
+    strippedInput = stripOcc( strippedInput, occS );
+    if ( occS.empty() ){
+      throw logic_error( "Missing occurence" );
+    }
+    else {
+      int tmp;
+      if ( !stringTo<int>( occS, tmp ) ){
+	throw runtime_error( "Wrong (non-integer) occurence value: '" + occS + "'" );
+      }
+      else {
+	occ = tmp;
       }
     }
     it = strippedInput.end();

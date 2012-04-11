@@ -1245,54 +1245,55 @@ namespace Timbl {
   }
   
   bool InstanceBase_base::AddInstance( const Instance& Inst ){
-    // add one instance to the IB
-    IBtree *hlp, **pnt = &InstBase;
-#ifdef IBSTATS
-    if ( mismatch.size() == 0 ){
-      mismatch.resize(Depth+1, 0);
-    }
-#endif
-    if ( !InstBase ){
-      for ( unsigned int i = 0; i < Depth; ++i ){
-	*pnt = new IBtree( Inst.FV[i] );
-	++ibCount;
-	pnt = &((*pnt)->link);
-      }
-      LastInstBasePos = InstBase;
-    }
-    else {
-      for ( unsigned int i = 0; i < Depth; ++i ){
-#ifdef IBSTATS
-	hlp = (*pnt)->add_feat_val( Inst.FV[i], mismatch[i], pnt, ibCount );
-#else
-	hlp = (*pnt)->add_feat_val( Inst.FV[i], pnt, ibCount );
-#endif
-	if ( i==0 && hlp->next == 0 )
-	  LastInstBasePos = hlp;
-	pnt = &(hlp->link);
-      }
-    }
-    if ( *pnt == NULL ){
-      *pnt = new IBtree();
-      ++ibCount;
-      if ( abs( Inst.ExemplarWeight() ) > Epsilon )
-	(*pnt)->TDistribution = new WValueDistribution();
-      else
-	(*pnt)->TDistribution = new ValueDistribution;
-      NumOfTails++;
-    }
     bool sw_conflict = false;
-    if ( abs( Inst.ExemplarWeight() ) > Epsilon ){
-      sw_conflict = (*pnt)->TDistribution->IncFreq( Inst.TV, 
-						    Inst.ExemplarWeight() );
+    for ( int occ=0; occ < Inst.Occurrences(); ++occ ){
+      // add one instance to the IB
+      IBtree *hlp, **pnt = &InstBase;
+#ifdef IBSTATS
+      if ( mismatch.size() == 0 ){
+	mismatch.resize(Depth+1, 0);
+      }
+#endif
+      if ( !InstBase ){
+	for ( unsigned int i = 0; i < Depth; ++i ){
+	  *pnt = new IBtree( Inst.FV[i] );
+	  ++ibCount;
+	  pnt = &((*pnt)->link);
+	}
+	LastInstBasePos = InstBase;
+      }
+      else {
+	for ( unsigned int i = 0; i < Depth; ++i ){
+#ifdef IBSTATS
+	  hlp = (*pnt)->add_feat_val( Inst.FV[i], mismatch[i], pnt, ibCount );
+#else
+	  hlp = (*pnt)->add_feat_val( Inst.FV[i], pnt, ibCount );
+#endif
+	  if ( i==0 && hlp->next == 0 )
+	    LastInstBasePos = hlp;
+	  pnt = &(hlp->link);
+	}
+      }
+      if ( *pnt == NULL ){
+	*pnt = new IBtree();
+	++ibCount;
+	if ( abs( Inst.ExemplarWeight() ) > Epsilon )
+	  (*pnt)->TDistribution = new WValueDistribution();
+	else
+	  (*pnt)->TDistribution = new ValueDistribution;
+	NumOfTails++;
+      }
+      if ( abs( Inst.ExemplarWeight() ) > Epsilon ){
+	sw_conflict = (*pnt)->TDistribution->IncFreq( Inst.TV, 
+						      Inst.ExemplarWeight() );
+      }
+      else
+	(*pnt)->TDistribution->IncFreq(Inst.TV);
+      TopDistribution->IncFreq(Inst.TV);
     }
-    else
-      (*pnt)->TDistribution->IncFreq(Inst.TV);
-    TopDistribution->IncFreq(Inst.TV);
     DefaultsValid = false;
     return !sw_conflict;
   }
-
 
   bool InstanceBase_base::MergeSub( InstanceBase_base *ib ){
     if ( ib->InstBase ){
@@ -1421,22 +1422,24 @@ namespace Timbl {
   }
 
   void InstanceBase_base::RemoveInstance( const Instance& Inst ){
-    // remove an instance from the IB
-    int pos = 0;
-    IBtree *pnt = InstBase;
-    while ( pnt ){
-      if ( pnt->link == NULL ){
-	pnt->TDistribution->DecFreq(Inst.TV);
-	TopDistribution->DecFreq(Inst.TV);
-	break;
-      }
-      else {
-	if ( pnt->FValue == Inst.FV[pos] ){
-	  pnt = pnt->link;
-	  pos++;
+    for ( int occ=0; occ < Inst.Occurrences(); ++occ ){
+      // remove an instance from the IB
+      int pos = 0;
+      IBtree *pnt = InstBase;
+      while ( pnt ){
+	if ( pnt->link == NULL ){
+	  pnt->TDistribution->DecFreq(Inst.TV);
+	  TopDistribution->DecFreq(Inst.TV);
+	  break;
 	}
-	else
-	  pnt = pnt->next;
+	else {
+	  if ( pnt->FValue == Inst.FV[pos] ){
+	    pnt = pnt->link;
+	    pos++;
+	  }
+	  else
+	    pnt = pnt->next;
+	}
       }
     }
     DefaultsValid = false;

@@ -96,6 +96,7 @@ namespace Timbl {
     outPath = "";
     logFile = "";
     pidFile = "";
+    occIn = 0;
   }
   
   GetOptClass::GetOptClass( CL_Options& Opts ):
@@ -171,7 +172,8 @@ namespace Timbl {
     parent_socket_os( in.parent_socket_os ),
     outPath( in.outPath ),
     logFile( in.logFile ),
-    pidFile( in.pidFile )
+    pidFile( in.pidFile ),
+    occIn( in.occIn )
   {
   }
   
@@ -344,7 +346,15 @@ namespace Timbl {
 	Exp->SetOption(  "HASHED_TREE: true" );
       else
 	Exp->SetOption(  "HASHED_TREE: false" );
-      if ( do_sample_weights ){
+      if ( occIn > 0 &&
+	   do_sample_weights ){
+	Error( "--occurrences and -s cannot be combined!" );
+	return false;
+      }
+      if ( occIn > 0 ){
+	Exp->SetOption( "HANDLE_OCCURRENCES: " + toString(occIn) );
+      }
+      else if ( do_sample_weights ){
 	Exp->SetOption(  "EXEMPLAR_WEIGHTS: true" );
 	if ( do_ignore_samples )
 	  Exp->SetOption( "IGNORE_EXEMPLAR_WEIGHTS: true" );
@@ -680,7 +690,7 @@ namespace Timbl {
     const char *ok_opt;
     switch ( mode ){
     case 0: 
-      ok_opt = "a:b:B:c:C:d:De:F:G:Hk:l:L:m:M:n:N:O:p:q:QR:sS:t:T:v:w:Wx"; 
+      ok_opt = "a:b:B:c:C:d:De:F:G:Hk:l:L:m:M:n:N:o:O:p:q:QR:sS:t:T:v:w:Wx"; 
       break;
     case 1:
       // limited usage, for @t
@@ -1011,6 +1021,35 @@ namespace Timbl {
 	
       case 'O':
 	outPath = myoptarg;
+	break;
+
+      case 'o':
+	if ( longOpt ){
+	  if ( long_option == "occurrences" ){
+	    if ( myoptarg.empty() ){
+	      Error( "missing value for '--occurrences'" );
+	      return false;
+	    }
+	    if ( myoptarg == "train" )
+	      occIn = 1;
+	    else if ( myoptarg == "test" )
+	      occIn = 2;
+	    else if ( myoptarg == "both" )
+	      occIn = 3;
+	    else {
+	      Error( "invalid --ocurrences value." );
+	      return false;
+	    }
+	  }
+	  else {
+	    Error( "invalid option: Did you mean '--ocurrences' ?" );
+	    return false;
+	  }
+	}
+	else if ( myoptarg.find("ccurences") != string::npos ){
+	  Error( "invalid option: Did you mean '--occurrences' ?" );
+	  return false;
+	}
 	break;
 	
       case 'p':

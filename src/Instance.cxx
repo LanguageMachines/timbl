@@ -1847,7 +1847,7 @@ namespace Timbl {
   }
   
   Instance::Instance():
-    TV(NULL), sample_weight(0.0) {
+    TV(NULL), sample_weight(0.0), occ(1) {
   }
   
   Instance::~Instance(){
@@ -1865,6 +1865,7 @@ namespace Timbl {
     }
     TV = 0;
     sample_weight = 0.0;
+    occ = 1;
   }
   
   void Instance::Init( size_t len ){

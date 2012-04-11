@@ -62,6 +62,7 @@ namespace Timbl {
     InputFormatType InputFormat() const { return input_format; };
     bool connectToSocket( std::ostream * );
     std::ostream *sock_os;
+    int getOcc() const { return doOcc; };
   protected:
     enum PhaseValue { TrainWords, LearnWords, TestWords, TrainLearnWords };
     friend std::ostream& operator<< ( std::ostream&, const PhaseValue& );
@@ -210,17 +211,29 @@ namespace Timbl {
     bool do_sample_weighting;
     bool do_ignore_samples;
     bool no_samples_test;
+    bool keep_distributions;
+    double DBEntropy;
+    TesterClass *tester;
+    int doOcc;
     bool chopExamples() const {
       return do_sample_weighting && 
 	!( runningPhase == TestWords && no_samples_test ); }
-    bool keep_distributions;
-    double DBEntropy;
+    bool chopOcc() const {
+      switch( runningPhase ) {
+      case TrainWords:
+      case LearnWords:
+      case TrainLearnWords:
+	return doOcc == 1 || doOcc == 3;
+      case TestWords:
+	return doOcc > 1;
+      default:
+	return false;
+      }
+    };
     void fill_table();
     void InvalidMessage() const ;
     double calculate_db_entropy( Target * );
     void do_numeric_statistics( );
-    TesterClass *tester;
-    
 
     void test_instance( const Instance& ,
 			InstanceBase_base * = NULL,

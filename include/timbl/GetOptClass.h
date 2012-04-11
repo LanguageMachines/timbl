@@ -102,6 +102,7 @@ namespace Timbl {
     std::string outPath;
     std::string logFile;
     std::string pidFile;
+    int occIn;
     void Error( const std::string& ) const;
     inline bool parse_range( std::string&, 
 			     std::string::iterator&,
