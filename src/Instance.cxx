@@ -390,7 +390,7 @@ namespace Timbl {
 	oss << f->value->Index() << " " << f->frequency;
       }
       ++it;
-      if ( it != distribution.end() )
+      if ( f->frequency > 0 && it != distribution.end() )
 	oss << ", ";
     }
     oss << " }";
@@ -429,7 +429,7 @@ namespace Timbl {
 	oss << f->value << " " << f->frequency;
       }
       ++it;
-      if ( it != distribution.end() )
+      if ( f->frequency > 0 && it != distribution.end() )
 	oss << ", ";
     }
     oss << " }";
