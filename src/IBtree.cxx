@@ -487,7 +487,7 @@ namespace Timbl {
     string buf;
     char delim;
     is >> ws >> buf;
-    result->FValue = Feats[level]->add_value( buf, NULL );
+    result->FValue = Feats[level]->add_value( buf, NULL, 1 );
     is >> delim;
     if ( !is || delim != '(' ){
       Error( "missing `(` in Instance Base file" );
@@ -552,7 +552,7 @@ namespace Timbl {
     char delim;
     int index;
     is >> index;
-    result->FValue = Feats[level]->add_value( index, NULL );
+    result->FValue = Feats[level]->add_value( index, NULL, 1 );
     is >> delim;
     if ( !is || delim != '(' ){
       Error( "missing `(` in Instance Base file" );
@@ -1246,51 +1246,51 @@ namespace Timbl {
   
   bool InstanceBase_base::AddInstance( const Instance& Inst ){
     bool sw_conflict = false;
-    for ( int occ=0; occ < Inst.Occurrences(); ++occ ){
-      // add one instance to the IB
-      IBtree *hlp, **pnt = &InstBase;
+    // add one instance to the IB
+    IBtree *hlp, **pnt = &InstBase;
 #ifdef IBSTATS
-      if ( mismatch.size() == 0 ){
-	mismatch.resize(Depth+1, 0);
-      }
-#endif
-      if ( !InstBase ){
-	for ( unsigned int i = 0; i < Depth; ++i ){
-	  *pnt = new IBtree( Inst.FV[i] );
-	  ++ibCount;
-	  pnt = &((*pnt)->link);
-	}
-	LastInstBasePos = InstBase;
-      }
-      else {
-	for ( unsigned int i = 0; i < Depth; ++i ){
-#ifdef IBSTATS
-	  hlp = (*pnt)->add_feat_val( Inst.FV[i], mismatch[i], pnt, ibCount );
-#else
-	  hlp = (*pnt)->add_feat_val( Inst.FV[i], pnt, ibCount );
-#endif
-	  if ( i==0 && hlp->next == 0 )
-	    LastInstBasePos = hlp;
-	  pnt = &(hlp->link);
-	}
-      }
-      if ( *pnt == NULL ){
-	*pnt = new IBtree();
-	++ibCount;
-	if ( abs( Inst.ExemplarWeight() ) > Epsilon )
-	  (*pnt)->TDistribution = new WValueDistribution();
-	else
-	  (*pnt)->TDistribution = new ValueDistribution;
-	NumOfTails++;
-      }
-      if ( abs( Inst.ExemplarWeight() ) > Epsilon ){
-	sw_conflict = (*pnt)->TDistribution->IncFreq( Inst.TV, 
-						      Inst.ExemplarWeight() );
-      }
-      else
-	(*pnt)->TDistribution->IncFreq(Inst.TV);
-      TopDistribution->IncFreq(Inst.TV);
+    if ( mismatch.size() == 0 ){
+      mismatch.resize(Depth+1, 0);
     }
+#endif
+    if ( !InstBase ){
+      for ( unsigned int i = 0; i < Depth; ++i ){
+	*pnt = new IBtree( Inst.FV[i] );
+	++ibCount;
+	pnt = &((*pnt)->link);
+      }
+      LastInstBasePos = InstBase;
+    }
+    else {
+      for ( unsigned int i = 0; i < Depth; ++i ){
+#ifdef IBSTATS
+	hlp = (*pnt)->add_feat_val( Inst.FV[i], mismatch[i], pnt, ibCount );
+#else
+	hlp = (*pnt)->add_feat_val( Inst.FV[i], pnt, ibCount );
+#endif
+	if ( i==0 && hlp->next == 0 )
+	  LastInstBasePos = hlp;
+	pnt = &(hlp->link);
+      }
+    }
+    if ( *pnt == NULL ){
+      *pnt = new IBtree();
+      ++ibCount;
+      if ( abs( Inst.ExemplarWeight() ) > Epsilon )
+	(*pnt)->TDistribution = new WValueDistribution();
+      else
+	(*pnt)->TDistribution = new ValueDistribution;
+      NumOfTails++;
+    }
+    int occ = Inst.Occurrences();
+    if ( abs( Inst.ExemplarWeight() ) > Epsilon ){
+      sw_conflict = (*pnt)->TDistribution->IncFreq( Inst.TV, occ,
+						    Inst.ExemplarWeight() );
+    }
+    else {
+      (*pnt)->TDistribution->IncFreq(Inst.TV, occ );
+    }
+    TopDistribution->IncFreq(Inst.TV, occ );
     DefaultsValid = false;
     return !sw_conflict;
   }

@@ -471,33 +471,37 @@ namespace Timbl {
     total_items += freq;
   }
   
-  bool ValueDistribution::IncFreq( const TargetValue *val, double ){
-    // search for val, if not there: add entry with frequency 1;
+  bool ValueDistribution::IncFreq( const TargetValue *val, 
+				   size_t occ, 
+				   double ){
+    // search for val, if not there: add entry with frequency 'occ';
     // otherwise increment the freqency
     size_t id = val->Index(); 
     VDlist::const_iterator it = distribution.find( id );
     if ( it != distribution.end() ){
-      it->second->IncFreq();
+      it->second->IncFreq( occ );
     }
     else
-      distribution[id] = new Vfield( val, 1, 1.0 );
-    total_items += 1;
+      distribution[id] = new Vfield( val, occ, 1.0 );
+    total_items += occ;
     return true;
   }
   
-  bool WValueDistribution::IncFreq( const TargetValue *val, double sw ){
-    // search for val, if not there: add entry with frequency 1;
+  bool WValueDistribution::IncFreq( const TargetValue *val, 
+				    size_t occ,
+				    double sw ){
+    // search for val, if not there: add entry with frequency 'occ';
     // otherwise increment the freqency
     // also set sample weight
     size_t id = val->Index(); 
     VDlist::const_iterator it = distribution.find( id );
     if ( it != distribution.end() ){
-      it->second->IncFreq();
+      it->second->IncFreq( occ );
     }  
     else {
-      distribution[id] = new Vfield( val, 1, sw );
+      distribution[id] = new Vfield( val, occ, sw );
     }
-    total_items += 1;
+    total_items += occ;
     return fabs( distribution[id]->Weight() - sw ) > Epsilon;
   }
   
@@ -1319,28 +1323,31 @@ namespace Timbl {
   }
 
   FeatureValue *Feature::add_value( const string& valstr, 
-				    TargetValue *tv ){
+				    TargetValue *tv, 
+				    int freq ){
     unsigned int hash_val = TokenTree->Hash( valstr );
-    return add_value( hash_val, tv );
+    return add_value( hash_val, tv, freq );
   }
   
   FeatureValue *Feature::add_value( size_t index, 
-				    TargetValue *tv ){
+				    TargetValue *tv,
+				    int freq ){
     IVCmaptype::const_iterator it = ValuesMap.find( index );
     if(  it == ValuesMap.end() ){
       const string& value = TokenTree->ReverseLookup( index );
       // we want to store the singleton value for this index
       // so we MUST reverse lookup the index
       FeatureValue *fv = new FeatureValue( value, index );
+      fv->ValFreq( freq );
       ValuesMap[index] = fv;
       ValuesArray.push_back( fv );
     }
     else {
-      it->second->incr_val_freq();
+      it->second->IncValFreq( freq );
     }
     FeatureValue *result = (FeatureValue *)ValuesMap[index];
     if ( tv )
-      result->TargetDist.IncFreq(tv);
+      result->TargetDist.IncFreq(tv, freq );
     return result;
   }
   
@@ -1350,7 +1357,7 @@ namespace Timbl {
     if ( FV ){
       FV->incr_val_freq();
       if ( tv )
-	FV->TargetDist.IncFreq(tv);
+	FV->TargetDist.IncFreq(tv,1);
       result = true;
     }
     return result;

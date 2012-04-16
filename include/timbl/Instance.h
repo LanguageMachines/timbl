@@ -59,7 +59,7 @@ namespace Timbl {
     const TargetValue *Value() const { return value; };
     void Value( const TargetValue *t ){  value = t; };
     size_t Freq() const { return frequency; };
-    void IncFreq() {  frequency += 1; };
+    void IncFreq( int inc=1 ) {  frequency += inc; };
     void AddFreq( int f ) {  frequency += f; weight += f; };
     void DecFreq() {  frequency -= 1; };
     double Weight() const { return weight; };
@@ -95,11 +95,11 @@ namespace Timbl {
     dist_iterator end() const { return distribution.end(); };
     virtual const TargetValue* BestTarget( bool &, bool = false ) const;
     void Merge( const ValueDistribution& );
-    virtual void SetFreq( const TargetValue *, const int, const double=1.0 );
-    virtual bool IncFreq( const TargetValue *, const double=1.0 );
+    virtual void SetFreq( const TargetValue *, int, double=1.0 );
+    virtual bool IncFreq( const TargetValue *, size_t, double=1.0 );
     void DecFreq( const TargetValue * );
     static ValueDistribution *read_distribution( std::istream &, 
-						  Target *, bool );
+						 Target *, bool );
     static ValueDistribution *read_distribution_hashed( std::istream &, 
 							Target *, bool );
     const std::string DistToString() const;
@@ -128,8 +128,8 @@ namespace Timbl {
   public:
     WValueDistribution(): ValueDistribution() {};
     const TargetValue* BestTarget( bool &, bool = false ) const;
-    void SetFreq( const TargetValue *, const int, const double );
-    bool IncFreq( const TargetValue *, const double );
+    void SetFreq( const TargetValue *, int, double );
+    bool IncFreq( const TargetValue *, size_t, double );
     WValueDistribution *to_WVD_Copy( ) const;
     const std::string SaveHashed() const;
     const std::string Save() const;
@@ -269,8 +269,8 @@ namespace Timbl {
     double Max() const { return n_max; };
     void Max( const double val ){ n_max = val; };
     double fvDistance( FeatureValue *, FeatureValue *, size_t=1 ) const;
-    FeatureValue *add_value( const std::string&, TargetValue * );
-    FeatureValue *add_value( size_t, TargetValue * );
+    FeatureValue *add_value( const std::string&, TargetValue *, int=1 );
+    FeatureValue *add_value( size_t, TargetValue *, int=1 );
     FeatureValue *Lookup( const std::string& ) const ;
     bool decrement_value( FeatureValue *, TargetValue * );
     bool increment_value( FeatureValue *, TargetValue * );
