@@ -938,12 +938,6 @@ namespace Timbl {
       // Add the target.
       CurrInst.TV = Targets->add_value( ChopInput->getField( num_of_features ),
 					occ );
-      // if ( occ > 1 ){
-      // 	for ( int i = 1; i < occ; ++i ){
-      // 	  Targets->add_value( ChopInput->getField( num_of_features ));
-      // 	}
-      // }
-
       // Now add the Feature values.
       for ( size_t i = 0; i < num_of_features; ++i ){
 	// when learning, no need to bother about Permutation
@@ -972,23 +966,11 @@ namespace Timbl {
       // First the Target
       CurrInst.TV = Targets->add_value( ChopInput->getField(num_of_features ),
 					occ );
-      // if ( occ > 1 ){
-      // 	for ( int i = 1; i < occ; ++i ){
-      // 	  Targets->add_value( ChopInput->getField( num_of_features ), 1 );
-      // 	}
-      // }
-
       // Then the Features
       for ( size_t l = 0; l < effective_feats; ++l ){
 	size_t j = permutation[l];
 	CurrInst.FV[l] = Features[j]->add_value( ChopInput->getField(j),
-						 CurrInst.TV, 1 ); 
-	if ( occ > 1 ){
-	  for ( int m = 1; m < occ; ++m ){
-	    Features[j]->add_value( ChopInput->getField(j),
-				    CurrInst.TV, 1 ); 
-	  }
-	}
+						 CurrInst.TV, occ ); 
       } // for l
       break;
     case TestWords:
