@@ -99,16 +99,16 @@ namespace Timbl {
     ostringstream oss;
     VDlist::const_iterator it = distribution.begin();
     oss << "{ ";
+    bool first = true;
     while ( it != distribution.end() ){
       Vfield *f = it->second;
-      if ( f->Freq() <= 0 ){
-	++it;
-	continue;
+      if ( f->Freq() > 0 ){
+	if ( !first )
+	  oss << ", ";
+	oss << encode(f->Value()->Name())<< " " << f->Freq();
+	first = false;
       }
-      oss << encode(f->Value()->Name())<< " " << f->Freq();
       ++it;
-      if ( it != distribution.end() )
-	oss << ", ";
     }
     oss << " }";
     DistStr = oss.str();
@@ -118,16 +118,16 @@ namespace Timbl {
     ostringstream oss;
     VDlist::const_iterator it = distribution.begin();
     oss << "{ ";
+    bool first = true;
     while ( it != distribution.end() ){
       Vfield *f = it->second;
-      if ( abs(f->weight) < Epsilon ){
-	++it;
-	continue;
+      if ( abs(f->weight) > Epsilon ){
+	if ( !first )
+	  oss << ", ";
+	oss << encode(f->value->Name()) << " " << f->weight;
+	first = false;
       }
-      oss << encode(f->value->Name()) << " " << f->weight;
       ++it;
-      if ( it != distribution.end() )
-	oss << ", ";
     }
     oss << " }";
     DistStr = oss.str();
@@ -141,18 +141,12 @@ namespace Timbl {
     oss << "{ ";
     while ( it != distribution.end() ){
       Vfield *f = it->second;
-      if ( f->frequency < minf ){
-	++it;
-	continue;
+      if ( f->frequency >= minf ){
+	if ( !first )
+	  oss << ", ";
+	oss << f->value << " " << double(f->frequency);
+	first = false;
       }
-      if ( f->frequency == 0 ){
-	++it;
-	continue;
-      }
-      if ( !first )
-	oss << ", ";
-      oss << f->value << " " << double(f->frequency);
-      first = false;
       ++it;
     }
     oss << " }";
@@ -167,7 +161,7 @@ namespace Timbl {
     oss << "{ ";
     while ( it != distribution.end() ){
       Vfield *f = it->second;
-      if (  abs(f->weight) < minw ){
+      if ( abs(f->weight) < minw ){
 	++it;
 	continue;
       }
@@ -380,14 +374,16 @@ namespace Timbl {
     ostringstream oss;
     VDlist::const_iterator it = distribution.begin();
     oss << "{ ";
+    bool first = true;
     while ( oss.good() && it != distribution.end() ){
       Vfield *f = it->second;
       if ( f->frequency > 0 ){
+	if ( !first )
+	  oss << ", ";
 	oss << f->value->Index() << " " << f->frequency;
+	first = false;
       }
       ++it;
-      if ( f->frequency > 0 && it != distribution.end() )
-	oss << ", ";
     }
     oss << " }";
     return oss.str();
@@ -396,16 +392,18 @@ namespace Timbl {
   const string WValueDistribution::SaveHashed() const{
     ostringstream oss;
     VDlist::const_iterator it = distribution.begin();
+    bool first = true;
     oss << "{ ";
     while ( oss.good() && it != distribution.end() ){
       Vfield *f = it->second;
       if ( f->frequency > 0 ){
+	if ( !first )
+	  oss << ", ";
 	oss << f->Value()->Index() << " " 
 	    << f->frequency << " " << f->weight;
+	first = false;
       }
       ++it;
-      if ( f->frequency > 0 && it != distribution.end() )
-	oss << ", ";
     }
     oss << " }";
     return oss.str();
@@ -419,14 +417,16 @@ namespace Timbl {
     ostringstream oss;
     VDlist::const_iterator it = distribution.begin();
     oss << "{ ";
+    bool first = true;
     while ( oss.good() && it != distribution.end() ){
       Vfield *f = it->second;
       if ( f->frequency > 0 ){
+	if ( !first )
+	  oss << ", ";
 	oss << f->value << " " << f->frequency;
+	first = false;
       }
       ++it;
-      if ( f->frequency > 0 && it != distribution.end() )
-	oss << ", ";
     }
     oss << " }";
     return oss.str();
@@ -436,15 +436,17 @@ namespace Timbl {
     ostringstream oss;
     VDlist::const_iterator it = distribution.begin();
     oss << "{ ";
+    bool first = true;
     while ( oss.good() && it != distribution.end() ){
       Vfield *f = it->second;
       if ( f->frequency > 0 ){
+	if ( !first )
+	  oss << ", ";
 	oss.setf(ios::showpoint);
 	oss << f->value << " " << f->frequency << " " << f->weight;
+	first = false;
       }
       ++it;
-      if ( it != distribution.end() )
-	oss << ", ";
     }
     oss << " }";
     return oss.str();
