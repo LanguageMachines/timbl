@@ -37,10 +37,6 @@
 #include <typeinfo>
 #include <cmath>
 #include <cstdio>
-#include <cstdlib>
-#include <cctype>
-#include <cstring>
-#include <cfloat>
 #include <cassert>
 
 #include "timbl/Common.h"
@@ -149,7 +145,7 @@ namespace Timbl {
 	++it;
 	continue;
       }
-      if ( abs(f->frequency) < Epsilon ){
+      if ( f->frequency == 0 ){
 	++it;
 	continue;
       }
