@@ -58,7 +58,7 @@ namespace Timbl {
     std::ostream& put( std::ostream& ) const;
     const TargetValue *Value() const { return value; };
     void Value( const TargetValue *t ){  value = t; };
-    int Freq() const { return frequency; };
+    size_t Freq() const { return frequency; };
     void IncFreq() {  frequency += 1; };
     void AddFreq( int f ) {  frequency += f; weight += f; };
     void DecFreq() {  frequency -= 1; };
@@ -67,7 +67,7 @@ namespace Timbl {
     size_t Index();
   protected:
     const TargetValue *value;
-    int frequency;
+    size_t frequency;
     double weight;
   private:
     Vfield& operator=( const Vfield& );
@@ -147,7 +147,7 @@ namespace Timbl {
 
   class ValueClass {
   public:
-    ValueClass( const std::string& n, unsigned int i ):
+    ValueClass( const std::string& n, size_t i ):
       name( n ), index( i ), Frequency( 1 ) {};
     virtual ~ValueClass() {};
     void ValFreq( size_t f ){ Frequency = f; };
@@ -155,12 +155,12 @@ namespace Timbl {
     size_t ValFreq( ) const { return Frequency; };
     void incr_val_freq(){ Frequency++; };
     void decr_val_freq(){ Frequency--; };
-    unsigned int Index() const { return index; };
+    size_t Index() const { return index; };
     const std::string& Name() const { return name; };
     friend std::ostream& operator<<( std::ostream& os, ValueClass const *vc );
   protected:
     const std::string& name;
-    unsigned int index;
+    size_t index;
     size_t Frequency;
     ValueClass( const ValueClass& );
     ValueClass& operator=( const ValueClass& );
@@ -168,7 +168,7 @@ namespace Timbl {
   
   class TargetValue: public ValueClass {
   public:
-    TargetValue( const std::string&, unsigned int );
+    TargetValue( const std::string&, size_t );
   };
   
   class SparseValueProbClass {
@@ -191,7 +191,7 @@ namespace Timbl {
     friend struct D_D;
   public:
     FeatureValue( const std::string& );
-    FeatureValue( const std::string&, unsigned int );
+    FeatureValue( const std::string&, size_t );
     ~FeatureValue();
     void ReconstructDistribution( const ValueDistribution& vd ) { 
       TargetDist.Merge( vd );
@@ -206,7 +206,7 @@ namespace Timbl {
     FeatureValue& operator=( const FeatureValue& );
   };
     
-  typedef std::map< unsigned int, ValueClass *> IVCmaptype;
+  typedef std::map< size_t, ValueClass *> IVCmaptype;
   typedef std::vector<ValueClass *> VCarrtype;
 
   class BaseFeatTargClass: public MsgClass {
@@ -231,9 +231,9 @@ namespace Timbl {
   public:
     Target( StringHash *T ): BaseFeatTargClass(T) {};
     TargetValue *add_value( const std::string&, int freq = 1 );
-    TargetValue *add_value( unsigned int, int freq = 1 );
+    TargetValue *add_value( size_t, int freq = 1 );
     TargetValue *Lookup( const std::string& ) const;
-    TargetValue *ReverseLookup( unsigned int ) const;
+    TargetValue *ReverseLookup( size_t ) const;
     bool decrement_value( TargetValue * );
     bool increment_value( TargetValue * );
     TargetValue *MajorityClass() const;
@@ -270,7 +270,7 @@ namespace Timbl {
     void Max( const double val ){ n_max = val; };
     double fvDistance( FeatureValue *, FeatureValue *, size_t=1 ) const;
     FeatureValue *add_value( const std::string&, TargetValue * );
-    FeatureValue *add_value( unsigned int, TargetValue * );
+    FeatureValue *add_value( size_t, TargetValue * );
     FeatureValue *Lookup( const std::string& ) const ;
     bool decrement_value( FeatureValue *, TargetValue * );
     bool increment_value( FeatureValue *, TargetValue * );
@@ -280,7 +280,7 @@ namespace Timbl {
     void InitSparseArrays();
     bool ArrayRead(){ return vcpb_read; };
     bool matrixPresent( bool& ) const;
-    unsigned int matrix_byte_size() const;
+    size_t matrix_byte_size() const;
     bool store_matrix( int = 1 );
     void clear_matrix();
     bool fill_matrix( std::istream& );

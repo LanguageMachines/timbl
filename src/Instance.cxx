@@ -408,7 +408,7 @@ namespace Timbl {
 	    << f->frequency << " " << f->weight;
       }
       ++it;
-      if ( it != distribution.end() )
+      if ( f->frequency > 0 && it != distribution.end() )
 	oss << ", ";
     }
     oss << " }";
@@ -560,7 +560,7 @@ namespace Timbl {
     VDlist::const_iterator It = distribution.begin();
     if ( It != distribution.end() ){
       Vfield *pnt = It->second;
-      int Max = pnt->Freq();
+      size_t Max = pnt->Freq();
       if ( do_rand ){
 	int nof_best=1, pick=1;
 	++It;
@@ -1268,7 +1268,7 @@ namespace Timbl {
   }
   
   FeatureValue::FeatureValue( const std::string& value,
-			      unsigned int hash_val ):
+			      size_t hash_val ):
     ValueClass( value, hash_val ), ValueClassProb( NULL ) {
   }
   
@@ -1283,11 +1283,11 @@ namespace Timbl {
   }
   
   TargetValue::TargetValue( const std::string& value,
-			    unsigned int value_hash ):
+			    size_t value_hash ):
     ValueClass( value, value_hash ){}
   
   size_t BaseFeatTargClass::EffectiveValues() const {
-    int result = 0;
+    size_t result = 0;
     VCarrtype::const_iterator it = ValuesArray.begin();
     while( it != ValuesArray.end() ){
       if ( (*it)->ValFreq() > 0 )
@@ -1324,7 +1324,7 @@ namespace Timbl {
     return add_value( hash_val, tv );
   }
   
-  FeatureValue *Feature::add_value( unsigned int index, 
+  FeatureValue *Feature::add_value( size_t index, 
 				    TargetValue *tv ){
     IVCmaptype::const_iterator it = ValuesMap.find( index );
     if(  it == ValuesMap.end() ){
@@ -1424,7 +1424,7 @@ namespace Timbl {
   
   TargetValue *Target::Lookup( const string& str ) const {
     TargetValue *result = 0;
-    unsigned int index = TokenTree->Lookup( str );
+    size_t index = TokenTree->Lookup( str );
     if ( index ) {
       IVCmaptype::const_iterator it = ValuesMap.find( index );
       result = (TargetValue *)it->second;
@@ -1432,7 +1432,7 @@ namespace Timbl {
     return result;
   }
 
-  TargetValue *Target::ReverseLookup( unsigned int index ) const {
+  TargetValue *Target::ReverseLookup( size_t index ) const {
     IVCmaptype::const_iterator it = ValuesMap.find( index );
     return dynamic_cast<TargetValue *>(it->second);
   }
@@ -1461,7 +1461,7 @@ namespace Timbl {
     return false;
   }
   
-  unsigned int Feature::matrix_byte_size() const {
+  size_t Feature::matrix_byte_size() const {
     if ( metric_matrix )
       return metric_matrix->NumBytes();
     else
@@ -1797,13 +1797,13 @@ namespace Timbl {
     return add_value( hash_val, freq );
   }
   
-  TargetValue *Target::add_value( unsigned int index, int freq ){
+  TargetValue *Target::add_value( size_t index, int freq ){
     IVCmaptype::const_iterator it = ValuesMap.find( index );
     if(  it == ValuesMap.end() ){
       const string& name = TokenTree->ReverseLookup( index );
       // we want to store the singleton value for this index
       // so we MUST reverse lookup the index
-      TargetValue *tv =  new TargetValue( name, index );
+      TargetValue *tv = new TargetValue( name, index );
       tv->ValFreq( freq );
       ValuesMap[index] = tv;
       ValuesArray.push_back( tv );
