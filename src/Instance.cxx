@@ -1201,7 +1201,7 @@ namespace Timbl {
     // otherwise 1. Special case when reading the TopDistribution.
     //
     TargetValue *target;
-    int freq;
+    size_t freq;
     unsigned int index;
     double sw;
     char nextCh;
