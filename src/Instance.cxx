@@ -1133,7 +1133,7 @@ namespace Timbl {
     ValueDistribution *result = 0;
     TargetValue *target;
     string buf;
-    int freq;
+    size_t freq;
     double sw;
     char nextCh;
     is >> nextCh;   // skip {
