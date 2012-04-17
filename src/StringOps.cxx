@@ -39,24 +39,6 @@
 using namespace std;
 namespace Timbl {
 
-  string encode( const string& buf ){
-    string result;
-    for( unsigned int i=0; i < buf.length(); ++i ){
-      if ( buf[i] == '<' ) {
-	result += "&lt;";
-      }
-      else if ( buf[i] == '>' ) {
-	result += "&gt;";
-      }
-      else if ( buf[i] == '&' ) {
-	result += "&amp;";
-      }
-      else
-	result += buf[i];
-    }
-    return result;
-  }
-  
   string StrToCode( const string &In ){
     string Out;
     string::const_iterator it = In.begin();

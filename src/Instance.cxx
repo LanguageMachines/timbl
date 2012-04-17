@@ -95,44 +95,6 @@ namespace Timbl {
     return 0.0;
   }
   
-  void ValueDistribution::DistToEncodedString( string& DistStr ) const {
-    ostringstream oss;
-    VDlist::const_iterator it = distribution.begin();
-    oss << "{ ";
-    bool first = true;
-    while ( it != distribution.end() ){
-      Vfield *f = it->second;
-      if ( f->Freq() > 0 ){
-	if ( !first )
-	  oss << ", ";
-	oss << encode(f->Value()->Name())<< " " << f->Freq();
-	first = false;
-      }
-      ++it;
-    }
-    oss << " }";
-    DistStr = oss.str();
-  }
-
-  void WValueDistribution::DistToEncodedString( string& DistStr ) const {
-    ostringstream oss;
-    VDlist::const_iterator it = distribution.begin();
-    oss << "{ ";
-    bool first = true;
-    while ( it != distribution.end() ){
-      Vfield *f = it->second;
-      if ( abs(f->weight) > Epsilon ){
-	if ( !first )
-	  oss << ", ";
-	oss << encode(f->value->Name()) << " " << f->weight;
-	first = false;
-      }
-      ++it;
-    }
-    oss << " }";
-    DistStr = oss.str();
-  }
-
   void ValueDistribution::DistToString( string& DistStr, double minf ) const {
     ostringstream oss;
     VDlist::const_iterator it = distribution.begin();
@@ -245,12 +207,6 @@ namespace Timbl {
     return result;
   }
 
-  const string ValueDistribution::ToEncodedString() const {
-    string result;
-    DistToEncodedString( result );
-    return result;
-  }  
-  
   double ValueDistribution::Entropy() const {
     double Prob = 0.0;
     double entropy = 0.0;

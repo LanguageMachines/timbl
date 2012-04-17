@@ -105,7 +105,6 @@ namespace Timbl {
     const std::string DistToString() const;
     const std::string DistToStringW( int ) const;
     double Confidence( const TargetValue * ) const;
-    virtual const std::string ToEncodedString() const;
     virtual const std::string SaveHashed() const;
     virtual const std::string Save() const;
     bool ZeroDist() const { return total_items == 0; };
@@ -113,7 +112,6 @@ namespace Timbl {
     ValueDistribution *to_VD_Copy( ) const;
     virtual WValueDistribution *to_WVD_Copy() const;
   protected:
-    virtual void DistToEncodedString( std::string& ) const;
     virtual void DistToString( std::string&, double=0 ) const;
     virtual void DistToStringWW( std::string&, int ) const;
     const TargetValue* BestTargetN( bool &, bool = false ) const;
@@ -138,7 +136,6 @@ namespace Timbl {
     void Normalize_2();
     void MergeW( const ValueDistribution&, double );
   private:
-    void DistToEncodedString( std::string& ) const;
     void DistToString( std::string&, double=0 ) const;
     void DistToStringWW( std::string&, int ) const;
     WValueDistribution *clone() const { 

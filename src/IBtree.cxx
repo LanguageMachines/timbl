@@ -274,19 +274,19 @@ namespace Timbl {
   
   xmlNode *to_node( const FeatureValue *fv ){
     xmlNode *result = XmlNewNode( "feature" );
-    XmlAddContent( result, encode(fv->Name()) );
+    XmlAddContent( result, fv->Name() );
     return result;
   }
 
   xmlNode *to_node( const TargetValue *tv ){
     xmlNode *result = XmlNewNode( "target" );
-    XmlAddContent( result, encode(tv->Name()) );
+    XmlAddContent( result, tv->Name() );
     return result;
   }
 
   xmlNode *to_node( const ValueDistribution *d ){
     xmlNode *result = XmlNewNode( "distribution" );
-    XmlAddContent( result, d->ToEncodedString() );
+    XmlAddContent( result, d->DistToString() );
     return result;
   }
   

@@ -59,8 +59,6 @@ namespace Timbl {
   void lowercase( std::string& );
   void uppercase( std::string& );
   
-  std::string encode( const std::string& );
-  
   std::string format_nonascii( const std::string& );
   
 }
