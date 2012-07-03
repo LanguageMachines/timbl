@@ -110,7 +110,10 @@ namespace Tries {
     //  Do F on each entry in the Trie
     //
     if ( the_info )
-      F( the_info );
+#pragma omp critical(trie_mod)
+      {
+	F( the_info );
+      }
     if ( sub_node )
       sub_node->Iterate( F );
     if ( next_node )
@@ -124,7 +127,10 @@ namespace Tries {
     //  Do F on each entry in the Trie
     //
     if ( the_info )
-      F( the_info, arg );
+#pragma omp critical(trie_mod)
+      {
+	F( the_info, arg );
+      }
     if ( sub_node )
       sub_node->Iterate( F, arg );
     if ( next_node )

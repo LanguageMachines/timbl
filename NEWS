@@ -1,6 +1,7 @@
 6.4.3 2012-**-**
   * added an --occurrences option for training/testing files with an occurrence
     value.
+  * made Tree.cxx and Trie.h 'omp thread-safe'
 
 6.4.2 2011-12-20
   * start to use Requires.private in timbl.pc

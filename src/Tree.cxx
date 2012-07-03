@@ -59,17 +59,21 @@ namespace Hash {
   }
 
   unsigned int StringHash::Hash( const string& name ){
-    HashInfo *info = StringTree.Retrieve( name );
-    if ( !info ){
-      info = new HashInfo( name, ++NumOfTokens );
-      info = (HashInfo *)StringTree.Store( name, info );
+    unsigned int idx = 0;
+#pragma omp critical(tree_mod)
+    {
+      HashInfo *info = StringTree.Retrieve( name );
+      if ( !info ){
+	info = new HashInfo( name, ++NumOfTokens );
+	info = (HashInfo *)StringTree.Store( name, info );
+      }
+      idx = info->Index();
+      if ( idx >= rev_index.size() ){
+	rev_index.resize( rev_index.size() + 1000 );
+      }
+      rev_index[idx] = info;
     }
-    unsigned int idx = info->Index();
-    if ( idx >= rev_index.size() ){
-      rev_index.resize( rev_index.size() + 1000 );
-    }
-    rev_index[idx] = info;
-    return info->Index();
+    return idx;
   }
   
   unsigned int StringHash::Lookup( const string& name ) const {
@@ -106,10 +110,14 @@ namespace Hash {
   }
   
   LexInfo *Lexicon::Store( const string& name, const string& translation ){
-    LexInfo *info = LexTree.Retrieve( name );
-    if ( !info ){
-      info = new LexInfo( name, translation );
-      return LexTree.Store( name, info );
+    LexInfo *info = 0;
+#pragma omp critical(tree_mod)
+    {
+      info = LexTree.Retrieve( name );
+      if ( !info ){
+	info = new LexInfo( name, translation );
+	info = LexTree.Store( name, info );
+      }
     }
     return info;
   }
