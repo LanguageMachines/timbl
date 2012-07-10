@@ -289,6 +289,9 @@ inline bool init_mutex(){
       locks[i].cnt = 0;
     }
     static_init = true;
+#ifdef LSDEBUG
+    cerr << "MUTEX system initialized!" << endl;
+#endif
   }
 #ifdef LSDEBUG
   cerr << "voor Lock door thread " << pthread_self() << endl;
