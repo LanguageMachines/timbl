@@ -45,9 +45,10 @@
 #include <cctype>
 #include <cassert>
 
+#include "ticcutils/StringOps.h"
+
 #include "timbl/MsgClass.h"
 #include "timbl/Common.h"
-#include "timbl/StringOps.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
 #include "timbl/Tree.h"
@@ -419,11 +420,11 @@ namespace Timbl {
     ostringstream tmp;
     Options.Show_Settings( tmp );
     vector<string> lines;
-    int num = split_at( tmp.str(), lines, "\n" );
+    int num = TiCC::split_at( tmp.str(), lines, "\n" );
     xmlNode *result = XmlNewNode("settings");
     for ( int i=0; i < num; ++i ){
       vector<string> parts;
-      if ( split_at( lines[i], parts, ":" ) ==2 ){
+      if ( TiCC::split_at( lines[i], parts, ":" ) ==2 ){
 	string tag = compress( parts[0] );
 	string val = compress( parts[1] );
 	XmlNewChild( result, tag, val );
@@ -1194,7 +1195,7 @@ namespace Timbl {
 	// 13      Ignore
 	//
 	vector<string> vals;
-	if ( split( Buffer, vals ) == 2 ){
+	if ( TiCC::split( Buffer, vals ) == 2 ){
 	  size_t i_f = stringTo<size_t>( vals[0] );
 	  if ( i_f > num_of_features ){
 	    Error( "in weightsfile, Feature index > Maximum, (" +
@@ -1257,7 +1258,7 @@ namespace Timbl {
 	else {
 	  if ( Buffer[0] == '#'){
 	    vector<string> vals;
-	    if ( split_at( Buffer, vals, " " ) == 2  ){
+	    if ( TiCC::split_at( Buffer, vals, " " ) == 2  ){
 	      WeightType tmp_w = Unknown_w;
 	      if ( !stringTo<WeightType>( vals[1], tmp_w ) )
 		continue;

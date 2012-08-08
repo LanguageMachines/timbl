@@ -32,6 +32,7 @@
 #include <vector>
 #include <climits>
 #include <cstdio>
+#include "ticcutils/StringOps.h"
 
 namespace Timbl {
   const int MAX_TABLE_SIZE =  50;
@@ -268,7 +269,7 @@ namespace Timbl {
     MetricType m = UnknownMetric;
     size_t i=0;
     std::vector<std::string> res;
-    bool result = split_at( line, res, "=" ) == 2 &&
+    bool result = TiCC::split_at( line, res, "=" ) == 2 &&
       stringTo<MetricType>( res[1], m ) && 
       stringTo<size_t>( res[0], i, 0, Size );
     if ( result ) 
@@ -395,7 +396,7 @@ namespace Timbl {
 			  std::string& name, 
 			  std::string& value ){
     std::vector<std::string> results;
-    size_t i = split_at( line, results, ":" );
+    size_t i = TiCC::split_at( line, results, ":" );
     switch (i){
     case 2:
       name = compress(results[0]);

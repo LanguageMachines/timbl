@@ -39,8 +39,9 @@
 #include <cstdio>
 #include <cassert>
 
+#include "ticcutils/StringOps.h"
+
 #include "timbl/Common.h"
-#include "timbl/StringOps.h"
 #include "timbl/MsgClass.h"
 #include "timbl/Tree.h"
 #include "timbl/Types.h"
@@ -1683,7 +1684,7 @@ namespace Timbl {
       if ( line.empty() ) break;
       vector<string> arr;
       double d;
-      if ( split_at( line, arr, " " ) != 2 ){
+      if ( TiCC::split_at( line, arr, " " ) != 2 ){
 	Error( "wrong line in inputfile" );
 	return false;
       }
@@ -1698,7 +1699,7 @@ namespace Timbl {
       else {
 	string stripped = arr[0].substr(1,arr[0].length()-2);
 	vector<string> parts;
-	if ( split_at( stripped, parts, ",\t" ) != 2 ){
+	if ( TiCC::split_at( stripped, parts, ",\t" ) != 2 ){
 	  Error( "wrong line in inputfile" );
 	  return false;
 	}

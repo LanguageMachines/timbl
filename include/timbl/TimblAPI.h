@@ -32,16 +32,15 @@
 
 #include <string>
 #include <vector>
-#include "StringOps.h"
-#include "Common.h"
-#include "MsgClass.h"
-#include "Types.h"
-#include "Options.h"
-#include "CommandLine.h"
-#include "Tree.h"
-#include "Instance.h"
-#include "neighborSet.h"
-#include "TimblExperiment.h"
+#include "timbl/Common.h"
+#include "timbl/MsgClass.h"
+#include "timbl/Types.h"
+#include "timbl/Options.h"
+#include "timbl/CommandLine.h"
+#include "timbl/Tree.h"
+#include "timbl/Instance.h"
+#include "timbl/neighborSet.h"
+#include "timbl/TimblExperiment.h"
 
 namespace Timbl{
   

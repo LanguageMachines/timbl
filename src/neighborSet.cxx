@@ -32,7 +32,6 @@
 #include <vector>
 
 #include "timbl/Common.h"
-#include "timbl/StringOps.h"
 #include "timbl/MsgClass.h"
 #include "timbl/Types.h"
 #include "timbl/Tree.h"

@@ -30,9 +30,9 @@
 #include <iostream>
 #include <string>
 #include <exception>
+
 #include "timbl/Common.h"
 #include "timbl/MsgClass.h"
-#include "timbl/StringOps.h"
 #include "timbl/Tree.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"

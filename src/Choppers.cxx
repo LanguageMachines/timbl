@@ -32,7 +32,7 @@
 #include <vector>
 #include <string>
 #include <cassert>
-#include "timbl/StringOps.h"
+#include "ticcutils/StringOps.h"
 #include "timbl/Types.h"
 #include "timbl/Choppers.h"
 
@@ -308,7 +308,7 @@ namespace Timbl{
     // which represent the feature-values and the target-value.
     init( InBuf, len, true );
     vector<string> splits;
-    size_t res = split_at( strippedInput, splits, "," );
+    size_t res = TiCC::split_at( strippedInput, splits, "," );
     if ( res != vSize )
       return false;
     for ( size_t i=0; i < res ; ++i ){

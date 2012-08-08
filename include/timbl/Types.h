@@ -39,65 +39,10 @@
 #include <ostream>
 #include <sstream>
 
-#include "StringOps.h"
+#include "ticcutils/StringOps.h"
+#include "timbl/StringOps.h"
 
 namespace Timbl {
-
-  template< typename T >
-    std::ostream& operator<< ( std::ostream& os, const std::set<T>& s ){
-    os << "{";
-    typename std::set<T>::const_iterator it = s.begin();
-    while ( it != s.end() ){
-      os << *it;
-      ++it;
-      if ( it != s.end() )
-	os << ",";
-    }
-    os << "}";
-    return os;
-  }
-
-  template< typename T >
-    std::ostream& operator<< ( std::ostream& os, const std::vector<T>& s ){
-    os << "[";
-    typename std::vector<T>::const_iterator it = s.begin();
-    while ( it != s.end() ){
-      os << *it;
-      ++it;
-      if ( it != s.end() )
-	os << ",";
-    }
-    os << "]";
-    return os;
-  }
-
-  template< typename S, typename T >
-    std::ostream& operator<< ( std::ostream& os, const std::map<S,T>& s ){
-    os << "{";
-    typename std::map<S,T>::const_iterator it = s.begin();
-    while ( it != s.end() ){
-      os << "<" << it->first << "," << it->second << ">";
-      ++it;
-      if ( it != s.end() )
-	os << ",";
-    }
-    os << "}";
-    return os;
-  }
-
-  template< typename S, typename T, typename U >
-    std::ostream& operator<< ( std::ostream& os, const std::map<S,T,U>& s ){
-    os << "{";
-    typename std::map<S,T,U>::const_iterator it = s.begin();
-    while ( it != s.end() ){
-      os << "<" << it->first << "," << it->second << ">";
-      ++it;
-      if ( it != s.end() )
-	os << ",";
-    }
-    os << "}";
-    return os;
-  }
 
   template< typename T >
     T stringTo( const std::string& str ) {
@@ -500,7 +445,7 @@ namespace Timbl {
   template <>
     inline VerbosityFlags stringTo<VerbosityFlags>( const std::string& str ) { 
     std::vector<std::string> tmp;
-    size_t cnt = split_at( str, tmp, "+" ); 
+    size_t cnt = TiCC::split_at( str, tmp, "+" ); 
     VerbosityFlags V = NO_VERB;
     for ( size_t i=0; i < cnt; ++i ){
       VerbosityFlags Flag;

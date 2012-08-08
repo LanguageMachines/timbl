@@ -29,7 +29,6 @@
 #include <map>
 #include <string>
 #include "timbl/Common.h"
-#include "timbl/StringOps.h"
 #include "timbl/MsgClass.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"

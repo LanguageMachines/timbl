@@ -34,7 +34,6 @@
 #include <cctype>
 #include <cstring>
 
-#include "timbl/StringOps.h"
 #include "timbl/Types.h"
 
 namespace Timbl {

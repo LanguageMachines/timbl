@@ -34,7 +34,6 @@
 #include <cerrno>
 #include <cfloat>
 #include "timbl/StringOps.h"
-#include "timbl/Types.h"
 
 using namespace std;
 namespace Timbl {
@@ -124,53 +123,6 @@ namespace Timbl {
     return result;
   }
   
-  size_t split_at( const string& src, vector<string>& results, 
-		   const string& sep ){
-    // split a string into substrings, using seps as seperator
-    // silently skip empty entries (e.g. when two or more seperators co-incide)
-    results.clear();
-    string::size_type pos = 0, p;
-    string res;
-    while ( pos != string::npos ){
-      p = src.find( sep, pos );
-      if ( p == string::npos ){
-	res = src.substr( pos );
-	pos = p;
-      }
-      else {
-	res = src.substr( pos, p - pos );
-	pos = p + sep.length();
-      }
-      if ( !res.empty() )
-	results.push_back( res );
-    }
-    return results.size();
-  }
-
-  size_t split_at_first_of( const string& src, vector<string>& results, 
-			    const string& seps ){
-    // split a string into substrings, using the characters in seps
-    // as seperators
-    // silently skip empty entries (e.g. when two or more seperators co-incide)
-    results.clear();
-    string::size_type e, s = src.find_first_not_of( seps );
-    string res;
-    while ( s != string::npos ){
-      e = src.find_first_of( seps, s );
-      if ( e == string::npos ){
-	res = src.substr( s );
-	s = e;
-      }
-      else {
-	res = src.substr( s, e - s );
-	s = src.find_first_not_of( seps, e );
-      }
-      if ( !res.empty() )
-	results.push_back( res );
-    }
-    return results.size();
-  }
-  
   string string_tok( const string& s, 
 		     string::size_type& pos,
 		     const string& seps ){
@@ -206,21 +158,6 @@ namespace Timbl {
       return true;
     else
       return false;
-  }
-
-  // format weird strings (like UTF8, LATIN1) printable 
-  // useful for debugging
-  string format_nonascii( const string& s ){
-    std::stringstream os;
-    os << std::showbase << std::hex;
-    unsigned int i;
-    for ( i=0; i < s.length(); ++i )
-      if ( isprint(s[i]) && (int)s[i] > 31 )
-	os << s[i];
-      else
-	os << "-" << (short int)s[i] << "-";
-    os << std::noshowbase << std::dec;
-    return os.str();
   }
 
 } // namespace Timbl

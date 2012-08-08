@@ -37,7 +37,6 @@
 #include "timbl/MsgClass.h"
 #include "timbl/IBtree.h"
 #include "timbl/Common.h"
-#include "timbl/StringOps.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
 #include "timbl/Options.h"
@@ -173,7 +172,7 @@ namespace Timbl {
     more = ( look_ahead(is) == '#' &&
 	     getline( is, buffer ) );
     while ( info_ok && more ){
-      size_t num = split( buffer, splits );
+      size_t num = TiCC::split( buffer, splits );
       if ( num > 2 ){
 	if ( compare_nocase_n( "Status:", splits[1] ) ){
 	  version = 2;

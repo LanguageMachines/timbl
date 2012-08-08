@@ -38,7 +38,6 @@
 
 #include "timbl/MsgClass.h"
 #include "timbl/Common.h"
-#include "timbl/StringOps.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
 #include "timbl/Tree.h"

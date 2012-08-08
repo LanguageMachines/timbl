@@ -36,8 +36,8 @@
 #include <ctime>
 #include <cstdio>
 
+#include "ticcutils/StringOps.h"
 #include "timbl/Common.h"
-#include "timbl/StringOps.h"
 #include "timbl/MsgClass.h"
 #include "timbl/Tree.h"
 #include "timbl/Types.h"
@@ -707,7 +707,7 @@ namespace Timbl {
     is >> ws;
     vector<string> vals;
     while ( getline( is, line ) ){
-      size_t i = split( line, vals );
+      size_t i = TiCC::split( line, vals );
       if ( i == 2 )
 	// just ignore index!
 	cats->Hash( vals[1] );
@@ -720,7 +720,7 @@ namespace Timbl {
       return false;
     }
     while ( getline( is, line ) ){
-      size_t i = split( line, vals );
+      size_t i = TiCC::split( line, vals );
       if ( i == 2 )
 	// just ignore index!
 	feats->Hash( vals[1] );

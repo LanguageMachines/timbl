@@ -48,10 +48,28 @@ AC_TYPE_SIZE_T
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([floor gettimeofday localtime_r pow rint sqrt strchr])
 
+# ugly hack when PKG_CONFIG_PATH isn't defined.
+# couldn't get it to work otherwise
+if test "x$PKG_CONFIG_PATH" = x; then
+    export PKG_CONFIG_PATH=""
+fi
+
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([XML2], [libxml-2.0 >= 2.6.16] )
 CXXFLAGS="$CXXFLAGS $XML2_CFLAGS"
 LIBS="$LIBS $XML2_LIBS"
+
+AC_ARG_WITH(ticcutils,
+       [  --with-ticcutils=DIR      use libticcutils installed in <DIR>; 
+        note that you can install libticcutils in a non-default directory with
+        ./configure --prefix=<DIR> in the libticutils installation directory],
+       [PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$withval/lib/pkgconfig"],
+       [PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$prefix/lib/pkgconfig"])
+AC_MSG_NOTICE( [pkg-config search path: $PKG_CONFIG_PATH] )
+PKG_CHECK_MODULES([ticcutils], [ticcutils >= 0.1] )
+CXXFLAGS="$CXXFLAGS $ticcutils_CFLAGS"
+LIBS="$LIBS $ticcutils_LIBS"
+
 
 OPENMP_CHECK( [CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
 	       AC_DEFINE(HAVE_OPENMP, 1 , Define to 1 if you have OpenMP )],
@@ -64,13 +82,6 @@ AC_SUBST([OPENMPFLAGS],[$OPENMP_CXXFLAGS])
 # do we need a solution for other compilers?????
 if test "$OPENMPFLAGS" = "-fopenmp"; then
    LIBS="$LIBS -lgomp"
-fi
-
-ACX_PTHREAD([],[AC_MSG_ERROR([We need pthread support!])])
-
-if test x"$acx_pthread_ok" = xyes; then
-   LIBS="$PTHREAD_LIBS $LIBS" \
-   CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 fi
 
 AC_CONFIG_FILES([
