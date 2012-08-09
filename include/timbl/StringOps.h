@@ -37,7 +37,6 @@
 #include <stdexcept>
 
 namespace Timbl {
-  std::string compress( const std::string& );
   
   std::string string_tok( const std::string&, 
 			  std::string::size_type&,

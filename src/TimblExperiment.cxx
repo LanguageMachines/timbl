@@ -71,9 +71,11 @@
 #include <omp.h>
 #endif
 
+using namespace std;
+
 namespace Timbl {
-  using namespace std;
-  using namespace Timbl;
+  #include "ticcutils/PrettyPrint.h"
+  using namespace TiCC;
 
   resultStore::~resultStore( ) {
     clear();
@@ -462,18 +464,7 @@ namespace Timbl {
     Error( "CVprepare called for NON CV experiment" );
     return false;
   }
-
-  ostream& operator<< ( ostream& os, const set<streamsize>& s ){
-    os << "{";
-    set<streamsize>::const_iterator it = s.begin();
-    while ( it != s.end() ){
-      os << *it << ",";
-      ++it;
-    }
-    os << "}";
-    return os;
-  }
-
+  
   ostream& operator<< ( ostream& os, const fileIndex& fi ){
     fileIndex::const_iterator it = fi.begin();
     while ( it != fi.end() ){

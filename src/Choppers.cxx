@@ -312,7 +312,7 @@ namespace Timbl{
     if ( res != vSize )
       return false;
     for ( size_t i=0; i < res ; ++i ){
-      choppedInput[i] = StrToCode( compress(splits[i]) );
+      choppedInput[i] = StrToCode( splits[i] );
     }
     return true;
   }
@@ -437,7 +437,7 @@ namespace Timbl{
     choppedInput[vSize-1] = "";
     string::size_type s_pos = strippedInput.find( "(" );
     if ( s_pos == string::npos )
-      choppedInput[vSize-1] = compress(strippedInput);
+      choppedInput[vSize-1] = TiCC::trim(strippedInput);
     else {
       string::size_type m_pos, e_pos = strippedInput.find( ")" );
       while ( s_pos < e_pos &&
@@ -449,14 +449,14 @@ namespace Timbl{
 	  return false;
 	else {
 	  choppedInput[k-1] = string( strippedInput, m_pos + 1, e_pos - m_pos -1 );
-	  choppedInput[k-1] = StrToCode( compress(choppedInput[k-1]) );
+	  choppedInput[k-1] = StrToCode( choppedInput[k-1] );
 	}
 	s_pos = strippedInput.find( '(', e_pos );
 	if ( s_pos == string::npos ){
 	  e_pos = strippedInput.find_first_not_of( ") \t", e_pos );
 	  if ( e_pos != string::npos ){
 	    choppedInput[vSize-1] = string( strippedInput, e_pos );
-	    choppedInput[vSize-1] = compress( choppedInput[vSize-1] );
+	    choppedInput[vSize-1] = TiCC::trim( choppedInput[vSize-1] );
 	  }
 	}
 	else

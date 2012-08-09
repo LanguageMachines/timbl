@@ -167,7 +167,7 @@ ActionType parse( const string& Buffer, int &pos, string *pars, int &len ){
   // first we take the first part and see if it is a NEW or FREE
   // command which need special attention.
   // otherwise we asume it to be the name of an experiment.
-  string Buf = compress( Buffer );
+  string Buf = TiCC::trim( Buffer );
   len = 0;
   if ( compare_nocase_n( Buf, "NEW ", 4 ) ){
     len = fill_params( pars, Buf.substr(4) );

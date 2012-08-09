@@ -425,8 +425,8 @@ namespace Timbl {
     for ( int i=0; i < num; ++i ){
       vector<string> parts;
       if ( TiCC::split_at( lines[i], parts, ":" ) ==2 ){
-	string tag = compress( parts[0] );
-	string val = compress( parts[1] );
+	string tag = TiCC::trim( parts[0] );
+	string val = TiCC::trim( parts[1] );
 	XmlNewChild( result, tag, val );
       }
     }
@@ -688,7 +688,7 @@ namespace Timbl {
     bool skip = false;
     bool anything = false;
     while ( getline( is, line ) ){
-      line = compress( line );
+      line = TiCC::trim( line );
       if ( line.empty() )
 	continue;
       if ( line.find( "Feature" ) != 0 ){
@@ -710,7 +710,7 @@ namespace Timbl {
 	  if ( pos == string::npos )
 	    line = "";
 	  else {
-	    line = compress( line.substr( pos ) );
+	    line = TiCC::trim( line.substr( pos ) );
 	  }
 	  if ( line.empty() ){
 	    if ( !Features[num-1]->isStorableMetric() ){
@@ -1720,32 +1720,6 @@ namespace Timbl {
     tester = getTester( globalMetricOption, Features, permutation, mvd_threshold );
   }
 
-  ostream& operator<< ( ostream& os, const vector<FeatureValue*>& fv ){
-    vector<FeatureValue*>::const_iterator it= fv.begin();
-    os << "vector<";
-    while( it != fv.end() ){
-      os << *it;
-      ++it;
-      if ( it != fv.end() )
-	os << ",";
-    }
-    os << ">";
-    return os;
-  }
-
-  ostream& operator<< ( ostream& os, const vector<double>& fv ){
-    vector<double>::const_iterator it= fv.begin();
-    os << "vector<";
-    while( it != fv.end() ){
-      os << *it;
-      ++it;
-      if ( it != fv.end() )
-	os << ",";
-    }
-    os << ">";
-    return os;
-  }
-  
   void MBLClass::test_instance( const Instance& Inst,
 				InstanceBase_base *IB,
 				size_t ib_offset ){

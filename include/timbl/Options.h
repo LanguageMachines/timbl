@@ -399,9 +399,9 @@ namespace Timbl {
     size_t i = TiCC::split_at( line, results, ":" );
     switch (i){
     case 2:
-      name = compress(results[0]);
+      name = TiCC::trim(results[0]);
     case 1:
-      value = compress(results[1]);
+      value = TiCC::trim(results[1]);
     default:
       break;
     }

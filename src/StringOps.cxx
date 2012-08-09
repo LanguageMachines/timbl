@@ -38,8 +38,9 @@
 
 using namespace std;
 namespace Timbl {
-
-  string StrToCode( const string &In ){
+  
+  string StrToCode( const string &par ){
+    string In = TiCC::trim(par);
     string Out;
     string::const_iterator it = In.begin();
     while ( it != In.end() ){
@@ -109,11 +110,6 @@ namespace Timbl {
     transform( s.begin(), s.end(), s.begin(), to_upper );
   }
 
-  string compress( const string& s ){
-    // remove leading and trailing spaces from a string
-    return TiCC::trim( s );
-  }
-  
   string string_tok( const string& s, 
 		     string::size_type& pos,
 		     const string& seps ){
