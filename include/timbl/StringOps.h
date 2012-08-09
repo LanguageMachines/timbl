@@ -48,9 +48,6 @@ namespace Timbl {
   std::string StrToCode( const std::string& );
   std::string CodeToStr( const std::string& );
   
-  void lowercase( std::string& );
-  void uppercase( std::string& );
-  
 }
 
 #endif

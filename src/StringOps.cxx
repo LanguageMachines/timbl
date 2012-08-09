@@ -99,17 +99,6 @@ namespace Timbl {
     return out;
   }
   
-  int to_lower( const int& i ){ return tolower(i); }
-  int to_upper( const int& i ){ return toupper(i); }
-  
-  void lowercase( string& s ){
-    transform( s.begin(), s.end(), s.begin(), to_lower );
-  }
-  
-  void uppercase( string& s ){
-    transform( s.begin(), s.end(), s.begin(), to_upper );
-  }
-
   string string_tok( const string& s, 
 		     string::size_type& pos,
 		     const string& seps ){

@@ -504,7 +504,7 @@ namespace Timbl {
   inline bool GetOptClass::parse_metrics( const string& Mline,
 					  MetricType& Def ){
     string line = TiCC::trim( Mline );
-    uppercase( line );
+    TiCC::toUpper( line );
     string::iterator p = line.begin();
     if ( p != line.end() ){
       switch ( *p++ ){
@@ -665,8 +665,7 @@ namespace Timbl {
       return true;
     }
     else {
-      string s = in;
-      uppercase(s);
+      string s = TiCC::uppercase( in );
       if ( s == "TRUE" || s == "YES" || s == "FALSE" || s == "NO" ){
 	val = ( s == "TRUE" || s == "YES" );
 	return true;
