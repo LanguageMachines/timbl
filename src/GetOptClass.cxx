@@ -504,7 +504,7 @@ namespace Timbl {
   inline bool GetOptClass::parse_metrics( const string& Mline,
 					  MetricType& Def ){
     string line = TiCC::trim( Mline );
-    TiCC::toUpper( line );
+    TiCC::to_upper( line );
     string::iterator p = line.begin();
     if ( p != line.end() ){
       switch ( *p++ ){
