@@ -193,6 +193,16 @@ namespace Timbl{
 	}
       };
       break;
+    case Tabbed:
+      for ( size_t j = 0; j < len; ++j ) {
+	if ( isspace(buffer[j]) ){
+	  result++;
+	  while ( isspace( buffer[++j] ) ){};
+	  if ( buffer[j] == '\0' )
+	    result--; // we had some trailing spaces
+	}
+      };
+      break;      
     default:
       throw logic_error( "CountFeatures: Illegal value in switch:" +
 			 toString(IF) );
