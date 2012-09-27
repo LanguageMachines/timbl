@@ -195,9 +195,9 @@ namespace Timbl{
       break;
     case Tabbed:
       for ( size_t j = 0; j < len; ++j ) {
-	if ( isspace(buffer[j]) ){
+	if ( buffer[j] == '\t' ){
 	  result++;
-	  while ( isspace( buffer[++j] ) ){};
+	  while ( buffer[++j]  == '\t' ){};
 	  if ( buffer[j] == '\0' )
 	    result--; // we had some trailing spaces
 	}
