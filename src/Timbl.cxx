@@ -147,7 +147,7 @@ inline void usage_full(void){
   cerr << "-f f      : read from Datafile 'f'" << endl;
   cerr << "-f f      : OR: use filenames from 'f' for CV test" << endl;
   cerr << "-F format : Assume the specified inputformat" << endl;
-  cerr << "            (Compact, C4.5, ARFF, Columns, Binary, Sparse )" 
+  cerr << "            (Compact, C4.5, ARFF, Columns, Tabbed, Binary, Sparse )" 
        << endl;
   cerr << "-l n      : length of Features (Compact format only)" << endl;
   cerr << "-i f      : read the InstanceBase from file 'f' "

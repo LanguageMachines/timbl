@@ -106,6 +106,7 @@ namespace Timbl {
     { "Compact", "Compact" },
     { "C45", "C4.5" },
     { "Column", "Columns" },
+    { "Tabbed", "Tabbed" },
     { "ARFF", "ARFF" },
     { "BINARY", "Sparse Binary" },
     { "SPARSE", "Sparse" } };

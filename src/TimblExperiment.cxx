@@ -840,6 +840,9 @@ namespace Timbl {
     case Columns:
       os << "InputFormat       : Columns";
       break;
+    case Tabbed:
+      os << "InputFormat       : Tabbed";
+      break;      
     case Compact:
       os << "InputFormat       : Compact, (Feature Length = "
 	 << F_length << ")";

@@ -1619,6 +1619,12 @@ namespace Timbl {
 	else
 	  result += inst.FV[InvPerm[j]]->Name() + " ";
 	break;
+      case Tabbed:
+	if ( Features[j]->Ignore() )
+	  result += "-*- ";
+	else
+	  result += inst.FV[InvPerm[j]]->Name() + "\t";
+	break;	
       default:
 	if ( Features[j]->Ignore() )
 	  result += string( F_length, '*' );

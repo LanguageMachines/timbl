@@ -150,6 +150,19 @@ namespace Timbl{
 
   class Columns_OccChopper : public Columns_Chopper, public OccChopper {
   };
+  
+  class Tabbed_Chopper : public virtual Chopper {
+  public:
+    bool chop( const std::string&, size_t );
+    std::string getString() const;
+  };
+
+  class Tabbed_ExChopper : public Tabbed_Chopper, public ExChopper {
+  };
+
+  class Tabbed_OccChopper : public Tabbed_Chopper, public OccChopper {
+  };
+  
 
   class Sparse_Chopper : public virtual Chopper {
   public:

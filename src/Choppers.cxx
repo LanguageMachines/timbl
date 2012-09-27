@@ -84,6 +84,14 @@ namespace Timbl{
       else
 	result = new Columns_Chopper();
       break;
+    case Tabbed:
+      if ( doOcc )
+	result = new Tabbed_OccChopper();
+      else if ( doEx )
+	result = new Tabbed_ExChopper();
+      else
+	result = new Tabbed_Chopper();
+      break;      
     case Compact:
       if ( doOcc )
 	result = new Compact_OccChopper( fLen );
@@ -423,6 +431,37 @@ namespace Timbl{
     string res;
     for ( size_t i = 0; i < vSize; ++i ) {
       res += choppedInput[i] + " ";
+    }
+    return res;
+  }
+  
+
+  
+  bool Tabbed_Chopper::chop( const string& InBuf, size_t len ){
+    // Lines look like this:
+    // one  two three bla
+    init( InBuf, len, false );
+    unsigned int i = 0;
+    string::size_type s_pos = 0;
+    string::size_type e_pos = strippedInput.find_first_of( "\t" );
+    while ( e_pos != s_pos && e_pos != string::npos && i < vSize ){
+      // stop if a zero length string is found or if too many entries show up
+      choppedInput[i++] = string( strippedInput, s_pos, e_pos - s_pos );
+      s_pos = strippedInput.find_first_not_of( "\t", e_pos );
+      e_pos = strippedInput.find_first_of( "\t", s_pos );
+    }
+    if ( e_pos != string::npos )
+      return false;
+    if ( s_pos != string::npos && i < vSize ){
+      choppedInput[i++] = string( strippedInput, s_pos );
+    }
+    return ( i == vSize ); // Enough?
+  }
+  
+  string Tabbed_Chopper::getString() const { 
+    string res;
+    for ( size_t i = 0; i < vSize; ++i ) {
+      res += choppedInput[i] + "\t";
     }
     return res;
   }

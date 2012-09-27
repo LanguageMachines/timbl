@@ -91,7 +91,7 @@ namespace Timbl {
   }
   
   enum InputFormatType { UnknownInputFormat,
-			 Compact, C4_5, Columns, ARFF, SparseBin,
+			 Compact, C4_5, Columns, Tabbed, ARFF, SparseBin,
 			 Sparse,
 			 MaxInputFormat };
   
