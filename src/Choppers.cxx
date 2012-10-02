@@ -463,7 +463,7 @@ namespace Timbl{
     if ( e_pos != string::npos )
       return false;
     if ( s_pos != string::npos && i < vSize ){
-      choppedInput[i++] = string( strippedInput, s_pos );
+      choppedInput[i++] = StrToCode( string( strippedInput, s_pos ) );
     }
     return ( i == vSize ); // Enough?
   }
@@ -471,7 +471,7 @@ namespace Timbl{
   string Tabbed_Chopper::getString() const { 
     string res;
     for ( size_t i = 0; i < vSize; ++i ) {
-      res += choppedInput[i] + "\t";
+      res += CodeToStr( choppedInput[i] ) + "\t";
     }
     return res;
   }
