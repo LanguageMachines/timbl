@@ -33,7 +33,6 @@
 #include <map>
 #include <cassert>
 
-#include "timbl/Tree.h"
 #include "timbl/MsgClass.h"
 #include "timbl/IBtree.h"
 #include "timbl/Common.h"

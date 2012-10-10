@@ -23,4 +23,4 @@ libtimbl_la_SOURCES = CommandLine.cxx Common.cxx XMLtools.cxx\
 	StringOps.cxx TimblAPI.cxx Choppers.cxx\
 	TimblExperiment.cxx IGExperiment.cxx Metrics.cxx Testers.cxx \
 	TRIBLExperiments.cxx LOOExperiment.cxx CVExperiment.cxx \
-	Tree.cxx Types.cxx neighborSet.cxx Statistics.cxx BestArray.cxx
+	Types.cxx neighborSet.cxx Statistics.cxx BestArray.cxx

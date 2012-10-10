@@ -35,9 +35,9 @@
 #include <map>
 #include "timbl/MsgClass.h"
 #include "timbl/Matrices.h"
+#include "ticcutils/TreeHash.h"
 
 namespace Timbl {
-  using Hash::StringHash;
   
   enum FeatVal_Stat { Unknown, Singleton, SingletonNumeric, NumericValue,
 		      NotNumeric };
@@ -208,7 +208,7 @@ namespace Timbl {
 
   class BaseFeatTargClass: public MsgClass {
   public:
-    BaseFeatTargClass( StringHash * );
+    BaseFeatTargClass( Hash::StringHash * );
     virtual ~BaseFeatTargClass();
     size_t EffectiveValues() const;
     size_t TotalValues() const;
@@ -216,7 +216,7 @@ namespace Timbl {
     IVCmaptype ValuesMap;
     virtual ValueClass *Lookup( const std::string& ) const = 0;
   protected:
-    StringHash *TokenTree;
+    Hash::StringHash *TokenTree;
     bool is_copy;
     BaseFeatTargClass( const BaseFeatTargClass& );
   private:
@@ -226,7 +226,7 @@ namespace Timbl {
   
   class Target: public BaseFeatTargClass {
   public:
-    Target( StringHash *T ): BaseFeatTargClass(T) {};
+  Target( Hash::StringHash *T ): BaseFeatTargClass(T) {};
     TargetValue *add_value( const std::string&, int freq = 1 );
     TargetValue *add_value( size_t, int freq = 1 );
     TargetValue *Lookup( const std::string& ) const;
@@ -241,7 +241,7 @@ namespace Timbl {
   class Feature: public BaseFeatTargClass {
     friend class MBLClass;
   public:
-    Feature( StringHash *T );
+    Feature( Hash::StringHash *T );
     ~Feature();
     bool Ignore() const { return ignore; };
     void Ignore( const bool val ){ ignore = val; };

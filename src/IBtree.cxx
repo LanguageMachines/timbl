@@ -37,9 +37,9 @@
 #include <cstdio>
 
 #include "ticcutils/StringOps.h"
+#include "ticcutils/TreeHash.h"
 #include "timbl/Common.h"
 #include "timbl/MsgClass.h"
-#include "timbl/Tree.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
 #include "timbl/XMLtools.h"
@@ -392,7 +392,9 @@ namespace Timbl {
     }
   }
   
-  void save_hash( ostream &os, StringHash *cats, StringHash *feats ){
+  void save_hash( ostream &os,
+		  Hash::StringHash *cats, 
+		  Hash::StringHash *feats ){
     int Size = cats->NumOfEntries();
     os << "Classes" << endl;
     for ( int i=1; i <= Size; ++i )
@@ -405,8 +407,8 @@ namespace Timbl {
   }
   
   void InstanceBase_base::Save( ostream &os, 
-				StringHash *cats, 
-				StringHash *feats,
+				Hash::StringHash *cats, 
+				Hash::StringHash *feats,
 				bool persist ) {
     // save an IBtree for later use.
     bool temp_persist =  PersistentDistributions;
@@ -695,8 +697,8 @@ namespace Timbl {
   }
   
   bool InstanceBase_base::read_hash( istream &is, 
-				     StringHash *cats,
-				     StringHash *feats ) const {
+				     Hash::StringHash *cats,
+				     Hash::StringHash *feats ) const {
     string line;
     is >> ws;
     is >> line;
@@ -732,7 +734,8 @@ namespace Timbl {
   
   bool InstanceBase_base::ReadIB( istream &is, 
 				  vector<Feature *>& Feats, Target *Targs,
-				  StringHash *cats, StringHash *feats,
+				  Hash::StringHash *cats, 
+				  Hash::StringHash *feats,
 				  int expected_version ){
     if ( read_IB( is, Feats, Targs, cats, feats, expected_version ) ){
       InstBase->redo_distributions();
@@ -748,7 +751,7 @@ namespace Timbl {
   
   bool IG_InstanceBase::ReadIB( istream &is, 
 				vector<Feature *>& Feats, Target *Targs,
-				StringHash *cats, StringHash *feats,
+				Hash::StringHash *cats, Hash::StringHash *feats,
 				int expected_version ){
     if ( read_IB( is, Feats, Targs, cats, feats, expected_version ) ){
       if ( PersistentDistributions ){
@@ -765,7 +768,8 @@ namespace Timbl {
   
   bool InstanceBase_base::read_IB( istream &is, 
 				   vector<Feature *>& Feats, Target *Targs,
-				   StringHash *cats, StringHash *feats,
+				   Hash::StringHash *cats, 
+				   Hash::StringHash *feats,
 				   int expected_version ){
     char delim;
     int dum;

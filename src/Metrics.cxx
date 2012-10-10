@@ -37,7 +37,6 @@
 
 #include "timbl/Common.h"
 #include "timbl/MsgClass.h"
-#include "timbl/Tree.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
 #include "timbl/Metrics.h"

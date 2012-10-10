@@ -53,7 +53,6 @@
 #include "timbl/Common.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
-#include "timbl/Tree.h"
 #include "timbl/Instance.h"
 #include "timbl/Choppers.h"
 #include "timbl/Metrics.h"

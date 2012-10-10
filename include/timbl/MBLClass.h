@@ -160,8 +160,8 @@ namespace Timbl {
     size_t num_of_neighbors;
     bool dynamic_neighbors;
     DecayType decay_flag;
-    StringHash *TargetStrings;
-    StringHash *FeatureStrings;
+    Hash::StringHash *TargetStrings;
+    Hash::StringHash *FeatureStrings;
     std::string exp_name;
     Instance CurrInst;
     BestArray bestArray;

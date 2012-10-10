@@ -40,10 +40,10 @@
 #include <cassert>
 
 #include "ticcutils/StringOps.h"
+#include "ticcutils/TreeHash.h"
 
 #include "timbl/Common.h"
 #include "timbl/MsgClass.h"
-#include "timbl/Tree.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
 #include "timbl/Metrics.h"
@@ -634,7 +634,7 @@ namespace Timbl {
     return best;
   }
 
-  Feature::Feature( StringHash *T ): 
+  Feature::Feature( Hash::StringHash *T ): 
     BaseFeatTargClass(T),
     metric_matrix( 0 ),
     metric( 0 ),
@@ -1360,7 +1360,7 @@ namespace Timbl {
       return false;
   }
 
-  BaseFeatTargClass::BaseFeatTargClass( StringHash *T ):
+  BaseFeatTargClass::BaseFeatTargClass( Hash::StringHash *T ):
     TokenTree( T ),
     is_copy(false){
   }

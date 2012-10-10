@@ -46,12 +46,12 @@
 #include <cassert>
 
 #include "ticcutils/StringOps.h"
+#include "ticcutils/TreeHash.h"
 
 #include "timbl/MsgClass.h"
 #include "timbl/Common.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
-#include "timbl/Tree.h"
 #include "timbl/Instance.h"
 #include "timbl/IBtree.h"
 #include "timbl/BestArray.h"
@@ -2002,8 +2002,8 @@ namespace Timbl {
 		  toString<size_t>( num_of_features+1 ) );
     Features.resize(num_of_features,NULL);
     PermFeatures.resize(num_of_features,NULL);
-    FeatureStrings = new StringHash(); // all features share the same hash
-    TargetStrings = new StringHash(); // targets has it's own hash
+    FeatureStrings = new Hash::StringHash(); // all features share the same hash
+    TargetStrings = new Hash::StringHash(); // targets has it's own hash
     Targets = new Target( TargetStrings );
     for ( size_t i=0; i< num_of_features; ++i ){
       Features[i] = new Feature( FeatureStrings );

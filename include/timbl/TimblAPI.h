@@ -37,7 +37,6 @@
 #include "timbl/Types.h"
 #include "timbl/Options.h"
 #include "timbl/CommandLine.h"
-#include "timbl/Tree.h"
 #include "timbl/Instance.h"
 #include "timbl/neighborSet.h"
 #include "timbl/TimblExperiment.h"

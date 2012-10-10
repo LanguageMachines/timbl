@@ -29,12 +29,12 @@
 #ifndef TIMBL_IBTREE_H
 #define TIMBL_IBTREE_H
 
+#include "ticcutils/TreeHash.h"
 #include "timbl/XMLtools.h"
 
 //#define IBSTATS
 
 namespace Timbl {
-  using Hash::StringHash;
 
   class IB_InstanceBase;
   class IG_InstanceBase;
@@ -132,17 +132,17 @@ namespace Timbl {
     virtual IB_InstanceBase *TRIBL2_test( const Instance& , 
 					  const ValueDistribution *&,
 					  size_t& );
-    bool read_hash( std::istream &, StringHash *, StringHash * ) const;
+    bool read_hash( std::istream &, Hash::StringHash *, Hash::StringHash * ) const;
     virtual InstanceBase_base *Copy() const = 0;
     virtual InstanceBase_base *clone() const = 0;
     void Save( std::ostream &, bool=false );
-    void Save( std::ostream &, StringHash *, StringHash *, bool=false );
+    void Save( std::ostream &, Hash::StringHash *, Hash::StringHash *, bool=false );
     void toXML( std::ostream& );
     void printStatsTree( std::ostream&, unsigned int startLevel );
     virtual bool ReadIB( std::istream&, std::vector<Feature *>&, 
 			 Target *, int );
     virtual bool ReadIB( std::istream &, std::vector<Feature *>&, Target *,
-			 StringHash *, StringHash *, int );
+			 Hash::StringHash *, Hash::StringHash *, int );
     virtual void Prune( const TargetValue *, long = 0 );
     virtual bool IsPruned() const { return false; };
     void CleanPartition(  bool );
@@ -194,7 +194,7 @@ namespace Timbl {
     void write_tree_hashed( std::ostream &os, const IBtree * ) const;
     bool read_IB( std::istream &, std::vector<Feature *>&, Target *, int );
     bool read_IB( std::istream &, std::vector<Feature *>&, Target *,
-		  StringHash *, StringHash *, int );
+		  Hash::StringHash *, Hash::StringHash *, int );
     void fill_index();
     const IBtree *fast_search_node( FeatureValue * );
   };
@@ -232,7 +232,7 @@ namespace Timbl {
 				      const TargetValue *& );
     bool ReadIB( std::istream &, std::vector<Feature *>&, Target *, int );
     bool ReadIB( std::istream &, std::vector<Feature *>&, Target *,
-		 StringHash *, StringHash *, int );
+		 Hash::StringHash *, Hash::StringHash *, int );
     bool MergeSub( InstanceBase_base * );
   protected:
     bool Pruned;
