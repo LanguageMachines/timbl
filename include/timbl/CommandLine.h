@@ -26,8 +26,8 @@
   or send mail to:
       timbl@uvt.nl
 */
-#ifndef COMMANDLINE_H
-#define COMMANDLINE_H
+#ifndef TIMBL_COMMANDLINE_H
+#define TIMBL_COMMANDLINE_H
 
 #include <list>
 #include <iosfwd>

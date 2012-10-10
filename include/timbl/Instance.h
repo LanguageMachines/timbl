@@ -26,8 +26,8 @@
   or send mail to:
       timbl@uvt.nl
 */
-#ifndef INSTANCE_H
-#define INSTANCE_H
+#ifndef TIMBL_INSTANCE_H
+#define TIMBL_INSTANCE_H
 
 #include <stdexcept>
 #include <list>

@@ -27,8 +27,8 @@
       timbl@uvt.nl
 */
 
-#ifndef MATRICES_H
-#define MATRICES_H
+#ifndef TIMBL_MATRICES_H
+#define TIMBL_MATRICES_H
 
 template <class T>  class SparseSymetricMatrix;
 template <class T> std::ostream& operator << (std::ostream&,
@@ -122,4 +122,4 @@ inline std::ostream& operator << (std::ostream& os,
   return os; 
 }
 
-#endif // MATRICES_H
+#endif // TIMBL_MATRICES_H

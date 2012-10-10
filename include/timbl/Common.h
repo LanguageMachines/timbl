@@ -26,8 +26,8 @@
   or send mail to:
       timbl@uvt.nl
 */
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef TIMBL_COMMON_H
+#define TIMBL_COMMON_H
 
 #include <iostream>
 #include <cmath>

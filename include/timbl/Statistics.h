@@ -27,8 +27,8 @@
       timbl@uvt.nl
 */
 
-#ifndef STATISTICS_H
-#define STATISTICS_H
+#ifndef TIMBL_STATISTICS_H
+#define TIMBL_STATISTICS_H
 
 namespace Timbl {
   class ConfusionMatrix: public MsgClass {

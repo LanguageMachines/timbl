@@ -1,5 +1,5 @@
-#ifndef CHOPPERS_H
-#define CHOPPERS_H
+#ifndef TIMBL_CHOPPERS_H
+#define TIMBL_CHOPPERS_H
 /*
   $Id$
   $URL$
@@ -177,4 +177,4 @@ namespace Timbl{
   };  
 
 }
-#endif // CHOPPERS_H
+#endif // TIMBL_CHOPPERS_H

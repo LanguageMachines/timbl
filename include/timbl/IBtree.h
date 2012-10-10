@@ -26,8 +26,8 @@
   or send mail to:
       timbl@uvt.nl
 */
-#ifndef IBtree_H
-#define IBtree_H
+#ifndef TIMBL_IBTREE_H
+#define TIMBL_IBTREE_H
 
 #include "timbl/XMLtools.h"
 

@@ -27,8 +27,8 @@
       timbl@uvt.nl
 */
 
-#ifndef STRING_OPS_H
-#define STRING_OPS_H
+#ifndef TIMBL_STRING_OPS_H
+#define TIMBL_STRING_OPS_H
 
 #include <string>
 #include <vector>

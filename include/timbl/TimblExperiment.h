@@ -27,8 +27,8 @@
       timbl@uvt.nl
 */
 
-#ifndef TIMBLEXP_H
-#define TIMBLEXP_H
+#ifndef TIMBL_EXPERIMENT_H
+#define TIMBL_EXPERIMENT_H
 
 #include <fstream>
 #include <set>
@@ -422,4 +422,4 @@ namespace Timbl {
   
 }
 
-#endif // TIMBLEXP_H
+#endif // TIMBL_EXPERIMENT_H

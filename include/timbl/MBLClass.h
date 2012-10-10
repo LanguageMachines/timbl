@@ -26,8 +26,8 @@
   or send mail to:
       timbl@uvt.nl
 */
-#ifndef MBLCLASS_H
-#define MBLCLASS_H
+#ifndef TIMBL_MBLCLASS_H
+#define TIMBL_MBLCLASS_H
 
 typedef struct _xmlNode xmlNode;
 
@@ -278,4 +278,4 @@ namespace Timbl {
   bool empty_line( const std::string& , const InputFormatType );
 }
 
-#endif // MBLCLASS_H
+#endif // TIMBL_MBLCLASS_H

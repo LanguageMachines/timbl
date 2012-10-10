@@ -27,8 +27,8 @@
       timbl@uvt.nl
 */
 
-#ifndef METRICS_H
-#define METRICS_H
+#ifndef TIMBL_METRICS_H
+#define TIMBL_METRICS_H
 
 #include <limits> 
 
@@ -150,4 +150,4 @@ namespace Timbl{
 
 }  
 
-#endif // METRICS_H
+#endif // TIMBL_METRICS_H

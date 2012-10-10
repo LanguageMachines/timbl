@@ -27,8 +27,8 @@
       timbl@uvt.nl
 */
 
-#ifndef XML_TOOLS_H
-#define XML_TOOLS_H
+#ifndef TIMBL_XML_TOOLS_H
+#define TIMBL_XML_TOOLS_H
 
 #include <list>
 #include "libxml/tree.h"

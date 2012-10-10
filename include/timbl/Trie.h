@@ -27,8 +27,8 @@
       timbl@uvt.nl
 */
 
-#ifndef TRIE_H
-#define TRIE_H
+#ifndef TICC_TRIE_H
+#define TICC_TRIE_H
 
 #if defined __GNUC__ || __IBMCPP__
 #define LTGT <>

@@ -26,8 +26,8 @@
   or send mail to:
       timbl@uvt.nl
 */
-#ifndef MSGCLASS_H
-#define MSGCLASS_H
+#ifndef TIMBL_MSGCLASS_H
+#define TIMBL_MSGCLASS_H
 
 namespace Timbl {
   class MsgClass{

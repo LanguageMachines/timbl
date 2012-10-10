@@ -27,8 +27,8 @@
       timbl@uvt.nl
 */
 
-#ifndef TIMBLAPI_H
-#define TIMBLAPI_H
+#ifndef TIMBL_API_H
+#define TIMBL_API_H
 
 #include <string>
 #include <vector>
@@ -161,4 +161,4 @@ namespace Timbl{
   bool string_to( const std::string&, Weighting& );
   
 }
-#endif // TIMBLAPI_H
+#endif // TIMBL_API_H

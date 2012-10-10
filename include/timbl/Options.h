@@ -26,8 +26,8 @@
   or send mail to:
       timbl@uvt.nl
 */
-#ifndef OPTIONS_H
-#define OPTIONS_H
+#ifndef TIMBL_OPTIONS_H
+#define TIMBL_OPTIONS_H
 
 #include <vector>
 #include <climits>

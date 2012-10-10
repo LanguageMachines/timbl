@@ -27,8 +27,8 @@
       timbl@uvt.nl
 */
 
-#ifndef NEIGHBORSET_H
-#define NEIGHBORSET_H
+#ifndef TIMBL_NEIGHBORSET_H
+#define TIMBL_NEIGHBORSET_H
 namespace Timbl{
 
   class decayStruct {

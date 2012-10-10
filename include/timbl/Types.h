@@ -27,8 +27,8 @@
       timbl@uvt.nl
 */
 
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef TIMBL_TYPES_H
+#define TIMBL_TYPES_H
 
 #include <string>
 #include <set>

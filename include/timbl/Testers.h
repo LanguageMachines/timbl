@@ -27,8 +27,8 @@
       timbl@uvt.nl
 */
 
-#ifndef TESTERS_H
-#define TESTERS_H
+#ifndef TIMBL_TESTERS_H
+#define TIMBL_TESTERS_H
 
 namespace Timbl{
   class metricTestFunction {
@@ -131,4 +131,4 @@ namespace Timbl{
 
 }  
 
-#endif // TESTERS_H
+#endif // TIMBL_TESTERS_H

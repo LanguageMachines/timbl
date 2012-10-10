@@ -27,8 +27,8 @@
       timbl@uvt.nl
 */
 
-#ifndef TREE_H
-#define TREE_H
+#ifndef TIMBL_TREE_H
+#define TIMBL_TREE_H
 
 #include <vector>
 #include "Trie.h"

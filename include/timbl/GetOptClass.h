@@ -26,8 +26,8 @@
   or send mail to:
       timbl@uvt.nl
 */
-#ifndef GETOPTCLASS_H
-#define GETOPTCLASS_H
+#ifndef TIMBL_GETOPTCLASS_H
+#define TIMBL_GETOPTCLASS_H
 
 #include <list>
 #include <iosfwd>

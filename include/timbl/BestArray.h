@@ -26,8 +26,8 @@
   or send mail to:
       timbl@uvt.nl
 */
-#ifndef BESTARRAY_H
-#define BESTARRAY_H
+#ifndef TIMBL_BESTARRAY_H
+#define TIMBL_BESTARRAY_H
 
 #include "timbl/XMLtools.h"
 #include "timbl/neighborSet.h"
@@ -69,4 +69,4 @@ namespace Timbl {
   };
 
 }
-#endif //  BESTARRAY_H
+#endif // TIMBL_BESTARRAY_H
