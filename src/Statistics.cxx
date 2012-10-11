@@ -137,27 +137,30 @@ namespace Timbl {
     ios_base::fmtflags flags = os.flags(ios::fixed);
     int oldPrec =  os.precision(5);
     size_t effF = 0;
-    size_t totF = 0;
+    size_t testF = 0;
     size_t effA = 0;
-    size_t totA = 0;
     if ( cs_too ){
       os << "Scores per Value Class:" << endl;
       os << "class  |\tTP\tFP\tTN\tFN\tprecision\trecall(TPR)\tFPR\t\tF-score\t\tAUC" << endl;
     }
     for ( unsigned int i=0; i < tg->ValuesArray.size(); ++i ){
+      // so we loop over all known (trained) target values
       size_t TP = 0;
       size_t FP = 0;
       size_t FN = 0;
       size_t TN = 0;
       ValueClass *tv = tg->ValuesArray[i];
       size_t valFreq = tv->ValFreq();
+      size_t testCount = 0;
       for ( unsigned int j=0; j < size; ++j ){
+	testCount += mat[i][j];
 	if ( i == j ){
 	  TP = mat[i][j];
 	}
 	else
 	  FN += mat[i][j];
       }
+      testF += testCount;
       for ( unsigned int j=0; j <= size; ++j ){
 	if ( j != i )
 	  FP += mat[j][i];
@@ -193,8 +196,7 @@ namespace Timbl {
 	FScore = ( 2 * precision * TPR ) / (precision + TPR );
 	++effF;
 	maf += FScore;
-	totF += valFreq;
-	mif += (FScore * valFreq);
+	mif += (FScore * testCount);
       }
       double AUC;
       if ( TPR < 0 || FPR < 0 ){
@@ -205,8 +207,7 @@ namespace Timbl {
 	  ( 0.5 * ( ( 1.0 - TPR ) * ( 1.0 - FPR ) ) );
 	++effA;
 	maa += AUC;
-	totA += valFreq;
-	mia += (AUC * valFreq);
+	mia += (AUC * testCount);
       }
       if ( cs_too ){
 	os.width( 6 );
@@ -225,9 +226,9 @@ namespace Timbl {
       }
     }
     maf = maf / effF;
-    mif = mif / totF;
+    mif = mif / testF;
     maa = maa / effA;
-    mia = mia / totA;
+    mia = mia / testF;
     os.precision( oldPrec );
     os.flags( flags );
     os << "F-Score beta=1, microav: " << mif << endl;
