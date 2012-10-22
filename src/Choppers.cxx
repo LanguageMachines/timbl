@@ -456,7 +456,7 @@ namespace Timbl{
     string::size_type e_pos = strippedInput.find_first_of( "\t" );
     while ( e_pos != s_pos && e_pos != string::npos && i < vSize ){
       // stop if a zero length string is found or if too many entries show up
-      choppedInput[i++] = string( strippedInput, s_pos, e_pos - s_pos );
+      choppedInput[i++] = StrToCode( string( strippedInput, s_pos, e_pos - s_pos ) );
       s_pos = strippedInput.find_first_not_of( "\t", e_pos );
       e_pos = strippedInput.find_first_of( "\t", s_pos );
     }
