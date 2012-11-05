@@ -404,7 +404,7 @@ namespace Timbl {
     else {
       if ( in.empty() )
 	return false;
-      if ( out.empty() && Algo() != CV )
+      if ( out.empty() && Algo() != CV && Algo() != LOO  )
 	return false;
       if ( !pimpl->Test( in, out ) )
 	return false;
@@ -419,7 +419,7 @@ namespace Timbl {
     else {
       if ( in.empty() )
 	return false;
-      if ( out.empty() && Algo() != CV )
+      if ( out.empty() && Algo() != CV && Algo() != LOO )
 	return false;
       return pimpl->NS_Test( in, out );
     }
