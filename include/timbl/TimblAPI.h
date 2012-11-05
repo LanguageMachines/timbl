@@ -124,6 +124,7 @@ namespace Timbl{
     static std::string VersionInfo( bool = false );
     bool SaveWeights( const std::string& = "" );
     bool GetWeights( const std::string& = "", Weighting = UNKNOWN_W  );
+    double GetAccuracy();
     Weighting CurrentWeighting() const;
     Weighting GetCurrentWeights( std::vector<double>& ) const;
     bool WriteInstanceBase( const std::string& = "" );
@@ -133,7 +134,7 @@ namespace Timbl{
     bool WriteArrays( const std::string& = "" );
     bool WriteMatrices( const std::string& = "" );
     bool GetArrays( const std::string& = "" );
-    bool GetMatrices( const std::string& = "" );
+    bool GetMatrices( const std::string& = "" );    
     bool WriteNamesFile( const std::string& = "" );
     bool ShowWeights( std::ostream& ) const;
     bool ShowOptions( std::ostream& ) const;

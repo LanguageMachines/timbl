@@ -568,6 +568,14 @@ namespace Timbl {
     return false;
   }
   
+  double TimblAPI::GetAccuracy() {
+    if (Valid()) {
+        return pimpl->stats.testedCorrect()/(double) pimpl->stats.dataLines();
+    } else {
+        return -1;
+    }
+  }
+  
   Weighting TimblAPI::CurrentWeighting() const{
     if ( Valid() )
       return WT_to_W( pimpl->CurrentWeighting() );
