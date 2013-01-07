@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2012
+  Copyright (c) 1998 - 2013
   ILK   - Tilburg University
   CLiPS - University of Antwerp
  
