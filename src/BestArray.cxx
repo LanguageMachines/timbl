@@ -41,6 +41,7 @@
 
 namespace Timbl {
   using namespace std;
+  using namespace TiCC;
   using namespace Common;
 
   BestRec::BestRec():

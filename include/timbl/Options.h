@@ -59,14 +59,14 @@ namespace Timbl {
       Content(tp) { *Content = t; };
     virtual bool set_option( const std::string& line ){ 
       Type T;
-      bool result = stringTo<Type>( line, T );
+      bool result = TiCC::stringTo<Type>( line, T );
       if ( result ) *Content = T;
       return result;
     };
     virtual std::ostream& show_opt( std::ostream &os ) const {
       os.width(20);
       os.setf( std::ios::left, std::ios::adjustfield );
-      os << Name << " : " << toString<Type>(*Content);
+      os << Name << " : " << TiCC::toString<Type>(*Content);
       return os;
     };
     virtual std::ostream& show_full( std::ostream &os ) const {
@@ -104,7 +104,7 @@ namespace Timbl {
     inline std::ostream& OptionClassT<VerbosityFlags>::show_full( std::ostream &os ) const {
     os.width(20);
     os.setf( std::ios::left, std::ios::adjustfield );
-    os << Name << " : " << toString<VerbosityFlags>(*Content,true);
+    os << Name << " : " << TiCC::toString<VerbosityFlags>(*Content,true);
     return os;
   }
   
@@ -117,9 +117,9 @@ namespace Timbl {
     os << Name << " : {";
     InputFormatType i = UnknownInputFormat;
     for ( ++i; i < MaxInputFormat-1; ++i )
-      os << toString<InputFormatType>(i) << ", ";
-    os << toString<InputFormatType>(i) << "}, [ "
-       << toString<InputFormatType>(*Content) << "]";
+      os << TiCC::toString<InputFormatType>(i) << ", ";
+    os << TiCC::toString<InputFormatType>(i) << "}, [ "
+       << TiCC::toString<InputFormatType>(*Content) << "]";
     return os;
   }
   
@@ -133,9 +133,9 @@ namespace Timbl {
     os << Name << " : {";
     MetricType i = UnknownMetric;
     for ( ++i; i < MaxMetric-1; ++i )
-      os << toString<MetricType>(i) << ", ";
-    os << toString<MetricType>(i) << "}, [ "
-       << toString<MetricType>(*Content) << "]";
+      os << TiCC::toString<MetricType>(i) << ", ";
+    os << TiCC::toString<MetricType>(i) << "}, [ "
+       << TiCC::toString<MetricType>(*Content) << "]";
     return os;
   }
 
@@ -148,9 +148,9 @@ namespace Timbl {
     os << Name << " : {";
     AlgorithmType i = Unknown_a;
     for ( ++i; i < Max_a-1; ++i )
-      os << toString<AlgorithmType>(i) << ", ";
-    os << toString<AlgorithmType>(i) << "}, [ "
-       << toString<AlgorithmType>(*Content) << "]";
+      os << TiCC::toString<AlgorithmType>(i) << ", ";
+    os << TiCC::toString<AlgorithmType>(i) << "}, [ "
+       << TiCC::toString<AlgorithmType>(*Content) << "]";
     return os;
   }
   
@@ -163,9 +163,9 @@ namespace Timbl {
     os << Name << " : {";
     DecayType i = UnknownDecay;
     for ( ++i; i < MaxDecay-1; ++i )
-      os << toString<DecayType>(i) << ", ";
-    os << toString<DecayType>(i) << "}, [ "
-       << toString<DecayType>(*Content) << "]";
+      os << TiCC::toString<DecayType>(i) << ", ";
+    os << TiCC::toString<DecayType>(i) << "}, [ "
+       << TiCC::toString<DecayType>(*Content) << "]";
     return os;
   }
   
@@ -178,9 +178,9 @@ namespace Timbl {
     os << Name << " : {";
     SmoothingType i = UnknownSmoothing;
     for ( ++i; i < MaxSmoothing-1; ++i )
-      os << toString<SmoothingType>(i) << ", ";
-    os << toString<SmoothingType>(i) << "}, [ "
-       << toString<SmoothingType>(*Content) << "]";
+      os << TiCC::toString<SmoothingType>(i) << ", ";
+    os << TiCC::toString<SmoothingType>(i) << "}, [ "
+       << TiCC::toString<SmoothingType>(*Content) << "]";
     return os;
   }
   
@@ -193,9 +193,9 @@ namespace Timbl {
     os << Name << " : {";
     WeightType i = Unknown_w;
     for ( ++i; i < Max_w-1; ++i )
-      os << toString<WeightType>(i) << ", ";
-    os << toString<WeightType>(i) << "}, [ "
-       << toString<WeightType>(*Content) << "]";
+      os << TiCC::toString<WeightType>(i) << ", ";
+    os << TiCC::toString<WeightType>(i) << "}, [ "
+       << TiCC::toString<WeightType>(*Content) << "]";
     return os;
   }
   
@@ -208,9 +208,9 @@ namespace Timbl {
     os << Name << " : {";
     OrdeningType i = UnknownOrdening;
     for ( ++i; i < MaxOrdening-1; ++i )
-      os << toString<OrdeningType>(i) << ", ";
-    os << toString<OrdeningType>(i) << "}, [ "
-       << toString<OrdeningType>(*Content) << "]";
+      os << TiCC::toString<OrdeningType>(i) << ", ";
+    os << TiCC::toString<OrdeningType>(i) << "}, [ "
+       << TiCC::toString<OrdeningType>(*Content) << "]";
     return os;
   }
 
@@ -223,9 +223,9 @@ namespace Timbl {
     os << Name << " : {";
     normType i = unknownNorm;
     for ( ++i; i < maxNorm-1; ++i )
-      os << toString<normType>(i) << ", ";
-    os << toString<normType>(i) << "}, [ "
-       << toString<normType>(*Content) << "]";
+      os << TiCC::toString<normType>(i) << ", ";
+    os << TiCC::toString<normType>(i) << "}, [ "
+       << TiCC::toString<normType>(*Content) << "]";
     return os;
   }
 
@@ -270,8 +270,8 @@ namespace Timbl {
     size_t i=0;
     std::vector<std::string> res;
     bool result = TiCC::split_at( line, res, "=" ) == 2 &&
-      stringTo<MetricType>( res[1], m ) && 
-      stringTo<size_t>( res[0], i, 0, Size );
+      TiCC::stringTo<MetricType>( res[1], m ) && 
+      TiCC::stringTo<size_t>( res[0], i, 0, Size );
     if ( result ) 
       TA[i] = m;
     return result;
@@ -283,7 +283,7 @@ namespace Timbl {
     os << Name << " : ";
     for ( size_t i=0; i < Size; i++ )
       if ( TA[i] != def )
-	os << i << ":" << toString<MetricType>(TA[i]) << ", ";
+	os << i << ":" << TiCC::toString<MetricType>(TA[i]) << ", ";
     return os;
   }
   
@@ -298,7 +298,7 @@ namespace Timbl {
 	  os << ",";
 	else
 	  first = false;
-	os << i << ":" << toString<MetricType>(TA[i]);
+	os << i << ":" << TiCC::toString<MetricType>(TA[i]);
       }
     }
     os << "]";
@@ -318,7 +318,7 @@ namespace Timbl {
     
     virtual bool set_option( const std::string& line ){ 
       Type T;
-      bool result = stringTo<Type>( line, T, minVal, maxVal );
+      bool result = TiCC::stringTo<Type>( line, T, minVal, maxVal );
       if ( result ) *Content = T;
       return result;
     };

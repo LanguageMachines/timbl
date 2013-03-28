@@ -43,53 +43,6 @@
 #include "timbl/StringOps.h"
 
 namespace Timbl {
-
-  template< typename T >
-    T stringTo( const std::string& str ) {
-    T result;
-    std::stringstream dummy ( str );
-    if ( !( dummy >> result ) ) {
-      throw( std::runtime_error( "conversion from string '"
-				 + str + "' failed" ) );
-    }
-    return result;
-  }
-  
-  template <>
-    inline bool stringTo<bool>( const std::string& str ) {
-    bool result;
-    std::stringstream dummy ( str );
-    if ( !( dummy >> result ) ) {
-      dummy.clear();
-      dummy.setf(std::ios_base::boolalpha);
-      if ( !( dummy >> result ) ) {
-	throw( std::runtime_error( "conversion from string '"
-				   + str + "' to bool failed" ) );
-      }
-   }
-    return result;
-  }
-  
-  template< typename T >
-    bool stringTo( const std::string& str, T& result ) {
-    try {
-      result = stringTo<T>( str );
-      return true;
-    }
-    catch( ... ){
-     return false;
-    }
-  }
-  
-  template< typename T >
-    std::string toString ( const T& obj, bool=false ) {
-    std::stringstream dummy;
-    if ( !( dummy << obj ) ) {
-      throw( std::runtime_error( "conversion to long string failed" ) );
-    }
-   return dummy.str();
-  }
-  
   enum InputFormatType { UnknownInputFormat,
 			 Compact, C4_5, Columns, Tabbed, ARFF, SparseBin,
 			 Sparse,
@@ -193,22 +146,13 @@ namespace Timbl {
     return W = ( MaxSmoothing == W ) ? UnknownSmoothing : SmoothingType(W+1);
   }
 
-  template <typename T>
-    bool stringTo( const std::string& s, T &answer, T low, T upp ){
-    try {
-      T tmp = stringTo<T>( s );
-      if ( (tmp >= low) && (tmp <= upp) ){
-	answer = tmp;
-	return true;
-      }
-      return false;
-    }
-    catch(...){
-      return false;
-    }
+  enum normType { unknownNorm, noNorm, probabilityNorm, 
+		  addFactorNorm, logProbNorm, maxNorm };
+  
+  inline normType& operator++( normType &W ){
+    return W = ( maxNorm == W ) ? noNorm : normType(W+1);
   }
-
-
+  
   extern const char *DecayName[][2];
   extern const char *OrdeningName[][2];
   extern const char *WeightName[][2];
@@ -218,6 +162,19 @@ namespace Timbl {
   extern const char *SmoothingName[][2];
   extern const char *VerbosityName[][2];
   extern const char *NormalisationName[][2];
+
+  WeightType charToWeig( char );
+  AlgorithmType charToAlg( char  );
+  normType charToNorm( char  );
+
+}
+
+namespace TiCC {
+  //
+  // We create specializations of TiCC templates
+  // the must be placed in the TiCC namespace (isn't it?)
+  //
+  using namespace Timbl;
 
   template <>
     inline DecayType stringTo<DecayType>( const std::string& str ) {
@@ -283,8 +240,6 @@ namespace Timbl {
       return MetricName[W][0];
   }
 
-  WeightType charToWeig( char );
-
   template <>
     inline WeightType stringTo<WeightType>( const std::string& str ) {
     WeightType w = Unknown_w;
@@ -311,8 +266,6 @@ namespace Timbl {
     else
       return WeightName[W][0];
   }
-
-  AlgorithmType charToAlg( char  );
 
   template <>
     inline AlgorithmType stringTo<AlgorithmType>( const std::string& str ) {
@@ -387,15 +340,6 @@ namespace Timbl {
     else
       return SmoothingName[s][0];
   }
-
-  enum normType { unknownNorm, noNorm, probabilityNorm, 
-		  addFactorNorm, logProbNorm, maxNorm };
-  
-  inline normType& operator++( normType &W ){
-    return W = ( maxNorm == W ) ? noNorm : normType(W+1);
-  }
-  
-  normType charToNorm( char  );
 
   template <>
     inline normType stringTo<normType>( const std::string& str ) { 
@@ -511,7 +455,6 @@ namespace Timbl {
   inline std::string toString( const VerbosityFlags& a, bool b=false ){
     return toString<VerbosityFlags>( a, b );
   }
-
 
 }
 #endif

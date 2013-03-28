@@ -46,6 +46,7 @@
 
 namespace Timbl {
   using namespace std;
+  using namespace TiCC;
 
   void IG_Experiment::InitInstanceBase(){
     srand( RandomSeed() );

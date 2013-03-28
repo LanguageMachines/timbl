@@ -42,6 +42,7 @@
 #include "timbl/Metrics.h"
 
 using namespace std;
+using namespace TiCC;
 using Common::Epsilon;
 using Common::Log2;
 

@@ -44,6 +44,7 @@
 #include "timbl/TimblExperiment.h"
 
 using namespace std;
+using namespace TiCC;
 
 namespace Timbl {
   

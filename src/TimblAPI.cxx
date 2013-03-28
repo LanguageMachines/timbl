@@ -43,6 +43,9 @@ using namespace std;
 
 #include "timbl/TimblAPI.h"
 #include "timbl/TimblExperiment.h"
+
+using namespace TiCC;
+
 namespace Timbl {
   
   TimblOpts::TimblOpts( const int argc, const char * const *argv ):

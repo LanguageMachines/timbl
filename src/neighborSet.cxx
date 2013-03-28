@@ -40,6 +40,7 @@
 namespace Timbl {
 
   using namespace std;
+  using namespace TiCC;
   using namespace Common;
   
   neighborSet::neighborSet(): showDistance(false),showDistribution(false){}

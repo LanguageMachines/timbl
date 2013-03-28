@@ -71,6 +71,7 @@
 #endif
 
 using namespace std;
+using namespace TiCC;
 
 namespace Timbl {
   #include "ticcutils/PrettyPrint.h"

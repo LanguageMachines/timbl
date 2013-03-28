@@ -62,6 +62,7 @@
 #include "timbl/MBLClass.h"
 
 using namespace std;
+using namespace TiCC;
 
 namespace Timbl {
 

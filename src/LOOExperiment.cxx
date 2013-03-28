@@ -50,6 +50,8 @@
 #include "timbl/MBLClass.h"
 #include "timbl/TimblExperiment.h"
 
+using namespace TiCC;
+
 namespace Timbl {
   using namespace std;
 

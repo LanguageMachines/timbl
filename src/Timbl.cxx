@@ -44,6 +44,7 @@
 
 using namespace std;
 using namespace Timbl;
+using namespace TiCC;
 
 static list<string> ind_lines;
 

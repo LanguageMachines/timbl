@@ -46,6 +46,7 @@
 #include "timbl/IBtree.h"
 
 using namespace std;
+using namespace TiCC;
 
 namespace Timbl {
   using namespace Common;
