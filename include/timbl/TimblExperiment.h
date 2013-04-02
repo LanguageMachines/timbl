@@ -32,7 +32,7 @@
 
 #include <fstream>
 #include <set>
-#include "timbl/XMLtools.h"
+#include "ticcutils/XMLtools.h"
 #include "timbl/BestArray.h"
 #include "timbl/Statistics.h"
 #include "timbl/MBLClass.h"

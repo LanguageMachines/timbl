@@ -36,7 +36,7 @@
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
 #include "timbl/neighborSet.h"
-#include "timbl/XMLtools.h"
+#include "ticcutils/XMLtools.h"
 #include "timbl/BestArray.h"
 
 namespace Timbl {

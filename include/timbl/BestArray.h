@@ -29,7 +29,7 @@
 #ifndef TIMBL_BESTARRAY_H
 #define TIMBL_BESTARRAY_H
 
-#include "timbl/XMLtools.h"
+#include "ticcutils/XMLtools.h"
 #include "timbl/neighborSet.h"
 
 namespace Timbl {

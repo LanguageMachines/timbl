@@ -38,11 +38,11 @@
 
 #include "ticcutils/StringOps.h"
 #include "ticcutils/TreeHash.h"
+#include "ticcutils/XMLtools.h"
 #include "timbl/Common.h"
 #include "timbl/MsgClass.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
-#include "timbl/XMLtools.h"
 #include "timbl/IBtree.h"
 
 using namespace std;

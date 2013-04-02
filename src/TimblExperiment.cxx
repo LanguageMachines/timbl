@@ -64,7 +64,7 @@
 #include "timbl/CommandLine.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
-#include "timbl/XMLtools.h"
+#include "ticcutils/XMLtools.h"
 #include "ticcutils/Timer.h"
 
 #ifdef HAVE_OPENMP

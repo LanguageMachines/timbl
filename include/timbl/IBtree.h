@@ -30,7 +30,7 @@
 #define TIMBL_IBTREE_H
 
 #include "ticcutils/TreeHash.h"
-#include "timbl/XMLtools.h"
+#include "ticcutils/XMLtools.h"
 
 //#define IBSTATS
 
