@@ -2057,7 +2057,7 @@ namespace Timbl {
     vector<double> wghts;
     GetCurrentWeights( wghts );
     for ( unsigned int i=0; i < wghts.size(); ++i ){
-      xmlNode *n = XmlNewChild( result, "feature", toString(wghts[i]) );
+      xmlNode *n = XmlNewTextChild( result, "feature", toString(wghts[i]) );
       XmlSetAttribute( n, "index", toString(i+1) );
     }
     return result;

@@ -428,7 +428,7 @@ namespace Timbl {
       if ( TiCC::split_at( lines[i], parts, ":" ) ==2 ){
 	string tag = TiCC::trim( parts[0] );
 	string val = TiCC::trim( parts[1] );
-	XmlNewChild( result, tag, val );
+	XmlNewTextChild( result, tag, val );
       }
     }
     return result;

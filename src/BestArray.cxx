@@ -220,10 +220,10 @@ namespace Timbl {
 	  XmlSetAttribute( nbs, "limited", toString( maxBests ) );
 	for ( unsigned int m=0; m < best->bestInstances.size(); ++m ){
 	  xmlNode *nb = XmlNewChild( nbs, "neighbor" );
-	  XmlNewChild( nb, "instance", best->bestInstances[m] );
+	  XmlNewTextChild( nb, "instance", best->bestInstances[m] );
 	  if ( _showDb )
-	    XmlNewChild( nb, "distribution", 
-			 best->bestDistributions[m]->DistToString() );
+	    XmlNewTextChild( nb, "distribution", 
+			     best->bestDistributions[m]->DistToString() );
 	}
       }
       else { 
@@ -232,12 +232,12 @@ namespace Timbl {
 	xmlNode *nbs = XmlNewChild( top, "neighbors" );
 	XmlSetAttribute( nbs, "k", toString(k+1) );
 	if ( _showDb ){
-	  XmlNewChild( nbs, "distribution", 
-		       best->aggregateDist.DistToString() );
+	  XmlNewTextChild( nbs, "distribution", 
+			   best->aggregateDist.DistToString() );
 	}
 	if ( _showDi ){
-	  XmlNewChild( nbs, "distance", 
-		       toString(best->bestDistance) );
+	  XmlNewTextChild( nbs, "distance", 
+			   toString(best->bestDistance) );
 	}
       }
     }
