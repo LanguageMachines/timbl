@@ -65,6 +65,7 @@
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
 #include "timbl/XMLtools.h"
+#include "ticcutils/Timer.h"
 
 #ifdef HAVE_OPENMP
 #include <omp.h>
@@ -74,7 +75,7 @@ using namespace std;
 using namespace TiCC;
 
 namespace Timbl {
-  #include "ticcutils/PrettyPrint.h"
+#include "ticcutils/PrettyPrint.h"
   using namespace TiCC;
 
   resultStore::~resultStore( ) {
@@ -396,7 +397,7 @@ namespace Timbl {
 	      result = false;
 	    }
 	    else {
-	      Common::Timer prepT;
+	      Timer prepT;
 	      prepT.start();
 	      bool found;
 	      bool go_on = true;
@@ -518,7 +519,7 @@ namespace Timbl {
   bool TimblExperiment::ClassicLearn( const string& FileName, 
 				      bool warnOnSingleTarget ){
     bool result = true;
-    Common::Timer learnT;
+    Timer learnT;
     if ( is_synced ){
       CurrentDataFile = FileName; // assume magic!
     }
@@ -540,14 +541,14 @@ namespace Timbl {
       result = false;
     }
     if ( result ) {
-      Common::Timer learnT;
+      Timer learnT;
       learnT.start();
       InitInstanceBase();
       if ( ExpInvalid() )
 	return false;
       if ( EffectiveFeatures() < 2 ) {
 	fileIndex fmIndex;
-	//      Common::Timer t;
+	//      Timer t;
 	//      t.start();
 	result = build_file_index( CurrentDataFile, fmIndex );
 	//      t.stop();
@@ -569,7 +570,7 @@ namespace Timbl {
       }
       else {
 	fileDoubleIndex fIndex;
-	//      Common::Timer t;
+	//      Timer t;
 	//      t.start();
 	result = build_file_multi_index( CurrentDataFile, fIndex );
 	//	cerr << "index: " << fIndex << endl;
@@ -1101,7 +1102,7 @@ namespace Timbl {
     }
     else {
       bool result = true;
-      Common::Timer learnT;
+      Timer learnT;
       if ( ExpInvalid() ||
 	   !ConfirmOptions() ){
 	result = false;

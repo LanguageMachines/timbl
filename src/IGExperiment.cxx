@@ -43,6 +43,7 @@
 #include "timbl/Instance.h"
 #include "timbl/IBtree.h"
 #include "timbl/TimblExperiment.h"
+#include "ticcutils/Timer.h"
 
 namespace Timbl {
   using namespace std;
@@ -122,7 +123,7 @@ namespace Timbl {
       result = false;
     }
     if ( result ) {
-      Common::Timer learnT;
+      Timer learnT;
       learnT.start();
       InitInstanceBase();
       if ( ExpInvalid() )

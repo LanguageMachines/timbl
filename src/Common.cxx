@@ -52,33 +52,4 @@ namespace Common {
   string Version() { return VERSION; }
   string VersionName() { return PACKAGE_STRING; }
 
-  void Timer::stop(){
-    timeval now;
-    gettimeofday( &now, 0 );
-    long usecs = (myTime.tv_sec + now.tv_sec - startTime.tv_sec) * 1000000 
-      + myTime.tv_usec + now.tv_usec - startTime.tv_usec;
-    ldiv_t div = ldiv( usecs, 1000000 );
-    myTime.tv_sec = div.quot;
-    myTime.tv_usec = div.rem;
-  }
-
-  string Timer::now() {
-    time_t now;
-    time( &now );
-    return asctime( localtime( &now ) );
-  }
-
-  ostream& operator << ( ostream& os, const Timer& T ){
-    ldiv_t div = ldiv( T.myTime.tv_usec, 1000 );
-    os << T.myTime.tv_sec << " seconds, " << div.quot << " milliseconds and "
-       << div.rem << " microseconds";
-    return os;
-  }
-  
-  string Timer::toString(){
-    stringstream os;
-    os << *this;
-    return os.str();
-  }
-
 }
