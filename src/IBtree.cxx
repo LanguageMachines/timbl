@@ -315,17 +315,17 @@ namespace Timbl {
     while ( pnt ){
       xmlNode *node = XmlNewChild( nodes, "node" );
       if ( pnt->FValue )
-	XmlAddChild( node, to_node( pnt->FValue ) );
+	xmlAddChild( node, to_node( pnt->FValue ) );
       if ( pnt->TValue )
-	XmlAddChild( node, to_node( pnt->TValue ) );
+	xmlAddChild( node, to_node( pnt->TValue ) );
       if ( pnt->link ){
 	if ( pnt->link->FValue )
-	  XmlAddChild( node, to_xml(pnt->link) );
+	  xmlAddChild( node, to_xml(pnt->link) );
 	else if ( pnt->link->TDistribution )
-	  XmlAddChild( node, to_node( pnt->link->TDistribution ) );
+	  xmlAddChild( node, to_node( pnt->link->TDistribution ) );
       }
       else if ( pnt->TDistribution )
-	XmlAddChild( node, to_node( pnt->TDistribution ) );
+	xmlAddChild( node, to_node( pnt->TDistribution ) );
       pnt = pnt->next;
     }
     return nodes;
@@ -335,14 +335,14 @@ namespace Timbl {
     // save an IBtree for later use.
     XmlDoc doc( "root" );
     xmlNode *root = doc.getRoot();
-    XmlAddChild( root, XmlNewComment( "Version " + toString(Version) ) );
+    xmlAddChild( root, XmlNewComment( "Version " + toString(Version) ) );
     bool dummy;
-    XmlAddChild( root, to_node( TopTarget( dummy ) ) );
+    xmlAddChild( root, to_node( TopTarget( dummy ) ) );
     if ( PersistentDistributions )
-      XmlAddChild( root, to_node( TopDistribution ) );
+      xmlAddChild( root, to_node( TopDistribution ) );
     IBtree *pnt = InstBase;
     xmlNode *tree = to_xml( pnt );
-    XmlAddChild( root, tree );
+    xmlAddChild( root, tree );
     os << doc << endl;
   }  
   
