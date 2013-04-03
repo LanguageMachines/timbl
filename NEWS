@@ -1,3 +1,8 @@
+6.4.4 2013-04-03
+  * rely more on ticcutils stuff. A lot of functions are moved there
+  * added a GetAccuracy option to the API
+  * bug fix in Choppers.cxx
+
 6.4.3 2012-10-11
   * added an --occurrences option for training/testing files with an occurrence
     value.
