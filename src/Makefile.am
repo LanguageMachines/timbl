@@ -15,7 +15,7 @@ LDADD = libtimbl.la
 
 timbl_SOURCES = Timbl.cxx
 lib_LTLIBRARIES = libtimbl.la
-libtimbl_la_LDFLAGS= -version-info 3:0:0
+libtimbl_la_LDFLAGS= -version-info 4:0:0
 
 libtimbl_la_SOURCES = CommandLine.cxx Common.cxx \
 	GetOptClass.cxx IBtree.cxx IBprocs.cxx Instance.cxx \
