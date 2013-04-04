@@ -150,7 +150,6 @@ namespace Timbl {
       size_t FN = 0;
       size_t TN = 0;
       ValueClass *tv = tg->ValuesArray[i];
-      size_t valFreq = tv->ValFreq();
       size_t testCount = 0;
       for ( unsigned int j=0; j < size; ++j ){
 	testCount += mat[i][j];
