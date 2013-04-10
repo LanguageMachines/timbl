@@ -40,8 +40,8 @@ namespace Common {
   
   std::string Version();
   std::string VersionName();
-  std::string VersionInfo( bool = false );
-  void ShowVersionInfo( std::ostream& );
+  std::string BuildInfo();
+  std::string VersionInfo( bool ); // obsolete
 
   inline int look_ahead( std::istream &is ){
     int nc;

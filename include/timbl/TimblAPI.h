@@ -45,6 +45,7 @@ namespace Timbl{
   
   inline std::string Version() { return Common::Version(); }
   inline std::string VersionName() { return Common::VersionName(); }
+  inline std::string BuildInfo() { return Common::BuildInfo(); }
   
   enum Algorithm { UNKNOWN_ALG, IB1, IB2, IGTREE, TRIBL, TRIBL2, LOO, CV };
   enum Weighting { UNKNOWN_W, UD, NW, GR, IG, X2, SV, SD };
@@ -121,7 +122,7 @@ namespace Timbl{
     size_t matchDepth() const;
     bool matchedAtLeaf() const;
     std::string ExpName() const;
-    static std::string VersionInfo( bool = false );
+    static std::string VersionInfo( bool = false ); //obsolete
     bool SaveWeights( const std::string& = "" );
     bool GetWeights( const std::string& = "", Weighting = UNKNOWN_W  );
     double GetAccuracy();

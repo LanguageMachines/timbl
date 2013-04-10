@@ -312,7 +312,7 @@ void Preset_Values( TimblOpts& Opts ){
     throw( softExit() );
   }
   if ( Opts.Find( 'V', value, mood ) ){
-    cerr << "TiMBL " << TimblAPI::VersionInfo( true ) << endl;
+    cerr << "TiMBL " << Timbl::BuildInfo() << endl;
     throw( softExit() );
   }
   if ( Opts.Find( 'S', value, mood ) ){

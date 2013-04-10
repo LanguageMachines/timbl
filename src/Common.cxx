@@ -35,21 +35,17 @@ using namespace std;
 
 namespace Common {
 
-  void ShowVersionInfo( std::ostream& os, bool full ){
-    os << VERSION;
-    if ( full )
-      os << ", compiled on " << __DATE__ << ", " << __TIME__;
-  }
-  
   string VersionInfo( bool full ){
-    string result;
-    ostringstream oss;
-    ShowVersionInfo( oss, full );
-    result = oss.str();
-    return result; 
+    // obsolete
+    if ( full )
+      return BuildInfo();
+    else
+      return Version();
   }
-
   string Version() { return VERSION; }
   string VersionName() { return PACKAGE_STRING; }
+  string BuildInfo() { 
+    return Version() + ", compiled on " + __DATE__ + ", " +  __TIME__;
+  }
 
 }

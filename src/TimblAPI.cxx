@@ -724,6 +724,7 @@ namespace Timbl {
   }
   
   string TimblAPI::VersionInfo( bool full ){
+    // obsolete
     return Common::VersionInfo( full );
   }
   
