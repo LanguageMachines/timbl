@@ -200,7 +200,7 @@ inline void usage_full(void){
        << endl;
   cerr << "-G        : normalize distibutions (+vdb option only)" << endl
        << "    Probability    : normalize between 0 and 1" << endl
-       << "             O     : does the same " << endl
+       << "             0     : does the same " << endl
        << "    addFactor:<f>  : add f to all possible targets" << endl
        << "                     then normalize between 0 and 1 (default f=1.0)" << endl
        << "             1:<f> : does the same" << endl
