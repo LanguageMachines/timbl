@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2013
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -47,7 +47,7 @@ using namespace std;
 using namespace TiCC;
 
 namespace Timbl {
-  
+
   void GetOptClass::set_default_options( int Max ){
     local_algo = IB1_a;
     local_metric = UnknownMetric;
@@ -97,7 +97,7 @@ namespace Timbl {
     pidFile = "";
     occIn = 0;
   }
-  
+
   GetOptClass::GetOptClass( CL_Options& Opts ):
     LocalInputFormat( UnknownInputFormat ),
     MaxFeats(-1),
@@ -119,10 +119,10 @@ namespace Timbl {
     }
     set_default_options( MaxF );
   }
-  
+
   GetOptClass::~GetOptClass( ){
   }
-  
+
   GetOptClass::GetOptClass( const GetOptClass& in ):
     MsgClass(in),
     local_algo( in.local_algo ),
@@ -153,13 +153,13 @@ namespace Timbl {
     myVerbosity( in.myVerbosity ),
     opt_init( in.opt_init ),
     opt_changed( in.opt_changed ),
-    do_exact( in.do_exact ), 
-    do_hashed( in.do_hashed ), 
+    do_exact( in.do_exact ),
+    do_hashed( in.do_hashed ),
     min_present( in.min_present ),
     N_present(false),
     keep_distributions( in.keep_distributions ),
     do_sample_weights( in.do_sample_weights ),
-    do_ignore_samples( in.do_ignore_samples ), 
+    do_ignore_samples( in.do_ignore_samples ),
     do_ignore_samples_test( in.do_ignore_samples_test ),
     do_query( in.do_query ),
     do_all_weights( false ),
@@ -175,13 +175,13 @@ namespace Timbl {
     occIn( in.occIn )
   {
   }
-  
+
   GetOptClass *GetOptClass::Clone( ostream *sock_os ) const{
     GetOptClass *result = new GetOptClass(*this);
     result->parent_socket_os = sock_os;
     return result;
   }
-  
+
   void GetOptClass::Error( const string& out_line ) const {
     if ( parent_socket_os )
       *parent_socket_os << "ERROR { " << out_line << " }" << endl;
@@ -189,7 +189,7 @@ namespace Timbl {
       cerr << "Error:" << out_line << endl;
     }
   }
-  
+
   bool GetOptClass::definitive_options( TimblExperiment *Exp ){
     if ( opt_changed || !opt_init ){
       opt_changed = false;
@@ -277,11 +277,11 @@ namespace Timbl {
 	}
 	if ( threshold >= 0 ){
 	  if ( local_algo != TRIBL_a ){
-	    Error( "-q option only valid for TRIBL algorithm" );	    
+	    Error( "-q option only valid for TRIBL algorithm" );
 	    return false;
 	  }
 	  if ( threshold == 0 ){
-	    Error( "invalid -q option. Must be > 0 " );	    
+	    Error( "invalid -q option. Must be > 0 " );
 	    return false;
 	  }
 	  optline = "TRIBL_OFFSET: " + toString<int>(threshold);
@@ -372,7 +372,7 @@ namespace Timbl {
 	for ( size_t j=0; j < metricsArray.size(); ++j ){
 	  metricsArray[j] = Overlap;
 	}
-	
+
       }
       optline = "GLOBAL_METRIC: " + toString(local_metric);
       Exp->SetOption( optline );
@@ -404,20 +404,22 @@ namespace Timbl {
 		if ( Exp->SetOption( optline ) ){
 		  optline = "PROGRESS: " + toString<int>(local_progress);
 		  if ( Exp->SetOption( optline ) ){
-		    optline = "VERBOSITY: " + 
+		    optline = "VERBOSITY: " +
 		      toString(myVerbosity);
 		    if ( Exp->SetOption( optline ) ){
 		      for ( size_t i=0; i < metricsArray.size(); ++i ){
-			if ( !first ){
-			  if ( metricsArray[i] == Ignore ){
-			    Error( "-m:I is not possible at this stage" );
-			    return false;
-			  }
-			}
+			// if ( !first ){
+			//   if ( metricsArray[i] == Ignore ){
+			//     Error( "-m:I is not possible at this stage" );
+			//     return false;
+			//   }
+			// }
 			optline = "METRICS: " + toString<int>( i ) + "=" +
 			  toString(metricsArray[i]);
-			if (!Exp->SetOption( optline ) )
+			if (!Exp->SetOption( optline ) ){
+			  Error( "changing metric is not possible at this stage" );
 			  return false;
+			}
 		      }
 		      if ( do_query ){
 			Exp->ShowSettings( cerr );
@@ -436,8 +438,8 @@ namespace Timbl {
     }
     return true;
   }
-  
-  inline bool GetOptClass::parse_range( string& line, 
+
+  inline bool GetOptClass::parse_range( string& line,
 					string::iterator& it,
 					MetricType Value ){
     size_t m;
@@ -445,7 +447,7 @@ namespace Timbl {
     while( it != line.end() && *it != ':' ){
       eit = it;
       while( eit != line.end() && isdigit( *eit ) ) ++eit;
-      string tmp = string( it, eit ); 
+      string tmp = string( it, eit );
       size_t k;
       if ( stringTo<size_t>( tmp, k, 1, metricsArray.size() ) ){
 	if ( metricsArray[k] != UnknownMetric && metricsArray[k] != Value ){
@@ -469,7 +471,7 @@ namespace Timbl {
 	++it;
 	eit = it;
 	while( eit != line.end() && isdigit( *eit ) ) ++eit;
-	tmp = string( it, eit ); 
+	tmp = string( it, eit );
 	m = stringTo<int>(tmp);
 	if ( m <= 0 || m > metricsArray.size() ){
 	  Error( "illegal value in metric description: -m " + line );
@@ -486,9 +488,9 @@ namespace Timbl {
 	}
 	else {
 	  for ( size_t j=k+1; j <= m && j <= metricsArray.size(); ++j ){
-	    if ( metricsArray[j] != UnknownMetric 
+	    if ( metricsArray[j] != UnknownMetric
 		 && metricsArray[j] != Value ){
-	      Error( "metric of feature " + toString<int>(j) + 
+	      Error( "metric of feature " + toString<int>(j) +
 		     " is multiply changed!" );
 	      return false;
 	    }
@@ -500,7 +502,7 @@ namespace Timbl {
     }
     return true;
   }
-  
+
   inline bool GetOptClass::parse_metrics( const string& Mline,
 					  MetricType& Def ){
     string line = TiCC::trim( Mline );
@@ -508,7 +510,7 @@ namespace Timbl {
     string::iterator p = line.begin();
     if ( p != line.end() ){
       switch ( *p++ ){
-      case 'O' : 
+      case 'O' :
 	Def = Overlap;
 	break;
       case 'J' :
@@ -581,7 +583,7 @@ namespace Timbl {
 	MetricType TmpMT;
 	while( p != line.end() ){
 	  switch ( *p ){
-	  case 'O' : 
+	  case 'O' :
 	    TmpMT = Overlap;
 	    break;
 	  case 'S' :
@@ -618,7 +620,7 @@ namespace Timbl {
 	  }
 	  metricClass *tmpMC = getMetricClass(Def);
 	  if ( TmpMT != Ignore && tmpMC->isSimilarityMetric() ){
-	    Error( "Similarity metric " + toString( Def ) 
+	    Error( "Similarity metric " + toString( Def )
 		   + " only accepts -I specifications: -m " + Mline );
 	    delete tmpMC;
 	    return false;
@@ -658,7 +660,7 @@ namespace Timbl {
     else
       return false;
   }
-  
+
   inline bool isBoolOrEmpty( const string& in, bool& val ){
     if ( in.empty() ){
       val = true;
@@ -687,21 +689,21 @@ namespace Timbl {
     }
     const char *ok_opt;
     switch ( mode ){
-    case 0: 
-      ok_opt = "a:b:B:c:C:d:De:F:G:Hk:l:L:m:M:n:N:o:O:p:q:QR:sS:t:T:v:w:Wx"; 
+    case 0:
+      ok_opt = "a:b:B:c:C:d:De:F:G:Hk:l:L:m:M:n:N:o:O:p:q:QR:sS:t:T:v:w:Wx";
       break;
     case 1:
       // limited usage, for @t
-      ok_opt = "d:e:G:k:L:m:p:QR:v:x"; 
+      ok_opt = "d:e:G:k:L:m:p:QR:v:x";
       break;
     case 2:
       // limited usage, for Server
-      ok_opt = "C:d:G:k:l:L:p:QS:v:x"; 
+      ok_opt = "C:d:G:k:l:L:p:QS:v:x";
       break;
     default:
       ok_opt = NULL;
-      string msg = string("Invalid value '") + toString(mode) 
-	+ "' in switch (" 
+      string msg = string("Invalid value '") + toString(mode)
+	+ "' in switch ("
 	+ __FILE__  + "," + toString(__LINE__) + ")\n"
 	+ "ABORTING now";
       throw std::logic_error( msg );
@@ -745,17 +747,17 @@ namespace Timbl {
 	}
 	return false;
       };
-      
+
       try {
 	//	cerr << "try " << option << endl;
 	switch (option) {
-	case 'a': 
+	case 'a':
 	  if ( !stringTo<AlgorithmType>( myoptarg, local_algo ) ){
 	    Error( "illegal -a value: " + myoptarg );
 	    return false;
 	  }
 	  break;
-	  
+
 	case 'b':
 	  bootstrap_lines = stringTo<int>( myoptarg );
 	  if ( bootstrap_lines < 1 ){
@@ -763,11 +765,11 @@ namespace Timbl {
 	    return false;
 	  }
 	  break;
-	  
+
 	case 'B':
 	  if ( longOpt ){
 	    if ( long_option == "Beam" ){
-	      if ( !stringTo<int>( myoptarg, BeamSize ) 
+	      if ( !stringTo<int>( myoptarg, BeamSize )
 		   || BeamSize <= 0 ){
 		Error( "illegal value for -Beam option: " + myoptarg );
 		return false;
@@ -790,13 +792,13 @@ namespace Timbl {
 	    }
 	  }
 	  break;
-	
+
       case 'c':
 	if ( longOpt ){
 	  if ( long_option == "clones" ){
 	    clones = stringTo<int>( myoptarg );
 	    if ( clones <= 0 ){
-	      Error( "invalid value for " + long_option + ": '" 
+	      Error( "invalid value for " + long_option + ": '"
 		     + myoptarg + "'" );
 	      return false;
 	    }
@@ -810,13 +812,13 @@ namespace Timbl {
 	  }
 	}
 	break;
-	
+
       case 'd': {
 	if ( longOpt ){
 	  if ( long_option == "daemonize" ){
 	    bool val;
 	    if ( !isBoolOrEmpty(myoptarg,val) ){
-	      Error( "invalid value for " + long_option + ": '" 
+	      Error( "invalid value for " + long_option + ": '"
 		     + myoptarg + "'" );
 	      return false;
 	    }
@@ -838,7 +840,7 @@ namespace Timbl {
 	    if ( pos1 != string::npos ){
 	      if ( ! ( stringTo<DecayType>( string( myoptarg, 0, pos1 ),
 					    local_decay ) &&
-		       stringTo<double>( string( myoptarg, pos1 ), 
+		       stringTo<double>( string( myoptarg, pos1 ),
 					 local_decay_alfa ) ) ){
 		Error( "illegal value for -d option: " + myoptarg );
 		return false;
@@ -856,7 +858,7 @@ namespace Timbl {
 	      if ( pos2 != string::npos ){
 		if ( ! ( stringTo<DecayType>( string( myoptarg, 0, pos1 ),
 					      local_decay ) &&
-			 stringTo<double>( string( myoptarg, pos2 ), 
+			 stringTo<double>( string( myoptarg, pos2 ),
 					   local_decay_alfa ) ) ){
 		  Error( "illegal value for -d option: " + myoptarg );
 		  return false;
@@ -870,9 +872,9 @@ namespace Timbl {
 	    else {
 	      if ( ! ( stringTo<DecayType>( string( myoptarg, 0, pos1 ),
 					    local_decay ) &&
-		       stringTo<double>( string( myoptarg, pos1+1, pos2-pos1-1 ), 
+		       stringTo<double>( string( myoptarg, pos1+1, pos2-pos1-1 ),
 					 local_decay_alfa ) &&
-		       stringTo<double>( string( myoptarg, pos2+1 ), 
+		       stringTo<double>( string( myoptarg, pos2+1 ),
 					 local_decay_beta ) ) ){
 		Error( "illegal value for -d option: " + myoptarg );
 		return false;
@@ -882,7 +884,7 @@ namespace Timbl {
 	}
 	break;
       }
-      
+
       case 'D':
 	if ( longOpt ){
 	  if ( long_option == "Diversify" )
@@ -899,7 +901,7 @@ namespace Timbl {
 	else
 	  keep_distributions = mood;
 	break;
-	
+
       case 'e':
 	estimate = stringTo<int>( myoptarg );
 	if ( estimate < 0 ){
@@ -914,7 +916,7 @@ namespace Timbl {
 	  return false;
 	}
 	break;
-	
+
       case 'G':
 	if ( myoptarg.empty() )
 	  local_normalisation = probabilityNorm;
@@ -926,7 +928,7 @@ namespace Timbl {
 	  }
 	  else {
 	    local_normalisation = stringTo<normType>( string( myoptarg, 0, pos1 ) );
-	    if ( !stringTo<double>( string( myoptarg, pos1+1 ), 
+	    if ( !stringTo<double>( string( myoptarg, pos1+1 ),
 				    local_norm_factor ) ||
 		 local_norm_factor < Epsilon ){
 	      Error( "illegal value for -G option: " + myoptarg );
@@ -939,11 +941,11 @@ namespace Timbl {
 	  }
 	}
 	break;
-	
+
       case 'H':
 	do_hashed = mood;
 	break;
-	
+
       case 'k':
 	no_neigh = stringTo<int>(myoptarg);
 	if ( no_neigh <= 0 ){
@@ -951,7 +953,7 @@ namespace Timbl {
 	  return false;
 	}
 	break;
-	
+
       case 'l':
 	if ( longOpt ){
 	  if ( long_option == "logfile" ){
@@ -978,7 +980,7 @@ namespace Timbl {
 	  }
 	}
 	break;
-	
+
       case 'L': {
 	string::size_type pos1 = myoptarg.find( ":" );
 	if ( pos1 == string::npos ){
@@ -1000,11 +1002,11 @@ namespace Timbl {
 	}
 	break;
       }
-      case 'm': 
+      case 'm':
 	if ( !parse_metrics( myoptarg, local_metric ) )
 	  return false;
 	break;
-      
+
       case 'M':
 	maxbests = stringTo<int>( myoptarg );
 	if ( maxbests <= 0 ){
@@ -1012,11 +1014,11 @@ namespace Timbl {
 	  return false;
 	}
 	break;
-	
+
       case 'N':
 	// skip previously parsed NumOfFeatures info.
 	break;
-	
+
       case 'O':
 	outPath = myoptarg;
 	break;
@@ -1049,7 +1051,7 @@ namespace Timbl {
 	  return false;
 	}
 	break;
-	
+
       case 'p':
 	if ( longOpt ){
 	  if ( long_option == "pidfile" ){
@@ -1072,15 +1074,15 @@ namespace Timbl {
 	  local_progress = stringTo<int>( myoptarg );
 	}
 	break;
-	
+
       case 'q':
 	threshold = stringTo<int>( myoptarg );
 	break;
-	
+
       case 'Q':
 	do_query = true;
 	break;
-	
+
       case 'R':
 	if ( isdigit(myoptarg[0]) )
 	  seed = stringTo<int>( myoptarg );
@@ -1089,13 +1091,13 @@ namespace Timbl {
 	  return false;
 	}
 	break;
-	
+
       case 's':
 	if ( longOpt ){
 	  if ( long_option == "sloppy" ){
 	    bool val;
 	    if ( !isBoolOrEmpty(myoptarg,val) ){
-	      Error( "invalid value for sloppy: '" 
+	      Error( "invalid value for sloppy: '"
 		     + myoptarg + "'" );
 	      return false;
 	    }
@@ -1104,7 +1106,7 @@ namespace Timbl {
 	  else if ( long_option == "silly" ){
 	    bool val;
 	    if ( !isBoolOrEmpty(myoptarg,val) ){
-	      Error( "invalid value for silly: '" 
+	      Error( "invalid value for silly: '"
 		     + myoptarg + "'" );
 	      return false;
 	    }
@@ -1139,18 +1141,18 @@ namespace Timbl {
 	  }
 	}
 	break;
-	
+
       case 't':
 	if ( compare_nocase( myoptarg, "leave_one_out" ) )
 	  local_algo = LOO_a;
 	else if ( compare_nocase( myoptarg, "cross_validate" ) )
 	  local_algo = CV_a;
 	break;
-	
+
       case 'T': {
 	if ( longOpt ){
 	  if ( long_option == "Threshold" ){
-	    if ( !stringTo<int>(myoptarg, igThreshold ) 
+	    if ( !stringTo<int>(myoptarg, igThreshold )
 		 || igThreshold < 0 ){
 	      Error( "invalid value for Threshold: " + myoptarg );
 	      return false;
@@ -1182,7 +1184,7 @@ namespace Timbl {
 	}
       }
 	break;
-	
+
       case 'v':{
 	VerbosityFlags Flag = NO_VERB;
 	if ( !stringTo<VerbosityFlags>( myoptarg, Flag ) ){
@@ -1205,22 +1207,22 @@ namespace Timbl {
 	}
       }
 	break;
-	
+
       case 'w': {
 	if ( !stringTo<WeightType>( myoptarg, local_weight ) )
 	  return false;
       };
       break;
-      
+
       case 'W': {
 	do_all_weights = true;
       };
       break;
-      
+
       case 'x':
 	do_exact = mood;
 	break;
-	
+
       }
       }
       catch( std::runtime_error& err ) {
@@ -1231,7 +1233,7 @@ namespace Timbl {
     }
     return true;
   }
-  
+
 }
 
 
