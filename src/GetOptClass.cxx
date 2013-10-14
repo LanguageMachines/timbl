@@ -34,6 +34,7 @@
 #include <cstring>
 #include <ctime>
 #include <cctype>
+#include <sys/time.h>
 #include "timbl/Common.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
