@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2013
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -30,6 +30,7 @@
 #ifndef TIMBL_EXPERIMENT_H
 #define TIMBL_EXPERIMENT_H
 
+#include <sys/time.h>
 #include <fstream>
 #include <set>
 #include "ticcutils/XMLtools.h"
@@ -43,7 +44,7 @@ namespace Timbl {
   class ConfusionMatrix;
   class CL_Options;
   class GetOptClass;
-  
+
   class resultStore: public MsgClass {
   public:
   resultStore(): dist(0), disposable(false), isTop(false), beam(0) {};
@@ -57,7 +58,7 @@ namespace Timbl {
     std::string getResult();
     void prepare();
     void normalize();
-    double confidence( const TargetValue* tv ) const { 
+    double confidence( const TargetValue* tv ) const {
       return dist->Confidence( tv );
     };
   private:
@@ -78,7 +79,7 @@ namespace Timbl {
     bool operator()( const FeatureValue* F, const FeatureValue* G ) const{
       return F->Index() > G->Index();
     }
-  };  
+  };
 
   typedef std::map<FeatureValue*,std::set<std::streamsize>, fCmp> fileIndex;
   typedef std::map<FeatureValue*, fileIndex, fCmp > fileDoubleIndex;
@@ -155,9 +156,9 @@ namespace Timbl {
     bool Classify( const std::string& , std::string&, std::string&, double& );
     size_t matchDepth() const { return match_depth; };
     bool matchedAtLeaf() const { return last_leaf; };
-    
+
     virtual AlgorithmType Algorithm() const = 0;
-    const TargetValue *Classify( const std::string& Line, 
+    const TargetValue *Classify( const std::string& Line,
 				 const ValueDistribution *& db,
 				 double& di ){
       const TargetValue *res = classifyString( Line, di );
@@ -171,8 +172,8 @@ namespace Timbl {
       double dum_d;
       return classifyString( Line, dum_d  );
     }
-    
-    const TargetValue *Classify( const std::string& Line, 
+
+    const TargetValue *Classify( const std::string& Line,
 				 const ValueDistribution *& db ){
       double dum_d;
       const TargetValue *res = classifyString( Line, dum_d );
@@ -182,20 +183,20 @@ namespace Timbl {
       }
       return res;
     }
-    const TargetValue *Classify( const std::string& Line, 
+    const TargetValue *Classify( const std::string& Line,
 				 double& di ){
       return classifyString( Line, di );
     }
-    
+
     const neighborSet *NB_Classify( const std::string& );
-    
+
     virtual void initExperiment( bool = false );
-    
+
   protected:
     TimblExperiment( const AlgorithmType, const std::string& = "" );
     virtual bool checkLine( const std::string& );
     virtual bool ClassicLearn( const std::string& = "", bool = true );
-    virtual const TargetValue *LocalClassify( const Instance& , 
+    virtual const TargetValue *LocalClassify( const Instance& ,
 					      double&,
 					      bool& );
     virtual bool GetInstanceBase( std::istream& ) = 0;
@@ -205,7 +206,7 @@ namespace Timbl {
     bool initTestFiles( const std::string&, const std::string& );
     void show_results( std::ostream&,
 		       const double,
-		       const std::string&, 
+		       const std::string&,
 		       const TargetValue *,
 		       const double ) ;
     void testInstance( const Instance&,
@@ -216,13 +217,13 @@ namespace Timbl {
     bool nextLine( std::istream &, std::string&, int& );
     bool nextLine( std::istream &, std::string& );
     bool skipARFFHeader( std::istream & );
-    
+
     void show_progress( std::ostream& os, time_t, unsigned int );
     bool createPercFile( const std::string& = "" ) const;
-    
+
     void show_speed_summary( std::ostream& os,
 			     const timeval& ) const;
-    
+
     void show_ignore_info( std::ostream& os ) const;
     void show_weight_info( std::ostream& os ) const;
     void show_metric_info( std::ostream& os ) const;
@@ -241,7 +242,7 @@ namespace Timbl {
     std::string outStreamName;
     std::ifstream testStream;
     std::ofstream outStream;
-    unsigned long ibCount; 
+    unsigned long ibCount;
     ConfusionMatrix *confusionInfo;
     std::vector<Instance> instances;
     StatisticsClass stats;
@@ -254,11 +255,11 @@ namespace Timbl {
     int estimate;
     int numOfThreads;
     const TargetValue *classifyString( const std::string& , double& );
-  }; 
+  };
 
   class IB1_Experiment: public TimblExperiment {
   public:
-    IB1_Experiment( const size_t N = DEFAULT_MAX_FEATS, 
+    IB1_Experiment( const size_t N = DEFAULT_MAX_FEATS,
 		    const std::string& s= "",
 		    const bool init = true );
     bool Increment( const std::string& );
@@ -270,8 +271,8 @@ namespace Timbl {
     bool NS_Test( const std::string&,
 		  const std::string& );
   protected:
-    TimblExperiment *clone() const { 
-      return new IB1_Experiment( MaxFeats(), "", false ); 
+    TimblExperiment *clone() const {
+      return new IB1_Experiment( MaxFeats(), "", false );
     };
     bool checkTestFile();
     bool checkLine( const std::string& );
@@ -280,13 +281,13 @@ namespace Timbl {
   private:
     bool GetInstanceBase( std::istream& );
   };
-  
+
   class IB2_Experiment: public IB1_Experiment {
   public:
-  IB2_Experiment( size_t N, const std::string& s="" ): 
+  IB2_Experiment( size_t N, const std::string& s="" ):
     IB1_Experiment( N, s ) {
       IB2_offset( 0 );
-    }; 
+    };
     bool Prepare( const std::string& = "", bool = false, bool = false );
     bool Expand( const std::string& );
     bool Remove( const std::string& );
@@ -298,10 +299,10 @@ namespace Timbl {
     bool Expand_N( const std::string& );
     bool show_learn_progress( std::ostream& os, time_t, size_t );
   };
-  
+
   class LOO_Experiment: public IB1_Experiment {
   public:
-  LOO_Experiment( int N, const std::string& s = "" ): 
+  LOO_Experiment( int N, const std::string& s = "" ):
     IB1_Experiment( N, s ) {
     };
     bool Test( const std::string&,
@@ -313,10 +314,10 @@ namespace Timbl {
     bool checkTestFile( );
     void showTestingInfo( std::ostream& );
   };
-  
+
   class CV_Experiment: public IB1_Experiment {
   public:
-  CV_Experiment( int N = DEFAULT_MAX_FEATS, const std::string& s = "" ): 
+  CV_Experiment( int N = DEFAULT_MAX_FEATS, const std::string& s = "" ):
     IB1_Experiment( N, s ), NumOfFiles( 0 ), FileNames( NULL )
       { };
     ~CV_Experiment(){ delete [] FileNames; };
@@ -340,35 +341,35 @@ namespace Timbl {
     std::string CV_PfileName;
     WeightType CV_fileW;
   };
-  
+
   class TRIBL_Experiment: public TimblExperiment {
   public:
-  TRIBL_Experiment( const size_t N = DEFAULT_MAX_FEATS, 
+  TRIBL_Experiment( const size_t N = DEFAULT_MAX_FEATS,
 		    const std::string& s = "",
-		    const bool init = true ): 
+		    const bool init = true ):
     TimblExperiment( TRIBL_a, s ) {
       if ( init ) InitClass( N );
     };
     void InitInstanceBase();
   protected:
-    TimblExperiment *clone() const { 
+    TimblExperiment *clone() const {
       return new TRIBL_Experiment( MaxFeats(), "", false ); };
     void showTestingInfo( std::ostream& );
     bool checkTestFile();
     AlgorithmType Algorithm() const { return TRIBL_a; };
     bool checkLine( const std::string& );
-    const TargetValue *LocalClassify( const Instance& , 
+    const TargetValue *LocalClassify( const Instance& ,
 				      double&,
 				      bool& );
   private:
     bool GetInstanceBase( std::istream& );
   };
-  
+
   class TRIBL2_Experiment: public TimblExperiment {
   public:
-  TRIBL2_Experiment( const size_t N = DEFAULT_MAX_FEATS, 
+  TRIBL2_Experiment( const size_t N = DEFAULT_MAX_FEATS,
 		     const std::string& s = "",
-		     const bool init = true ): 
+		     const bool init = true ):
     TimblExperiment( TRIBL2_a, s ) {
       if ( init ) InitClass( N );
     };
@@ -390,8 +391,8 @@ namespace Timbl {
   public:
   IG_Experiment( const size_t N = DEFAULT_MAX_FEATS,
 		 const std::string& s = "",
-		 const bool init = true ): 
-    TimblExperiment( IGTREE_a, s ) { 
+		 const bool init = true ):
+    TimblExperiment( IGTREE_a, s ) {
       if ( init ) InitClass( N );
     };
     AlgorithmType Algorithm() const { return IGTREE_a; };
@@ -401,11 +402,11 @@ namespace Timbl {
     void initExperiment( bool = false );
     bool Expand( const std::string& ){
       FatalError( "Expand not supported for IGTree" );
-      return false; 
+      return false;
     };
-    
+
   protected:
-    TimblExperiment *clone() const { 
+    TimblExperiment *clone() const {
       return new IG_Experiment( MaxFeats(), "", false ); };
     bool ClassicLearn( const std::string& = "", bool = true );
     bool checkTestFile();
@@ -416,10 +417,10 @@ namespace Timbl {
 				      double&,
 				      bool& );
   private:
-    
+
     bool GetInstanceBase( std::istream& );
   };
-  
+
 }
 
 #endif // TIMBL_EXPERIMENT_H
