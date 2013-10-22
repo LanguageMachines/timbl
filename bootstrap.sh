@@ -22,7 +22,7 @@ automake=automake
 aclocal=aclocal
 
 # if you want to autogenerate a ChangeLog form svn:
-# 
+#
 #  svn2cl, a python script, as used in the GNU Enterprise project.
 #    By jcater (Jason Cater), contributions by reinhard (Reinhard Müller).
 #    Get it from
@@ -45,6 +45,25 @@ if $automake --version|head -1 |grep ' 1\.[4-9]'; then
         echo " sudo update-alternatives --config automake"
     fi
     exit 1
+fi
+# autoconf-archive Debian package, aclocal-archive RPM, obsolete/badly supported OS, installed in home dir
+acdirs="/usr/share/autoconf-archive/ /usr/share/aclocal/ /usr/local/share/aclocal/ $HOME/local/share/autoconf-archive/"
+
+found=false
+for d in $acdirs
+do
+    if test -f ${d}libtool.m4
+    then
+        found=true
+        break
+    fi
+done
+
+if ! $found
+then
+    cat <<EOT
+You need the autoconf-archive package, or the aclocal-archive package.
+EOT
 fi
 
 # Debian automake package installs as automake-version.  Use this
