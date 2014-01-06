@@ -2,10 +2,10 @@
   $Id$
   $URL$
 
-  Copyright (c) 1998 - 2013
+  Copyright (c) 1998 - 2014
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -86,14 +86,14 @@ inline void usage_full(void){
   cerr << "     2 or TRIBL : TRIBL" << endl;
   cerr << "     3 or IB2   : IB2" << endl;
   cerr << "     4 or TRIBL2 : TRIBL2" << endl;
-  cerr << "-m s      : use feature metrics as specified in string s:" 
+  cerr << "-m s      : use feature metrics as specified in string s:"
        << endl
-       << "            format: GlobalMetric:MetricRange:MetricRange" 
+       << "            format: GlobalMetric:MetricRange:MetricRange"
 	 << endl
        << "            e.g.: mO:N3:I2,5-7" << endl;
-  cerr << "     C: Cosine distance. (Global only. numeric features implied)" 
+  cerr << "     C: Cosine distance. (Global only. numeric features implied)"
        << endl;
-  cerr << "     D: Dot product. (Global only. numeric features implied)" 
+  cerr << "     D: Dot product. (Global only. numeric features implied)"
        << endl;
   cerr << "     DC: Dice Coefficient" << endl;
   cerr << "     O: weighted Overlap (default)" << endl;
@@ -113,13 +113,13 @@ inline void usage_full(void){
   cerr << "     5 or sd: Weight using Standard Deviation. (all features must be numeric)" << endl;
   cerr << "-w f      : read Weights from file 'f'" << endl;
   cerr << "-w f:n    : read Weight n from file 'f'" << endl;
-  cerr << "-b n      : number of lines used for bootstrapping (IB2 only)" 
+  cerr << "-b n      : number of lines used for bootstrapping (IB2 only)"
        << endl;
 #ifdef HAVE_OPENMP
   cerr << "--clones=<num> : use 'n' threads for parallel testing" << endl;
 #endif
   cerr << "--Diversify: rescale weight (see docs)" << endl;
-  cerr << "-d val    : weight neighbors as function of their distance:" 
+  cerr << "-d val    : weight neighbors as function of their distance:"
        << endl;
   cerr << "     Z      : equal weights to all (default)" << endl;
   cerr << "     ID     : Inverse Distance" << endl;
@@ -135,27 +135,27 @@ inline void usage_full(void){
   cerr << "-t  f     : test using file 'f'" << endl;
   cerr << "-t leave_one_out:"
        << " test with Leave One Out,using IB1" << endl;
-  cerr << " you may add -sloppy to speed up Leave One Out testing (see docs)" 
+  cerr << " you may add -sloppy to speed up Leave One Out testing (see docs)"
        << endl;
   cerr << "-t cross_validate:"
        << " Cross Validate Test,using IB1" << endl;
-  cerr << "   @f     : test using files and options described in file 'f'" 
+  cerr << "   @f     : test using files and options described in file 'f'"
        << endl;
-  cerr << "            Supported options: d e F k m o p q R t u v w x % -" 
+  cerr << "            Supported options: d e F k m o p q R t u v w x % -"
        << endl;
   cerr << "            -t <file> is mandatory" << endl;
   cerr << "Input options:" << endl;
   cerr << "-f f      : read from Datafile 'f'" << endl;
   cerr << "-f f      : OR: use filenames from 'f' for CV test" << endl;
   cerr << "-F format : Assume the specified inputformat" << endl;
-  cerr << "            (Compact, C4.5, ARFF, Columns, Tabbed, Binary, Sparse )" 
+  cerr << "            (Compact, C4.5, ARFF, Columns, Tabbed, Binary, Sparse )"
        << endl;
   cerr << "-l n      : length of Features (Compact format only)" << endl;
   cerr << "-i f      : read the InstanceBase from file 'f' "
        << "(skips phase 1 & 2 )"
        << endl;
   cerr << "--matrixin=<f> read ValueDifference Matrices from file 'f'" << endl;
-  cerr << "-u f      : read value_class probabilities from file 'f'" 
+  cerr << "-u f      : read value_class probabilities from file 'f'"
        << endl;
   cerr << "--occurrences=train|test|both assume occurrence info in the files."
        << endl;
@@ -171,7 +171,7 @@ inline void usage_full(void){
   cerr << "--matrixout=<f> store ValueDifference Matrices in file 'f'" << endl;
   cerr << "-X f      : dump the InstanceBase as XML in file 'f'" << endl;
   cerr << "-n f      : create names file 'f'" << endl;
-  cerr << "-p n      : show progress every n lines (default p = 100,000)" 
+  cerr << "-p n      : show progress every n lines (default p = 100,000)"
        << endl;
   cerr << "-U f      : save value_class probabilities in file 'f'" << endl;
   cerr << "-V        : Show VERSION" << endl;
@@ -180,7 +180,7 @@ inline void usage_full(void){
   cerr << "      s:  work silently" << endl;
   cerr << "      o:  show all options set" << endl;
   cerr << "      b:  show node/branch count and branching factor" << endl;
-  cerr << "      f:  show Calculated Feature Weights (default)" 
+  cerr << "      f:  show Calculated Feature Weights (default)"
        << endl;
   cerr << "      p:  show Value Difference matrices" << endl;
   cerr << "      e:  show exact matches" << endl;
@@ -189,7 +189,7 @@ inline void usage_full(void){
   cerr << "      cs: show per Class Statistics (implies +vas)" << endl;
   cerr << "      cf: add confidence to the output file. (needs -G)" << endl;
   cerr << "      di: add distance to output file" << endl;
-  cerr << "      db: add distribution of best matched to output file" 
+  cerr << "      db: add distribution of best matched to output file"
        << endl;
   cerr << "      md: add matching depth to output file." << endl;
   cerr << "      k:  add a summary for all k neigbors to output file"
@@ -212,7 +212,7 @@ inline void usage_full(void){
   cerr << "-o s      : use s as output filename" << endl;
   cerr << "-O d      : save output using path 'd'" << endl;
   cerr << "Internal representation options:" << endl;
-  cerr << "-B n      : number of bins used for discretization of numeric " 
+  cerr << "-B n      : number of bins used for discretization of numeric "
        << "feature values" << endl;
   cerr << "-c n      : clipping frequency for prestoring MVDM matrices"
        << endl;
@@ -221,7 +221,7 @@ inline void usage_full(void){
        << endl;
   cerr << "+H or -H  : write hashed trees (default +H)" << endl;
   cerr << "-M n      : size of MaxBests Array" << endl;
-  cerr << "-N n      : Number of features (default " 
+  cerr << "-N n      : Number of features (default "
        << TimblAPI::Default_Max_Feats() << ")" << endl;
   cerr << "--Treeorder=<value>      : ordering of the Tree :" << endl;
   cerr << "       DO: none" << endl;
@@ -254,9 +254,9 @@ inline void usage(void){
 
 void get_command_lines( const string& value, list<string>& result ){
   result.clear();
-  ifstream ind( value.c_str()+1 ); // skip @ 
+  ifstream ind( value.c_str()+1 ); // skip @
   if ( ind.bad() ){
-    cerr << "Problem reading command-lines from file '" 
+    cerr << "Problem reading command-lines from file '"
 	 << value << "'" << endl;
     throw( "command line failure" );
   }
@@ -270,12 +270,12 @@ void get_command_lines( const string& value, list<string>& result ){
 
 string correct_path( const string& filename,
 		     const string& path,
-		     bool keep_origpath ){  
+		     bool keep_origpath ){
   // if filename contains pathinformation, it is replaced with path, except
-  // when keep_origpath is true. 
+  // when keep_origpath is true.
   // if filename contains NO pathinformation, path is always appended.
   // of course we don't append if the filename is empty or just '-' !
-  
+
   if ( path != "" && filename != "" && filename[0] != '-' ){
     bool add_slash = path[path.length()] != '/';
     string tmp;
@@ -286,14 +286,14 @@ string correct_path( const string& filename,
 	tmp += "/";
       tmp += filename;
     }
-    else { 
+    else {
       tmp = path;
       if ( add_slash )
 	tmp += "/";
       if ( !keep_origpath ){
 	tmp += filename.substr( pos+1 );
       }
-      else 
+      else
 	tmp += filename;
     }
     return tmp;
@@ -531,7 +531,7 @@ bool get_file_names( TimblOpts& Opts ){
       else if ( num == 1 ){
 	WgtInFile = correct_path( value, I_Path, true );
 	Opts.Delete( 'w' );
-      } 
+      }
       else {
 	cerr << "invalid weighting option: " << value << endl;
 	return false;
@@ -598,7 +598,7 @@ bool Default_Output_Names( TimblOpts& Opts ){
     if ( Opts.Find( 'w', value, mood ) ){
       temp +=  value;
     }
-    else 
+    else
       if ( !WgtInFile.empty() )
 	temp += "ud";
       else
@@ -662,7 +662,7 @@ void Do_Test( TimblAPI *Run ){
       TimblOpts Opts( tmp_line );
       Adjust_Default_Values( Opts );
       if ( !get_file_names( Opts ) || TestFile == "" ){
-	cerr << "Warning: Skipped a line from indirect testfile:\n'"	
+	cerr << "Warning: Skipped a line from indirect testfile:\n'"
 	     << tmp_line << "'" << endl;
 	if ( TestFile == "" )
 	  cerr << "missing a Testfile name " << endl;
@@ -721,7 +721,7 @@ int main(int argc, char *argv[]){
     // Start.
     //
     cerr << "TiMBL " << TimblAPI::VersionInfo()
-	 << " (c) ILK 1998 - 2013.\n" 
+	 << " (c) ILK 1998 - 2014.\n"
 	 << "Tilburg Memory Based Learner\n"
 	 << "Induction of Linguistic Knowledge Research Group, Tilburg University\n"
 	 << "CLiPS Computational Linguistics Group, University of Antwerp" << endl;
@@ -787,7 +787,7 @@ int main(int argc, char *argv[]){
 	  }
 	  if ( ProbOutFile != "" )
 	    Run->WriteArrays( ProbOutFile );
-	  
+
 	  do_test = TestFile != "" || Do_Indirect;
 	  if ( do_test ||     // something to test ?
 	       MatrixOutFile != "" || // or at least to produce
@@ -809,15 +809,15 @@ int main(int argc, char *argv[]){
 	      if ( TreeOutFile != "" )
 		Run->WriteInstanceBase( TreeOutFile );
 	      if ( levelTreeOutFile != "" )
-		Run->WriteInstanceBaseLevels( levelTreeOutFile, 
+		Run->WriteInstanceBaseLevels( levelTreeOutFile,
 					      levelTreeLevel );
 	    }
-	    else 
+	    else
 	      do_test = false; // no testing because of problems
 	  }
 	}
       }
-      else if ( !dataFile.empty() && 
+      else if ( !dataFile.empty() &&
 		!( TestFile.empty() && TreeOutFile.empty() && levelTreeOutFile.empty() ) ){
 	// it seems we want to expand our tree
 	do_test = false;
@@ -826,7 +826,7 @@ int main(int argc, char *argv[]){
 	    if ( !TreeOutFile.empty() )
 	      Run->WriteInstanceBase( TreeOutFile );
 	    if ( levelTreeOutFile != "" )
-	      Run->WriteInstanceBaseLevels( levelTreeOutFile, 
+	      Run->WriteInstanceBaseLevels( levelTreeOutFile,
 					    levelTreeLevel );
 	    do_test = !TestFile.empty();
 	  }
@@ -865,14 +865,14 @@ int main(int argc, char *argv[]){
   catch( softExit& e ){
     return 0;
   }
-  catch(std::string& what){    
-    cerr << what << ", sorry" << endl; 
+  catch(std::string& what){
+    cerr << what << ", sorry" << endl;
   }
   catch(std::exception& e){
     cerr << e.what() << ", sorry" << endl;
   }
   catch(...){
     cerr << "some exception was raised" << endl;
-    cerr << "timbl terminated, Sorry for that" << endl; 
+    cerr << "timbl terminated, Sorry for that" << endl;
   }
 }

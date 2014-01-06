@@ -1,8 +1,8 @@
 /*
-  Copyright (c) 1998 - 2013
+  Copyright (c) 1998 - 2014
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -29,8 +29,8 @@ int main(){
   Timbl::TimblAPI My_Experiment( "-a IGTREE +vDI+DB+F", "test1" );
   My_Experiment.SetOptions( "-w3 -vDB" );
   My_Experiment.ShowSettings( std::cout );
-  My_Experiment.Learn( "dimin.train" );  
-  My_Experiment.Test( "dimin.test", "my_first_test.out" );  
+  My_Experiment.Learn( "dimin.train" );
+  My_Experiment.Test( "dimin.test", "my_first_test.out" );
   My_Experiment.SetOptions( "-mM" );
-  My_Experiment.Test( "dimin.test", "my_first_test.out" );  
+  My_Experiment.Test( "dimin.test", "my_first_test.out" );
 }

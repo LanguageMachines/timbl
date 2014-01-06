@@ -1,8 +1,8 @@
 /*
-  Copyright (c) 1998 - 2013
+  Copyright (c) 1998 - 2014
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -23,12 +23,12 @@
   or send mail to:
       timbl@uvt.nl
 */
- 
+
 #include <iostream>
 #include <fstream>
 
 #include <cstdlib>
- 
+
 #include "timbl/TimblAPI.h"
 
 using namespace std;
@@ -40,7 +40,7 @@ char test_f[] = "./dimin.test";
 int main(){
   string Bresult;
   double Distance;
-  
+
   TimblAPI *Exp = new TimblAPI( "-a TRIBL" );
   Exp->SetOptions( "+vS +x -N30 -q2" );
   Exp->ShowOptions( cout );
@@ -68,7 +68,7 @@ int main(){
   while ( getline( testfile, Buffer ) ){
     if ( Exp->Classify( Buffer, Bresult, Distance ) ){
       cout << Buffer << "\t --> " << Bresult << " " << Distance << endl;
-    } 
+    }
     else
       cout << Buffer << "\t --> (nill)" << endl;
   }
@@ -83,10 +83,10 @@ int main(){
   cout << "\nStart testing, using IGTree, first run" << endl;
   testfile.clear();
   testfile.open( test_f, ios::in );
-  while ( getline( testfile, Buffer ) ){ 
-    if ( Exp->Classify( Buffer, Bresult, Distance ) ){ 
+  while ( getline( testfile, Buffer ) ){
+    if ( Exp->Classify( Buffer, Bresult, Distance ) ){
       cout << Buffer << "\t --> " << Bresult << " " << Distance << endl;
-    } 
+    }
     else
       cout << Buffer << "\t --> (nill)" << endl;
   }
@@ -101,9 +101,9 @@ int main(){
   testfile.clear();
   testfile.open( test_f, ios::in );
   while ( getline( testfile, Buffer ) ){
-    if ( Exp->Classify( Buffer, Bresult, Distance ) ){ 
+    if ( Exp->Classify( Buffer, Bresult, Distance ) ){
       cout << Buffer << "\t --> " << Bresult << " " << Distance << endl;
-    } 
+    }
     else
       cout << Buffer << "\t --> (nill)" << endl;
   }

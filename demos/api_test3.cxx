@@ -1,8 +1,8 @@
 /*
-  Copyright (c) 1998 - 2013
+  Copyright (c) 1998 - 2014
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ using Timbl::TimblAPI;
 
 int main(){
   TimblAPI *My_Experiment = new TimblAPI( "-t cross_validate" );
-  My_Experiment->Test( "cross_val.test" );  
+  My_Experiment->Test( "cross_val.test" );
   delete My_Experiment;
   exit(0);
 }

@@ -1,8 +1,8 @@
 /*
-  Copyright (c) 1998 - 2013
+  Copyright (c) 1998 - 2014
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -33,9 +33,9 @@ using std::string;
 using namespace Timbl;
 
 int main(){
-  TimblAPI *My_Experiment = new TimblAPI( "-a IB1 +vDI+DB+n +mM +k4 " , 
+  TimblAPI *My_Experiment = new TimblAPI( "-a IB1 +vDI+DB+n +mM +k4 " ,
                                           "test5" );
-  My_Experiment->Learn( "dimin.train" );  
+  My_Experiment->Learn( "dimin.train" );
   {
     string line =  "=,=,=,=,+,k,e,=,-,r,@,l,T";
     const neighborSet *neighbours1 = My_Experiment->classifyNS( line );

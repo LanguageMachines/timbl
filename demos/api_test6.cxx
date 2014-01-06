@@ -1,8 +1,8 @@
 /*
-  Copyright (c) 1998 - 2013
+  Copyright (c) 1998 - 2014
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ using namespace Timbl;
 
 int main(){
   TimblAPI My_Experiment( "-a IB1 +vDI+DB -k3", "test6" );
-  My_Experiment.Learn( "dimin.train" ); 
+  My_Experiment.Learn( "dimin.train" );
   const ValueDistribution *vd;
   const TargetValue *tv
     = My_Experiment.Classify( "-,=,O,m,+,h,K,=,-,n,I,N,K", vd );
@@ -54,6 +54,6 @@ int main(){
   delete vd2;
   vd2 = nb->bestDistribution( dc );
   delete dc;
-  cout << "with exponenial decay, alpha = 0.3 " << vd2 << endl;  
+  cout << "with exponenial decay, alpha = 0.3 " << vd2 << endl;
   delete vd2;
 }

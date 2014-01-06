@@ -1,8 +1,8 @@
 /*
-  Copyright (c) 1998 - 2013
+  Copyright (c) 1998 - 2014
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -31,29 +31,29 @@
 using namespace Timbl;
 
 int main(){
-  TimblAPI *My_Experiment = new TimblAPI( "-a IB1 +vDI+DB +mM" , 
+  TimblAPI *My_Experiment = new TimblAPI( "-a IB1 +vDI+DB +mM" ,
                                           "test4" );
   My_Experiment->ShowSettings( std::cout );
-  My_Experiment->Learn( "dimin.train" );  
+  My_Experiment->Learn( "dimin.train" );
   My_Experiment->Test( "dimin.test", "inc1.out" );
-  My_Experiment->SaveWeights( "wg.1.wgt" );  
-  My_Experiment->WriteArrays( "arr.1.arr" );  
-  My_Experiment->Increment( "=,=,=,=,+,k,e,=,-,r,@,l,T" );  
+  My_Experiment->SaveWeights( "wg.1.wgt" );
+  My_Experiment->WriteArrays( "arr.1.arr" );
+  My_Experiment->Increment( "=,=,=,=,+,k,e,=,-,r,@,l,T" );
   My_Experiment->Test( "dimin.test", "inc2.out" );
-  My_Experiment->SaveWeights( "wg.2.wgt" );  
-  My_Experiment->WriteArrays( "arr.2.arr" );  
-  My_Experiment->Increment( "+,zw,A,rt,-,k,O,p,-,n,O,n,E" );  
+  My_Experiment->SaveWeights( "wg.2.wgt" );
+  My_Experiment->WriteArrays( "arr.2.arr" );
+  My_Experiment->Increment( "+,zw,A,rt,-,k,O,p,-,n,O,n,E" );
   My_Experiment->Test( "dimin.test", "inc3.out" );
-  My_Experiment->SaveWeights( "wg.3.wgt" );  
-  My_Experiment->WriteArrays( "arr.3.arr" );  
-  My_Experiment->Decrement( "+,zw,A,rt,-,k,O,p,-,n,O,n,E" );  
+  My_Experiment->SaveWeights( "wg.3.wgt" );
+  My_Experiment->WriteArrays( "arr.3.arr" );
+  My_Experiment->Decrement( "+,zw,A,rt,-,k,O,p,-,n,O,n,E" );
   My_Experiment->Test( "dimin.test", "inc4.out" );
-  My_Experiment->SaveWeights( "wg.4.wgt" );  
-  My_Experiment->WriteArrays( "arr.4.arr" );  
-  My_Experiment->Decrement( "=,=,=,=,+,k,e,=,-,r,@,l,T" );  
+  My_Experiment->SaveWeights( "wg.4.wgt" );
+  My_Experiment->WriteArrays( "arr.4.arr" );
+  My_Experiment->Decrement( "=,=,=,=,+,k,e,=,-,r,@,l,T" );
   My_Experiment->Test( "dimin.test", "inc5.out" );
-  My_Experiment->SaveWeights( "wg.5.wgt" );  
-  My_Experiment->WriteArrays( "arr.5.arr" );  
+  My_Experiment->SaveWeights( "wg.5.wgt" );
+  My_Experiment->WriteArrays( "arr.5.arr" );
   delete My_Experiment;
   exit(1);
 }

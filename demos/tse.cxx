@@ -1,8 +1,8 @@
 /*
-  Copyright (c) 1998 - 2013
+  Copyright (c) 1998 - 2014
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -64,16 +64,16 @@ bool compare_nocase_n( const string& s1, const string& s2, size_t n ){
 //
 // here are the various scripting actions:
 //
-enum ActionType { UnknownAct, New, Free,         
+enum ActionType { UnknownAct, New, Free,
 		  Set,  Show, Classify,
 		  Train, Test, Increment, Decrement,
 		  Expand, Remove,
-		  SaveTree, GetTree,      
+		  SaveTree, GetTree,
 		  SaveW, GetW,
 		  Quit };
 /*
   The following scripting commands are implemented:
-  QUIT 
+  QUIT
       stop all further actions.
   NEW name <algo>
       create an experiment with name 'name' of type 'algo'
@@ -88,19 +88,19 @@ enum ActionType { UnknownAct, New, Free,
   <name>.SHOW SETTINGS
       show all options with current settings of 'name'
   <name>.TRAIN file
-      build an instancebase from file. 
+      build an instancebase from file.
   <name>.TEST file1 [file2]
       classify all lines from file1, write results to file2 or
       to file1.out if parameter file2 is not present
-  <name>.EXPAND file1 
+  <name>.EXPAND file1
       increment the database with contents of file1
-  <name>.REMOVE file1 
+  <name>.REMOVE file1
       decrement the database with contents of file1
-  <name>.CLASSIFY line 
+  <name>.CLASSIFY line
       classify this line
-  <name>.ADD line 
+  <name>.ADD line
       increment the database with line
-  <name>.REM line 
+  <name>.REM line
       decrement the database with line
   <name>.SAVE file
       save the instancebase of experiment name to file.
@@ -134,7 +134,7 @@ int fill_params( string *params, const string& line ){
   for ( size_t u_i = 0; u_i < len; u_i++) {
     if ( line[u_i] == ',' || line[u_i] == ' ' ){
       if ( params[i] != "" ) // Don't accept zero length strings !
-	++i; 
+	++i;
       if ( i >= MAX_PARAMS )
 	break;
     }
@@ -270,7 +270,7 @@ void one_command( istream &in_file, int &line_count ) {
   int pos = -1, len;
   if ( params == 0 ){
     params = new string[MAX_PARAMS+1];
-  } 
+  }
   string Buffer;
   getline( in_file, Buffer );
   line_count++;
@@ -297,7 +297,7 @@ void one_command( istream &in_file, int &line_count ) {
       cerr << " Wrong number of parameters for New" << endl;
       exit(1);
     }
-    string cmnd; 
+    string cmnd;
     if ( len == 1 ){
       cerr << "1 parameters " << params[0] << endl;
       cmnd = "-a IB1";
@@ -307,7 +307,7 @@ void one_command( istream &in_file, int &line_count ) {
 	cmnd += params[i] + " ";
     }
     experiments[exp_cnt++] = new TimblAPI( cmnd, params[0] );
-    cerr << "Created a new experiment: " 
+    cerr << "Created a new experiment: "
 	 << experiments[exp_cnt-1]->ExpName() << endl;
     break;
   }
@@ -393,7 +393,7 @@ void one_command( istream &in_file, int &line_count ) {
     experiments[pos]->Test( params[0], params[1] );
     break;
   }
-  case Classify: 
+  case Classify:
     if ( len == 1 ){
       const TargetValue *tv = experiments[pos]->Classify(params[0]);
       cout << "classify: " << params[0] << " ==> " << tv << endl;
@@ -401,13 +401,13 @@ void one_command( istream &in_file, int &line_count ) {
     else
       cerr << "missing instancestring for Add" << endl;
     break;
-  case Increment: 
+  case Increment:
     if ( len == 1 )
       experiments[pos]->Increment(params[0]);
     else
       cerr << "missing instancestring for Add" << endl;
     break;
-  case Decrement: 
+  case Decrement:
     if ( len == 1 )
       experiments[pos]->Decrement(params[0]);
     else
@@ -423,8 +423,8 @@ void one_command( istream &in_file, int &line_count ) {
     break;
   case UnknownAct:
     if ( pos < 0 )
-      cerr << "[" << line_count << "]" << Buffer 
-	   << "  ==> Unknown experiment, skipped\n" << endl; 
+      cerr << "[" << line_count << "]" << Buffer
+	   << "  ==> Unknown experiment, skipped\n" << endl;
     else
       cerr << "[" << line_count << "] " << Buffer
 	   << "  ==> Unknown action, skipped\n" << endl;
@@ -444,7 +444,7 @@ int main(int argc, char *argv[] ){
     }
     cout << "reading script from: " << argv[1] << endl;
     script_file = &test_file;
-  }    
+  }
   else
     script_file = &cin;
   int line = 0;
