@@ -1,3 +1,6 @@
+6.4.5 2014-06-xx
+  * small bug fixes
+
 6.4.4 2013-04-03
   * rely more on ticcutils stuff. A lot of functions are moved there
   * added a GetAccuracy option to the API
@@ -55,7 +58,7 @@
 6.3.2
 - fixed bug 44. Segfault in weird cases
 - fixed bug 45. Needless processing of traindata when required option is missing
-- fixed bug 46. Tribl2 sometimes fails to correctly output +v+k+n 
+- fixed bug 46. Tribl2 sometimes fails to correctly output +v+k+n
 - fixed bug 47. Unclear error message when InnerProduct fails
 - several small uncritical enhancements
 
@@ -66,7 +69,7 @@
 
 6.2.3
   forgot to edit this file
-6.2.2 
+6.2.2
   forgot to edit this file
 
 6.2.1 - 2009-11-30
