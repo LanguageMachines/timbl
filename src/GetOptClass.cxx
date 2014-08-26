@@ -678,7 +678,7 @@ namespace Timbl {
     const char *ok_opt;
     switch ( mode ){
     case 0:
-      ok_opt = "a:b:B:c:C:d:De:F:G:Hk:l:L:m:M:n:N:o:O:p:q:QR:sS:t:T:v:w:Wx";
+      ok_opt = "a:b:B:c:C:d:De:F:G:Hk:l:L:m:M:n:N:o:O:p:q:QR:st:T:v:w:Wx";
       break;
     case 1:
       // limited usage, for @t
@@ -686,7 +686,7 @@ namespace Timbl {
       break;
     case 2:
       // limited usage, for Server
-      ok_opt = "C:d:G:k:l:L:p:QS:v:x";
+      ok_opt = "C:d:G:k:l:L:p:Qv:x";
       break;
     default:
       ok_opt = NULL;

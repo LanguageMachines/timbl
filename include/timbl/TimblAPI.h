@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2014
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -40,16 +40,17 @@
 #include "timbl/Instance.h"
 #include "timbl/neighborSet.h"
 #include "timbl/TimblExperiment.h"
+#include "ticcutils/CommandLine.h"
 
 namespace Timbl{
-  
+
   inline std::string Version() { return Common::Version(); }
   inline std::string VersionName() { return Common::VersionName(); }
   inline std::string BuildInfo() { return Common::BuildInfo(); }
-  
+
   enum Algorithm { UNKNOWN_ALG, IB1, IB2, IGTREE, TRIBL, TRIBL2, LOO, CV };
   enum Weighting { UNKNOWN_W, UD, NW, GR, IG, X2, SV, SD };
-  
+
   class TimblOpts {
     friend class TimblAPI;
     friend std::ostream& operator<<( std::ostream&, const TimblOpts&  );
@@ -70,11 +71,12 @@ namespace Timbl{
     TimblOpts( const TimblOpts& );
     TimblOpts& operator=( const TimblOpts& );
   };
-  
+
   class TimblAPI {
     friend class TimblExperiment;
   public:
     TimblAPI( const TimblOpts *, const std::string& = "" );
+    TimblAPI( const TiCC::CL_Options&, const std::string& = "" );
     TimblAPI( const std::string&,  const std::string& = "" );
     TimblAPI( const TimblAPI& );
     ~TimblAPI();
@@ -98,17 +100,17 @@ namespace Timbl{
     bool Decrement( const std::string& );
     bool Expand( const std::string& );
     bool Remove( const std::string& );
-    bool Test( const std::string& = "", 
+    bool Test( const std::string& = "",
 	       const std::string& = "",
 	       const std::string& = "" );
-    bool NS_Test( const std::string& = "", 
+    bool NS_Test( const std::string& = "",
 		  const std::string& = "" );
     const TargetValue *Classify( const std::string& );
-    const TargetValue *Classify( const std::string&, 
+    const TargetValue *Classify( const std::string&,
 				 const ValueDistribution *& );
     const TargetValue *Classify( const std::string&, double& );
-    const TargetValue *Classify( const std::string&, 
-				 const ValueDistribution *&, 
+    const TargetValue *Classify( const std::string&,
+				 const ValueDistribution *&,
 				 double& );
     const neighborSet *classifyNS( const std::string& );
     bool classifyNS( const std::string&, neighborSet& );
@@ -116,7 +118,7 @@ namespace Timbl{
     const Target *myTargets() const;
     bool Classify( const std::string&, std::string& );
     bool Classify( const std::string&, std::string&, double& );
-    bool Classify( const std::string&, std::string&, 
+    bool Classify( const std::string&, std::string&,
 		   std::string&, double& );
     bool ShowBestNeighbors( std::ostream& ) const;
     size_t matchDepth() const;
@@ -135,7 +137,7 @@ namespace Timbl{
     bool WriteArrays( const std::string& = "" );
     bool WriteMatrices( const std::string& = "" );
     bool GetArrays( const std::string& = "" );
-    bool GetMatrices( const std::string& = "" );    
+    bool GetMatrices( const std::string& = "" );
     bool WriteNamesFile( const std::string& = "" );
     bool ShowWeights( std::ostream& ) const;
     bool ShowOptions( std::ostream& ) const;
@@ -154,12 +156,12 @@ namespace Timbl{
     TimblAPI& operator=( const TimblAPI& ); // so nobody may use them
     TimblExperiment *pimpl;
     bool i_am_fine;
-  }; 
-  
+  };
+
   const std::string to_string( const Algorithm );
   const std::string to_string( const Weighting );
   bool string_to( const std::string&, Algorithm& );
   bool string_to( const std::string&, Weighting& );
-  
+
 }
 #endif // TIMBL_API_H
