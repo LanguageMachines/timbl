@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2014
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -48,11 +48,8 @@ namespace Timbl {
     bool definitive_options( TimblExperiment * );
     AlgorithmType Algo() const { return local_algo; };
     int MaxFeatures() const { return MaxFeats; };
-    std::string getLogFile() const { return logFile; };
-    std::string getPidFile() const { return pidFile; };
-    bool daemonizeFlag() const { return do_daemon; };
     VerbosityFlags getVerbosity() { return myVerbosity; };
-  private:  
+  private:
     AlgorithmType local_algo;
     MetricType local_metric;
     OrdeningType local_order;
@@ -95,16 +92,13 @@ namespace Timbl {
     bool do_sloppy_loo;
     bool do_silly;
     bool do_diversify;
-    bool do_daemon;
     std::vector<MetricType>metricsArray;
     std::ostream *parent_socket_os;
     std::string inPath;
     std::string outPath;
-    std::string logFile;
-    std::string pidFile;
     int occIn;
     void Error( const std::string& ) const;
-    inline bool parse_range( std::string&, 
+    inline bool parse_range( std::string&,
 			     std::string::iterator&,
 			     MetricType );
     inline bool parse_metrics( const std::string&,

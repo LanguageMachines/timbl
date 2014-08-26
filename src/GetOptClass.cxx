@@ -81,7 +81,6 @@ namespace Timbl {
     do_sloppy_loo = false;
     do_silly = false;
     do_diversify = false;
-    do_daemon = true;
     if ( MaxFeats == -1 ){
       MaxFeats = Max;
       LocalInputFormat = UnknownInputFormat; // InputFormat and verbosity
@@ -93,8 +92,6 @@ namespace Timbl {
       metricsArray[i] = UnknownMetric;
     }
     outPath = "";
-    logFile = "";
-    pidFile = "";
     occIn = 0;
   }
 
@@ -166,12 +163,9 @@ namespace Timbl {
     do_sloppy_loo( false ),
     do_silly( in.do_silly ),
     do_diversify( in.do_diversify ),
-    do_daemon( in.do_daemon ),
     metricsArray( in.metricsArray ),
     parent_socket_os( in.parent_socket_os ),
     outPath( in.outPath ),
-    logFile( in.logFile ),
-    pidFile( in.pidFile ),
     occIn( in.occIn )
   {
   }
@@ -408,12 +402,6 @@ namespace Timbl {
 		      toString(myVerbosity);
 		    if ( Exp->SetOption( optline ) ){
 		      for ( size_t i=0; i < metricsArray.size(); ++i ){
-			// if ( !first ){
-			//   if ( metricsArray[i] == Ignore ){
-			//     Error( "-m:I is not possible at this stage" );
-			//     return false;
-			//   }
-			// }
 			optline = "METRICS: " + toString<int>( i ) + "=" +
 			  toString(metricsArray[i]);
 			if (!Exp->SetOption( optline ) ){
@@ -813,27 +801,7 @@ namespace Timbl {
 	}
 	break;
 
-      case 'd': {
-	if ( longOpt ){
-	  if ( long_option == "daemonize" ){
-	    bool val;
-	    if ( !isBoolOrEmpty(myoptarg,val) ){
-	      Error( "invalid value for " + long_option + ": '"
-		     + myoptarg + "'" );
-	      return false;
-	    }
-	    do_daemon = val;
-	  }
-	  else {
-	    Error( "invalid option: Did you mean '--daemonize'?" );
-	    return false;
-	  }
-	}
-	else if ( myoptarg.find("aemonize") != string::npos ){
-	  Error( "invalid option: Did you mean '--daemonize' ?" );
-	  return false;
-	}
-	else {
+	case 'd': {
 	  string::size_type pos1 = myoptarg.find( ":" );
 	  if ( pos1 == string::npos ){
 	    pos1 = myoptarg.find_first_of( "0123456789" );
@@ -881,7 +849,6 @@ namespace Timbl {
 	      }
 	    }
 	  }
-	}
 	break;
       }
 
@@ -955,29 +922,10 @@ namespace Timbl {
 	break;
 
       case 'l':
-	if ( longOpt ){
-	  if ( long_option == "logfile" ){
-	    if ( myoptarg.empty() ){
-	      Error( "missing filename for '--logfile'" );
-	      return false;
-	    }
-	    logFile = myoptarg;
-	  }
-	  else {
-	    Error( "invalid option: Did you mean '--logfile' ?" );
-	    return false;
-	  }
-	}
-	else if ( myoptarg.find("ogfile") != string::npos ){
-	  Error( "invalid option: Did you mean '--logfile' ?" );
+	f_length = stringTo<int>( myoptarg );
+	if ( f_length <= 0 ){
+	  Error( "illegal value for -l option: " + myoptarg );
 	  return false;
-	}
-	else {
-	  f_length = stringTo<int>( myoptarg );
-	  if ( f_length <= 0 ){
-	    Error( "illegal value for -l option: " + myoptarg );
-	    return false;
-	  }
 	}
 	break;
 
@@ -1053,26 +1001,7 @@ namespace Timbl {
 	break;
 
       case 'p':
-	if ( longOpt ){
-	  if ( long_option == "pidfile" ){
-	    if ( myoptarg.empty() ){
-	      Error( "missing filename for '--pidfile'" );
-	      return false;
-	    }
-	    pidFile = myoptarg;
-	  }
-	  else {
-	    Error( "invalid option: Did you mean '--pidfile' ?" );
-	    return false;
-	  }
-	}
-	else if ( myoptarg.find("idfile") != string::npos ){
-	  Error( "invalid option: Did you mean '--pidfile' ?" );
-	  return false;
-	}
-	else {
-	  local_progress = stringTo<int>( myoptarg );
-	}
+	local_progress = stringTo<int>( myoptarg );
 	break;
 
       case 'q':
@@ -1235,5 +1164,3 @@ namespace Timbl {
   }
 
 }
-
-
