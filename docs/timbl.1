@@ -1,20 +1,20 @@
-.TH timbl 1 "2012 July 10"
+.TH timbl 1 "2014 December 2"
 
 .SH NAME
-timbl - Tilburg Memory Based Learner
+timbl \- Tilburg Memory Based Learner
 .SH SYNOPSYS
 timbl [options]
 
-timbl -f data-file -t test-file
+timbl \-f data\-file \-t test\(hyfile
 
 .SH DESCRIPTION
-TiMBL is an open source software package implementing several memory-based learning algorithms, among which IB1-IG, an implementation of k-nearest neighbor classification with feature weighting suitable for symbolic feature spaces, and IGTree, a decision-tree approximation of IB1-IG. All implemented algorithms have in common that they store some representation of the training set explicitly in memory. During testing, new cases are classified by extrapolation from the most similar stored cases.
+TiMBL is an open source software package implementing several memory\(hybased learning algorithms, among which IB1\(hyIG, an implementation of k\(hynearest neighbor classification with feature weighting suitable for symbolic feature spaces, and IGTree, a decision\(hytree approximation of IB1\(hyIG. All implemented algorithms have in common that they store some representation of the training set explicitly in memory. During testing, new cases are classified by extrapolation from the most similar stored cases.
 
 .SH OPTIONS
-.B -a
+.B \-a
 <n>
 or
-.B -a
+.B \-a
 <string>
 .RS
 determines the classification algorithm.
@@ -24,12 +24,12 @@ Possible values are:
 .B 0
 or
 .B IB
- the IB1 (k-NN) algorithm (default)
+ the IB1 (k\(hyNN) algorithm (default)
 
 .B 1
 or
 .B IGTREE
- a decision-tree-based approximation of IB1
+ a decision\(hytree\(hybased approximation of IB1
 
 .B 2
 or
@@ -44,32 +44,32 @@ or
 .B 4
 or
 .B TRIBL2
- a non-parameteric version of TRIBL
+ a non\(hyparameteric version of TRIBL
 .RE
 
-.B -b
+.B \-b
 n
 .RS
 number of lines used for bootstrapping (IB2 only)
 .RE
 
-.B -B
+.B \-B
 n
 .RS
 number of bins used for discretization of numeric feature values
 .RE
 
-.BR --Beam =<n>
+.BR \-\-Beam =<n>
 .RS
-limit +v db output to n highest-vote classes
+limit +v db output to n highest\(hyvote classes
 .RE
 
-.BR --clones =<n>
+.BR \-\-clones =<n>
 .RS
 number f threads to use for parallel testing
 .RE
 
-.B -c
+.B \-c
 n
 .RS
 clipping frequency for prestoring MVDM matrices
@@ -77,16 +77,16 @@ clipping frequency for prestoring MVDM matrices
 
 .B +D
 .RS
-store distributions on all nodes (necessary for 
+store distributions on all nodes (necessary for
 using +v db with IGTree, but wastes memory otherwise)
 .RE
 
-.B --Diversify
+.B \-\-Diversify
 .RS
 rescale weight (see docs)
 .RE
 
-.B -d
+.B \-d
 val
 .RS
 weigh neighbors as function of their distance:
@@ -97,26 +97,26 @@ weigh neighbors as function of their distance:
  ED:a:b : Exponential Decay with factor a and b (no whitespace!)
 .RE
 
-.B -e
+.B \-e
 n
 .RS
 estimate time until n patterns tested
 .RE
 
-.B -f
+.B \-f
 file
 .RS
 read from data file 'file' OR use filenames from 'file' for cross validation test
 .RE
 
-.B -F
+.B \-F
 format
 .RS
 assume the specified input format
 (Compact, C4.5, ARFF, Columns, Binary, Sparse )
 .RE
 
-.B -G
+.B \-G
 normalization
 
 .RS
@@ -124,7 +124,7 @@ normalize distibutions (+v db option only)
 
 Supported normalizations are:
 
-.B Probability 
+.B Probability
 or
 .B 0
 
@@ -146,47 +146,47 @@ Add 1 to the target Weight, take the 10Log and then normalize between 0 and 1
 
 .B +H
 or
-.B -H
+.B \-H
 .RS
 write hashed trees (default +H)
 .RE
 
-.B -i
+.B \-i
 file
 .RS
 read the InstanceBase from 'file' (skips phase 1 & 2 )
 .RE
 
-.B -I
+.B \-I
 file
 .RS
 dump the InstanceBase in 'file'
 .RE
 
-.B -k
+.B \-k
 n
 .RS
 search 'n' nearest neighbors (default n = 1)
 .RE
 
-.B -L
+.B \-L
 n
 .RS
 set value frequency threshold to back off from MVDM to Overlap at level n
 .RE
 
-.B -l
+.B \-l
 n
 .RS
 fixed feature value length (Compact format only)
 .RE
 
-.B -m
+.B \-m
 string
 .RS
-use feature metrics as specified in' string':
+use feature metrics as specified in 'string':
  The format is : GlobalMetric:MetricRange:MetricRange
-           e.g.: mO:N3:I2,5-7
+           e.g.: mO:N3:I2,5\-7
 
  C: cosine distance. (Global only. numeric features implied)
  D: dot product. (Global only. numeric features implied)
@@ -196,49 +196,49 @@ use feature metrics as specified in' string':
  L: Levenshtein distance
  M: modified value difference
  J: Jeffrey divergence
- S: Jensen-Shannon divergence
+ S: Jensen\(hyShannon divergence
  N: numeric values
  I: Ignore named  values
 .RE
 
-.BR --matrixin =file
+.BR \-\-matrixin =file
 .RS
 read ValueDifference Matrices from file 'file'
 .RE
 
-.BR --matrixout =file
+.BR \-\-matrixout =file
 .RS
 store ValueDifference Matrices in 'file'
 .RE
 
-.B -n
+.B \-n
 file
 .RS
-create a C4.5-style names file 'file'
+create a C4.5\-style names file 'file'
 .RE
 
-.B -M
+.B \-M
 n
 .RS
 size of MaxBests Array
 .RE
 
-.B -N
+.B \-N
 n
 .RS
 number of features (default 2500)
 .RE
 
-.B -o
+.B \-o
 s
 .RS
 use s as output filename
 .RE
 
-.BR --occurences =<value>
+.BR \-\-occurences =<value>
 .RS
 The input file contains occurrence counts (at the last position)
-value can be one of: 
+value can be one of:
 .B train
 ,
 .B test
@@ -246,79 +246,79 @@ or
 .B both
 .RE
 
-.B -O
+.B \-O
 path
 .RS
 save output using 'path'
 .RE
 
-.B -p
+.B \-p
 n
 .RS
 show progress every n lines (default p = 100,000)
 .RE
 
-.B -P
+.B \-P
 path
 .RS
 read data using 'path'
 .RE
 
-.B -q
+.B \-q
 n
 .RS
 set TRIBL threshold at level n
 .RE
 
-.B -R
+.B \-R
 n
 .RS
 solve ties at random with seed n
 .RE
 
-.B -s
+.B \-s
 .RS
 use the exemplar weights from the input file
 .RE
 
-.B -s0
+.B \-s0
 .RS
 ignore the exemplar weights from the input file
 .RE
 
-.B -T
+.B \-T
 n
 .RS
 use feature n as the class label. (default: the last feature)
 .RE
 
-.B -t
+.B \-t
 file
 .RS
 test using 'file'
 .RE
 
-.B -t
+.B \-t
 leave_one_out
 .RS
-test with the leave-one-out testing regimen (IB1 only).
-you may add --sloppy to speed up leave-one-out testing (but see docs)
+test with the leave\(hyone\(hyout testing regimen (IB1 only).
+you may add \-\-sloppy to speed up leave\(hyone\hy(out testing (but see docs)
 .RE
 
-.B -t
+.B \-t
 cross_validate
 .RS
-perform cross-validation test (IB1 only)
+perform cross\(hyvalidation test (IB1 only)
 .RE
 
-.B -t
+.B \-t
 @file
 .RS
 test using files and options described in 'file'
-Supported options: d e F k m o p q R t u v w x % -
+Supported options: d e F k m o p q R t u v w x % \-
 .RE
 
-.B --Treeorder =value
+.B \-\-Treeorder =value
 n
 .RS
 ordering of the Tree:
@@ -328,8 +328,8 @@ ordering of the Tree:
  1/V: using 1/# of Values
  G/V: using GainRatio/# of Valuess
  I/V: using InfoGain/# of Valuess
- X2O: using X-square
- X/V: using X-square/# of Values
+ X2O: using X\(hysquare
+ X/V: using X\(hysquare/# of Values
  SVO: using Shared Variance
  S/V: using Shared Variance/# of Values
  GxE: using GainRatio * SplitInfo
@@ -337,26 +337,26 @@ ordering of the Tree:
  1/S: using 1/SplitInfo
 .RE
 
-.B -u
+.B \-u
 file
 .RS
-read value-class probabilities from 'file'
+read value\(hyclass probabilities from 'file'
 .RE
 
-.B -U
+.B \-U
 file
 .RS
-save value-class probabilities in 'file'
+save value\(hyclass probabilities in 'file'
 .RE
 
-.B -V
+.B \-V
 .RS
 Show VERSION
 .RE
 
 .B +v
 level or
-.B -v
+.B \-v
 level
 .RS
 set or unset verbosity level, where level is:
@@ -369,42 +369,42 @@ set or unset verbosity level, where level is:
  e:  show exact matches
  as: show advanced statistics (memory consuming)
  cm: show confusion matrix (implies +vas)
- cs: show per-class statistics (implies +vas)
- cf: add confidence to output file (needs -G)
+ cs: show per\(hyclass statistics (implies +vas)
+ cf: add confidence to output file (needs \-G)
  di: add distance to output file
  db: add distribution of best matched to output file
  md: add matching depth to output file.
- k:  add a summary for all k neigbors to output file (sets -x)
- n:  add nearest neigbors to output file (sets -x)
+ k:  add a summary for all k neigbors to output file (sets \-x)
+ n:  add nearest neigbors to output file (sets \-x)
 
-  You may combine levels using '+' e.g. +v p+db or -v o+di
+  You may combine levels using '+' e.g. +v p+db or \-v o+di
 .RE
 
-.B -w
+.B \-w
 n
 .RS
 weighting
  0 or nw: no weighting
  1 or gr: weigh using gain ratio (default)
  2 or ig: weigh using information gain
- 3 or x2: weigh using the chi-square statistic
+ 3 or x2: weigh using the chi\(hysquare statistic
  4 or sv: weigh using the shared variance statistic
  5 or sd: weigh using standard deviation. (all features must be numeric)
 .RE
 
-.B -w
+.B \-w
 file
 .RS
 read weights from 'file'
 .RE
 
-.B -w
+.B \-w
 file:n
 .RS
 read weight n from 'file'
 .RE
 
-.B -W
+.B \-W
 file
 .RS
 calculate and save all weights in 'file'
@@ -412,20 +412,20 @@ calculate and save all weights in 'file'
 
 .B +%
 or
-.B -%
+.B \-%
 .RS
 do or don't save test result (%) to file
 .RE
 
 .B +x
 or
-.B -x
+.B \-x
 .RS
-do or don't use the exact match shortcut 
-   (IB1 and IB2 only, default is -x)
+do or don't use the exact match shortcut
+   (IB1 and IB2 only, default is \-x)
 .RE
 
-.BR -X " file"
+.BR \-X " file"
 .RS
 dump the InstanceBase as XML in 'file'
 .RE
