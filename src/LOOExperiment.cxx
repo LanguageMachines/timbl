@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ using namespace TiCC;
 namespace Timbl {
   using namespace std;
 
-  void LOO_Experiment::initExperiment( bool all_vd ){ 
+  void LOO_Experiment::initExperiment( bool all_vd ){
     if ( !ExpInvalid() ){
       if ( !MBL_init ){  // do this only when necessary
 	initDecay();
@@ -65,7 +65,7 @@ namespace Timbl {
 	    calculatePrestored();
 	  else {
 	    Error( string("not enough memory for Probability Arrays")
-		   + "' in (" 
+		   + "' in ("
 		   + __FILE__  + "," + toString(__LINE__) + ")\n"
 		   + "ABORTING now" );
 	    throw std::bad_alloc();
@@ -80,7 +80,7 @@ namespace Timbl {
       }
     }
   }
-  
+
   bool LOO_Experiment::checkTestFile(){
     // no need to test the Testfile
     // it is the same as the trainfile, so already checked
@@ -112,6 +112,10 @@ namespace Timbl {
 			     const string& OutFile ){
     bool result = false;
     if ( initTestFiles( FileName, OutFile ) ){
+      if ( InstanceBase->nodeCount() == InstanceBase->depth() + 1 ){
+	// protect ourselves against 1-line trainfiles
+	FatalError( "the file '" + FileName + "' contains only 1 usable line. LOO impossible!" );
+      }
       initExperiment();
       stats.clear();
       delete confusionInfo;
@@ -130,7 +134,7 @@ namespace Timbl {
       string Buffer;
       while ( nextLine( testStream, Buffer ) ){
 	if ( !chopLine( Buffer ) ) {
-	  Warning( "testfile, skipped line #" + 
+	  Warning( "testfile, skipped line #" +
 		   toString<int>( stats.totalLines() ) +
 		   "\n" + Buffer );
 	}
@@ -139,7 +143,7 @@ namespace Timbl {
 	  Decrement( CurrInst );
 	  double final_distance = 0.0;
 	  bool exact = false;
-	  const TargetValue *ResultTarget = LocalClassify( CurrInst, 
+	  const TargetValue *ResultTarget = LocalClassify( CurrInst,
 							   final_distance,
 							   exact );
 	  normalizeResult();
@@ -148,7 +152,7 @@ namespace Timbl {
 	  if ( Verbosity(CONFIDENCE) )
 	    confidence = bestResult.confidence( ResultTarget );
 	  // Write it to the output file for later analysis.
-	  show_results( outStream, confidence, dString, 
+	  show_results( outStream, confidence, dString,
 			ResultTarget, final_distance );
 	  if ( exact ){ // remember that a perfect match may be incorrect!
 	    if ( Verbosity(EXACT) ) {
@@ -176,5 +180,5 @@ namespace Timbl {
     Error( "cannot combine Leave One Out with retrieving an Instancebase " );
     return false;
   }
-  
+
 }
