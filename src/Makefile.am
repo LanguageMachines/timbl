@@ -2,11 +2,12 @@
 # $URL$
 
 AM_CPPFLAGS = -I@top_srcdir@/include
+AM_CXXFLAGS = -std=c++11
 
 bin_PROGRAMS = timbl
 
 check_PROGRAMS = simpletest
-TESTS = $(check_PROGRAMS) 
+TESTS = $(check_PROGRAMS)
 TESTS_ENVIRONMENT = topsrcdir=$(top_srcdir)
 simpletest_SOURCES = simpletest.cxx
 CLEANFILES = dimin.out
