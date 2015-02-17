@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -47,54 +47,54 @@ namespace Timbl {
 			 Compact, C4_5, Columns, Tabbed, ARFF, SparseBin,
 			 Sparse,
 			 MaxInputFormat };
-  
+
   inline InputFormatType& operator++( InputFormatType &I ){
-    return I = ( MaxInputFormat == I ) 
-      ? UnknownInputFormat 
+    return I = ( MaxInputFormat == I )
+      ? UnknownInputFormat
       : InputFormatType(I+1);
   }
-  
-  
+
+
   enum WeightType { Unknown_w,
-		    No_w, GR_w, IG_w, X2_w, SV_w, SD_w, UserDefined_w, 
+		    No_w, GR_w, IG_w, X2_w, SV_w, SD_w, UserDefined_w,
 		    Max_w };
-  
+
   inline WeightType& operator++( WeightType &W ){
     return W = ( Max_w == W ) ? Unknown_w : WeightType(W+1);
   }
-  
+
   enum AlgorithmType { Unknown_a,
 		       IB1_a, IB2_a, IGTREE_a, TRIBL_a, TRIBL2_a,
 		       LOO_a, CV_a,
 		       Max_a };
-  
+
   inline AlgorithmType& operator++( AlgorithmType &W ){
     return W = ( Max_a == W ) ? Unknown_a : AlgorithmType(W+1);
   }
-  
-  
-  enum MetricType { UnknownMetric, Ignore, 
-		    Numeric, DotProduct, Cosine, Overlap, Levenshtein, 
+
+
+  enum MetricType { UnknownMetric, Ignore,
+		    Numeric, DotProduct, Cosine, Overlap, Levenshtein,
 		    Dice, ValueDiff, JeffreyDiv, JSDiv, Euclidean, MaxMetric };
-  
+
   inline MetricType& operator++( MetricType &W ){
     return W = ( MaxMetric == W ) ? UnknownMetric : MetricType(W+1);
   }
-  
+
   enum OrdeningType { UnknownOrdening, DataFile, NoOrder,
-		      GROrder, IGOrder, 
+		      GROrder, IGOrder,
 		      OneoverFeature, OneoverSplitInfo,
 		      GRoverFeature, IGoverFeature,
 		      GREntropyOrder, IGEntropyOrder,
 		      X2Order, SVOrder, SDOrder,
 		      X2overFeature, SVoverFeature, SDoverFeature,
 		      MaxOrdening };
-  
+
   inline OrdeningType& operator++( OrdeningType &W ){
     return W = ( MaxOrdening == W ) ? UnknownOrdening : OrdeningType(W+1);
   }
-  
-  
+
+
   enum VerbosityFlags { NO_VERB=0, SILENT=1, OPTIONS=2, FEAT_W=4,
 			VD_MATRIX=8, EXACT=16, DISTANCE=32, DISTRIB=64,
 			NEAR_N=128, ADVANCED_STATS=256, CONF_MATRIX=512,
@@ -114,54 +114,54 @@ namespace Timbl {
     f = (f | g);
     return f;
   }
-  
+
   inline VerbosityFlags operator& ( VerbosityFlags f, VerbosityFlags g ){
     return (VerbosityFlags)((int)f & (int)g );
 }
-  
+
   inline VerbosityFlags& operator&= ( VerbosityFlags& f, VerbosityFlags g ){
     f = (f & g);
     return f;
   }
-  
+
   enum OptType { UnknownOpt,
 		 StringT, IntegerT, BooleanT, VerbosityT, IFormatT,
 		 AlgoT, MetricT, WeightT, OrdeningT,
 		 MaxOpt };
-  
+
   inline OptType& operator++( OptType &W ){
     return W = ( MaxOpt == W ) ? UnknownOpt : OptType(W+1);
   }
-  
-  enum DecayType { UnknownDecay, 
+
+  enum DecayType { UnknownDecay,
 		   Zero, InvDist, InvLinear, ExpDecay, MaxDecay };
-   
+
   inline DecayType& operator++( DecayType &W ){
     return W = ( MaxDecay == W ) ? UnknownDecay : DecayType(W+1);
   }
-  
-  enum SmoothingType { UnknownSmoothing, Default, Lidstone, MaxSmoothing };  
-  
+
+  enum SmoothingType { UnknownSmoothing, Default, Lidstone, MaxSmoothing };
+
   inline SmoothingType& operator++( SmoothingType &W ){
     return W = ( MaxSmoothing == W ) ? UnknownSmoothing : SmoothingType(W+1);
   }
 
-  enum normType { unknownNorm, noNorm, probabilityNorm, 
+  enum normType { unknownNorm, noNorm, probabilityNorm,
 		  addFactorNorm, logProbNorm, maxNorm };
-  
+
   inline normType& operator++( normType &W ){
     return W = ( maxNorm == W ) ? noNorm : normType(W+1);
   }
-  
-  extern const char *DecayName[][2];
-  extern const char *OrdeningName[][2];
-  extern const char *WeightName[][2];
-  extern const char *MetricName[][2];
-  extern const char *InputFormatName[][2];
-  extern const char *AlgorithmName[][2];
-  extern const char *SmoothingName[][2];
-  extern const char *VerbosityName[][2];
-  extern const char *NormalisationName[][2];
+
+  extern const std::string DecayName[][2];
+  extern const std::string OrdeningName[][2];
+  extern const std::string WeightName[][2];
+  extern const std::string MetricName[][2];
+  extern const std::string InputFormatName[][2];
+  extern const std::string AlgorithmName[][2];
+  extern const std::string SmoothingName[][2];
+  extern const std::string VerbosityName[][2];
+  extern const std::string NormalisationName[][2];
 
   WeightType charToWeig( char );
   AlgorithmType charToAlg( char  );
@@ -189,7 +189,7 @@ namespace TiCC {
 			       + str + "' to decayType failed" ) );
     return UnknownDecay;
   }
-  
+
   template <>
     inline std::string toString<DecayType>( const DecayType& W, bool b ){
     if ( b )
@@ -211,7 +211,7 @@ namespace TiCC {
 			       + str + "' to ordeningType failed" ) );
     return UnknownOrdening;
   }
-  
+
   template <>
     inline std::string toString<OrdeningType>( const OrdeningType& W,
 					       bool b ){
@@ -258,10 +258,10 @@ namespace TiCC {
 			       + str + "' to weightType failed" ) );
     return Unknown_w;
   }
-  
+
   template <>
     inline std::string toString<WeightType>( const WeightType& W, bool b ){
-    if ( b ) 
+    if ( b )
       return WeightName[W][1];
     else
       return WeightName[W][0];
@@ -294,7 +294,7 @@ namespace TiCC {
     else
       return AlgorithmName[a][0];
   }
-  
+
   template <>
     inline InputFormatType stringTo<InputFormatType>( const std::string& str ){
     InputFormatType d = UnknownInputFormat;
@@ -308,7 +308,7 @@ namespace TiCC {
 			       + str + "' to weightType failed" ) );
     return UnknownInputFormat;
   }
-  
+
   template <>
     inline std::string toString<InputFormatType>( const InputFormatType& i,
 						  bool b ){
@@ -319,7 +319,7 @@ namespace TiCC {
   }
 
   template <>
-    inline SmoothingType stringTo<SmoothingType>( const std::string& str ) { 
+    inline SmoothingType stringTo<SmoothingType>( const std::string& str ) {
     SmoothingType d = UnknownSmoothing;
     for ( ++d; d < MaxSmoothing; ++d ){
       if ( compare_nocase( str, SmoothingName[d][0] ) ||
@@ -331,7 +331,7 @@ namespace TiCC {
 			       + str + "' to smoothingType failed" ) );
     return UnknownSmoothing;
   }
-  
+
   template <>
     inline std::string toString<SmoothingType>( const SmoothingType& s,
 						bool b ){
@@ -342,7 +342,7 @@ namespace TiCC {
   }
 
   template <>
-    inline normType stringTo<normType>( const std::string& str ) { 
+    inline normType stringTo<normType>( const std::string& str ) {
     normType d = unknownNorm;
     if ( str.length() == 1 && isdigit(str[0]) ){
       d = charToNorm( str[0] );
@@ -359,7 +359,7 @@ namespace TiCC {
 			       + str + "' to normalisationType failed" ) );
     return unknownNorm;
   }
-  
+
   template <>
     inline std::string toString<normType>( const normType& s,
 					   bool b ){
@@ -369,13 +369,13 @@ namespace TiCC {
       return NormalisationName[s][0];
   }
 
-  inline bool string_to_verbflag( const std::string& line, 
+  inline bool string_to_verbflag( const std::string& line,
 				  VerbosityFlags &a ){
     unsigned int i;
     for ( i=0; VerbosityName[i][0][0] != '\0'; i++ )
       if ( compare_nocase( line, VerbosityName[i][0] ) ||
 	   compare_nocase( line, VerbosityName[i][1] ) ){
-	if ( i==0 ){	
+	if ( i==0 ){
 	  a = NO_VERB;
 	}
 	else{
@@ -385,11 +385,11 @@ namespace TiCC {
       }
     return false;
   }
-  
+
   template <>
-    inline VerbosityFlags stringTo<VerbosityFlags>( const std::string& str ) { 
+    inline VerbosityFlags stringTo<VerbosityFlags>( const std::string& str ) {
     std::vector<std::string> tmp;
-    size_t cnt = TiCC::split_at( str, tmp, "+" ); 
+    size_t cnt = TiCC::split_at( str, tmp, "+" );
     VerbosityFlags V = NO_VERB;
     for ( size_t i=0; i < cnt; ++i ){
       VerbosityFlags Flag;
@@ -421,7 +421,7 @@ namespace TiCC {
       return OutLine;
     }
   }
-  
+
   template <>
     inline std::string toString<VerbosityFlags>( const VerbosityFlags& v,
 						 bool full ){

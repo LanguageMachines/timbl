@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -54,13 +54,13 @@ namespace Timbl {
     default_order();
     set_order();
     runningPhase = TrainWords;
-    InstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
+    InstanceBase = new IG_InstanceBase( EffectiveFeatures(),
 					ibCount,
-					(RandomSeed()>=0), 
+					(RandomSeed()>=0),
 					false, KeepDistributions() );
   }
-  
-  void IG_Experiment::initExperiment( bool ){ 
+
+  void IG_Experiment::initExperiment( bool ){
     if ( !ExpInvalid() ) {
       if ( !MBL_init ){  // do this only when necessary
 	stats.clear();
@@ -77,7 +77,7 @@ namespace Timbl {
 	MBL_init = true;
       }
     }
-  }  
+  }
 
   bool IG_Experiment::checkTestFile(){
     if ( TimblExperiment::checkTestFile() )
@@ -86,7 +86,7 @@ namespace Timbl {
       return false;
   }
 
-  ostream& operator<< ( ostream& os, 
+  ostream& operator<< ( ostream& os,
 			const fileDoubleIndex& fmi ){
     os << "[";
     fileDoubleIndex::const_iterator fmIt = fmi.begin();
@@ -96,9 +96,9 @@ namespace Timbl {
     }
     os << "]";
     return os;
-  }  
+  }
 
-  bool IG_Experiment::ClassicLearn( const string& FileName, 
+  bool IG_Experiment::ClassicLearn( const string& FileName,
 				    bool warnOnSingleTarget ){
     bool result = true;
     if ( is_synced ) {
@@ -118,7 +118,7 @@ namespace Timbl {
     else if ( FileName != "" &&
 	      CurrentDataFile != FileName ){
       Error( "Unable to Learn from file '" + FileName + "'\n"
-	     "while previously instantiated from file '" + 
+	     "while previously instantiated from file '" +
 	     CurrentDataFile + "'" );
       result = false;
     }
@@ -143,7 +143,7 @@ namespace Timbl {
 	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
 	  // Open the file.
 	  //
-	  ifstream datafile( CurrentDataFile.c_str(), ios::in);
+	  ifstream datafile( CurrentDataFile, ios::in);
 	  //
 	  fileIndex::const_iterator fit = fmIndex.begin();
 	  while ( fit != fmIndex.end() ){
@@ -155,14 +155,14 @@ namespace Timbl {
 	      chopLine( Buffer );
 	      // Progress update.
 	      //
-	      if (( stats.dataLines() % Progress() ) == 0) 
+	      if (( stats.dataLines() % Progress() ) == 0)
 		time_stamp( "Learning:  ", stats.dataLines() );
 	      chopped_to_instance( TrainWords );
 	      if ( !outInstanceBase ){
-		outInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
+		outInstanceBase = new IG_InstanceBase( EffectiveFeatures(),
 						       ibCount,
-						       (RandomSeed()>=0), 
-						       false, 
+						       (RandomSeed()>=0),
+						       false,
 						       true );
 	      }
 	      //		cerr << "add instance " << &CurrInst << endl;
@@ -206,7 +206,7 @@ namespace Timbl {
 	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
 	  // Open the file.
 	  //
-	  ifstream datafile( CurrentDataFile.c_str(), ios::in);
+	  ifstream datafile( CurrentDataFile, ios::in);
 	  //
 	  fileDoubleIndex::const_iterator dit = fmIndex.begin();
 	  while ( dit != fmIndex.end() ){
@@ -218,10 +218,10 @@ namespace Timbl {
 	    if ( igOffset() > 0 && dit->second.size() > igOffset() ){
 	      //	    cerr << "within offset!" << endl;
 	      IG_InstanceBase *TmpInstanceBase = 0;
-	      TmpInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
+	      TmpInstanceBase = new IG_InstanceBase( EffectiveFeatures(),
 						     ibCount,
-						     (RandomSeed()>=0), 
-						     false, 
+						     (RandomSeed()>=0),
+						     false,
 						     true );
 	      fileIndex::const_iterator fit = dit->second.begin();
 	      while ( fit !=  dit->second.end() ) {
@@ -233,14 +233,14 @@ namespace Timbl {
 		  chopLine( Buffer );
 		  // Progress update.
 		  //
-		  if (( stats.dataLines() % Progress() ) == 0) 
+		  if (( stats.dataLines() % Progress() ) == 0)
 		    time_stamp( "Learning:  ", stats.dataLines() );
 		  chopped_to_instance( TrainWords );
 		  if ( !PartInstanceBase ){
-		    PartInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
+		    PartInstanceBase = new IG_InstanceBase( EffectiveFeatures(),
 							    ibCount,
-							    (RandomSeed()>=0), 
-							    false, 
+							    (RandomSeed()>=0),
+							    false,
 							    true );
 		  }
 		  //		cerr << "add instance " << &CurrInst << endl;
@@ -292,14 +292,14 @@ namespace Timbl {
 		  chopLine( Buffer );
 		  // Progress update.
 		  //
-		  if (( stats.dataLines() % Progress() ) == 0) 
+		  if (( stats.dataLines() % Progress() ) == 0)
 		    time_stamp( "Learning:  ", stats.dataLines() );
 		  chopped_to_instance( TrainWords );
 		  if ( !outInstanceBase )
-		    outInstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
+		    outInstanceBase = new IG_InstanceBase( EffectiveFeatures(),
 							   ibCount,
-							   (RandomSeed()>=0), 
-							   false, 
+							   (RandomSeed()>=0),
+							   false,
 							   true );
 		  //	      cerr << "add instance " << &CurrInst << endl;
 		  outInstanceBase->AddInstance( CurrInst );
@@ -342,7 +342,7 @@ namespace Timbl {
     }
     return result;
   }
-  
+
 
   bool IG_Experiment::checkLine( const string& line ){
     if ( TimblExperiment::checkLine( line ) )
@@ -350,7 +350,7 @@ namespace Timbl {
     else
       return false;
   }
-  
+
   bool IG_Experiment::sanityCheck() const {
     bool status = true;
     if ( IBStatus() != Pruned ){
@@ -372,9 +372,9 @@ namespace Timbl {
     }
     return status;
   }
-  
+
   const TargetValue *IG_Experiment::LocalClassify( const Instance& Inst,
-						   double& Distance, 
+						   double& Distance,
 						   bool& exact ){
     match_depth = -1;
     last_leaf = false;
@@ -386,7 +386,7 @@ namespace Timbl {
 	       "output is NOT normalized!" );
     }
     const TargetValue *TV = NULL;
-    const ValueDistribution *ResultDist; 
+    const ValueDistribution *ResultDist;
     ResultDist = InstanceBase->IG_test( Inst, match_depth, last_leaf, TV );
     if ( match_depth == 0 ){
       // when level 0, ResultDist == TopDistribution
@@ -425,12 +425,12 @@ namespace Timbl {
       os << endl;
     }
   }
-  
+
 
   bool IG_Experiment::WriteInstanceBase( const string& FileName ){
     bool result = false;
     if ( ConfirmOptions() ){
-      ofstream outfile( FileName.c_str(), ios::out | ios::trunc );
+      ofstream outfile( FileName, ios::out | ios::trunc );
       if (!outfile) {
 	Warning( "can't open outputfile: " + FileName );
       }
@@ -440,7 +440,7 @@ namespace Timbl {
 	if ( PutInstanceBase( outfile ) ){
 	  string tmp = FileName;
 	  tmp += ".wgt";
-	  ofstream wf( tmp.c_str() );
+	  ofstream wf( tmp );
 	  if ( !wf ){
 	    Error( "can't write default weightfile " + tmp );
 	    result = false;
@@ -455,7 +455,7 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   bool IG_Experiment::GetInstanceBase( istream& is ){
     bool result = false;
     bool Pruned;
@@ -477,9 +477,9 @@ namespace Timbl {
       }
       else {
 	srand( RandomSeed() );
-	InstanceBase = new IG_InstanceBase( EffectiveFeatures(), 
+	InstanceBase = new IG_InstanceBase( EffectiveFeatures(),
 					    ibCount,
-					    (RandomSeed()>=0), 
+					    (RandomSeed()>=0),
 					    Pruned,
 					    KeepDistributions() );
 	int pos=0;
@@ -487,18 +487,18 @@ namespace Timbl {
 	  Features[i]->SetWeight( 1.0 );
 	  if ( Features[permutation[i]]->Ignore() )
 	    PermFeatures[i] = NULL;
-	  else 
+	  else
 	    PermFeatures[pos++] = Features[permutation[i]];
 	}
 	if ( Hashed )
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 Targets, 
+					 Targets,
 					 TargetStrings, FeatureStrings,
-					 Version ); 
+					 Version );
 	else
-	  result = InstanceBase->ReadIB( is, PermFeatures, 
-					 Targets, 
-					 Version ); 
+	  result = InstanceBase->ReadIB( is, PermFeatures,
+					 Targets,
+					 Version );
 	if ( result ){
 	  if ( !InstanceBase->HasDistributions() ){
 	    if ( KeepDistributions() )
@@ -519,7 +519,7 @@ namespace Timbl {
   bool IG_Experiment::ReadInstanceBase( const string& FileName ){
     bool result = false;
     if ( ConfirmOptions() ){
-      ifstream infile( FileName.c_str(), ios::in );
+      ifstream infile( FileName, ios::in );
       if ( !infile ) {
 	Error( "can't open: " + FileName );
       }
@@ -532,7 +532,7 @@ namespace Timbl {
 	  }
 	  string tmp = FileName;
 	  tmp += ".wgt";
-	  ifstream wf( tmp.c_str() );
+	  ifstream wf( tmp );
 	  if ( !wf ){
 	    Error( "cant't find default weightsfile " + tmp );
 	  }
@@ -548,5 +548,5 @@ namespace Timbl {
     }
     return result;
   }
-      
+
 }

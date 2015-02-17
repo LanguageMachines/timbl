@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -72,105 +72,105 @@ namespace Timbl {
     else
       tableFilled = true;
     //cerr << "fill table() for " << (void*)this << endl;
-    bool stat = 
+    bool stat =
       Options.Add( new IntegerOption( "FLENGTH",
 				      &F_length, 0, 1, 32 ) )
-      && Options.Add( new SizeOption( "MAXBESTS", 
+      && Options.Add( new SizeOption( "MAXBESTS",
 				      &MaxBests, 500, 10, 100000 ) )
-      && Options.Add( new SizeOption( "TRIBL_OFFSET", 
+      && Options.Add( new SizeOption( "TRIBL_OFFSET",
 				      &tribl_offset, 0, 0, MaxFeatures ) )
-      && Options.Add( new UnsignedOption( "IG_THRESHOLD", 
-					  &igThreshold, 
+      && Options.Add( new UnsignedOption( "IG_THRESHOLD",
+					  &igThreshold,
 					  1000, 0,
 					  std::numeric_limits<unsigned>::max() ) )
       && Options.Add( new InputFormatOption( "INPUTFORMAT",
-					     &input_format, 
+					     &input_format,
 					     UnknownInputFormat ) )
       && Options.Add( new OrdeningOption( "TREE_ORDER",
 					  &TreeOrder, UnknownOrdening ) )
-      && Options.Add( new BoolOption( "ALL_WEIGHTS", 
+      && Options.Add( new BoolOption( "ALL_WEIGHTS",
 				      &need_all_weights, false ) )
       && Options.Add( new WeightOption( "WEIGHTING",
 					&Weighting, GR_w ) )
-      && Options.Add( new IntegerOption( "BIN_SIZE", 
+      && Options.Add( new IntegerOption( "BIN_SIZE",
 					 &Bin_Size, 20, 2, 10000 ) )
-      && Options.Add( new UnsignedOption( "IB2_OFFSET", 
+      && Options.Add( new UnsignedOption( "IB2_OFFSET",
 					  &ib2_offset, 0, 1, 10000000 ) )
-      && Options.Add( new BoolOption( "KEEP_DISTRIBUTIONS", 
+      && Options.Add( new BoolOption( "KEEP_DISTRIBUTIONS",
 				      &keep_distributions, false ) )
-      && Options.Add( new BoolOption( "DO_SLOPPY_LOO", 
+      && Options.Add( new BoolOption( "DO_SLOPPY_LOO",
 				      &do_sloppy_loo, false ) )
-      && Options.Add( new SizeOption( "TARGET_POS", 
-				      &target_pos, 
+      && Options.Add( new SizeOption( "TARGET_POS",
+				      &target_pos,
 				      std::numeric_limits<size_t>::max(),
 				      0, MaxFeatures ) );
     if ( stat ){
       Options.SetFreezeMark();
-      stat = 
-	Options.Add( new BoolOption( "DO_SILLY", 
+      stat =
+	Options.Add( new BoolOption( "DO_SILLY",
 				     &do_silly_testing, false ) )
-	&& Options.Add( new BoolOption( "DO_DIVERSIFY", 
+	&& Options.Add( new BoolOption( "DO_DIVERSIFY",
 					&do_diversify, false ) )
 	&& Options.Add( new DecayOption( "DECAY",
 					 &decay_flag, Zero ) )
 	&& Options.Add( new IntegerOption( "SEED",
 					   &random_seed, -1, -1, RAND_MAX ) )
-	&& Options.Add( new IntegerOption( "BEAM_SIZE", 
+	&& Options.Add( new IntegerOption( "BEAM_SIZE",
 					   &beamSize, 0, 1, INT_MAX ) )
-	&& Options.Add( new RealOption( "DECAYPARAM_A", 
+	&& Options.Add( new RealOption( "DECAYPARAM_A",
 					&decay_alfa, 1.0, 0.0, DBL_MAX ) )
-	&& Options.Add( new RealOption( "DECAYPARAM_B", 
+	&& Options.Add( new RealOption( "DECAYPARAM_B",
 					&decay_beta, 1.0, 0.0, DBL_MAX ) )
 	&& Options.Add( new NormalisationOption( "NORMALISATION",
 						 &normalisation, noNorm ) )
 	&& Options.Add( new RealOption( "NORM_FACTOR",
 					&norm_factor, 1.0, Epsilon, DBL_MAX ) )
-	&& Options.Add( new BoolOption( "EXEMPLAR_WEIGHTS", 
+	&& Options.Add( new BoolOption( "EXEMPLAR_WEIGHTS",
 					&do_sample_weighting, false ) )
-	&& Options.Add( new BoolOption( "IGNORE_EXEMPLAR_WEIGHTS", 
+	&& Options.Add( new BoolOption( "IGNORE_EXEMPLAR_WEIGHTS",
 					&do_ignore_samples, true ) )
-	&& Options.Add( new BoolOption( "NO_EXEMPLAR_WEIGHTS_TEST", 
+	&& Options.Add( new BoolOption( "NO_EXEMPLAR_WEIGHTS_TEST",
 					&no_samples_test, true ) )
-	&& Options.Add( new VerbosityOption( "VERBOSITY", 
+	&& Options.Add( new VerbosityOption( "VERBOSITY",
 					     &verbosity, NO_VERB ) )
-	&& Options.Add( new BoolOption( "EXACT_MATCH", 
+	&& Options.Add( new BoolOption( "EXACT_MATCH",
 					&do_exact_match, false ) )
-	&& Options.Add( new BoolOption( "HASHED_TREE", 
+	&& Options.Add( new BoolOption( "HASHED_TREE",
 					&hashed_trees, true ) )
-	&& Options.Add( new MetricOption( "GLOBAL_METRIC", 
+	&& Options.Add( new MetricOption( "GLOBAL_METRIC",
 					  &globalMetricOption, Overlap ) )
-	&& Options.Add( new MetricArrayOption( "METRICS", 
-					       UserOptions, globalMetricOption, 
+	&& Options.Add( new MetricArrayOption( "METRICS",
+					       UserOptions, globalMetricOption,
 					       MaxFeatures+1 ) )
-	&& Options.Add( new IntegerOption( "MVD_LIMIT", 
+	&& Options.Add( new IntegerOption( "MVD_LIMIT",
 					   &mvd_threshold, 1, 1, 100000 ) )
-	&& Options.Add( new SizeOption( "NEIGHBORS", 
+	&& Options.Add( new SizeOption( "NEIGHBORS",
 					&num_of_neighbors, 1, 1, 100000 ) )
-	&& Options.Add( new IntegerOption( "PROGRESS", 
+	&& Options.Add( new IntegerOption( "PROGRESS",
 					   &progress, 10000, 1, INT_MAX ) )
-	&& Options.Add( new IntegerOption( "HANDLE_OCCURRENCES", 
+	&& Options.Add( new IntegerOption( "HANDLE_OCCURRENCES",
 					   &doOcc, 0, 0, 3 ) )
-	&& Options.Add( new IntegerOption( "CLIP_FACTOR", 
+	&& Options.Add( new IntegerOption( "CLIP_FACTOR",
 					   &clip_factor, 10, 0, 1000000 ) );
     }
     if ( !stat ){
       FatalError( "Too many options for OptionTable" );
     }
   }
-  
+
   void MBLClass::InvalidMessage(void) const{
     if ( err_count++ == 1 )
       Warning( "A preceding error prevents any operation on this "
 	       "Timbl Object\n"
 	       "other experiments might not be influenced" );
-    else 
+    else
       Warning( "This Experiment is invalid due to errors" );
   }
-  
-  bool MBLClass::SetOption( const string& line ){ 
+
+  bool MBLClass::SetOption( const string& line ){
     bool result = false;
     if ( !ExpInvalid() ){
-      //      Info( "set Option:" + line ); 
+      //      Info( "set Option:" + line );
       enum SetOptRes opt_res = Options.SetOption( line );
       switch ( opt_res ){
       case Opt_OK: // OK
@@ -185,14 +185,14 @@ namespace Timbl {
 	Warning( "SetOption '" + line + "' failed.\nOption unknown" );
 	break;
       case Opt_Ill_Val:
-	Error( "SetOption '" + line + 
+	Error( "SetOption '" + line +
 	       "' failed.\nIllegal value for this option" );
 	break;
       }
     }
     return result;
   }
-  
+
   void MBLClass::InitClass( const size_t Size ){
     GlobalMetric = 0;
     is_copy = false;
@@ -286,7 +286,7 @@ namespace Timbl {
       for ( unsigned int i=0; i < Features.size(); ++i ){
 	Features[i] = new Feature( *m.Features[i] );
 	if ( m.PermFeatures[i] )
-	  PermFeatures[i] = Features[permutation[i]]; 
+	  PermFeatures[i] = Features[permutation[i]];
 	else
 	  PermFeatures[i] = 0;
       }
@@ -309,7 +309,7 @@ namespace Timbl {
     }
     return *this;
   }
-  
+
   MBLClass::~MBLClass(){
     CurrInst.clear();
     if ( !is_copy ){
@@ -334,8 +334,8 @@ namespace Timbl {
     delete decay;
     delete ChopInput;
   }
-  
-  
+
+
   void MBLClass::Info( const string& out_line ) const {
 #pragma omp critical
     {
@@ -346,7 +346,7 @@ namespace Timbl {
 	*mylog << out_line << endl;
     }
   }
-  
+
   void MBLClass::Warning( const string& out_line ) const {
 #pragma omp critical
     {
@@ -355,12 +355,12 @@ namespace Timbl {
       else {
 	if ( exp_name != "" )
 	  *myerr << "Warning:-" << exp_name << "-" << out_line << endl;
-	else 
+	else
 	*myerr << "Warning: " << out_line << endl;
       }
     }
   }
-  
+
   void MBLClass::Error( const string& out_line ) const {
     if ( sock_os )
       *sock_os << "ERROR { " << out_line << " }"  << endl;
@@ -372,7 +372,7 @@ namespace Timbl {
     }
     err_count++;
   }
-  
+
   void MBLClass::FatalError( const string& out_line ) const {
     if ( sock_os )
       *sock_os << "ERROR { " << out_line << " }" << endl;
@@ -381,26 +381,26 @@ namespace Timbl {
 	*myerr << "-" << exp_name << "-";
       if ( exp_name != "" )
 	*myerr << "FatalError:-" << exp_name << "-" << out_line << endl;
-      else 
+      else
 	*myerr << "FatalError: " << out_line << endl;
       throw( runtime_error("Stopped") );
     }
   }
-    
+
   bool MBLClass::ShowOptions( ostream& os ) const {
     os << "Possible Experiment Settings (current value between []):" << endl;
     Options.Show_Options( os );
     os << endl;
     return true;
   }
- 
+
   bool MBLClass::ShowSettings( ostream& os ) const{
     os << "Current Experiment Settings :" << endl;
     Options.Show_Settings( os );
     os << endl;
     return true;
   }
-  
+
   bool MBLClass::connectToSocket( ostream *ss ){
     if ( sock_os ){
       throw( logic_error( "connectToSocket:: already connected!" ) );
@@ -410,12 +410,12 @@ namespace Timbl {
       if ( sock_os && sock_os->good() ){
 	return true;
       }
-      else 
+      else
 	FatalError( "connecting streams to socket failed" );
     }
     return false;
-  }  
-  
+  }
+
   xmlNode *MBLClass::settingsToXml() const{
     ostringstream tmp;
     Options.Show_Settings( tmp );
@@ -436,18 +436,18 @@ namespace Timbl {
   bool MBLClass::ShowWeights( ostream &os ) const {
     if ( ExpInvalid() )
       return false;
-    else { 
+    else {
       int OldPrec = os.precision(DBL_DIG);
       for ( size_t i=0; i< num_of_features; ++i ){
 	os.precision(DBL_DIG);
-	os << "Feature " << i+1 << "\t : " 
+	os << "Feature " << i+1 << "\t : "
 	   << Features[i]->Weight() << endl;
       }
       os.precision(OldPrec);
     }
     return true;
   }
-  
+
   void MBLClass::calculatePermutation( const vector<double>& W ){
     vector<double> WR = W;
     size_t IgnoredFeatures = 0;
@@ -475,9 +475,9 @@ namespace Timbl {
       }
     }
   }
-  
+
   void MBLClass::writePermutation( ostream& os ) const {
-    os << "Feature Permutation based on " 
+    os << "Feature Permutation based on "
        << ( Weighting==UserDefined_w?"weightfile":toString(TreeOrder, true))
        << " :" << endl << "< ";
     for ( size_t j=0; j < num_of_features-1; ++j ){
@@ -485,7 +485,7 @@ namespace Timbl {
     }
     os << permutation[num_of_features-1]+1 << " >" << endl;
   }
-  
+
   inline char *CurTime(){
     time_t lTime;
     struct tm *curtime;
@@ -496,7 +496,7 @@ namespace Timbl {
     time_string[24] = '\0'; // defeat the newline!
     return time_string;
   }
-  
+
   void MBLClass::time_stamp( const char *line, int number ) const {
     if ( !Verbosity(SILENT) ){
       ostringstream ostr;
@@ -512,7 +512,7 @@ namespace Timbl {
       Info( ostr.str() );
     }
   }
-  
+
   void MBLClass::InitWeights(void){
     for ( size_t i=0; i< num_of_features; ++i ){
       if ( Features[i]->Ignore() )
@@ -594,7 +594,7 @@ namespace Timbl {
 	break;
       }
   }
-  
+
   void MBLClass::set_order(){
     calculate_fv_entropy(false);
     vector<double> Order(num_of_features);
@@ -660,11 +660,11 @@ namespace Timbl {
     for ( size_t j=0; j < num_of_features; ++j ){
       if ( j < effective_feats )
 	PermFeatures[j] = Features[permutation[j]];
-      else 
+      else
 	PermFeatures[j] = NULL;
     }
   }
-  
+
   void MBLClass::MatrixInfo( ostream& os ) const {
     unsigned int TotalCount = 0;
     bool dummy;
@@ -673,13 +673,13 @@ namespace Timbl {
 	   Features[f]->isStorableMetric() &&
 	   Features[f]->matrixPresent( dummy ) ){
 	unsigned int Count = Features[f]->matrix_byte_size();
-	os << "Size of value-matrix[" << f+1 << "] = " 
+	os << "Size of value-matrix[" << f+1 << "] = "
 	   << Count << " Bytes " << endl;
 	TotalCount += Count;
       }
     }
     if ( TotalCount )
-      os << "Total Size of value-matrices " << TotalCount << " Bytes " 
+      os << "Total Size of value-matrices " << TotalCount << " Bytes "
 	 << endl << endl;
   }
 
@@ -750,7 +750,7 @@ namespace Timbl {
     }
     return os.good();
   }
-  
+
   bool MBLClass::readArrays( istream& is ){
     bool result = true;
     size_t num;
@@ -764,8 +764,8 @@ namespace Timbl {
 	is >> ws >> kar; // skip #
 	if ( kar != '#' ){
 	  Error( "Input out-of-sync, a '#' was expected" );
-	  result = false; 
-	} 
+	  result = false;
+	}
 	else {
 	  is >> num;
 	  if ( num != index ){
@@ -785,7 +785,7 @@ namespace Timbl {
 		continue;
 	      }
 	      else {
-		Error( "Feature #" + toString<size_t>(index) + 
+		Error( "Feature #" + toString<size_t>(index) +
 		       " may not be ignored...");
 		result = false;
 	      }
@@ -806,7 +806,7 @@ namespace Timbl {
 	    }
 	    else if ( Features[index-1]->Ignore() ||
 		      Features[index-1]->isNumerical() ){
-	      Warning( "Matrix info found for feature #" 
+	      Warning( "Matrix info found for feature #"
 		       + toString<size_t>(index)
 		       + " (skipped)" );
 	      ++index;
@@ -827,8 +827,8 @@ namespace Timbl {
     }
     return result;
   }
-  
-  
+
+
   bool MBLClass::writeArrays( ostream& os ) {
     if ( ExpInvalid() )
       return false;
@@ -846,7 +846,7 @@ namespace Timbl {
 	++it;
 	if ( it != Targets->ValuesArray.end() )
 	  os << ",";
-      } 
+      }
       os << "." << endl << endl;
       for ( size_t i = 0; i < num_of_features; ++i )
 	if ( Features[i]->Ignore() )
@@ -861,7 +861,7 @@ namespace Timbl {
       return true;
     }
   }
-  
+
   bool MBLClass::allocate_arrays(){
     size_t Dim = Targets->ValuesArray.size();
     bool result = true;
@@ -882,49 +882,49 @@ namespace Timbl {
 	for ( size_t j = 0; j < num_of_features; ++j ) {
 	  if ( !Features[j]->Ignore() &&
 	       !Features[j]->isNumerical() ){
-	    Features[j]->ClipFreq( (int)rint(clip_factor * 
+	    Features[j]->ClipFreq( (int)rint(clip_factor *
 					     log((double)Features[j]->EffectiveValues())));
 	    if ( !Features[j]->ArrayRead() &&
 		 ( force ||
 		   Features[j]->isStorableMetric() ) ){
 	      Features[j]->InitSparseArrays();
-	    } 
+	    }
 	  }
 	} // j
-      }  
+      }
     }
     return result;
   }
-  
+
   /*
     For mvd metric.
   */
   void MBLClass::calculatePrestored(){
     if ( !is_copy ){
       for ( size_t j = tribl_offset; j < effective_feats; ++j ) {
-	if ( !PermFeatures[j]->Ignore() && 
+	if ( !PermFeatures[j]->Ignore() &&
 	     PermFeatures[j]->isStorableMetric() ){
 	  PermFeatures[j]->store_matrix( mvd_threshold );
 	}
       }
-      if ( Verbosity(VD_MATRIX) ) 
+      if ( Verbosity(VD_MATRIX) )
 	for ( size_t i = 0; i < num_of_features; ++i )
 	  if ( !Features[i]->Ignore() ){
 	    bool dummy;
 	    if (Features[i]->matrixPresent( dummy ) ){
-	      *mylog << "Value matrix of feature # " 
+	      *mylog << "Value matrix of feature # "
 		     << i+1 << endl;
 	      Features[i]->print_matrix( *mylog, true );
 	      *mylog << endl;
 	    }
 	    else {
-	      *mylog << "Value Difference matrix of feature # " 
+	      *mylog << "Value Difference matrix of feature # "
 		     << i+1 << endl << "Not available." << endl;
 	    }
 	  }
     }
   }
-  
+
   const Instance *MBLClass::chopped_to_instance( PhaseValue phase ){
     CurrInst.clear();
     if ( num_of_features != target_pos ) {
@@ -947,7 +947,7 @@ namespace Timbl {
 	else {
 	  // Add it to the Instance.
 	  CurrInst.FV[i] = Features[i]->add_value( ChopInput->getField(i),
-						   CurrInst.TV, occ ); 
+						   CurrInst.TV, occ );
 	}
       } // i
       break;
@@ -971,7 +971,7 @@ namespace Timbl {
       for ( size_t l = 0; l < effective_feats; ++l ){
 	size_t j = permutation[l];
 	CurrInst.FV[l] = Features[j]->add_value( ChopInput->getField(j),
-						 CurrInst.TV, occ ); 
+						 CurrInst.TV, occ );
       } // for l
       break;
     case TestWords:
@@ -991,7 +991,7 @@ namespace Timbl {
       CurrInst.TV = Targets->Lookup( ChopInput->getField(num_of_features) );
       break;
     default:
-      FatalError( "Wrong value in Switch: " 
+      FatalError( "Wrong value in Switch: "
 		  + toString<PhaseValue>(phase) );
     }
     if ( ( phase != TestWords ) && doSamples() ){
@@ -1002,16 +1002,16 @@ namespace Timbl {
     }
     return &CurrInst;
   }
-  
+
   bool empty_line( const string& Line, const InputFormatType IF ){
     // determine wether Line is empty or a commentline
-    bool result = ( Line.empty() || 
+    bool result = ( Line.empty() ||
 		    ( IF == ARFF &&  // ARFF "comment"
 		      ( Line[0] == '%' || Line[0] == '@' ) ) ||
 		    ( Line.find_first_not_of( " \t" ) == string::npos ) );
     return result;
   }
-  
+
   string MBLClass::get_org_input( ) const {
     return ChopInput->getString();
   }
@@ -1092,7 +1092,7 @@ namespace Timbl {
       }
     }
   }
-  
+
   bool MBLClass::writeWeights( ostream& os ) const {
     bool result = false;
     if ( !ExpInvalid() ){
@@ -1177,7 +1177,7 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   bool MBLClass::read_the_vals( istream& is ){
     bool result = true;
     bool *done = new bool[num_of_features];
@@ -1302,7 +1302,7 @@ namespace Timbl {
 	}
       }
       if ( !result ){
-	Warning( "Unable to retrieve " 
+	Warning( "Unable to retrieve "
 		 + toString( wanted ) + " Weights" );
 	Warning( "unable to continue" );
 	return false;
@@ -1331,7 +1331,7 @@ namespace Timbl {
       size_t totval = Targets->TotalValues();
       VCarrtype::const_iterator it = Targets->ValuesArray.begin();
       while ( it != Targets->ValuesArray.end() ){
-	Ratio = (*it)->ValFreq() / 
+	Ratio = (*it)->ValFreq() /
 	  (double)totval;
 	if ( Ratio > 0 )
 	  Entropy += Ratio * Log2(Ratio);
@@ -1365,7 +1365,7 @@ namespace Timbl {
 	  else {
 	    TmpMetricType = globalMetricOption;
 	  }
-	} 
+	}
       }
       else if ( Features[g]->ValuesArray.size() == 1 )
 	feat_status[g] = Singleton;
@@ -1377,8 +1377,8 @@ namespace Timbl {
 	     Features[g]->isStorableMetric() &&
 	     Features[g]->matrixPresent( isRead ) &&
 	     isRead ){
-	  Error( "The metric " + toString(Features[g]->getMetricType()) + 
-		 " for feature " + toString( g+1 ) + 
+	  Error( "The metric " + toString(Features[g]->getMetricType()) +
+		 " for feature " + toString( g+1 ) +
 		 " is set from a file. It cannot be changed!" );
 	  return;
 	}
@@ -1387,16 +1387,16 @@ namespace Timbl {
       if ( metricChanged )
 	nothing_changed = false;
     } // end g
-    if ( ( CurrentWeighting() == SD_w || 
+    if ( ( CurrentWeighting() == SD_w ||
 	   GlobalMetric->isSimilarityMetric() )
 	 && !nothing_changed ){
       // check to see if ALL features are still Numeric.
-      // otherwise we can't do Standard Deviation weighting, 
+      // otherwise we can't do Standard Deviation weighting,
       // or Similarity Metrics!
       bool first = true;
       ostringstream ostr1;
       ostringstream ostr2;
-      for ( size_t ff = 0; ff < num_of_features; ++ff ) 
+      for ( size_t ff = 0; ff < num_of_features; ++ff )
 	if ( feat_status[ff] == NotNumeric ){
 	  if ( first ){
 	    ostr1 << "The following feature(s) have non numeric value: ";
@@ -1405,7 +1405,7 @@ namespace Timbl {
 	  else
 	    ostr1 << ", ";
 	  size_t n = ff;
-	  while ( ff < num_of_features-1 && 
+	  while ( ff < num_of_features-1 &&
 		  feat_status[ff+1] == NotNumeric )
 	    ff++;
 	  if ( n != ff ){
@@ -1419,12 +1419,12 @@ namespace Timbl {
 	if ( GlobalMetric->isSimilarityMetric() )
 	  Error( "Therefore InnerProduct/Cosine operations are impossible" );
 	else
-	  Error( "Therefore " + toString(CurrentWeighting()) + " weighting is impossible" );	  
+	  Error( "Therefore " + toString(CurrentWeighting()) + " weighting is impossible" );
 	return;
       }
     }
     // Give a warning for singular features, except when it's
-    // a result of a forced recalculation 
+    // a result of a forced recalculation
     if ( realy_first ){
       bool first = true;
       ostringstream ostr1;
@@ -1439,7 +1439,7 @@ namespace Timbl {
 	  else
 	    ostr1 << ", ";
 	  size_t n = ff;
-	  while ( ff < num_of_features-1 && 
+	  while ( ff < num_of_features-1 &&
 		  ( feat_status[ff+1] == Singleton ||
 		    feat_status[ff+1] == SingletonNumeric ) )
 	    ff++;
@@ -1454,7 +1454,7 @@ namespace Timbl {
 	Warning( ostr1.str() );
       }
       first = true;
-      for ( size_t ff = 0; ff < num_of_features; ++ff ) 
+      for ( size_t ff = 0; ff < num_of_features; ++ff )
 	if ( feat_status[ff] == NotNumeric ){
 	  if ( first ){
 	    ostr2 << "The following feature(s) contained non-numeric values and\nwill be treated as NON-Numeric: ";
@@ -1463,7 +1463,7 @@ namespace Timbl {
 	  else
 	    ostr2 << ", ";
 	  size_t n = ff;
-	  while ( ff < num_of_features-1 && 
+	  while ( ff < num_of_features-1 &&
 		  feat_status[ff+1] == NotNumeric ) ff++;
 	  if ( n != ff ){
 	    ostr2 << n+1 << "-" << ff+1;
@@ -1493,7 +1493,7 @@ namespace Timbl {
     }
     delete [] feat_status;
   }
-  
+
   bool MBLClass::writeNamesFile( ostream& os ) const {
     bool result = true;
     if ( ExpInvalid() ){
@@ -1508,13 +1508,13 @@ namespace Timbl {
 	++it;
 	if ( it != Targets->ValuesArray.end() )
 	  os << ",";
-      } 
+      }
       os << "." << endl << endl;
-      
+
       // Loop over the Features.
       //
       for ( size_t f = 0; f < num_of_features; ++f ) {
-	
+
 	// Print the Feature name, and a colon.
 	//
 	os << "a" << f+1 << ": ";
@@ -1548,7 +1548,7 @@ namespace Timbl {
       return false;
     }
   }
-  
+
   bool MBLClass::setInputFormat( const InputFormatType IF ){
     if ( ChopInput ){
       delete ChopInput;
@@ -1561,11 +1561,11 @@ namespace Timbl {
     }
     return false;
   }
-  
+
   const ValueDistribution *MBLClass::ExactMatch( const Instance& inst ) const {
     const ValueDistribution *result = NULL;
     if ( !GlobalMetric->isSimilarityMetric() &&
-	 ( do_exact_match || 
+	 ( do_exact_match ||
 	   ( num_of_neighbors == 1 &&
 	     !( Verbosity( NEAR_N | ALL_K) ) ) ) ){
       result = InstanceBase->ExactMatch( inst );
@@ -1624,7 +1624,7 @@ namespace Timbl {
 	  result += "-*- ";
 	else
 	  result += inst.FV[InvPerm[j]]->Name() + "\t";
-	break;	
+	break;
       default:
 	if ( Features[j]->Ignore() )
 	  result += string( F_length, '*' );
@@ -1640,14 +1640,14 @@ namespace Timbl {
   inline double WeightFun( double D, double W ){
     return D / (W + Common::Epsilon);
   }
-  
-  
+
+
   void MBLClass::test_instance_ex( const Instance& Inst,
 				   InstanceBase_base *IB,
 				   size_t ib_offset ){
     vector<FeatureValue *> CurrentFV(num_of_features);
     size_t EffFeat = effective_feats - ib_offset;
-    const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV, 
+    const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV,
 							       &Inst.FV,
 							       ib_offset,
 							       effective_feats );
@@ -1672,8 +1672,8 @@ namespace Timbl {
       ResultDist.SetFreq( Bpnt->Value(), Bpnt->Freq() );
       string origI;
       if ( Verbosity(NEAR_N) ){
-	origI = formatInstance( Inst.FV, CurrentFV, 
-				ib_offset, 
+	origI = formatInstance( Inst.FV, CurrentFV,
+				ib_offset,
 				num_of_features );
       }
       double Distance = WeightFun( tester->getDistance(EndPos),
@@ -1685,19 +1685,19 @@ namespace Timbl {
 	Bpnt = lastpos->second;
       }
       else {
-	best_distrib = IB->NextGraphTest( CurrentFV, 
+	best_distrib = IB->NextGraphTest( CurrentFV,
 					  CurPos );
 	Bpnt = NULL;
 	if ( best_distrib ){
 	  lastpos = best_distrib->begin();
 	  if ( lastpos != best_distrib->end() ){
-	    Bpnt = lastpos->second;  
+	    Bpnt = lastpos->second;
 	  }
 	}
       }
     }
   }
-  
+
   void MBLClass::initDecay(){
     if ( decay ){
       delete decay;
@@ -1732,7 +1732,7 @@ namespace Timbl {
     vector<FeatureValue *> CurrentFV(num_of_features);
     double Threshold = DBL_MAX;
     size_t EffFeat = effective_feats - ib_offset;
-    const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV, 
+    const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV,
 							       &Inst.FV,
 							       ib_offset,
 							       effective_feats );
@@ -1752,8 +1752,8 @@ namespace Timbl {
 	if ( Distance >= 0.0 ){
 	  string origI;
 	  if ( Verbosity(NEAR_N) ){
-	    origI = formatInstance( Inst.FV, CurrentFV, 
-				    ib_offset, 
+	    origI = formatInstance( Inst.FV, CurrentFV,
+				    ib_offset,
 				    num_of_features );
 	  }
 	  //	  cerr << "Ok add " << best_distrib << "at distance " << Distance << endl;
@@ -1777,7 +1777,7 @@ namespace Timbl {
 	if ( tester->getDistance(pos) <= Threshold ){
 	  CurPos = pos;
 	  //	  cerr << "voor next test " << endl;
-	  best_distrib = IB->NextGraphTest( CurrentFV, 
+	  best_distrib = IB->NextGraphTest( CurrentFV,
 					    CurPos );
 	  //	  cerr << "na next test, curpos=" << CurPos << "-" << toString(CurrentFV) << endl;
 	  break;
@@ -1795,7 +1795,7 @@ namespace Timbl {
 				    size_t ib_offset ){
     vector<FeatureValue *> CurrentFV(num_of_features);
     size_t EffFeat = effective_feats - ib_offset;
-    const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV, 
+    const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV,
 							       &Inst.FV,
 							       ib_offset,
 							       effective_feats );
@@ -1812,8 +1812,8 @@ namespace Timbl {
 	if ( Distance >= 0.0 ){
 	  string origI;
 	  if ( Verbosity(NEAR_N) ){
-	    origI = formatInstance( Inst.FV, CurrentFV, 
-				    ib_offset, 
+	    origI = formatInstance( Inst.FV, CurrentFV,
+				    ib_offset,
 				    num_of_features );
 	  }
 	  bestArray.addResult( Distance, best_distrib, origI );
@@ -1834,13 +1834,13 @@ namespace Timbl {
       }
       if ( EndPos > 0 ){
 	CurPos = EndPos-1;
-	best_distrib = IB->NextGraphTest( CurrentFV, 
+	best_distrib = IB->NextGraphTest( CurrentFV,
 					  CurPos );
       }
     }
   }
-  
-  void MBLClass::TestInstance( const Instance& Inst, 
+
+  void MBLClass::TestInstance( const Instance& Inst,
 			       InstanceBase_base *SubTree,
 			       size_t level ){
     // must be cleared for EVERY test
@@ -1854,15 +1854,15 @@ namespace Timbl {
 	test_instance( Inst, SubTree, level );
     }
   }
-  
+
   size_t MBLClass::countFeatures( const string& inBuffer,
 				  const InputFormatType IF ) const {
     size_t result = 0;
-    if ( IF == Sparse  || IF == SparseBin ) 
+    if ( IF == Sparse  || IF == SparseBin )
       return num_of_features;
     else {
       try {
-	result = Chopper::countFeatures( inBuffer, IF, F_length, 
+	result = Chopper::countFeatures( inBuffer, IF, F_length,
 					 chopExamples() || chopOcc() );
       }
       catch( const runtime_error& e ){
@@ -1893,7 +1893,7 @@ namespace Timbl {
     }
     else {
       string Buffer;
-      ifstream datafile( FileName.c_str(), ios::in);
+      ifstream datafile( FileName, ios::in);
       if (!datafile) {
 	Warning( "can't open DataFile: " + FileName );
 	return 0;
@@ -1917,17 +1917,17 @@ namespace Timbl {
 		};
 	      }
 	      if ( more && !getline( datafile, Buffer ) ){
-		Warning( "empty data file" ); 
+		Warning( "empty data file" );
 		more = false;
 	      };
 	    }
 	    while ( more && empty_line( Buffer, input_format ) ){
 	      if ( !getline( datafile, Buffer ) ){
-		Warning( "empty data file" ); 
+		Warning( "empty data file" );
 		more = false;
 	      };
 	    }
-	    // now we have a usable line, 
+	    // now we have a usable line,
 	    //analyze it using the User defined input_format
 	    NumF = countFeatures( Buffer, input_format );
 	  }
@@ -1940,7 +1940,7 @@ namespace Timbl {
       // We start by reading the first line so we can figure out the number
       // of Features, and see if the file is comma seperated or not,  etc.
       //
-      else { 
+      else {
 	if ( IF == ARFF ){
 	  // Remember, we DON't want to auto-detect ARFF
 	  while ( !compare_nocase_n( "@DATA", Buffer ) ){
@@ -1990,7 +1990,7 @@ namespace Timbl {
     return NumF;
   }
 
-  void MBLClass::Initialize( size_t n ){ 
+  void MBLClass::Initialize( size_t n ){
     if ( n > 0 )
       num_of_features = n;
     // Allocate memory. Will be reused again and again ....
@@ -2034,5 +2034,5 @@ namespace Timbl {
 	 TreeOrder >= X2Order )
       need_all_weights = true;
   }
-  
+
 } // namespace

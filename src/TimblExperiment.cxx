@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -82,7 +82,7 @@ namespace Timbl {
     clear();
   }
 
-  bool resultStore::reset( int _beam, normType _norm, 
+  bool resultStore::reset( int _beam, normType _norm,
 			   double _factor, const Target *_targets ) {
     clear();
     beam = _beam;
@@ -97,24 +97,24 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   void resultStore::clear( ) {
     delete dist;
     dist = 0;
     if ( disposable )
-      delete rawDist; 
+      delete rawDist;
     rawDist = 0;
     beam = 0;
     isTop = false;
     resultCache.clear();
   }
-  
+
   const WValueDistribution *resultStore::getResultDist() {
     if ( rawDist && !dist )
       prepare();
     return dist;
   }
-  
+
   string resultStore::getResult() {
     if ( isTop ){
       if ( topCache.empty() ){
@@ -133,7 +133,7 @@ namespace Timbl {
     }
     return resultCache;
   }
-  
+
   void resultStore::addConstant( const ValueDistribution *vd ) {
     rawDist = vd;
     disposable = false;
@@ -163,7 +163,7 @@ namespace Timbl {
       }
     }
   }
-  
+
   void resultStore::normalize() {
     if ( dist ){
       switch ( norm ){
@@ -190,7 +190,7 @@ namespace Timbl {
     bestResult.prepare();
     bestResult.normalize();
   }
-  
+
   TimblExperiment::TimblExperiment( const AlgorithmType Alg,
 				    const string& s ):
     MBLClass( s ),
@@ -208,12 +208,12 @@ namespace Timbl {
   {
     Weighting = GR_w;
   }
-  
+
   TimblExperiment::~TimblExperiment() {
     delete OptParams;
     delete confusionInfo;
   }
-  
+
   TimblExperiment& TimblExperiment::operator=( const TimblExperiment&in ){
     if ( this != &in ){
       MBLClass::operator=(in);
@@ -229,18 +229,18 @@ namespace Timbl {
     }
     return *this;
   }
-  
+
   TimblExperiment *TimblExperiment::splitChild( ) const {
     TimblExperiment *result = 0;
     switch ( Algorithm() ){
     case IB1_a:
-    case TRIBL_a: 
-    case TRIBL2_a: 
-    case IGTREE_a: 
+    case TRIBL_a:
+    case TRIBL2_a:
+    case IGTREE_a:
       result = clone();
       break;
     default:
-      FatalError( "You may not split experiments for Special cases like " + 
+      FatalError( "You may not split experiments for Special cases like " +
 		  toString(algorithm) );
     }
     *result = *this;
@@ -253,9 +253,9 @@ namespace Timbl {
     result->InstanceBase = 0;
     result->is_synced = true;
     return result;
-  }  
+  }
 
-  void TimblExperiment::initExperiment( bool all_vd ){ 
+  void TimblExperiment::initExperiment( bool all_vd ){
     if ( !ExpInvalid() ){
       match_depth = NumOfFeatures();
       if ( !MBL_init ){  // do this only when necessary
@@ -285,7 +285,7 @@ namespace Timbl {
 	    calculatePrestored();
 	  else {
 	    Error( string("not enough memory for Probability Arrays")
-		   + "' in (" 
+		   + "' in ("
 		   + __FILE__  + "," + toString(__LINE__) + ")\n"
 		   + "ABORTING now" );
 	    throw std::bad_alloc();
@@ -300,7 +300,7 @@ namespace Timbl {
       }
     }
   }
-  
+
   bool TimblExperiment::skipARFFHeader( istream& is ){
     string Buffer;
     while ( getline( is, Buffer ) &&
@@ -308,7 +308,7 @@ namespace Timbl {
       stats.addSkipped();
     return true;
   }
-  
+
   bool TimblExperiment::nextLine( istream& datafile, string& Line ){
     int dummy;
     return nextLine( datafile, Line, dummy );
@@ -325,12 +325,12 @@ namespace Timbl {
       if ( empty_line( Line, InputFormat() ) ){
 	stats.addSkipped();
 	continue;
-      } 
-      else 
+      }
+      else
 	found = true;
     }
     return found;
-  }  
+  }
 
   bool TimblExperiment::chopLine( const string& Line ){
     if ( !Chop( Line ) ){
@@ -342,7 +342,7 @@ namespace Timbl {
       return true;
     }
   }
-  
+
   /*
     First learning Phase:
     Learning of the names of the FeatureValues and TargetValues
@@ -368,7 +368,7 @@ namespace Timbl {
 	  }
 	  else {
 	    if ( !Verbosity(SILENT) ){
-	      *mylog << "Examine datafile '" << FileName 
+	      *mylog << "Examine datafile '" << FileName
 		     << "' gave the following results:"
 		     << endl
 		     << "Number of Features: " << Num << endl;
@@ -383,7 +383,7 @@ namespace Timbl {
 	    }
 	    // Open the file.
 	    //
-	    ifstream datafile( FileName.c_str(), ios::in);
+	    ifstream datafile( FileName, ios::in);
 	    stats.clear();
 	    string Buffer;
 	    if ( InputFormat() == ARFF )
@@ -414,11 +414,11 @@ namespace Timbl {
 		    time_stamp( "Examining: ", stats.dataLines() );
 		}
 		found = false;
-		while ( !found && 
+		while ( !found &&
 			nextLine( datafile, Buffer ) ){
 		  found = chopLine( Buffer );
 		  if ( !found ){
-		    Warning( "datafile, skipped line #" + 
+		    Warning( "datafile, skipped line #" +
 			     toString<int>( stats.totalLines() ) +
 			     "\n" + Buffer );
 		  }
@@ -433,7 +433,7 @@ namespace Timbl {
 		  time_stamp( "Finished:  ", stats.totalLines() );
 		  time_stamp( "Calculating Entropy " );
 		  if ( Verbosity(FEAT_W) ){
-		    *mylog << "Lines of data     : " 
+		    *mylog << "Lines of data     : "
 			   << stats.dataLines() << endl;
 		    if ( stats.skippedLines() != 0 )
 		      *mylog << "SkippedLines      : "
@@ -458,14 +458,14 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   bool TimblExperiment::CVprepare( const string&,
 				   WeightType,
 				   const string& ){
     Error( "CVprepare called for NON CV experiment" );
     return false;
   }
-  
+
   ostream& operator<< ( ostream& os, const fileIndex& fi ){
     fileIndex::const_iterator it = fi.begin();
     while ( it != fi.end() ){
@@ -477,7 +477,7 @@ namespace Timbl {
     return os;
   }
 
-  bool TimblExperiment::learnFromFileIndex( const fileIndex& fi, 
+  bool TimblExperiment::learnFromFileIndex( const fileIndex& fi,
 					    istream& datafile ){
     InstanceBase_base *outInstanceBase = 0;
     fileIndex::const_iterator fit = fi.begin();
@@ -491,14 +491,14 @@ namespace Timbl {
 	chopLine( Buffer );
 	// Progress update.
 	//
-	if (( stats.dataLines() % Progress() ) == 0) 
+	if (( stats.dataLines() % Progress() ) == 0)
 	  time_stamp( "Learning:  ", stats.dataLines() );
 	chopped_to_instance( TrainWords );
 	if ( !outInstanceBase )
 	  outInstanceBase = InstanceBase->clone();
 	//		  cerr << "add instance " << &CurrInst << endl;
 	if ( !outInstanceBase->AddInstance( CurrInst ) ){
-	  Warning( "deviating exemplar weight in:\n" + 
+	  Warning( "deviating exemplar weight in:\n" +
 		   Buffer + "\nIgnoring the new weight" );
 	}
 	++sit;
@@ -516,7 +516,7 @@ namespace Timbl {
     return true;
   }
 
-  bool TimblExperiment::ClassicLearn( const string& FileName, 
+  bool TimblExperiment::ClassicLearn( const string& FileName,
 				      bool warnOnSingleTarget ){
     bool result = true;
     Timer learnT;
@@ -536,7 +536,7 @@ namespace Timbl {
     else if ( FileName != "" &&
 	      CurrentDataFile != FileName ){
       Error( "Unable to Learn from file '" + FileName + "'\n"
-	     "while previously instantiated from file '" + 
+	     "while previously instantiated from file '" +
 	     CurrentDataFile + "'" );
       result = false;
     }
@@ -563,7 +563,7 @@ namespace Timbl {
 	  }
 	  // Open the file.
 	  //
-	  ifstream datafile( CurrentDataFile.c_str(), ios::in);
+	  ifstream datafile( CurrentDataFile, ios::in);
 	  //
 	  learnFromFileIndex( fmIndex, datafile );
 	}
@@ -586,7 +586,7 @@ namespace Timbl {
 	  string Buffer;
 	  // Open the file.
 	  //
-	  ifstream datafile( CurrentDataFile.c_str(), ios::in);
+	  ifstream datafile( CurrentDataFile, ios::in);
 	  //
 	  fileDoubleIndex::const_iterator mit = fIndex.begin();
 	  while ( mit != fIndex.end() ){
@@ -619,7 +619,7 @@ namespace Timbl {
     }
     return ClassicLearn( s, warnOnSingleTarget );
   }
-  
+
   IB1_Experiment::IB1_Experiment( const size_t N,
 				  const string& s,
 				  const bool init ):
@@ -627,7 +627,7 @@ namespace Timbl {
     if ( init ) InitClass( N );
     TreeOrder = GRoverFeature;
   }
-  
+
   /*
     Increment the Instancebase with one instance (IB1 Class only)
   */
@@ -645,18 +645,18 @@ namespace Timbl {
 	Error( "Couldn't convert to Instance: " + InstanceString );
 	result = false;    // No more input
       }
-      else {	
+      else {
 	chopped_to_instance( TrainLearnWords );
 	MBL_init = false;
 	bool happy = InstanceBase->AddInstance( CurrInst );
 	if ( !happy )
-	  Warning( "deviating exemplar weight in:\n" + 
+	  Warning( "deviating exemplar weight in:\n" +
 		   InstanceString + "\nIgnoring the new weight" );
       }
     }
     return result;
   }
-  
+
   /*
     Decrement the Instancebase with one instance (IB1 Class only)
   */
@@ -681,7 +681,7 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   /*
     Expand  an Instance Base
   */
@@ -710,7 +710,7 @@ namespace Timbl {
       stats.clear();
       // Open the file.
       //
-      ifstream datafile( FileName.c_str(), ios::in);
+      ifstream datafile( FileName, ios::in);
       if ( InputFormat() == ARFF )
 	skipARFFHeader( datafile );
       if ( !nextLine( datafile, Buffer ) ){
@@ -729,23 +729,23 @@ namespace Timbl {
 	}
 	bool found;
 	do {
-	  // The next Instance to store. 
+	  // The next Instance to store.
 	  chopped_to_instance( TrainLearnWords );
 	  bool happy = InstanceBase->AddInstance( CurrInst );
 	  if ( !happy ){
-	    Warning( "deviating exemplar weight in line #" + 
+	    Warning( "deviating exemplar weight in line #" +
 		     toString<int>(stats.totalLines() ) + ":\n" +
-		     Buffer + "\nIgnoring the new weight" );	
+		     Buffer + "\nIgnoring the new weight" );
 	  }
 	  // Progress update.
 	  //
-	  if ((stats.dataLines() % Progress() ) == 0) 
+	  if ((stats.dataLines() % Progress() ) == 0)
 	    time_stamp(  "Learning:  ", stats.dataLines() );
 	  found = false;
 	  while ( !found && nextLine( datafile, Buffer ) ){
 	    found = chopLine( Buffer );
 	    if ( !found ){
-	      Warning( "datafile, skipped line #" + 
+	      Warning( "datafile, skipped line #" +
 		       toString<int>( stats.totalLines() ) +
 		       "\n" + Buffer );
 	    }
@@ -780,7 +780,7 @@ namespace Timbl {
       stats.clear();
       // Open the file.
       //
-      ifstream datafile( FileName.c_str(), ios::in);
+      ifstream datafile( FileName, ios::in);
       if ( InputFormat() == ARFF )
 	skipARFFHeader( datafile );
       if ( !nextLine( datafile, Buffer ) ){
@@ -798,19 +798,19 @@ namespace Timbl {
 	}
 	bool found;
 	do {
-	  // The next Instance to remove. 
+	  // The next Instance to remove.
 	  chopped_to_instance( TestWords );
 	  HideInstance( CurrInst );
 	  // Progress update.
 	  //
-	  if ((stats.dataLines() % Progress() ) == 0) 
+	  if ((stats.dataLines() % Progress() ) == 0)
 	    time_stamp( "Removing:  ", stats.dataLines() );
 	  found = false;
-	  while ( !found && 
+	  while ( !found &&
 		  nextLine( datafile, Buffer ) ){
 	    found = chopLine( Buffer );
 	    if ( !found ){
-	      Warning( "datafile, skipped line #" + 
+	      Warning( "datafile, skipped line #" +
 		       toString<int>( stats.totalLines() ) +
 		       "\n" + Buffer );
 	    }
@@ -823,7 +823,7 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   void TimblExperiment::showInputFormat( ostream& os ) const {
     switch ( InputFormat() ){
     case C4_5:
@@ -843,7 +843,7 @@ namespace Timbl {
       break;
     case Tabbed:
       os << "InputFormat       : Tabbed";
-      break;      
+      break;
     case Compact:
       os << "InputFormat       : Compact, (Feature Length = "
 	 << F_length << ")";
@@ -853,8 +853,8 @@ namespace Timbl {
     }
     os << endl << endl;
   }
-  
-  void TimblExperiment::show_progress( ostream& os, 
+
+  void TimblExperiment::show_progress( ostream& os,
 				       time_t start, unsigned int line ){
     char time_string[26];
     struct tm *curtime;
@@ -886,25 +886,25 @@ namespace Timbl {
       strcpy( time_string, asctime(curtime));
       time_string[24] = '\0';
       os << line << " @ " << time_string;
-      
+
       // Estime time until Estimate.
       //
       if ( Estimate() > 0 &&  (unsigned int)Estimate() < line ) {
 	SecsUsed = Time - start;
 	if ( SecsUsed > 0 ) {
-	  Estimated = (SecsUsed / (float)line) * 
+	  Estimated = (SecsUsed / (float)line) *
 	    (float)Estimate();
 	  EstimatedTime = (long)Estimated + start;
 	  os << ", ";
 	  strcpy(time_string, ctime(&EstimatedTime));
 	  time_string[24] = '\0';
 	  os << Estimate() << ": " << time_string;
-	} 
+	}
       }
       os << endl;
     }
   }
-  
+
   bool IB2_Experiment::show_learn_progress( ostream& os,
 					    time_t start,
 					    size_t added ){
@@ -952,14 +952,14 @@ namespace Timbl {
       if ( Estimate() > 0 && (unsigned int)Estimate() < lines ) {
 	SecsUsed = Time - start;
 	if ( SecsUsed > 0 ) {
-	  Estimated = (SecsUsed / (float)line) * 
+	  Estimated = (SecsUsed / (float)line) *
 	    ( (float)Estimate() - IB2_offset() );
 	  EstimatedTime = (long)Estimated + start;
 	  os << "\t, ";
 	  strcpy(time_string, ctime(&EstimatedTime));
 	  time_string[24] = '\0';
 	  os << Estimate() << ": " << time_string;
-	} 
+	}
       }
       os << endl;
       return true;
@@ -967,7 +967,7 @@ namespace Timbl {
     else
       return false;
   }
-  
+
   void TimblExperiment::show_speed_summary( ostream& os,
 					    const timeval& Start ) const {
     timeval Time;
@@ -983,13 +983,13 @@ namespace Timbl {
     os << stats.dataLines() / secsUsed << " p/s)" << endl;
     os << setprecision(oldPrec);
   }
-  
+
   bool TimblExperiment::showStatistics( ostream& os ) const {
     os << endl;
     if ( confusionInfo )
       confusionInfo->FScore( os, Targets, Verbosity(CLASS_STATS) );
-    os << "overall accuracy:        " 
-       << stats.testedCorrect()/(double) stats.dataLines() 
+    os << "overall accuracy:        "
+       << stats.testedCorrect()/(double) stats.dataLines()
        << "  (" << stats.testedCorrect() << "/" << stats.dataLines()  << ")" ;
     if ( stats.exactMatches() != 0 )
       os << ", of which " << stats.exactMatches() << " exact matches " ;
@@ -1020,13 +1020,13 @@ namespace Timbl {
 
   bool TimblExperiment::createPercFile( const string& fileName ) const {
     if ( fileName != "" ) {
-      ofstream outfile( fileName.c_str(), ios::out | ios::trunc);
+      ofstream outfile( fileName, ios::out | ios::trunc);
       if (!outfile) {
 	Warning( "can't open: " + fileName );
 	return false;
       }
       else {
-	outfile 
+	outfile
 	  << (stats.testedCorrect() / (float)stats.dataLines()) * 100.0
 	  << endl
 	  << "tested " << stats.dataLines() << " lines " << endl
@@ -1036,7 +1036,7 @@ namespace Timbl {
     }
     return true;
   }
-  
+
   bool TimblExperiment::showBestNeighbors( ostream& outfile ) const {
     if ( Verbosity( NEAR_N | ALL_K) ){
       outfile << bestArray;
@@ -1045,7 +1045,7 @@ namespace Timbl {
     else
       return false;
   }
-    
+
   xmlNode *TimblExperiment::bestNeighborsToXML() const {
     if ( Verbosity( NEAR_N | ALL_K) ){
       return bestArray.toXML();
@@ -1053,8 +1053,8 @@ namespace Timbl {
     else
       return 0;
   }
-    
-  void TimblExperiment::show_results( ostream& outfile, 
+
+  void TimblExperiment::show_results( ostream& outfile,
 				      const double confidence,
 				      const string& dString,
 				      const TargetValue *Best,
@@ -1082,8 +1082,8 @@ namespace Timbl {
     outfile << endl;
     showBestNeighbors( outfile );
   }
-  
-  bool IB2_Experiment::Prepare( const string& FileName, 
+
+  bool IB2_Experiment::Prepare( const string& FileName,
 				bool,
 				bool expand ){
     if ( !ConfirmOptions() ||
@@ -1094,7 +1094,7 @@ namespace Timbl {
     else
       return TimblExperiment::Prepare( FileName, false, expand );
   }
-  
+
   bool IB2_Experiment::Learn( const string& FileName, bool ){
     if ( IB2_offset() == 0 ){
       Error( "IB2 learning failed, invalid bootstrap option?" );
@@ -1124,7 +1124,7 @@ namespace Timbl {
 	else if ( FileName != "" &&
 		  CurrentDataFile != FileName ){
 	  Error( "Unable to Learn from file '" + FileName + "'\n"
-		 "while previously instantiated from file '" + 
+		 "while previously instantiated from file '" +
 		 CurrentDataFile + "'" );
 	  result = false;
 	}
@@ -1134,7 +1134,7 @@ namespace Timbl {
 	stats.clear();
 	// Open the file.
 	//
-	ifstream datafile( CurrentDataFile.c_str(), ios::in);
+	ifstream datafile( CurrentDataFile, ios::in);
 	if ( InputFormat() == ARFF )
 	  skipARFFHeader( datafile );
 	if ( !nextLine( datafile, Buffer ) ){
@@ -1157,8 +1157,8 @@ namespace Timbl {
 	  }
 	  bool found;
 	  bool go_on = ( stats.dataLines() <= IB2_offset() );
-	  while( go_on ){ 
-	    // The next Instance to store. 
+	  while( go_on ){
+	    // The next Instance to store.
 	    chopped_to_instance( TrainWords );
 	    bool happy = InstanceBase->AddInstance( CurrInst );
 	    if ( !happy ){
@@ -1168,17 +1168,17 @@ namespace Timbl {
 	    }
 	    // Progress update.
 	    //
-	    if ((stats.dataLines() % Progress() ) == 0) 
+	    if ((stats.dataLines() % Progress() ) == 0)
 	      time_stamp( "Learning:  ", stats.dataLines() );
 	    if ( stats.dataLines() >= IB2_offset() )
 	      go_on = false;
 	    else {
 	      found = false;
-	      while ( !found && 
+	      while ( !found &&
 		      nextLine( datafile, Buffer ) ){
 		found = chopLine( Buffer );
 		if ( !found ){
-		  Warning( "datafile, skipped line #" + 
+		  Warning( "datafile, skipped line #" +
 			   toString<int>( stats.totalLines() ) +
 			   "\n" + Buffer );
 		}
@@ -1204,7 +1204,7 @@ namespace Timbl {
       return result;
     }
   }
-  
+
   bool IB2_Experiment::Expand( const string& FileName ){
     bool result = false;
     if ( CurrentDataFile == "" && InstanceBase == 0 ){
@@ -1223,12 +1223,12 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   bool IB2_Experiment::Remove( const string& ){
     Warning( "IB2, remove impossible, (ignored) " );
     return false;
   }
-  
+
   bool IB2_Experiment::Expand_N( const string& FileName ){
     bool result = true;
     size_t Added = 0;
@@ -1254,7 +1254,7 @@ namespace Timbl {
       stats.clear();
       // Open the file.
       //
-      ifstream datafile( file_name.c_str(), ios::in);
+      ifstream datafile( file_name, ios::in);
       if ( InputFormat() == ARFF )
 	skipARFFHeader( datafile );
       if ( !nextLine( datafile, Buffer ) ){
@@ -1273,7 +1273,7 @@ namespace Timbl {
 	    break;
 	  }
 	  else if ( !chopLine( Buffer ) ){
-	    Warning( "datafile, skipped line #" + 
+	    Warning( "datafile, skipped line #" +
 		     toString<int>( stats.totalLines() ) +
 		     "\n" + Buffer );
 	  }
@@ -1282,19 +1282,19 @@ namespace Timbl {
 	  time_t lStartTime;
 	  time(&lStartTime);
 	  if ( !Verbosity(SILENT) ) {
-	    Info( "Phase 2: Appending from Datafile: " + FileName + 
+	    Info( "Phase 2: Appending from Datafile: " + FileName +
 		  " (starting at line " + toString<int>( stats.dataLines() ) + ")" );
 	    time_stamp( "Start:     ", stats.dataLines() );
 	  }
 	  bool found;
 	  initExperiment();
 	  do {
-	    // The next Instance to store. 
+	    // The next Instance to store.
 	    chopped_to_instance( TestWords );
 	    double final_distance;
 	    bool dummy = false;
 	    StatisticsClass stats_keep = stats;
-	    const TargetValue *ResultTarget = LocalClassify( CurrInst, 
+	    const TargetValue *ResultTarget = LocalClassify( CurrInst,
 							     final_distance,
 							     dummy );
 	    stats = stats_keep;
@@ -1302,14 +1302,14 @@ namespace Timbl {
 	      chopped_to_instance( TrainLearnWords );
 	      bool happy = InstanceBase->AddInstance( CurrInst );
 	      if ( !happy ){
-		Warning( "deviating exemplar weight in line #" + 
+		Warning( "deviating exemplar weight in line #" +
 			 toString<int>(stats.totalLines() ) + ":\n" +
 			 Buffer + "\nIgnoring the new weight" );
 	      }
 	      ++Added;
 	      ++TotalAdded;
 	      MBL_init = true; // avoid recalculations in LocalClassify
-	      
+
 	    }
 	    // Progress update.
 	    //
@@ -1321,7 +1321,7 @@ namespace Timbl {
 		    nextLine( datafile, Buffer ) ){
 	      found = chopLine( Buffer );
 	      if ( !found ){
-		Warning( "datafile, skipped line #" + 
+		Warning( "datafile, skipped line #" +
 			 toString<int>( stats.totalLines() ) +
 			 "\n" + Buffer );
 	      }
@@ -1341,14 +1341,14 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   bool TimblExperiment::initTestFiles( const string& InFileName,
 				       const string& OutFileName ){
     if ( !ExpInvalid() &&
 	 ConfirmOptions() ){
       testStream.close();
       testStream.clear(); // just to be shure. old G++ libraries are in error here
-      testStream.open( InFileName.c_str(), ios::in);
+      testStream.open( InFileName, ios::in);
       if ( !testStream ) {
 	Error( "can't open: " + InFileName );
       }
@@ -1358,7 +1358,7 @@ namespace Timbl {
 	// first we check if the outFile is writable.
 	// We don't write it though, because we don't want to have
 	// it mangled when checkTestFile fails
-	outStream.open( OutFileName.c_str(), ios::app );
+	outStream.open( OutFileName, ios::app );
 	if ( !outStream ) {
 	  Error( "can't open: " + OutFileName );
 	}
@@ -1368,7 +1368,7 @@ namespace Timbl {
 	  if ( checkTestFile() ){
 	    outStream.close();
 	    outStream.clear(); // just to be shure. old G++ libraries are in error here
-	    outStream.open( OutFileName.c_str(), ios::out | ios::trunc );
+	    outStream.open( OutFileName, ios::out | ios::trunc );
 	    return true;
 	  }
 	}
@@ -1392,21 +1392,21 @@ namespace Timbl {
 	else
 	  Error( "mismatch between number of features in Testfile " +
 		 testStreamName + " and the Instancebase (" +
-		 toString<size_t>(numF) + " vs. " + 
-		 toString<size_t>(NumOfFeatures()) + ")" ); 
+		 toString<size_t>(numF) + " vs. " +
+		 toString<size_t>(NumOfFeatures()) + ")" );
 	return false;
       }
       if ( !Verbosity(SILENT) ){
-	*mylog << "Examine datafile '" << testStreamName 
+	*mylog << "Examine datafile '" << testStreamName
 	       << "' gave the following results:"
 	       << endl
 	       << "Number of Features: " << numF << endl;
 	showInputFormat( *mylog );
       }
-    }	
+    }
     return true;
   }
-  
+
   bool IB1_Experiment::checkTestFile(){
     if ( !TimblExperiment::checkTestFile() )
       return false;
@@ -1417,7 +1417,7 @@ namespace Timbl {
     }
     return true;
   }
-  
+
   bool IB2_Experiment::checkTestFile(){
     if ( !IB1_Experiment::checkTestFile() )
       return false;
@@ -1427,7 +1427,7 @@ namespace Timbl {
     }
     return true;
   }
-  
+
   bool TimblExperiment::checkLine( const string& line ){
     size_t i;
     bool result = false;
@@ -1441,9 +1441,9 @@ namespace Timbl {
 	if ( i > 0 )
 	  Warning( "mismatch between number of features in testline " +
 		   line + " and the Instancebase (" + toString<size_t>(i)
-		   + " vs. " + toString<size_t>(NumOfFeatures()) + ")" ); 
+		   + " vs. " + toString<size_t>(NumOfFeatures()) + ")" );
       }
-      else { 
+      else {
 	if ( Initialized ){
 	  result = true;
 	}
@@ -1464,8 +1464,8 @@ namespace Timbl {
     }
     return result;
   }
-    
-    
+
+
   bool IB1_Experiment::checkLine( const string& line ){
     if ( !TimblExperiment::checkLine( line ) )
       return false;
@@ -1481,8 +1481,8 @@ namespace Timbl {
     }
     return true;
   }
-    
-  bool TimblExperiment::Classify( const string& Line, 
+
+  bool TimblExperiment::Classify( const string& Line,
 				  string& Result,
 				  string& Dist,
 				  double& Distance ){
@@ -1497,8 +1497,8 @@ namespace Timbl {
     }
     return false;
   }
-  
-  bool TimblExperiment::Classify( const string& Line, 
+
+  bool TimblExperiment::Classify( const string& Line,
 				  string& Result,
 				  double& Distance ){
     Result.clear();
@@ -1509,8 +1509,8 @@ namespace Timbl {
     }
     return false;
   }
-  
-  bool TimblExperiment::Classify( const string& Line, 
+
+  bool TimblExperiment::Classify( const string& Line,
 				  string& Result ) {
     Result.clear();
     double dummy;
@@ -1528,7 +1528,7 @@ namespace Timbl {
     initExperiment();
     bestArray.init( num_of_neighbors, MaxBests,
 		    Verbosity(NEAR_N), Verbosity(DISTANCE),
-		    Verbosity(DISTRIB) ); 
+		    Verbosity(DISTRIB) );
     TestInstance( Inst, base, offset );
   }
 
@@ -1536,7 +1536,7 @@ namespace Timbl {
 						     double& Distance,
 						     bool& exact ){
     bool recurse = true;
-    bool Tie = false; 
+    bool Tie = false;
     exact = false;
     if ( !bestResult.reset( beamSize, normalisation, norm_factor, Targets ) ){
       Warning( "no normalisation possible because a BeamSize is specified\n"
@@ -1557,7 +1557,7 @@ namespace Timbl {
       //
       bestArray.init( num_of_neighbors, MaxBests,
 		      Verbosity(NEAR_N), Verbosity(DISTANCE),
-		      Verbosity(DISTRIB) ); 
+		      Verbosity(DISTRIB) );
       bestArray.addResult( Distance, ExResultDist, get_org_input() );
       bestArray.initNeighborSet( nSet );
     }
@@ -1579,7 +1579,7 @@ namespace Timbl {
       if ( !Tie2 ){
 	Res = Res2;
 	delete ResultDist;
-	ResultDist = ResultDist2; 
+	ResultDist = ResultDist2;
       }
       else
 	delete ResultDist2;
@@ -1608,8 +1608,8 @@ namespace Timbl {
       stats.addTieFailure();
     return Res;
   }
-  
-  const TargetValue *TimblExperiment::classifyString( const string& Line, 
+
+  const TargetValue *TimblExperiment::classifyString( const string& Line,
 						      double& Distance ){
     Distance = -1.0;
     const TargetValue *BestT = NULL;
@@ -1631,7 +1631,7 @@ namespace Timbl {
     }
     return 0;
   }
-  
+
   const neighborSet *TimblExperiment::LocalClassify( const Instance& Inst ){
     testInstance( Inst, InstanceBase );
     bestArray.initNeighborSet( nSet );
@@ -1639,7 +1639,7 @@ namespace Timbl {
     nSet.setShowDistribution( Verbosity(DISTRIB) );
     return &nSet;
   }
-  
+
   double TimblExperiment::sum_remaining_weights( size_t level ) const {
     double result = 0.0;
     for ( size_t i = level; i < EffectiveFeatures(); ++i ){
@@ -1647,7 +1647,7 @@ namespace Timbl {
     }
     return result;
   }
-    
+
   void TimblExperiment::show_metric_info( ostream& os ) const {
     os << "Global metric : " << toString( globalMetricOption, true);
     if ( GlobalMetric->isStorable() ){
@@ -1735,7 +1735,7 @@ namespace Timbl {
 
   class threadData {
   public:
-    threadData():exp(0), lineNo(0), resultTarget(0), 
+    threadData():exp(0), lineNo(0), resultTarget(0),
 		 exact(false), distance(-1), confidence(0) {};
     bool exec();
     void show( ostream& ) const;
@@ -1757,7 +1757,7 @@ namespace Timbl {
       return false;
     }
     if ( !exp->chopLine( Buffer ) ){
-      exp->Warning( "testfile, skipped line #" + 
+      exp->Warning( "testfile, skipped line #" +
 		    toString<int>( lineNo ) +
 		    "\n" + Buffer );
       return false;
@@ -1867,7 +1867,7 @@ namespace Timbl {
 #pragma omp critical
 	      show_progress( *mylog, lStartTime, ++dataCount );
 	  }
-	  
+
 	  for ( int i=0; i < numOfThreads; ++i ){
 	    // Write it to the output file for later analysis.
 	    experiments.exps[i].show( outStream );
@@ -1912,7 +1912,7 @@ namespace Timbl {
       string Buffer;
       while ( nextLine( testStream, Buffer ) ){
 	if ( !chopLine( Buffer ) ) {
-	  Warning( "testfile, skipped line #" + 
+	  Warning( "testfile, skipped line #" +
 		   toString<int>( stats.totalLines() ) +
 		   "\n" + Buffer );
 	}
@@ -1975,7 +1975,7 @@ namespace Timbl {
       string Buffer;
       while ( nextLine( testStream, Buffer ) ){
 	if ( !chopLine( Buffer ) ) {
-	  Warning( "testfile, skipped line #" + 
+	  Warning( "testfile, skipped line #" +
 		   toString<int>( stats.totalLines() ) +
 		   "\n" + Buffer );
 	}
@@ -1996,7 +1996,7 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   bool TimblExperiment::SetOptions( int i, const char **argv ){
     CL_Options *Opts = new CL_Options( i, argv );
     bool result = SetOptions( *Opts  );
@@ -2064,9 +2064,9 @@ namespace Timbl {
   }
 
   bool TimblExperiment::WriteArrays( const std::string& FileName ){
-    ofstream out( FileName.c_str(), ios::out | ios::trunc );
+    ofstream out( FileName, ios::out | ios::trunc );
     if ( !out ) {
-      Warning( "Problem opening Probability file '" + 
+      Warning( "Problem opening Probability file '" +
 	       FileName + "' (not written)" );
       return false;
     }
@@ -2076,9 +2076,9 @@ namespace Timbl {
       return MBLClass::writeArrays( out );
     }
   }
-  
+
   bool TimblExperiment::GetArrays( const std::string& FileName ){
-    ifstream inf( FileName.c_str(), ios::in );
+    ifstream inf( FileName, ios::in );
     if ( !inf ){
       Error( "Problem opening Probability file " + FileName );
       return false;
@@ -2096,9 +2096,9 @@ namespace Timbl {
   }
 
   bool TimblExperiment::WriteMatrices( const std::string& FileName ){
-    ofstream out( FileName.c_str(), ios::out | ios::trunc );
+    ofstream out( FileName, ios::out | ios::trunc );
     if ( !out ) {
-      Warning( "Problem opening matrices file '" + 
+      Warning( "Problem opening matrices file '" +
 	       FileName + "' (not written)" );
       return false;
     }
@@ -2109,9 +2109,9 @@ namespace Timbl {
       return writeMatrices( out );
     }
     }
-    
+
   bool TimblExperiment::GetMatrices( const std::string& FileName ){
-    ifstream inf( FileName.c_str(), ios::in );
+    ifstream inf( FileName, ios::in );
     if ( !inf ){
       Error( "Problem opening matrices file " + FileName );
       return false;
@@ -2132,7 +2132,7 @@ namespace Timbl {
     if ( ConfirmOptions() ){
       // Open the output file.
       //
-      ofstream outfile( FileName.c_str(), ios::out | ios::trunc);
+      ofstream outfile( FileName, ios::out | ios::trunc);
       if (!outfile) {
 	Warning( "can't open Weightsfile: " + FileName );
 	return false;
@@ -2156,7 +2156,7 @@ namespace Timbl {
     if ( ConfirmOptions() ){
       // Open the file.
       //
-      ifstream weightsfile( FileName.c_str(), ios::in);
+      ifstream weightsfile( FileName, ios::in);
       if ( !weightsfile) {
 	Error( "can't open WeightsFile " + FileName );
 	return false;
@@ -2164,7 +2164,7 @@ namespace Timbl {
       else {
 	if ( w == Unknown_w ){
 	  w = GR_w;
-	  // 	Warning( "Unspecified weighting, using default: " 
+	  // 	Warning( "Unspecified weighting, using default: "
 	  // 		 + toString(w) );
 	}
 	if ( !Verbosity(SILENT) )
@@ -2187,7 +2187,7 @@ namespace Timbl {
   bool TimblExperiment::WriteInstanceBase( const std::string& FileName ){
     bool result = false;
     if ( ConfirmOptions() ){
-      ofstream outfile( FileName.c_str(), ios::out | ios::trunc );
+      ofstream outfile( FileName, ios::out | ios::trunc );
       if (!outfile) {
 	Warning( "can't open outputfile: " + FileName );
       }
@@ -2200,11 +2200,11 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   bool TimblExperiment::WriteInstanceBaseXml( const std::string& FileName ) {
     bool result = false;
     if ( ConfirmOptions() ){
-      ofstream os( FileName.c_str(), ios::out | ios::trunc );
+      ofstream os( FileName, ios::out | ios::trunc );
       if (!os) {
 	Warning( "can't open outputfile: " + FileName );
       }
@@ -2229,7 +2229,7 @@ namespace Timbl {
 						 unsigned int levels ) {
     bool result = false;
     if ( ConfirmOptions() ){
-      ofstream os( FileName.c_str(), ios::out | ios::trunc );
+      ofstream os( FileName, ios::out | ios::trunc );
       if (!os) {
 	Warning( "can't open outputfile: " + FileName );
       }
@@ -2260,7 +2260,7 @@ namespace Timbl {
       return false;
     }
     else if ( Pruned ){
-      Error( "Instance-base is Pruned!, NOT valid for " + 
+      Error( "Instance-base is Pruned!, NOT valid for " +
 	     toString(algorithm) + " Algorithm" );
     }
     else {
@@ -2276,30 +2276,30 @@ namespace Timbl {
 	  Features[i]->SetWeight( 1.0 );
 	  if ( Features[permutation[i]]->Ignore() )
 	    PermFeatures[i] = NULL;
-	  else 
+	  else
 	    PermFeatures[pos++] = Features[permutation[i]];
 	}
-	InstanceBase = new IB_InstanceBase( EffectiveFeatures(), 
+	InstanceBase = new IB_InstanceBase( EffectiveFeatures(),
 					    ibCount,
 					    (RandomSeed()>=0) );
 	if ( Hashed )
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 Targets, 
+					 Targets,
 					 TargetStrings, FeatureStrings,
-					 Version ); 
+					 Version );
 	else
-	  result = InstanceBase->ReadIB( is, PermFeatures, 
-					 Targets, 
-					 Version ); 
+	  result = InstanceBase->ReadIB( is, PermFeatures,
+					 Targets,
+					 Version );
       }
     }
     return result;
   }
-  
+
   bool TimblExperiment::ReadInstanceBase( const string& FileName ){
     bool result = false;
     if ( ConfirmOptions() ){
-      ifstream infile( FileName.c_str(), ios::in );
+      ifstream infile( FileName, ios::in );
       if ( !infile ) {
 	Error( "can't open: " + FileName );
       }
@@ -2317,11 +2317,11 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   bool TimblExperiment::WriteNamesFile( const string& FileName ) const {
     // Open the file.
     //
-    ofstream namesfile( FileName.c_str(), ios::out | ios::trunc);
+    ofstream namesfile( FileName, ios::out | ios::trunc);
     if (!namesfile) {
       Warning( "can't open NamesFile: '" +
 	       FileName + "' (not written)" );
@@ -2334,21 +2334,21 @@ namespace Timbl {
       return true;
     }
   }
-  
+
   void IB1_Experiment::InitInstanceBase(){
     srand( RandomSeed() );
     set_order();
     runningPhase = TrainWords;
-    InstanceBase = new IB_InstanceBase( EffectiveFeatures(), 
+    InstanceBase = new IB_InstanceBase( EffectiveFeatures(),
 					ibCount,
 					(RandomSeed()>=0) );
   }
-  
+
   bool TimblExperiment::GetCurrentWeights( vector<double>& res ) {
     res.clear();
     if ( ExpInvalid() )
       return false;
-    else { 
+    else {
       initExperiment( );
       for ( size_t i=0; i< NumOfFeatures(); ++i ){
 	res.push_back( Features[i]->Weight() );
@@ -2357,7 +2357,7 @@ namespace Timbl {
     return true;
   }
 
-  bool TimblExperiment::build_file_index( const string& file_name, 
+  bool TimblExperiment::build_file_index( const string& file_name,
 					  fileIndex& fmIndex ){
     bool result = true;
     string Buffer;
@@ -2365,7 +2365,7 @@ namespace Timbl {
     size_t cur_pos = 0;
     // Open the file.
     //
-    ifstream datafile( file_name.c_str(), ios::in);
+    ifstream datafile( file_name, ios::in);
     if ( InputFormat() == ARFF )
       skipARFFHeader( datafile );
     cur_pos = datafile.tellg();
@@ -2384,8 +2384,8 @@ namespace Timbl {
       }
       bool found;
       bool go_on = true;
-      while( go_on ){ 
-	// The next Instance to store. 
+      while( go_on ){
+	// The next Instance to store.
 	//	cerr << "line at pos " << cur_pos << " : " << Buffer << endl;
 	chopped_to_instance( TrainWords );
 	//	cerr << "gives Instance " << &CurrInst << endl;
@@ -2399,15 +2399,15 @@ namespace Timbl {
 	else {
 	  it->second.insert( cur_pos );
 	}
-	if ((stats.dataLines() % Progress() ) == 0) 
+	if ((stats.dataLines() % Progress() ) == 0)
 	  time_stamp( "Indexing:  ", stats.dataLines() );
 	found = false;
-	while ( !found && 
+	while ( !found &&
 		( cur_pos = datafile.tellg(),
 		  nextLine( datafile, Buffer ) ) ){
 	  found = chopLine( Buffer );
 	  if ( !found ){
-	    Warning( "datafile, skipped line #" + 
+	    Warning( "datafile, skipped line #" +
 		     toString<int>( stats.totalLines() ) +
 		     "\n" + Buffer );
 	  }
@@ -2418,8 +2418,8 @@ namespace Timbl {
     }
     return result;
   }
-  
-  bool TimblExperiment::build_file_multi_index( const string& file_name, 
+
+  bool TimblExperiment::build_file_multi_index( const string& file_name,
 						fileDoubleIndex& fmIndex ){
     bool result = true;
     string Buffer;
@@ -2427,7 +2427,7 @@ namespace Timbl {
     size_t cur_pos = 0;
     // Open the file.
     //
-    ifstream datafile( file_name.c_str(), ios::in);
+    ifstream datafile( file_name, ios::in);
     if ( InputFormat() == ARFF )
       skipARFFHeader( datafile );
     cur_pos = datafile.tellg();
@@ -2446,8 +2446,8 @@ namespace Timbl {
       }
       bool found;
       bool go_on = true;
-      while( go_on ){ 
-	// The next Instance to store. 
+      while( go_on ){
+	// The next Instance to store.
 	//	cerr << "line at pos " << cur_pos << " : " << Buffer << endl;
 	chopped_to_instance( TrainWords );
 	//	cerr << "gives Instance " << &CurrInst << endl;
@@ -2461,15 +2461,15 @@ namespace Timbl {
 	  mi[fv1].insert( cur_pos );
 	  fmIndex[fv0] = mi;
 	}
-	if ((stats.dataLines() % Progress() ) == 0) 
+	if ((stats.dataLines() % Progress() ) == 0)
 	  time_stamp( "Indexing:  ", stats.dataLines() );
 	found = false;
-	while ( !found && 
+	while ( !found &&
 		( cur_pos = datafile.tellg(),
 		  nextLine( datafile, Buffer ) ) ){
 	  found = chopLine( Buffer );
 	  if ( !found ){
-	    Warning( "datafile, skipped line #" + 
+	    Warning( "datafile, skipped line #" +
 		     toString<int>( stats.totalLines() ) +
 		     "\n" + Buffer );
 	  }
@@ -2480,6 +2480,6 @@ namespace Timbl {
     }
     return result;
   }
-  
-  
+
+
 }

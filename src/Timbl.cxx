@@ -254,7 +254,7 @@ inline void usage(void){
 
 void get_command_lines( const string& value, list<string>& result ){
   result.clear();
-  ifstream ind( value.c_str()+1 ); // skip @
+  ifstream ind( value.substr(1) ); // skip @
   if ( ind.bad() ){
     cerr << "Problem reading command-lines from file '"
 	 << value << "'" << endl;
@@ -694,7 +694,7 @@ void Do_Test( TimblAPI *Run ){
 
 bool checkInputFile( const string& name ){
   if ( !name.empty() ){
-    ifstream is( name.c_str() );
+    ifstream is( name );
     if ( !is.good() ){
       cerr << "unable to find or use input file '" << name << "'" << endl;
       return false;
@@ -705,7 +705,7 @@ bool checkInputFile( const string& name ){
 
 bool checkOutputFile( const string& name ){
   if ( !name.empty() ){
-    ofstream os( name.c_str() );
+    ofstream os( name );
     if ( !os.good() ) {
       cerr << "unable to find or use output file"  << name << "'" << endl;
       return false;

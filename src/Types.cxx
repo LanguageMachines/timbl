@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -42,67 +42,67 @@ namespace Timbl {
 
 // initializers
 
-  const char *AlgorithmName[][2] = { { "Unknown", "Unknown Algorithm" },
-				     { "IB1", "Memory Based Learning" },
-				     { "IB2", "Adapted Memory Based Learning"},
-				     { "IGTree", "Information Gain Tree" },
-				     { "TRIBL", "Tree IB1" },
-				     { "TRIBL2", "Tribl 2" },
-				     { "LOO", "Leave One Out" },
-				     { "CV", "Cross Validate" } };
-  
-  const char *MetricName[][2] = { { "U", "Unknown Metric" },
-				  { "I", "Ignore" },
-				  { "N", "Numeric" },
-				  { "D", "Dot product" },
-				  { "C", "Cosine metric" },
-				  { "O", "Overlap" }, 
-				  { "L", "Levenshtein" },
-				  { "DC", "Dice coefficient" },
-				  { "M", "Value Difference" },
-				  { "J", "Jeffrey Divergence" },
-				  { "S", "Jensen-Shannon Divergence" },
+  const string AlgorithmName[][2] = { { "Unknown", "Unknown Algorithm" },
+				      { "IB1", "Memory Based Learning" },
+				      { "IB2", "Adapted Memory Based Learning"},
+				      { "IGTree", "Information Gain Tree" },
+				      { "TRIBL", "Tree IB1" },
+				      { "TRIBL2", "Tribl 2" },
+				      { "LOO", "Leave One Out" },
+				      { "CV", "Cross Validate" } };
+
+  const string MetricName[][2] = { { "U", "Unknown Metric" },
+				   { "I", "Ignore" },
+				   { "N", "Numeric" },
+				   { "D", "Dot product" },
+				   { "C", "Cosine metric" },
+				   { "O", "Overlap" },
+				   { "L", "Levenshtein" },
+				   { "DC", "Dice coefficient" },
+				   { "M", "Value Difference" },
+				   { "J", "Jeffrey Divergence" },
+				   { "S", "Jensen-Shannon Divergence" },
 				  { "E", "Euclidean Distance" } };
-  
-  const char *WeightName[][2] = { { "un", "Unknown Weighting" },
-				  { "nw", "No Weighting" },
-				  { "gr", "GainRatio" },
-				  { "ig", "InfoGain" },
-				  { "x2", "Chi-square" }, 
-				  { "sv", "Shared Variance" }, 
-				  { "sd", "Standard Deviation" }, 
-				  { "ud", "User Defined"} };
-  
-  const char *DecayName[][2] = { { "Unknown", "Unknown Decay" },
-				 { "Z", "Zero Decay" },
-				 { "ID", "Inverse Distance" },
-				 { "IL", "Inverse Linear Distance" },
-				 { "ED", "Exponential Decay" } };
-  
-  const char *SmoothingName[][2] = { { "Unknown", "Unknown Smoothing" },
-				     { "Default", "Default Smoothing" },
-				     { "L", "Lidstone Smoothing" } };
-  
-  const char *OrdeningName[][2] = { { "Unknown", "Unknown Ordering" },
-				    { "UDO", "Data File Ordering" },
-				    { "DO", "Default Ordering" },
-				    { "GRO", "GainRatio" },
-				    { "IGO", "InformationGain" },
-				    { "1/V", "Inverse Values" },
-				    { "1/S", "Inverse SplitInfo" },
-				    { "G/V", "GainRatio/Values" },
-				    { "I/V", "InformationGain/Values" },
-				    { "GxE", "GainRatio*Entropy" },
-				    { "IxE", "InformationGain*Entropy" },
-				    { "X2O", "Chi-Squared" },
-				    { "SVO", "Shared Variance" },
-				    { "SDO", "Standard Deviation" },
-				    { "X/V", "Chi-Squared/Values" },
-				    { "S/V", "Shared Variance/Values" },
-				    { "SD/V", "Standard Deviation/Values" } };
-  
-  const char *InputFormatName[][2] = {
-    { "Unknown", "Unknown Input Format" }, 
+
+  const string WeightName[][2] = { { "un", "Unknown Weighting" },
+				   { "nw", "No Weighting" },
+				   { "gr", "GainRatio" },
+				   { "ig", "InfoGain" },
+				   { "x2", "Chi-square" },
+				   { "sv", "Shared Variance" },
+				   { "sd", "Standard Deviation" },
+				   { "ud", "User Defined"} };
+
+  const string DecayName[][2] = { { "Unknown", "Unknown Decay" },
+				  { "Z", "Zero Decay" },
+				  { "ID", "Inverse Distance" },
+				  { "IL", "Inverse Linear Distance" },
+				  { "ED", "Exponential Decay" } };
+
+  const string SmoothingName[][2] = { { "Unknown", "Unknown Smoothing" },
+				      { "Default", "Default Smoothing" },
+				      { "L", "Lidstone Smoothing" } };
+
+  const string OrdeningName[][2] = { { "Unknown", "Unknown Ordering" },
+				     { "UDO", "Data File Ordering" },
+				     { "DO", "Default Ordering" },
+				     { "GRO", "GainRatio" },
+				     { "IGO", "InformationGain" },
+				     { "1/V", "Inverse Values" },
+				     { "1/S", "Inverse SplitInfo" },
+				     { "G/V", "GainRatio/Values" },
+				     { "I/V", "InformationGain/Values" },
+				     { "GxE", "GainRatio*Entropy" },
+				     { "IxE", "InformationGain*Entropy" },
+				     { "X2O", "Chi-Squared" },
+				     { "SVO", "Shared Variance" },
+				     { "SDO", "Standard Deviation" },
+				     { "X/V", "Chi-Squared/Values" },
+				     { "S/V", "Shared Variance/Values" },
+				     { "SD/V", "Standard Deviation/Values" } };
+
+  const string InputFormatName[][2] = {
+    { "Unknown", "Unknown Input Format" },
     { "Compact", "Compact" },
     { "C45", "C4.5" },
     { "Column", "Columns" },
@@ -110,29 +110,29 @@ namespace Timbl {
     { "ARFF", "ARFF" },
     { "BINARY", "Sparse Binary" },
     { "SPARSE", "Sparse" } };
-  
-  const char *VerbosityName[][2] = { { "Unknown", "erronous" },
-				     { "S", "Silent" },
-				     { "O", "Options" },
-				     { "F", "Feature_Statistics" },
-				     { "P", "Probability_arrays" },
-				     { "E", "Exact_match" },
-				     { "DI", "Distances" },
-				     { "DB", "Distribution" },
-				     { "N", "Nearest_Neighbours" },
-				     { "AS", "Advanced_Statistics" },
-				     { "CM", "Confusion_Matrix" },
-				     { "CS", "Class_Statistics" },
-				     { "CD", "Client_Debug" },
-				     { "K", "All_K_values" },
-				     { "MD", "MatchingDepth" },
-				     { "B", "BranchingFactor" },
-				     { "CF", "Confidence" },
-				     // Verbosity is special!
-				     // should end with "" strings!
-				     { "", "" } };
 
-  const char *NormalisationName[][2] = {
+  const string VerbosityName[][2] = { { "Unknown", "erronous" },
+				      { "S", "Silent" },
+				      { "O", "Options" },
+				      { "F", "Feature_Statistics" },
+				      { "P", "Probability_arrays" },
+				      { "E", "Exact_match" },
+				      { "DI", "Distances" },
+				      { "DB", "Distribution" },
+				      { "N", "Nearest_Neighbours" },
+				      { "AS", "Advanced_Statistics" },
+				      { "CM", "Confusion_Matrix" },
+				      { "CS", "Class_Statistics" },
+				      { "CD", "Client_Debug" },
+				      { "K", "All_K_values" },
+				      { "MD", "MatchingDepth" },
+				      { "B", "BranchingFactor" },
+				      { "CF", "Confidence" },
+				      // Verbosity is special!
+				      // should end with "" strings!
+				      { "", "" } };
+
+  const string NormalisationName[][2] = {
     { "Unknown", "Unknown normalisation" },
     { "None", "No Normalisation" },
     { "Probability", "Normalise to 100%" },
@@ -158,7 +158,7 @@ namespace Timbl {
       return Unknown_w;
     }
   }
-  
+
   AlgorithmType charToAlg( char a ){
     switch ( a ){
     case '0':

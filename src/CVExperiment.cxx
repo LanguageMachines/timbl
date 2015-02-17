@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -57,7 +57,7 @@ namespace Timbl {
     cerr << "CV prepare " << f << endl;
     return true;
   }
-  
+
   bool CV_Experiment::CVprepare( const string& wgtFile,
 				 WeightType w,
 				 const string& probFile ){
@@ -84,26 +84,26 @@ namespace Timbl {
     }
     return true;
   }
-  
+
   bool CV_Experiment::get_file_names( const string& FileName ){
     bool result = false;
     if ( !ExpInvalid() ){
       NumOfFiles = 0;
-      ifstream file_names( FileName.c_str(), ios::in );
+      ifstream file_names( FileName, ios::in );
       string name;
       if ( file_names.good() ) {
 	while ( getline( file_names, name ) )
 	  ++NumOfFiles;
 	file_names.close();
 	FileNames = new string[NumOfFiles];
-	ifstream file_names2( FileName.c_str(), ios::in );
+	ifstream file_names2( FileName, ios::in );
 	size_t size = 0;
 	int pos = 0;
 	while ( getline( file_names2, name ) ){
 	  size_t tmp = examineData( name );
 	  if ( tmp != 0 ){
 	    if ( !Verbosity(SILENT) ){
-	      *mylog << "Examine datafile '" << FileName 
+	      *mylog << "Examine datafile '" << FileName
 		     << "' gave the following results:"
 		     << endl
 		     << "Number of Features: " << tmp << endl;
@@ -123,7 +123,7 @@ namespace Timbl {
 	    return false;
 	}
 	if ( pos != NumOfFiles ){
-	  Error( "Unable to read all " + toString<int>(NumOfFiles) + 
+	  Error( "Unable to read all " + toString<int>(NumOfFiles) +
 		 " CV filenames from " + FileName );
 	  return false;
 	}
@@ -152,7 +152,7 @@ namespace Timbl {
 	  tmp += "/";
 	tmp += fileName;
       }
-      else { 
+      else {
 	tmp = path;
 	if ( addSlash )
 	tmp += "/";
@@ -162,7 +162,7 @@ namespace Timbl {
     }
     else
       return fileName;
-  }  
+  }
 
   bool CV_Experiment::Test( const string& FileName,
 			    const string& OutFile ){
@@ -210,7 +210,7 @@ namespace Timbl {
 	GetWeights( CV_WfileName, CV_fileW );
       if ( !CV_PfileName.empty() )
 	GetArrays( CV_PfileName );
-      result = TimblExperiment::Test( FileNames[NumOfFiles-1], outName ); 
+      result = TimblExperiment::Test( FileNames[NumOfFiles-1], outName );
       if ( result )
 	result = createPercFile( percName );
     }
