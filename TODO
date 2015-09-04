@@ -1,2 +1,2 @@
-* Move LogStream and LogBuffer back in from TimblServer package
-  It is of general interest.
+* reorganize clone() splitChild() and such in TimblExperiment.
+  it is very confusing now.
