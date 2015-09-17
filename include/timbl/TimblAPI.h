@@ -86,9 +86,10 @@ namespace Timbl{
     bool StartMultiServer( const std::string& );
     TimblExperiment *grabAndDisconnectExp(){
       TimblExperiment *res = 0;
-      if ( Valid() )
+      if ( Valid() ){
 	res = pimpl;
-      pimpl = 0;
+	pimpl = 0;
+      }
       return res;
     }
     bool Prepare( const std::string& = "" );
