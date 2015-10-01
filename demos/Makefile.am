@@ -3,7 +3,6 @@
 
 AM_CPPFLAGS = -I@top_srcdir@/include
 AM_CXXFLAGS = -std=c++0x
-AM_LDFLAGS = -lstdc++
 
 noinst_PROGRAMS = api_test1 api_test2 api_test3 api_test4 api_test5 api_test6\
 	tse classify
