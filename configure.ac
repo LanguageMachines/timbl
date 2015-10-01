@@ -28,6 +28,14 @@ LT_INIT
 # when running tests, use CXX
 AC_LANG([C++])
 
+AC_OPENMP
+if test "x$ac_cv_prog_cxx_openmp" != "xunsupported"; then
+   CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
+   AC_DEFINE(HAVE_OPENMP, 1 , Define to 1 if you have OpenMP )
+else
+   AC_MSG_NOTICE(We don't have OpenMP. Multithreaded operation is disabled)
+fi
+
 #checks for libraries.
 
 # Checks for header files.
@@ -63,20 +71,6 @@ AC_MSG_NOTICE( [pkg-config search path: $PKG_CONFIG_PATH] )
 PKG_CHECK_MODULES([ticcutils], [ticcutils >= 0.4] )
 CXXFLAGS="$CXXFLAGS $ticcutils_CFLAGS"
 LIBS="$LIBS $ticcutils_LIBS"
-
-
-OPENMP_CHECK( [CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
-	       AC_DEFINE(HAVE_OPENMP, 1 , Define to 1 if you have OpenMP )],
-	      [AC_MSG_NOTICE(We don't have OpenMP. Multithreaded testing is disabled)] )
-
-AC_SUBST([OPENMPFLAGS],[$OPENMP_CXXFLAGS])
-
-# for GCC we add -lgomp to LIBS. This makes libtimbl depending on libgomp,
-# as we would like to see.
-# do we need a solution for other compilers?????
-if test "$OPENMPFLAGS" = "-fopenmp"; then
-   LIBS="$LIBS -lgomp"
-fi
 
 AC_CONFIG_FILES([
   Makefile
