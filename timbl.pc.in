@@ -2,7 +2,7 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
-openmpflags=@OPENMPFLAGS@
+openmpflags=@OPENMP_CXXFLAGS@
 
 Name: timbl
 Version: @VERSION@
