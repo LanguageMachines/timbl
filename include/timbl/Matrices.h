@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -43,15 +43,15 @@ class SparseSymetricMatrix {
 
  public:
   void Clear() { my_mat.clear(); };
-  void Assign( Class i, Class j, double d ){ 
+  void Assign( Class i, Class j, double d ){
     if ( i == j )
       return;
     if ( i <j )
-      my_mat[j][i] = d; 
+      my_mat[j][i] = d;
       else
-	my_mat[i][j] = d; 
+	my_mat[i][j] = d;
   };
-  double Extract( Class i, Class j ) const { 
+  double Extract( Class i, Class j ) const {
     if ( i == j ){
       return 0.0;
     }
@@ -60,7 +60,7 @@ class SparseSymetricMatrix {
       if ( it1 != my_mat.end() ){
 	typename CDmap::const_iterator it2 = it1->second.find(i);
 	if ( it2 != it1->second.end() ){
-	  return it2->second; 
+	  return it2->second;
 	}
       }
     }
@@ -69,7 +69,7 @@ class SparseSymetricMatrix {
       if ( it1 != my_mat.end() ){
 	typename CDmap::const_iterator it2 = it1->second.find(j);
 	if ( it2 != it1->second.end() ){
-	  return it2->second; 
+	  return it2->second;
 	}
       }
     }
@@ -119,7 +119,7 @@ inline std::ostream& operator << (std::ostream& os,
     }
     ++it1;
   }
-  return os; 
+  return os;
 }
 
 #endif // TIMBL_MATRICES_H

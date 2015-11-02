@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -55,20 +55,20 @@ namespace Timbl {
   using namespace Common;
 
   size_t Vfield::Index() { return value->Index(); }
-  
+
   ostream& operator<<(ostream& os, const Vfield *vd ) {
     return vd->put( os );
   }
-  
+
   ostream& operator<<(ostream& os, const Vfield& vd ) {
     return vd.put( os );
   }
-  
+
   ostream& Vfield::put( ostream& os ) const {
     os << value << " " << weight;
     return os;
   }
-  
+
   inline int random_number( int Min, int Max ){
     // calculate a random integer within the interval [min,max]
     if ( Min == Max )
@@ -77,13 +77,13 @@ namespace Timbl {
     randnum *= (Max-Min);
     randnum += Min;
     return (int)floor(randnum+0.5);
-  }  
+  }
 
-  void ValueDistribution::clear(){ 
+  void ValueDistribution::clear(){
     VDlist::iterator it;
     for ( it = distribution.begin(); it != distribution.end(); ++it )
       delete it->second;
-    distribution.clear(); 
+    distribution.clear();
     total_items = 0;
   }
 
@@ -96,7 +96,7 @@ namespace Timbl {
     }
     return 0.0;
   }
-  
+
   void ValueDistribution::DistToString( string& DistStr, double minf ) const {
     ostringstream oss;
     VDlist::const_iterator it = distribution.begin();
@@ -142,14 +142,14 @@ namespace Timbl {
     oss << " }";
     DistStr = oss.str();
   }
-  
+
   class dblCmp {
   public:
     bool operator() ( const double d1, const double d2 ) const {
       return d1 - d2 > Epsilon;
     }
   };
-  
+
   void ValueDistribution::DistToStringWW( string& DistStr, int beam ) const {
     double minw = 0.0;
     if ( beam > 0 ){
@@ -162,7 +162,7 @@ namespace Timbl {
       }
       int cnt=0;
       std::set<double, dblCmp>::iterator rit = freqs.begin();
-      while ( rit != freqs.end() && cnt < beam ) { 
+      while ( rit != freqs.end() && cnt < beam ) {
 	++cnt;
 	if ( cnt < beam )
 	  ++rit;
@@ -173,7 +173,7 @@ namespace Timbl {
     DistToString( DistStr, minw );
   }
 
-  void WValueDistribution::DistToStringWW( string& DistStr, 
+  void WValueDistribution::DistToStringWW( string& DistStr,
 					   int beam ) const {
     double minw = 0.0;
     if ( beam > 0 ){
@@ -186,7 +186,7 @@ namespace Timbl {
       }
       int cnt=0;
       std::set<double, dblCmp>::iterator rit = wgths.begin();
-      while ( rit != wgths.end() && cnt < beam ) { 
+      while ( rit != wgths.end() && cnt < beam ) {
 	++cnt;
 	if ( cnt < beam )
 	  ++rit;
@@ -196,13 +196,13 @@ namespace Timbl {
     }
     DistToString( DistStr, minw );
   }
-  
+
   const string ValueDistribution::DistToString() const {
     string result;
     DistToString( result );
     return result;
   }
-  
+
   const string ValueDistribution::DistToStringW( int beam ) const {
     string result;
     DistToStringWW( result, beam );
@@ -241,7 +241,7 @@ namespace Timbl {
       ++it;
     }
   }
-  
+
   void WValueDistribution::Normalize_1( double factor, const Target *targ ) {
     for ( unsigned int i=0; i < targ->ValuesArray.size(); ++i ){
       // search for val, if not there: add entry with frequency factor;
@@ -251,7 +251,7 @@ namespace Timbl {
       VDlist::const_iterator it = distribution.find( id );
       if ( it != distribution.end() ){
 	it->second->SetWeight( it->second->Weight() + factor );
-      }  
+      }
       else {
 	distribution[id] = new Vfield( val, 1, factor );
       }
@@ -259,7 +259,7 @@ namespace Timbl {
     total_items += targ->ValuesArray.size();
     Normalize();
   }
-  
+
   void WValueDistribution::Normalize_2( ) {
     VDlist::iterator it = distribution.begin();
     while ( it != distribution.end() ){
@@ -268,7 +268,7 @@ namespace Timbl {
     }
     Normalize();
   }
-  
+
   ValueDistribution *ValueDistribution::to_VD_Copy( ) const {
     ValueDistribution *res = new ValueDistribution();
     size_t key;
@@ -319,15 +319,15 @@ namespace Timbl {
     result->total_items = total_items;
     return result;
   }
-  
-  
+
+
   //
   // special functions to serialize distibutions including both frequency
   // AND weight information. Needed for store/retrieve InstanceBases
   //
   // First hashed variant:
   //
-  
+
   const string ValueDistribution::SaveHashed() const{
     ostringstream oss;
     VDlist::const_iterator it = distribution.begin();
@@ -357,7 +357,7 @@ namespace Timbl {
       if ( f->frequency > 0 ){
 	if ( !first )
 	  oss << ", ";
-	oss << f->Value()->Index() << " " 
+	oss << f->Value()->Index() << " "
 	    << f->frequency << " " << f->weight;
 	first = false;
       }
@@ -417,7 +417,7 @@ namespace Timbl {
     distribution[val->Index()] = temp;
     total_items += freq;
   }
-  
+
   void WValueDistribution::SetFreq( const TargetValue *val, const int freq,
 				    double sw ){
     // add entry with frequency freq;
@@ -426,13 +426,13 @@ namespace Timbl {
     distribution[val->Index()] = temp;
     total_items += freq;
   }
-  
-  bool ValueDistribution::IncFreq( const TargetValue *val, 
-				   size_t occ, 
+
+  bool ValueDistribution::IncFreq( const TargetValue *val,
+				   size_t occ,
 				   double ){
     // search for val, if not there: add entry with frequency 'occ';
     // otherwise increment the freqency
-    size_t id = val->Index(); 
+    size_t id = val->Index();
     VDlist::const_iterator it = distribution.find( id );
     if ( it != distribution.end() ){
       it->second->IncFreq( occ );
@@ -442,25 +442,25 @@ namespace Timbl {
     total_items += occ;
     return true;
   }
-  
-  bool WValueDistribution::IncFreq( const TargetValue *val, 
+
+  bool WValueDistribution::IncFreq( const TargetValue *val,
 				    size_t occ,
 				    double sw ){
     // search for val, if not there: add entry with frequency 'occ';
     // otherwise increment the freqency
     // also set sample weight
-    size_t id = val->Index(); 
+    size_t id = val->Index();
     VDlist::const_iterator it = distribution.find( id );
     if ( it != distribution.end() ){
       it->second->IncFreq( occ );
-    }  
+    }
     else {
       distribution[id] = new Vfield( val, occ, sw );
     }
     total_items += occ;
     return fabs( distribution[id]->Weight() - sw ) > Epsilon;
   }
-  
+
   void ValueDistribution::DecFreq( const TargetValue *val ){
     // search for val, if not there, just forget
     // otherwise decrement the freqency
@@ -468,9 +468,9 @@ namespace Timbl {
     if ( it != distribution.end() ){
       it->second->DecFreq();
       total_items -= 1;
-    }  
+    }
   }
-  
+
   void ValueDistribution::Merge( const ValueDistribution& VD ){
     VDlist::const_iterator It = VD.distribution.begin();
     size_t key;
@@ -481,7 +481,7 @@ namespace Timbl {
       if ( distribution.find(key) != distribution.end() ){
 	distribution[key]->AddFreq( vd->Freq() );
       }
-      else 
+      else
 	// VD might be weighted. But we don't need/want that info here
 	// Weight == Freq is more convenient
 	distribution[key] = new Vfield( vd->Value(), vd->Freq(),
@@ -491,7 +491,7 @@ namespace Timbl {
     total_items += VD.total_items;
   }
 
-  void WValueDistribution::MergeW( const ValueDistribution& VD, 
+  void WValueDistribution::MergeW( const ValueDistribution& VD,
 				   double Weight ){
     VDlist::const_iterator It = VD.distribution.begin();
     while ( It != VD.distribution.end() ){
@@ -512,7 +512,7 @@ namespace Timbl {
   const TargetValue *ValueDistribution::BestTarget( bool& tie,
 						    bool do_rand ) const {
     // get the most frequent target from the distribution.
-    // In case of a tie take the one which is GLOBALLY the most frequent, 
+    // In case of a tie take the one which is GLOBALLY the most frequent,
     // OR (if do_rand) take random one of the most frequents
     // and signal if this ties also!
     const TargetValue *best = NULL;
@@ -573,11 +573,11 @@ namespace Timbl {
     }
     return best;
   }
-  
+
   const TargetValue *WValueDistribution::BestTarget( bool& tie,
 						     bool do_rand ) const {
     // get the most frequent target from the distribution.
-    // In case of a tie take the one which is GLOBALLY the most frequent, 
+    // In case of a tie take the one which is GLOBALLY the most frequent,
     // OR (if do_rand) take random one of the most frequents
     // and signal if this ties also!
     const TargetValue *best = NULL;
@@ -611,7 +611,7 @@ namespace Timbl {
 	}
 	return NULL;
       }
-      else { 
+      else {
 	best = It->second->Value();
 	++It;
 	while ( It != distribution.end() ){
@@ -620,7 +620,7 @@ namespace Timbl {
 	    best = It->second->Value();
 	    Max = It->second->Weight();
 	  }
-	  else 
+	  else
 	    if ( abs(It->second->Weight() - Max) < Epsilon ) {
 	      tie = true;
 	      if ( It->second->Value()->ValFreq() > best->ValFreq() ){
@@ -635,7 +635,7 @@ namespace Timbl {
     return best;
   }
 
-  Feature::Feature( Hash::StringHash *T ): 
+  Feature::Feature( Hash::StringHash *T ):
     BaseFeatTargClass(T),
     metric_matrix( 0 ),
     metric( 0 ),
@@ -664,7 +664,7 @@ namespace Timbl {
   Feature::Feature( const Feature& in ): BaseFeatTargClass( in ){
     *this = in;
   }
-  
+
   Feature& Feature::operator=( const Feature& in ){
     if ( this != &in ){
       metric_matrix = in.metric_matrix;
@@ -692,7 +692,7 @@ namespace Timbl {
     }
     return *this;
   }
-  
+
   void Feature::InitSparseArrays(){
     if ( !is_copy ){
       // Loop over all values.
@@ -707,13 +707,13 @@ namespace Timbl {
 	  //
 	  ValueDistribution::dist_iterator It = FV->TargetDist.begin();
 	  while ( It != FV->TargetDist.end() ){
-	    FV->ValueClassProb->Assign( It->second->Index(), 
+	    FV->ValueClassProb->Assign( It->second->Index(),
 					It->second->Freq()/(double)freq );
 	    ++It;
 	  }
 	}
 	++it;
-      } 
+      }
     }
   }
 
@@ -731,7 +731,7 @@ namespace Timbl {
   bool dd_less( const D_D* dd1, const D_D* dd2 ){
     return dd1->value < dd2->value;
   }
-  
+
   void Feature::NumStatistics( vector<FeatureValue *>& FVBin,
 			       double DBentropy,
 			       int BinSize ){
@@ -789,7 +789,7 @@ namespace Timbl {
     // Info gain.
     //
     info_gain = DBentropy - entropy;
-    
+
     // And the split info.
     //
     split_info = 0.0;
@@ -798,7 +798,7 @@ namespace Timbl {
       if ( Freq > 0 ){
 	Prob = Freq / (double)TotalVals;
 	split_info += Prob * Log2(Prob);
-      } 
+      }
     }
     split_info = -split_info;
     // Gain ratio.
@@ -811,15 +811,15 @@ namespace Timbl {
     else
       gain_ratio = info_gain / split_info;
   }
- 
-  void Feature::Statistics( double DBentropy, Target *Targets, bool full ){ 
+
+  void Feature::Statistics( double DBentropy, Target *Targets, bool full ){
     Statistics( DBentropy );
     if ( full ){
       ChiSquareStatistics( Targets );
       SharedVarianceStatistics( Targets, EffectiveValues() );
     }
   }
-  
+
   void Feature::NumStatistics( double DBentropy, Target *Targets,
 			       int BinSize, bool full ){
     char dumname[80];
@@ -831,7 +831,7 @@ namespace Timbl {
     NumStatistics( FVBin, DBentropy, BinSize );
     if ( full ){
       ChiSquareStatistics( FVBin, BinSize, Targets );
-      int cnt = 0;   // count effective values in Bin 
+      int cnt = 0;   // count effective values in Bin
       for( int i=0; i < BinSize; ++i ){
 	if ( FVBin[i]->ValFreq() > 0 )
 	  cnt++;
@@ -864,8 +864,8 @@ namespace Timbl {
 	entropy += -FVEntropy * Freq / (double)TotalVals;
       }
       ++it;
-    } 
-    
+    }
+
     entropy = fabs( entropy );
     // Info. gain.
     //
@@ -883,7 +883,7 @@ namespace Timbl {
 	split_info += Prob * Log2(Prob);
       }
       ++it;
-    } 
+    }
     split_info = -split_info;
     // Gain ratio.
     //
@@ -893,7 +893,7 @@ namespace Timbl {
       gain_ratio = info_gain / split_info;
   }
 
-  void Feature::ChiSquareStatistics( vector<FeatureValue *>& FVA, 
+  void Feature::ChiSquareStatistics( vector<FeatureValue *>& FVA,
 				     size_t Num_Vals,
 				     Target *Targets ){
     chi_square = 0.0;
@@ -901,8 +901,8 @@ namespace Timbl {
     double tmp;
     size_t Size = Targets->ValuesArray.size();
     if ( !n_dot_j ) {
-      n_dot_j = new long int[Size]; 
-      n_i_dot = new long int[Num_Vals]; 
+      n_dot_j = new long int[Size];
+      n_i_dot = new long int[Num_Vals];
       SaveSize = Size;
       SaveNum = Num_Vals;
     }
@@ -972,8 +972,8 @@ namespace Timbl {
     size_t Size = Targets->ValuesArray.size();
     size_t Num_Vals = ValuesArray.size();
     if ( !n_dot_j ) {
-      n_dot_j = new long int[Size]; 
-      n_i_dot = new long int[Num_Vals]; 
+      n_dot_j = new long int[Size];
+      n_i_dot = new long int[Num_Vals];
       SaveSize = Size;
       SaveNum = Num_Vals;
     }
@@ -1046,7 +1046,7 @@ namespace Timbl {
     }
   }
 
-  double Feature::fvDistance( FeatureValue *F, FeatureValue *G, 
+  double Feature::fvDistance( FeatureValue *F, FeatureValue *G,
 			      size_t limit ) const {
     bool dummy;
     double result = 0.0;
@@ -1065,14 +1065,14 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   ostream& operator<<(ostream& os, const ValueDistribution& vd ) {
     string tmp;
     vd.DistToString( tmp );
     os << tmp;
     return os;
   }
-  
+
   ostream& operator<<(ostream& os, const ValueDistribution *vd ) {
     string tmp = "{null}";
     if( vd )
@@ -1080,8 +1080,8 @@ namespace Timbl {
     os << tmp;
     return os;
   }
-  
-  ValueDistribution *ValueDistribution::read_distribution( istream &is, 
+
+  ValueDistribution *ValueDistribution::read_distribution( istream &is,
 							   Target *Targ,
 							   bool do_fr ){
     // read a distribution from stream is into Target
@@ -1147,9 +1147,9 @@ namespace Timbl {
     }
     return result;
   }
-  
-  
-  ValueDistribution *ValueDistribution::read_distribution_hashed( istream &is, 
+
+
+  ValueDistribution *ValueDistribution::read_distribution_hashed( istream &is,
 								  Target *Targ,
 								  bool do_fr ){
 
@@ -1216,8 +1216,8 @@ namespace Timbl {
     }
     return result;
   }
-  
-   
+
+
   ostream& operator<<( std::ostream& os, ValueClass const *vc ){
     if ( vc ){
       os << vc->Name();
@@ -1226,26 +1226,26 @@ namespace Timbl {
       os << "*FV-NF*";
     return os;
   }
-  
+
   FeatureValue::FeatureValue( const std::string& value,
 			      size_t hash_val ):
     ValueClass( value, hash_val ), ValueClassProb( NULL ) {
   }
-  
+
   FeatureValue::FeatureValue( const string& s ):
     ValueClass( s, 0 ),
-    ValueClassProb(NULL){ 
-    Frequency = 0; 
+    ValueClassProb(NULL){
+    Frequency = 0;
   }
-  
+
   FeatureValue::~FeatureValue( ){
     delete ValueClassProb;
   }
-  
+
   TargetValue::TargetValue( const std::string& value,
 			    size_t value_hash ):
     ValueClass( value, value_hash ){}
-  
+
   size_t BaseFeatTargClass::EffectiveValues() const {
     size_t result = 0;
     VCarrtype::const_iterator it = ValuesArray.begin();
@@ -1256,7 +1256,7 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   size_t BaseFeatTargClass::TotalValues() const {
     size_t result = 0;
     VCarrtype::const_iterator it = ValuesArray.begin();
@@ -1266,7 +1266,7 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   FeatureValue *Feature::Lookup( const string& str ) const {
     FeatureValue *result = NULL;
     unsigned int index = TokenTree->Lookup( str );
@@ -1278,14 +1278,14 @@ namespace Timbl {
     return result;
   }
 
-  FeatureValue *Feature::add_value( const string& valstr, 
-				    TargetValue *tv, 
+  FeatureValue *Feature::add_value( const string& valstr,
+				    TargetValue *tv,
 				    int freq ){
     unsigned int hash_val = TokenTree->Hash( valstr );
     return add_value( hash_val, tv, freq );
   }
-  
-  FeatureValue *Feature::add_value( size_t index, 
+
+  FeatureValue *Feature::add_value( size_t index,
 				    TargetValue *tv,
 				    int freq ){
     IVCmaptype::const_iterator it = ValuesMap.find( index );
@@ -1306,8 +1306,8 @@ namespace Timbl {
       result->TargetDist.IncFreq(tv, freq );
     return result;
   }
-  
-  bool Feature::increment_value( FeatureValue *FV, 
+
+  bool Feature::increment_value( FeatureValue *FV,
 				 TargetValue *tv ){
     bool result = false;
     if ( FV ){
@@ -1318,7 +1318,7 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   bool Feature::decrement_value( FeatureValue *FV, TargetValue *tv ){
     bool result = false;
     if ( FV ){
@@ -1329,7 +1329,7 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   bool Feature::AllocSparseArrays( size_t Dim ){
     // Loop over all values.
     //
@@ -1343,7 +1343,7 @@ namespace Timbl {
 	}
       }
       ++it;
-    } 
+    }
     return true;
   }
 
@@ -1365,7 +1365,7 @@ namespace Timbl {
     TokenTree( T ),
     is_copy(false){
   }
-  
+
   BaseFeatTargClass::BaseFeatTargClass( const BaseFeatTargClass& in ):
     MsgClass( in ),
     TokenTree( in.TokenTree ){
@@ -1373,7 +1373,7 @@ namespace Timbl {
     ValuesMap = in.ValuesMap;
     is_copy = true;
   }
-  
+
   BaseFeatTargClass::~BaseFeatTargClass(){
     if ( !is_copy ){
       VCarrtype::iterator it = ValuesArray.begin();
@@ -1384,7 +1384,7 @@ namespace Timbl {
     }
     ValuesMap.clear();
   }
-  
+
   TargetValue *Target::Lookup( const string& str ) const {
     TargetValue *result = 0;
     size_t index = TokenTree->Lookup( str );
@@ -1407,7 +1407,7 @@ namespace Timbl {
 	delete [] n_i_dot;
       }
       delete_matrix();
-      delete metric; 
+      delete metric;
     }
   }
 
@@ -1423,16 +1423,16 @@ namespace Timbl {
     }
     return false;
   }
-  
+
   size_t Feature::matrix_byte_size() const {
     if ( metric_matrix )
       return metric_matrix->NumBytes();
     else
       return 0;
   }
-  
+
   FeatVal_Stat Feature::prepare_numeric_stats(){
-    double tmp; 
+    double tmp;
     size_t freq;
     bool first = true;
     VCarrtype::const_iterator it = ValuesArray.begin();
@@ -1441,7 +1441,7 @@ namespace Timbl {
       freq = fv->ValFreq();
       if ( freq > 0 ){
 	if ( !stringTo<double>( fv->Name(), tmp ) ){
-	  Warning( "a Non Numeric value '" + 
+	  Warning( "a Non Numeric value '" +
 		   string(fv->Name()) +
 		   "' in Numeric Feature!" );
 	  return NotNumeric;
@@ -1476,7 +1476,7 @@ namespace Timbl {
     else
       shared_variance = chi_square / (double)( NumInst * k );
   }
-  
+
   void Feature::StandardDeviationStatistics( ){
     double sum = 0.0;
     vector<double> store( ValuesArray.size() );
@@ -1493,14 +1493,14 @@ namespace Timbl {
     }
     standard_deviation = sqrt( total / ValuesArray.size() );
   }
-  
+
   void Feature::clear_matrix(){
     if ( PrestoreStatus == ps_read )
       return;
     else
       delete_matrix();
   }
-  
+
   void Feature::delete_matrix(){
     if ( metric_matrix ){
       metric_matrix->Clear();
@@ -1509,18 +1509,18 @@ namespace Timbl {
     metric_matrix = 0;
     PrestoreStatus = ps_undef;
   }
-  
-  bool Feature::setMetricType( const MetricType M ){ 
+
+  bool Feature::setMetricType( const MetricType M ){
     if ( !metric || ( metric && M != metric->type() ) ){
-      delete metric; 
-      metric = getMetricClass(M); 
+      delete metric;
+      metric = getMetricClass(M);
       return true;
     }
     else {
       return false;
     }
   }
-  
+
   MetricType Feature::getMetricType() const { return metric->type(); }
 
   bool Feature::store_matrix( int limit){
@@ -1582,7 +1582,7 @@ namespace Timbl {
       os << "(Null SA)";
     return os;
   }
-  
+
   void Feature::print_vc_pb_array( ostream &os ) const {
     VCarrtype::const_iterator it = ValuesArray.begin();
     while ( it != ValuesArray.end() ){
@@ -1593,7 +1593,7 @@ namespace Timbl {
       ++it;
     }
   }
-  
+
   bool Feature::read_vc_pb_array( istream &is ){
     const char*p;
     unsigned int Num = 0;
@@ -1721,6 +1721,7 @@ namespace Timbl {
     //
     int old_prec = os.precision();
     os.setf( ios::scientific );
+    os.unsetf(std::ios_base::floatfield);
     if ( full ){
       VCarrtype::const_iterator it1 = ValuesArray.begin();
       while ( it1 != ValuesArray.end() ){
@@ -1728,23 +1729,24 @@ namespace Timbl {
 	os.width(6);
 	os.setf(ios::left, ios::adjustfield);
 	os << FV_i << ":";
-	os.width(12); 
+	os.width(12);
 	os.precision(3);
 	os.setf(ios::right, ios::adjustfield);
 	VCarrtype::const_iterator it2 = ValuesArray.begin();
 	while ( it2 !=  ValuesArray.end() ){
 	  FeatureValue *FV_j = (FeatureValue *)(*it2);
-	  os.width(12); 
+	  os.width(12);
 	  os.precision(3);
 	  os.setf(ios::right, ios::adjustfield);
 	  if ( FV_i->ValFreq() < matrix_clip_freq ||
 	       FV_j->ValFreq() < matrix_clip_freq ){
 	    os << "*";
 	  }
-	  else
+	  else {
 	    os << metric_matrix->Extract(FV_i,FV_j);
+	  }
 	  ++it2;
-	} 
+	}
 	os << endl;
 	++it1;
       }
@@ -1754,12 +1756,12 @@ namespace Timbl {
     }
     os << setprecision( old_prec );
   }
-  
+
   TargetValue *Target::add_value( const string& valstr, int freq ){
     unsigned int hash_val = TokenTree->Hash( valstr );
     return add_value( hash_val, freq );
   }
-  
+
   TargetValue *Target::add_value( size_t index, int freq ){
     IVCmaptype::const_iterator it = ValuesMap.find( index );
     if(  it == ValuesMap.end() ){
@@ -1776,7 +1778,7 @@ namespace Timbl {
     }
     return (TargetValue *)ValuesMap[index];
   }
-  
+
   TargetValue *Target::MajorityClass() const {
     ValueClass *result = 0;
     size_t freq = 0;
@@ -1799,7 +1801,7 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   bool Target::decrement_value( TargetValue *TV ){
     bool result = false;
     if ( TV ){
@@ -1808,11 +1810,11 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   Instance::Instance():
     TV(NULL), sample_weight(0.0), occ(1) {
   }
-  
+
   Instance::~Instance(){
     clear();
   }
@@ -1830,11 +1832,11 @@ namespace Timbl {
     sample_weight = 0.0;
     occ = 1;
   }
-  
+
   void Instance::Init( size_t len ){
     FV.resize( len, 0 );
   }
-  
+
   ostream& operator<<(ostream& os, const Instance *I ){
     if ( I ){
       os << *I;
@@ -1843,14 +1845,14 @@ namespace Timbl {
       os << " Empty Instance";
     return os;
   }
-  
+
   ostream& operator<<(ostream& os, const Instance& I ){
     for ( unsigned int i=0; i < I.FV.size(); ++i )
       os << I.FV[i] << ", ";
     os << I.TV << " " << I.sample_weight;
     return os;
   }
-  
+
   void Instance::permute( const std::vector<size_t> permutation ){
     std::vector<FeatureValue *> vals( FV.size(), 0 );
     for ( size_t i=0; i < FV.size(); ++i ){
@@ -1860,5 +1862,5 @@ namespace Timbl {
       FV[i] = vals[i];
     }
   }
-  
+
 }
