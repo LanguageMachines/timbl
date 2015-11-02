@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -34,11 +34,13 @@
 #include <vector>
 #include <map>
 #include "timbl/MsgClass.h"
-#include "timbl/Matrices.h"
 #include "ticcutils/TreeHash.h"
 
+template<typename T>
+class SparseSymetricMatrix;
+
 namespace Timbl {
-  
+
   enum FeatVal_Stat { Unknown, Singleton, SingletonNumeric, NumericValue,
 		      NotNumeric };
 
@@ -72,7 +74,7 @@ namespace Timbl {
   private:
     Vfield& operator=( const Vfield& );
   };
-  
+
   class Target;
 
   class WValueDistribution;
@@ -98,9 +100,9 @@ namespace Timbl {
     virtual void SetFreq( const TargetValue *, int, double=1.0 );
     virtual bool IncFreq( const TargetValue *, size_t, double=1.0 );
     void DecFreq( const TargetValue * );
-    static ValueDistribution *read_distribution( std::istream &, 
+    static ValueDistribution *read_distribution( std::istream &,
 						 Target *, bool );
-    static ValueDistribution *read_distribution_hashed( std::istream &, 
+    static ValueDistribution *read_distribution_hashed( std::istream &,
 							Target *, bool );
     const std::string DistToString() const;
     const std::string DistToStringW( int ) const;
@@ -116,7 +118,7 @@ namespace Timbl {
     virtual void DistToStringWW( std::string&, int ) const;
     const TargetValue* BestTargetN( bool &, bool = false ) const;
     const TargetValue* BestTargetW( bool &, bool = false ) const;
-    virtual ValueDistribution *clone( ) const { 
+    virtual ValueDistribution *clone( ) const {
       return new ValueDistribution(); };
     size_t total_items;
     VDlist distribution;
@@ -138,7 +140,7 @@ namespace Timbl {
   private:
     void DistToString( std::string&, double=0 ) const;
     void DistToStringWW( std::string&, int ) const;
-    WValueDistribution *clone() const { 
+    WValueDistribution *clone() const {
       return new WValueDistribution; };
   };
 
@@ -162,12 +164,12 @@ namespace Timbl {
     ValueClass( const ValueClass& );
     ValueClass& operator=( const ValueClass& );
   };
-  
+
   class TargetValue: public ValueClass {
   public:
     TargetValue( const std::string&, size_t );
   };
-  
+
   class SparseValueProbClass {
     friend std::ostream& operator<< ( std::ostream&, SparseValueProbClass * );
   public:
@@ -177,12 +179,12 @@ namespace Timbl {
     void Assign( const size_t i, const double d ) { vc_map[i] = d; };
     void Clear() { vc_map.clear(); };
     IDiterator begin() const { return vc_map.begin(); };
-    IDiterator end() const { return vc_map.end(); };    
+    IDiterator end() const { return vc_map.end(); };
   private:
     IDmaptype vc_map;
     size_t dimension;
   };
-  
+
   class FeatureValue: public ValueClass {
     friend class Feature;
     friend struct D_D;
@@ -190,7 +192,7 @@ namespace Timbl {
     FeatureValue( const std::string& );
     FeatureValue( const std::string&, size_t );
     ~FeatureValue();
-    void ReconstructDistribution( const ValueDistribution& vd ) { 
+    void ReconstructDistribution( const ValueDistribution& vd ) {
       TargetDist.Merge( vd );
       Frequency = TargetDist.totalSize();
     };
@@ -202,7 +204,7 @@ namespace Timbl {
     FeatureValue( const FeatureValue& );
     FeatureValue& operator=( const FeatureValue& );
   };
-    
+
   typedef std::map< size_t, ValueClass *> IVCmaptype;
   typedef std::vector<ValueClass *> VCarrtype;
 
@@ -222,8 +224,8 @@ namespace Timbl {
   private:
     BaseFeatTargClass& operator=( const BaseFeatTargClass& );
   };
-  
-  
+
+
   class Target: public BaseFeatTargClass {
   public:
   Target( Hash::StringHash *T ): BaseFeatTargClass(T) {};
@@ -287,7 +289,7 @@ namespace Timbl {
     FeatVal_Stat prepare_numeric_stats();
     void Statistics( double, Target *, bool );
     void NumStatistics( double, Target *, int, bool );
-    void ClipFreq( size_t f ){ matrix_clip_freq = f; };  
+    void ClipFreq( size_t f ){ matrix_clip_freq = f; };
     size_t ClipFreq() const { return matrix_clip_freq; };
     SparseSymetricMatrix<FeatureValue *> *metric_matrix;
  private:
@@ -323,7 +325,7 @@ namespace Timbl {
     Feature( const Feature& );
     Feature& operator=( const Feature& );
   };
-  
+
   class Instance {
     friend std::ostream& operator<<(std::ostream&, const Instance& );
     friend std::ostream& operator<<(std::ostream&, const Instance * );
@@ -333,8 +335,8 @@ namespace Timbl {
     ~Instance();
     void Init( size_t );
     void clear();
-    double ExemplarWeight() const { return sample_weight; }; 
-    void ExemplarWeight( const double sw ){ sample_weight = sw; }; 
+    double ExemplarWeight() const { return sample_weight; };
+    void ExemplarWeight( const double sw ){ sample_weight = sw; };
     int Occurrences() const { return occ; };
     void Occurrences( const int o ) { occ = o; };
     size_t size() const { return FV.size(); };
@@ -345,6 +347,6 @@ namespace Timbl {
     double sample_weight; // relative weight
     int occ;
   };
-  
+
 }
 #endif

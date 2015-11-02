@@ -46,6 +46,7 @@
 #include "timbl/MsgClass.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
+#include "timbl/Matrices.h"
 #include "timbl/Metrics.h"
 
 using namespace std;
