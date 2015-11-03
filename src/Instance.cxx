@@ -1721,7 +1721,7 @@ namespace Timbl {
     // Print the matrix.
     //
     int old_prec = os.precision();
-    os.setf( ios::scientific );
+    ios::fmtflags old_flags = os.flags();
     os.unsetf(std::ios_base::floatfield);
     if ( full ){
       VCarrtype::const_iterator it1 = ValuesArray.begin();
@@ -1738,7 +1738,7 @@ namespace Timbl {
 	  FeatureValue *FV_j = (FeatureValue *)(*it2);
 	  os.width(12);
 	  os.precision(3);
-	  os.setf(ios::right, ios::adjustfield);
+	  os.setf(ios::right,ios::adjustfield );
 	  if ( FV_i->ValFreq() < matrix_clip_freq ||
 	       FV_j->ValFreq() < matrix_clip_freq ){
 	    os << "*";
@@ -1756,6 +1756,7 @@ namespace Timbl {
       os << *metric_matrix << endl;
     }
     os << setprecision( old_prec );
+    os.flags( old_flags );
   }
 
   TargetValue *Target::add_value( const string& valstr, int freq ){
