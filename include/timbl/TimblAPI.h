@@ -51,31 +51,9 @@ namespace Timbl{
   enum Algorithm { UNKNOWN_ALG, IB1, IB2, IGTREE, TRIBL, TRIBL2, LOO, CV };
   enum Weighting { UNKNOWN_W, UD, NW, GR, IG, X2, SV, SD };
 
-  class TimblOpts {
-    friend class TimblAPI;
-    friend std::ostream& operator<<( std::ostream&, const TimblOpts&  );
-  public:
-    TimblOpts( const int, const char * const * );
-    TimblOpts( const std::string& );
-    ~TimblOpts();
-    bool Find( char, std::string&, bool& ) const;
-    bool Find( const std::string&, std::string& ) const;
-    bool Find( const std::string&, std::string&, bool& ) const;
-    void Add( char, const std::string&, bool );
-    void Add( const std::string&, const std::string& );
-    bool Delete( char );
-    bool Delete( const std::string& );
-    CL_Options *getPimpl()const { return pimpl; };
-  private:
-    CL_Options *pimpl;
-    TimblOpts( const TimblOpts& );
-    TimblOpts& operator=( const TimblOpts& );
-  };
-
   class TimblAPI {
     friend class TimblExperiment;
   public:
-    TimblAPI( const TimblOpts *, const std::string& = "" );
     TimblAPI( const TiCC::CL_Options&, const std::string& = "" );
     TimblAPI( const std::string&,  const std::string& = "" );
     TimblAPI( const TimblAPI& );
@@ -146,7 +124,7 @@ namespace Timbl{
     bool ShowIBInfo( std::ostream& ) const;
     bool ShowStatistics( std::ostream& ) const;
     bool SetOptions( const std::string& );
-    bool SetIndirectOptions( const TimblOpts&  );
+    bool SetIndirectOptions( const TiCC::CL_Options&  );
     bool SetThreads( int c );
     Algorithm Algo() const;
     InputFormatType getInputFormat() const;

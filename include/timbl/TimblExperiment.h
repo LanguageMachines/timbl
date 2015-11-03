@@ -38,6 +38,10 @@
 #include "timbl/Statistics.h"
 #include "timbl/MBLClass.h"
 
+namespace TiCC {
+  class CL_Options;
+}
+
 namespace Timbl {
 
   class TimblAPI;

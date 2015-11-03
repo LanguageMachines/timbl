@@ -64,8 +64,10 @@
 #include "timbl/CommandLine.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
+#include "ticcutils/CommandLine.h"
 #include "ticcutils/XMLtools.h"
 #include "ticcutils/Timer.h"
+#include "ticcutils/PrettyPrint.h"
 
 #ifdef HAVE_OPENMP
 #include <omp.h>
@@ -75,8 +77,6 @@ using namespace std;
 using namespace TiCC;
 
 namespace Timbl {
-#include "ticcutils/PrettyPrint.h"
-  using namespace TiCC;
 
   resultStore::~resultStore( ) {
     clear();
@@ -467,6 +467,7 @@ namespace Timbl {
   }
 
   ostream& operator<< ( ostream& os, const fileIndex& fi ){
+    using TiCC::operator<<;
     fileIndex::const_iterator it = fi.begin();
     while ( it != fi.end() ){
       os << "<";

@@ -77,6 +77,11 @@ string ProbInFile = "";
 string ProbOutFile = "";
 string NamesFile = "";
 
+const string timbl_short_opts = "a:A::b:B:c:C:d:De:f:F:G::hHi:I:k:l:L:m:M:n:N:o:O:p:P:q:QR:s::t:T:u:U:v:w:W:xX:Z%";
+const string timbl_long_opts = "Beam:,clones:,Diversify,occurrences:,sloppy::,silly::,Threshold:,Treeorder:,matrixin:,matrixout:";
+
+const string timbl_indirect_opts = "d:e:G:k:L:m:o:p:QR:t:v:w:x%";
+
 inline void usage_full(void){
   cerr << "usage: timbl -f data-file {-t test-file} [options]" << endl;
   cerr << "Algorithm and Metric options:" << endl;
@@ -304,40 +309,37 @@ string correct_path( const string& filename,
 
 class softExit : public exception {};
 
-void Preset_Values( TimblOpts& Opts ){
-  bool mood;
+void Preset_Values( TiCC::CL_Options& opts ){
   string value;
-  if ( Opts.Find( 'h', value, mood ) ){
+  if ( opts.is_present( 'h' ) ){
     usage_full();
     throw( softExit() );
   }
-  if ( Opts.Find( 'V', value, mood ) ){
+  if ( opts.is_present( 'V' ) ){
     cerr << "TiMBL " << Timbl::BuildInfo() << endl;
     throw( softExit() );
   }
-  if ( Opts.Find( 'S', value, mood ) ){
+  if ( opts.is_present( 'S' ) ){
     cerr << "Server mode is no longer available in timbl" << endl;
     cerr << "Please use the 'timblserver' command instead." << endl;
     throw( softExit() );
   }
-  if ( Opts.Find( 'a', value, mood ) ){
+  if ( opts.extract( 'a', value ) ){
     // the user gave an algorithm
     if ( !string_to( value, algorithm ) ){
       cerr << "illegal -a value: " << value << endl;
       throw( softExit() ); // no chance to proceed
     }
-    Opts.Delete( 'a' );
   }
   else
     algorithm = IB1; // general default
-  Opts.Add( 'a', to_string( algorithm ), false );
-  if ( Opts.Find( 'Z', value, mood ) ){
+  opts.insert( 'a', to_string( algorithm ), false );
+  if ( opts.extract( 'Z', value ) ){
     // Special case
     //    spitting neigborSets only
     Do_NS = true;
-    Opts.Delete( 'Z' );
   }
-  if ( Opts.Find( 't', value, mood ) ){
+  if ( opts.is_present( 't', value ) ){
     if ( value == "cross_validate" )
       // Special case
       //    running Cross Validation
@@ -348,8 +350,8 @@ void Preset_Values( TimblOpts& Opts ){
       Do_LOO = true;
     else if ( value != "" && value[0] == '@' ){
       Do_Indirect = true;
+      opts.remove( 't' );
       get_command_lines( value, ind_lines );
-      Opts.Delete( 't' );
     }
     if ( Do_LOO || Do_CV )
       if ( algorithm != IB1 ){
@@ -357,47 +359,41 @@ void Preset_Values( TimblOpts& Opts ){
 	throw( softExit() ); // no chance to proceed
       }
   }
-  if ( Opts.Find( 'P', value, mood ) ){
+  if ( opts.extract( 'P', value ) ){
     I_Path = value;
-    Opts.Delete( 'P' );
   }
-  if ( Opts.Find( 'O', value, mood ) ){
+  if ( opts.is_present( 'O', value ) ){
     // output path is needed for CV testing
     O_Path = value;
   }
-  if ( Opts.Find( 'f', value, mood ) ){
+  if ( opts.extract( 'f', value ) ){
     dataFile = correct_path( value, I_Path, true );
-    Opts.Delete( 'f' );
   }
-  if ( Opts.Find( 'q', value, mood ) ){
-    Q_value = value;
-  }
-  Opts.Add( 'v', "F", true );
-  Opts.Add( 'v', "S", false );
+  opts.is_present( 'q', Q_value );
+  opts.insert( 'v', "F", true );
+  opts.insert( 'v', "S", false );
   Weighting W = GR;
   // default Weighting = GainRatio
-  if ( Opts.Find( 'w', value, mood ) ){
+  if ( opts.is_present( 'w', value ) ){
     // user specified weighting
     if ( !string_to( value, W ) )
       // no valid weight, hopefully a filename
       return;
     else
       // valid Weight, but maybe a number, so replace
-      Opts.Delete( 'w' );
+      opts.remove( 'w' );
   }
-  Opts.Add( 'w', to_string(W), false );
+  opts.insert( 'w', to_string(W), false );
 }
 
-void Adjust_Default_Values( TimblOpts& Opts ){
-  bool mood;
+void Adjust_Default_Values( TiCC::CL_Options& opts ){
   string value;
-  if ( !Opts.Find( 'm', value, mood ) ){
-    Opts.Add( 'm', "O", false );
+  if ( !opts.is_present( 'm' ) ){
+    opts.insert( 'm', "O", false );
     // Default Metric = Overlap
   }
-  if ( Opts.Find( '%', value, mood ) ){
+  if ( opts.extract( '%' ) ){
     Do_Save_Perc = true;
-    Opts.Delete( '%' );
   }
 }
 
@@ -412,7 +408,7 @@ bool next_test( string& line ){
   return result;
 }
 
-bool get_file_names( TimblOpts& Opts ){
+bool get_file_names( TiCC::CL_Options& opts ){
   TestFile = "";
   OutputFile = "";
   PercFile = "";
@@ -430,9 +426,7 @@ bool get_file_names( TimblOpts& Opts ){
   ProbOutFile = "";
   NamesFile = "";
   string value;
-  bool mood;
-  if ( Opts.Find( 'P', value, mood ) ||
-       Opts.Find( 'f', value, mood ) ){
+  if ( opts.extract( 'P', value ) || opts.extract( 'f', value ) ){
     cerr << "illegal option, value = " << value << endl;
     return false;
   }
@@ -450,31 +444,26 @@ bool get_file_names( TimblOpts& Opts ){
     }
     TestFile = dataFile;
   }
-  else if ( Opts.Find( 't', value, mood ) ){
+  else if ( opts.extract( 't', value ) ){
     TestFile = correct_path( value, I_Path, true );
-    Opts.Delete( 't' );
   }
-  if ( Opts.Find( 'n', value, mood ) ){
+  if ( opts.extract( 'n', value ) ){
     NamesFile = correct_path( value, O_Path, true );
-    Opts.Delete( 'n' );
   }
-  if ( Opts.Find( "matrixout", value ) ){
+  if ( opts.extract( "matrixout", value ) ){
     MatrixOutFile = correct_path( value, O_Path, true );
-    Opts.Delete( "matrixout" );
   }
-  if ( Opts.Find( "matrixin", value ) ){
+  if ( opts.extract( "matrixin", value ) ){
     MatrixInFile = correct_path( value, I_Path, true );
-    Opts.Delete( "matrixin" );
   }
-  if ( Opts.Find( 'o', value, mood ) ){
+  if ( opts.extract( 'o', value ) ){
     if ( Do_CV ){
       cerr << "-o option not possible for Cross Validation testing" << endl;
       return false;
     }
     OutputFile = correct_path( value, O_Path, true );
-    Opts.Delete( 'o' );
   }
-  if ( Opts.Find( "IL", value ) ){
+  if ( opts.extract( "IL", value ) ){
     vector<string> vec;
     int num = TiCC::split_at( value, vec, ":" );
     if ( num > 1 ){
@@ -483,37 +472,31 @@ bool get_file_names( TimblOpts& Opts ){
     }
     else
       levelTreeOutFile = correct_path( value, O_Path, true );
-    Opts.Delete( "IL" );
   }
-  if ( Opts.Find( 'I', value, mood ) ){
+  if ( opts.extract( 'I', value ) ){
     TreeOutFile = correct_path( value, O_Path, true );
-    Opts.Delete( 'I' );
   }
-  if ( Opts.Find( 'X', value, mood ) ){
+  if ( opts.extract( 'X', value ) ){
     XOutFile = correct_path( value, O_Path, true );
-    Opts.Delete( 'X' );
   }
-  if ( Opts.Find( 'i', value, mood ) ){
+  if ( opts.extract( 'i', value ) ){
     TreeInFile = correct_path( value, I_Path, true );
-    Opts.Delete( 'i' );
   }
-  if ( Opts.Find( 'U', value, mood ) ){
+  if ( opts.extract( 'U', value ) ){
     ProbOutFile = correct_path( value, O_Path, true );
-    Opts.Delete( 'U' );
   }
-  if ( Opts.Find( 'u', value, mood ) ){
+  if ( opts.extract( 'u', value ) ){
     if ( algorithm == IGTREE ){
       cerr << "-u option is useless for IGtree" << endl;
       return false;
     }
     ProbInFile = correct_path( value, I_Path, true );
-    Opts.Delete( 'u' );
   }
-  if ( Opts.Find( 'W', value, mood ) ){
+  if ( opts.is_present( 'W', value ) ){
     WgtOutFile = correct_path( value, O_Path, true );
     // leave the option, to signal that we need ALL feature weights
   }
-  if ( Opts.Find( 'w', value, mood ) ){
+  if ( opts.is_present( 'w', value ) ){
     Weighting W;
     if ( !string_to( value, W ) ){
       // No valid weighting, so assume it also has a filename
@@ -526,11 +509,11 @@ bool get_file_names( TimblOpts& Opts ){
 	}
 	WgtInFile = correct_path( parts[0], I_Path, true );
 	WgtType = W;
-	Opts.Delete( 'w' );
+	opts.remove( 'w' );
       }
       else if ( num == 1 ){
 	WgtInFile = correct_path( value, I_Path, true );
-	Opts.Delete( 'w' );
+	opts.remove( 'w' );
       }
       else {
 	cerr << "invalid weighting option: " << value << endl;
@@ -541,9 +524,8 @@ bool get_file_names( TimblOpts& Opts ){
   return true;
 }
 
-bool Default_Output_Names( TimblOpts& Opts ){
+bool Default_Output_Names( TiCC::CL_Options& opts ){
   string value;
-  bool mood;
   if ( OutputFile == "" && TestFile != "" ){
     string temp = correct_path( TestFile, O_Path, false );
     temp += ".";
@@ -585,18 +567,18 @@ bool Default_Output_Names( TimblOpts& Opts ){
     }
     if ( algorithm != IGTREE ){
       temp +=  ".";
-      if ( Opts.Find( 'm', value, mood ) )
-	temp +=  value;
+      if ( opts.is_present( 'm', value ) )
+	temp += value;
       else
 	temp +=  "ErRoR";
-      if ( Opts.Find( 'L', value, mood ) ){
-	temp +=  ".L";
-	temp +=  value;
+      if ( opts.is_present( 'L', value ) ){
+	temp += ".L";
+	temp += value;
       }
     }
     temp +=  ".";
-    if ( Opts.Find( 'w', value, mood ) ){
-      temp +=  value;
+    if ( opts.is_present( 'w', value ) ){
+      temp += value;
     }
     else
       if ( !WgtInFile.empty() )
@@ -604,18 +586,19 @@ bool Default_Output_Names( TimblOpts& Opts ){
       else
 	temp += "gr";
     if ( algorithm != IGTREE ){
-      if ( Opts.Find( 'k', value, mood ) ){
+      if ( opts.is_present( 'k', value ) ){
 	temp +=  ".k";
 	temp +=  value;
       }
       else
 	temp +=  ".k1";
-      if ( Opts.Find( 'd', value, mood ) ){
+      if ( opts.is_present( 'd', value ) ){
 	temp +=  ".";
 	temp +=  value;
       }
     }
-    if ( Opts.Find( 'x', value, mood ) ){
+    bool mood;
+    if ( opts.is_present( 'x', value, mood ) ){
       if ( mood ){
 	temp +=  ".X";
       }
@@ -659,16 +642,25 @@ void Do_Test( TimblAPI *Run ){
     // multiple tests from indirect file
     string tmp_line;
     while ( next_test( tmp_line) ){
-      TimblOpts Opts( tmp_line );
-      Adjust_Default_Values( Opts );
-      if ( !get_file_names( Opts ) || TestFile == "" ){
+      TiCC::CL_Options opts( timbl_indirect_opts, "" );
+      try {
+	opts.init( tmp_line );
+	Adjust_Default_Values( opts );
+      }
+      catch ( TiCC::OptionError& e ){
+	cerr << e.what() << endl;
+	cerr << "Warning: Skipped a line from indirect testfile:\n'"
+	     << tmp_line << "'" << endl;
+	continue;
+      }
+      if ( !get_file_names( opts ) || TestFile == "" ){
 	cerr << "Warning: Skipped a line from indirect testfile:\n'"
 	     << tmp_line << "'" << endl;
 	if ( TestFile == "" )
 	  cerr << "missing a Testfile name " << endl;
       }
-      else if ( Run->SetIndirectOptions( Opts ) ){
-	Default_Output_Names( Opts );
+      else if ( Run->SetIndirectOptions( opts ) ){
+	Default_Output_Names( opts );
 	if ( WgtInFile != "" ) {
 	  if ( !Run->GetWeights( WgtInFile, WgtType ) )
 	    continue;
@@ -732,18 +724,32 @@ int main(int argc, char *argv[]){
       usage();
       return 1;
     }
-    TimblOpts Opts( argc, argv );
-    Preset_Values( Opts );
-    Adjust_Default_Values( Opts );
-    if ( !get_file_names( Opts ) )
+    TiCC::CL_Options opts( timbl_short_opts, timbl_long_opts );
+    try {
+      opts.init( argc, argv );
+    }
+    catch ( TiCC::OptionError& e ){
+      cerr << e.what() << endl;
+      usage();
+      return 666;
+    }
+    Preset_Values( opts );
+    Adjust_Default_Values( opts );
+    if ( !get_file_names( opts ) )
       return 2;
-    TimblAPI *Run = new TimblAPI( &Opts );
+    TimblAPI *Run = new TimblAPI( opts );
     if ( !Run->isValid() ){
       delete Run;
       usage();
       return 3;
     }
-    Default_Output_Names( Opts );
+    Default_Output_Names( opts );
+    vector<string> mas = opts.getMassOpts();
+    if ( !mas.empty() ){
+      cerr << "unknown value in option string: " << mas[0] << endl;
+      usage();
+      return 33;
+    }
     if ( Do_CV ){
       if ( checkInputFile( TestFile ) ){
 	Run->CVprepare( WgtInFile, WgtType, ProbInFile );

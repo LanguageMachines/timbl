@@ -48,56 +48,6 @@ using namespace TiCC;
 
 namespace Timbl {
 
-  TimblOpts::TimblOpts( const int argc, const char * const *argv ):
-    pimpl( new CL_Options( argc, argv ) )
-  {}
-
-  TimblOpts::TimblOpts( const string& args ):
-    pimpl( new CL_Options( args ) )
-  {}
-
-  TimblOpts::~TimblOpts(){
-    delete pimpl;
-  }
-
-  ostream& operator<<( ostream& os, const TimblOpts& opts ){
-    os << *opts.pimpl;
-    return os;
-  }
-
-  bool TimblOpts::Find( char c, string& opt, bool& mood ) const{
-    return pimpl->Find( c, opt, mood );
-  }
-
-  bool TimblOpts::Find( const string& s, string& opt ) const{
-    return pimpl->Find( s, opt );
-  }
-
-  bool TimblOpts::Find( const string& s, string& opt, bool& mood ) const{
-    //
-    // DEPRECATED
-    // is here only for backward compatibility
-    //
-    mood=false;
-    return pimpl->Find( s, opt );
-  }
-
-  void TimblOpts::Add( char c, const string& opt, bool mood ){
-    pimpl->Add( c, opt, mood );
-  }
-
-  void TimblOpts::Add( const string& opt, const string& val ){
-    pimpl->Add( opt, val );
-  }
-
-  bool TimblOpts::Delete( char c ){
-    return pimpl->Delete( c );
-  }
-
-  bool TimblOpts::Delete( const string& s ){
-    return pimpl->Delete( s );
-  }
-
   TimblExperiment *Create_Pimpl( AlgorithmType algo, const string& ex_name,
 				 GetOptClass *opt ){
     TimblExperiment *result = NULL;
@@ -137,23 +87,6 @@ namespace Timbl {
 
   TimblAPI::TimblAPI( ):
     pimpl( 0 ), i_am_fine(false) {
-  }
-
-  TimblAPI::TimblAPI( const TimblOpts *T_Opts,
-		      const string& name ):
-    pimpl(), i_am_fine(false) {
-    if ( T_Opts ){
-      GetOptClass *OptPars = new GetOptClass( *T_Opts->pimpl );
-      if ( !OptPars->parse_options( *T_Opts->pimpl ) )
-	delete OptPars;
-      else if ( OptPars->Algo() != Unknown_a ){
-	pimpl = Create_Pimpl( OptPars->Algo(), name, OptPars );
-      }
-      else {
-	pimpl = Create_Pimpl( IB1_a, name, OptPars );
-      }
-    }
-    i_am_fine = (pimpl != NULL);
   }
 
   TimblAPI::TimblAPI( const TiCC::CL_Options& opts,
@@ -617,8 +550,10 @@ namespace Timbl {
     return Valid() && pimpl->SetOptions( argv );
   }
 
-  bool TimblAPI::SetIndirectOptions( const TimblOpts& O ){
-    return Valid() && pimpl->IndirectOptions( *O.pimpl );
+  bool TimblAPI::SetIndirectOptions( const TiCC::CL_Options& opts ){
+    string bla = opts.toString();
+    CL_Options Opts( bla );
+    return Valid() && pimpl->IndirectOptions( Opts );
   }
 
   string TimblAPI::ExpName() const {
