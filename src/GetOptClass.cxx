@@ -39,7 +39,7 @@
 #include "timbl/Options.h"
 #include "timbl/Instance.h"
 #include "timbl/Metrics.h"
-#include "timbl/CommandLine.h"
+#include "ticcutils/CommandLine.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
 
@@ -95,7 +95,7 @@ namespace Timbl {
     occIn = 0;
   }
 
-  GetOptClass::GetOptClass( CL_Options& Opts ):
+  GetOptClass::GetOptClass( const TiCC::CL_Options& opts ):
     LocalInputFormat( UnknownInputFormat ),
     MaxFeats(-1),
     target_pos(-1),
@@ -108,9 +108,8 @@ namespace Timbl {
     N_present( false ),
     parent_socket_os( 0 ) {
     int MaxF = DEFAULT_MAX_FEATS;
-    bool the_mood;
     string optie;
-    if ( Opts.Find( 'N', optie, the_mood ) ){
+    if ( opts.is_present( 'N', optie ) ){
       N_present = true;
       MaxF = stringTo<int>( optie );
     }
@@ -664,85 +663,47 @@ namespace Timbl {
     return false;
   }
 
-  bool GetOptClass::parse_options( const CL_Options& opts,
+  bool GetOptClass::parse_options( const TiCC::CL_Options& opts,
 				   const int mode ){
     opt_changed = true;
     //    cerr << "options: " << opts << endl;
     //    cerr << "mode: " << mode << endl;
-    const char *q;
-    list<CL_item>::const_iterator curr_opt;
-    curr_opt = opts.Opts.begin();
-    if ( curr_opt == opts.Opts.end() ){
-      return true;
-    }
-    const char *ok_opt;
-    switch ( mode ){
-    case 0:
-      ok_opt = "a:b:B:c:C:d:De:F:G:Hk:l:L:m:M:n:N:o:O:p:q:QR:st:T:v:w:Wx";
-      break;
-    case 1:
-      // limited usage, for @t
-      ok_opt = "d:e:G:k:L:m:p:QR:v:x";
-      break;
-    case 2:
-      // limited usage, for Server
-      ok_opt = "C:d:G:k:l:L:p:Qv:x";
-      break;
-    default:
-      ok_opt = NULL;
-      string msg = string("Invalid value '") + toString(mode)
-	+ "' in switch ("
-	+ __FILE__  + "," + toString(__LINE__) + ")\n"
-	+ "ABORTING now";
-      throw std::logic_error( msg );
-    }
-    while ( curr_opt != opts.Opts.end()  ) {
+    for( auto const& curr_opt: opts ){
+      //      cerr << "process " << curr_opt << endl;
       bool mood = false;
       bool longOpt = false;
       string long_option;
-      string myoptarg = curr_opt->Option();
-      char option = curr_opt->OptChar();
+      string myoptarg = curr_opt.Option();
+      char option = curr_opt.OptChar();
 
-      if ( curr_opt->isLong() ){
-	long_option = curr_opt->OptWord();
+      if ( curr_opt.isLong() ){
+	long_option = curr_opt.OptWord();
 	longOpt = true;
       }
       else {
-	mood = curr_opt->getMood();
+	mood = curr_opt.getMood();
       }
       //      cerr << "long option:" << long_option << endl;
       //      cerr << "   myoptarg:" << myoptarg << endl;
-      if ( !strchr( ok_opt, option ) ){
-	// invalid option
-	switch ( mode ){
-	case 1:
-	case 2:{
-	  string LongLine;
-	  q = ok_opt;
-	  while ( *q ){
-	    if ( *q != ':'  ){
-	      LongLine = LongLine + *q + ' ';
-	    }
-	    q++;
-	  }
-	  Error( string("Illegal option, -") + (char)option
-		 + ", only the following options are allowed: "
-		 + LongLine );
-	}
-	break;
-	default:
-	  break;
-	}
-	return false;
-      };
-
       try {
 	//	cerr << "try " << option << endl;
 	switch (option) {
 	case 'a':
-	  if ( !stringTo<AlgorithmType>( myoptarg, local_algo ) ){
-	    Error( "illegal -a value: " + myoptarg );
-	    return false;
+	  {
+	    AlgorithmType tmp_a = IB1_a;
+	    if ( !stringTo<AlgorithmType>( myoptarg, tmp_a ) ){
+	      Error( "illegal -a value: " + myoptarg );
+	      return false;
+	    }
+	    else if ( tmp_a != IB1_a ){
+	      if ( local_algo == LOO_a || local_algo == CV_a ){
+		Error( "only IB1 algorithm is allowed for: " + toString(local_algo)  );
+		return false;
+	      }
+	      else {
+		local_algo = tmp_a;
+	      }
+	    }
 	  }
 	  break;
 
@@ -781,25 +742,25 @@ namespace Timbl {
 	  }
 	  break;
 
-      case 'c':
-	if ( longOpt ){
-	  if ( long_option == "clones" ){
-	    clones = stringTo<int>( myoptarg );
-	    if ( clones <= 0 ){
-	      Error( "invalid value for " + long_option + ": '"
-		     + myoptarg + "'" );
+	case 'c':
+	  if ( longOpt ){
+	    if ( long_option == "clones" ){
+	      clones = stringTo<int>( myoptarg );
+	      if ( clones <= 0 ){
+		Error( "invalid value for " + long_option + ": '"
+		       + myoptarg + "'" );
+		return false;
+	      }
+	    }
+	  }
+	  else {
+	    clip_freq = stringTo<int>( myoptarg );
+	    if ( clip_freq < 0 ){
+	      Error( "illegal value for -c option: " + myoptarg );
 	      return false;
 	    }
 	  }
-	}
-	else {
-	  clip_freq = stringTo<int>( myoptarg );
-	  if ( clip_freq < 0 ){
-	    Error( "illegal value for -c option: " + myoptarg );
-	    return false;
-	  }
-	}
-	break;
+	  break;
 
 	case 'd': {
 	  string::size_type pos1 = myoptarg.find( ":" );
@@ -849,316 +810,322 @@ namespace Timbl {
 	      }
 	    }
 	  }
-	break;
-      }
+	  break;
+	}
 
-      case 'D':
-	if ( longOpt ){
-	  if ( long_option == "Diversify" )
-	    do_diversify = true;
-	  else {
-	    Error( "invalid option: Did you mean '--Diversify' ?" );
+	case 'D':
+	  if ( longOpt ){
+	    if ( long_option == "Diversify" )
+	      do_diversify = true;
+	    else {
+	      Error( "invalid option: Did you mean '--Diversify' ?" );
+	      return false;
+	    }
+	  }
+	  else if ( myoptarg.size() > 1 ){
+	    Error( "invalid option: Did you mean '--Diversify'?" );
 	    return false;
 	  }
-	}
-	else if ( myoptarg.size() > 1 ){
-	  Error( "invalid option: Did you mean '--Diversify'?" );
-	  return false;
-	}
-	else
-	  keep_distributions = mood;
-	break;
+	  else
+	    keep_distributions = mood;
+	  break;
 
-      case 'e':
-	estimate = stringTo<int>( myoptarg );
-	if ( estimate < 0 ){
-	  Error( "illegal value for -e option: " + myoptarg );
-	  return false;
-	}
-	break;
-
-      case 'F':
-	if ( !stringTo<InputFormatType>( myoptarg, LocalInputFormat ) ){
-	  Error( "illegal value for -F option: " + myoptarg );
-	  return false;
-	}
-	break;
-
-      case 'G':
-	if ( myoptarg.empty() )
-	  local_normalisation = probabilityNorm;
-	else {
-	  string::size_type pos1 = myoptarg.find( ":" );
-	  if ( pos1 == string::npos ){
-	    local_normalisation = stringTo<normType>( myoptarg );
-	    local_norm_factor = 1;
+	case 'e':
+	  estimate = stringTo<int>( myoptarg );
+	  if ( estimate < 0 ){
+	    Error( "illegal value for -e option: " + myoptarg );
+	    return false;
 	  }
+	  break;
+
+	case 'F':
+	  if ( !stringTo<InputFormatType>( myoptarg, LocalInputFormat ) ){
+	    Error( "illegal value for -F option: " + myoptarg );
+	    return false;
+	  }
+	  break;
+
+	case 'G':
+	  if ( myoptarg.empty() )
+	    local_normalisation = probabilityNorm;
 	  else {
-	    local_normalisation = stringTo<normType>( string( myoptarg, 0, pos1 ) );
-	    if ( !stringTo<double>( string( myoptarg, pos1+1 ),
-				    local_norm_factor ) ||
-		 local_norm_factor < Epsilon ){
+	    string::size_type pos1 = myoptarg.find( ":" );
+	    if ( pos1 == string::npos ){
+	      local_normalisation = stringTo<normType>( myoptarg );
+	      local_norm_factor = 1;
+	    }
+	    else {
+	      local_normalisation = stringTo<normType>( string( myoptarg, 0, pos1 ) );
+	      if ( !stringTo<double>( string( myoptarg, pos1+1 ),
+				      local_norm_factor ) ||
+		   local_norm_factor < Epsilon ){
+		Error( "illegal value for -G option: " + myoptarg );
+		return false;
+	      }
+	    }
+	    if ( local_normalisation == unknownNorm ){
 	      Error( "illegal value for -G option: " + myoptarg );
 	      return false;
 	    }
 	  }
-	  if ( local_normalisation == unknownNorm ){
-	    Error( "illegal value for -G option: " + myoptarg );
+	  break;
+
+	case 'H':
+	  do_hashed = mood;
+	  break;
+
+	case 'k':
+	  no_neigh = stringTo<int>(myoptarg);
+	  if ( no_neigh <= 0 ){
+	    Error( "illegal value for -k option: " + myoptarg );
 	    return false;
 	  }
-	}
-	break;
+	  break;
 
-      case 'H':
-	do_hashed = mood;
-	break;
+	case 'l':
+	  f_length = stringTo<int>( myoptarg );
+	  if ( f_length <= 0 ){
+	    Error( "illegal value for -l option: " + myoptarg );
+	    return false;
+	  }
+	  break;
 
-      case 'k':
-	no_neigh = stringTo<int>(myoptarg);
-	if ( no_neigh <= 0 ){
-	  Error( "illegal value for -k option: " + myoptarg );
-	  return false;
-	}
-	break;
-
-      case 'l':
-	f_length = stringTo<int>( myoptarg );
-	if ( f_length <= 0 ){
-	  Error( "illegal value for -l option: " + myoptarg );
-	  return false;
-	}
-	break;
-
-      case 'L': {
-	string::size_type pos1 = myoptarg.find( ":" );
-	if ( pos1 == string::npos ){
-	  pos1 = myoptarg.find_first_of( "0123456789" );
-	  if ( pos1 != string::npos ){
-	    mvd_limit = stringTo<int>( myoptarg );
+	case 'L': {
+	  string::size_type pos1 = myoptarg.find( ":" );
+	  if ( pos1 == string::npos ){
+	    pos1 = myoptarg.find_first_of( "0123456789" );
+	    if ( pos1 != string::npos ){
+	      mvd_limit = stringTo<int>( myoptarg );
+	      if ( mvd_limit <= 0 ){
+		Error( "illegal value for -L option: " + myoptarg );
+		return false;
+	      }
+	    }
+	  }
+	  else {
+	    mvd_limit = stringTo<int>( string( myoptarg, pos1+1 ) );
 	    if ( mvd_limit <= 0 ){
 	      Error( "illegal value for -L option: " + myoptarg );
 	      return false;
 	    }
 	  }
+	  break;
 	}
-	else {
-	  mvd_limit = stringTo<int>( string( myoptarg, pos1+1 ) );
-	  if ( mvd_limit <= 0 ){
-	    Error( "illegal value for -L option: " + myoptarg );
+	case 'm':
+	  if ( !parse_metrics( myoptarg, local_metric ) )
+	    return false;
+	  break;
+
+	case 'M':
+	  maxbests = stringTo<int>( myoptarg );
+	  if ( maxbests <= 0 ){
+	    Error( "illegal value for -M option: " + myoptarg );
 	    return false;
 	  }
-	}
-	break;
-      }
-      case 'm':
-	if ( !parse_metrics( myoptarg, local_metric ) )
-	  return false;
-	break;
+	  break;
 
-      case 'M':
-	maxbests = stringTo<int>( myoptarg );
-	if ( maxbests <= 0 ){
-	  Error( "illegal value for -M option: " + myoptarg );
-	  return false;
-	}
-	break;
+	case 'N':
+	  // skip previously parsed NumOfFeatures info.
+	  break;
 
-      case 'N':
-	// skip previously parsed NumOfFeatures info.
-	break;
+	case 'O':
+	  outPath = myoptarg;
+	  break;
 
-      case 'O':
-	outPath = myoptarg;
-	break;
+	case 'o':
+	  if ( longOpt ){
+	    if ( long_option == "occurrences" ){
+	      if ( myoptarg.empty() ){
+		Error( "missing value for '--occurrences'" );
+		return false;
+	      }
+	      if ( myoptarg == "train" )
+		occIn = 1;
+	      else if ( myoptarg == "test" )
+		occIn = 2;
+	      else if ( myoptarg == "both" )
+		occIn = 3;
+	      else {
+		Error( "invalid --ocurrences value." );
+		return false;
+	      }
+	    }
+	    else {
+	      Error( "invalid option: Did you mean '--ocurrences' ?" );
+	      return false;
+	    }
+	  }
+	  else if ( myoptarg.find("ccurences") != string::npos ){
+	    Error( "invalid option: Did you mean '--occurrences' ?" );
+	    return false;
+	  }
+	  break;
 
-      case 'o':
-	if ( longOpt ){
-	  if ( long_option == "occurrences" ){
+	case 'p':
+	  local_progress = stringTo<int>( myoptarg );
+	  break;
+
+	case 'q':
+	  threshold = stringTo<int>( myoptarg );
+	  break;
+
+	case 'Q':
+	  do_query = true;
+	  break;
+
+	case 'R':
+	  if ( isdigit(myoptarg[0]) )
+	    seed = stringTo<int>( myoptarg );
+	  else {
+	    Error( "Integer argument for Random Seed expected (-R option)" );
+	    return false;
+	  }
+	  break;
+
+	case 's':
+	  if ( longOpt ){
+	    if ( long_option == "sloppy" ){
+	      bool val;
+	      if ( !isBoolOrEmpty(myoptarg,val) ){
+		Error( "invalid value for sloppy: '"
+		       + myoptarg + "'" );
+		return false;
+	      }
+	      do_sloppy_loo = val;
+	    }
+	    else if ( long_option == "silly" ){
+	      bool val;
+	      if ( !isBoolOrEmpty(myoptarg,val) ){
+		Error( "invalid value for silly: '"
+		       + myoptarg + "'" );
+		return false;
+	      }
+	      do_silly = val;
+	    }
+	    else {
+	      Error( "invalid option: Did you mean '--sloppy or --silly' ?" );
+	      return false;
+	    }
+	  }
+	  else {
 	    if ( myoptarg.empty() ){
-	      Error( "missing value for '--occurrences'" );
-	      return false;
-	    }
-	    if ( myoptarg == "train" )
-	      occIn = 1;
-	    else if ( myoptarg == "test" )
-	      occIn = 2;
-	    else if ( myoptarg == "both" )
-	      occIn = 3;
-	    else {
-	      Error( "invalid --ocurrences value." );
-	      return false;
-	    }
-	  }
-	  else {
-	    Error( "invalid option: Did you mean '--ocurrences' ?" );
-	    return false;
-	  }
-	}
-	else if ( myoptarg.find("ccurences") != string::npos ){
-	  Error( "invalid option: Did you mean '--occurrences' ?" );
-	  return false;
-	}
-	break;
-
-      case 'p':
-	local_progress = stringTo<int>( myoptarg );
-	break;
-
-      case 'q':
-	threshold = stringTo<int>( myoptarg );
-	break;
-
-      case 'Q':
-	do_query = true;
-	break;
-
-      case 'R':
-	if ( isdigit(myoptarg[0]) )
-	  seed = stringTo<int>( myoptarg );
-	else {
-	  Error( "Integer argument for Random Seed expected (-R option)" );
-	  return false;
-	}
-	break;
-
-      case 's':
-	if ( longOpt ){
-	  if ( long_option == "sloppy" ){
-	    bool val;
-	    if ( !isBoolOrEmpty(myoptarg,val) ){
-	      Error( "invalid value for sloppy: '"
-		     + myoptarg + "'" );
-	      return false;
-	    }
-	    do_sloppy_loo = val;
-	  }
-	  else if ( long_option == "silly" ){
-	    bool val;
-	    if ( !isBoolOrEmpty(myoptarg,val) ){
-	      Error( "invalid value for silly: '"
-		     + myoptarg + "'" );
-	      return false;
-	    }
-	    do_silly = val;
-	  }
-	  else {
-	    Error( "invalid option: Did you mean '--sloppy or --silly' ?" );
-	    return false;
-	  }
-	}
-	else {
-	  if ( myoptarg.empty() ){
-	    do_sample_weights = true;
-	  }
-	  else {
-	    if ( isdigit(myoptarg[0]) ){
-	      int val = stringTo<int>( myoptarg );
-	      if ( val == 0 ){
-		do_ignore_samples = true;
-		do_ignore_samples_test = false;
-		do_sample_weights = true;
-	      }
-	      else if ( val == 1 ){
-		do_ignore_samples_test = true;
-		do_sample_weights = true;
-	      }
-	    }
-	    if ( !do_sample_weights) {
-	      Error( "invalid value for -s: '" + myoptarg + "' (maybe you meant --s" + myoptarg + " ?)" );
-	      return false;
-	    }
-	  }
-	}
-	break;
-
-      case 't':
-	if ( compare_nocase( myoptarg, "leave_one_out" ) )
-	  local_algo = LOO_a;
-	else if ( compare_nocase( myoptarg, "cross_validate" ) )
-	  local_algo = CV_a;
-	break;
-
-      case 'T': {
-	if ( longOpt ){
-	  if ( long_option == "Threshold" ){
-	    if ( !stringTo<int>(myoptarg, igThreshold )
-		 || igThreshold < 0 ){
-	      Error( "invalid value for Threshold: " + myoptarg );
-	      return false;
-	    }
-	  }
-	  else if ( long_option == "Treeorder" ){
-	    if ( !stringTo<OrdeningType>( myoptarg, local_order ) ){
-	      Error( "invalid value for Treeorder: " + myoptarg );
-	      return false;
-	    }
-	  }
-	  else {
-	    Error( "invalid option: Did you mean '--Threshold' or --Treeorder ?" );
-	    return false;
-	  }
-	}
-	else if ( myoptarg.find("hreshold") != string::npos ||
-		  myoptarg.find("reeorder") != string::npos ){
-	  Error( "invalid option: Did you mean '--T" + myoptarg + "' ?" );
-	  return false;
-	}
-	else if ( ! stringTo<int>( myoptarg, target_pos ) ){
-	  Error( "invalid option: Did you mean '-T value ?" );
-	  return false;
-	}
-	else if ( target_pos <= 0 ){
-	  Error( "illegal value for -T option: " + myoptarg );
-	  return false;
-	}
-      }
-	break;
-
-      case 'v':{
-	VerbosityFlags Flag = NO_VERB;
-	if ( !stringTo<VerbosityFlags>( myoptarg, Flag ) ){
-	  Error( "illegal value for +/- v option: " + myoptarg );
-	  return false;
-	}
-	else {
-	  if ( mode == 2 &&
-	       ( !(Flag & (SILENT|DISTANCE|DISTRIB|NEAR_N|CONF_MATRIX) ) ) )
-	    return false;
-	  else if ( Flag > 0 )
-	    if ( mood ){
-	      myVerbosity |= Flag;
+	      do_sample_weights = true;
 	    }
 	    else {
-	      myVerbosity &= ~Flag;
+	      if ( isdigit(myoptarg[0]) ){
+		int val = stringTo<int>( myoptarg );
+		if ( val == 0 ){
+		  do_ignore_samples = true;
+		  do_ignore_samples_test = false;
+		  do_sample_weights = true;
+		}
+		else if ( val == 1 ){
+		  do_ignore_samples_test = true;
+		  do_sample_weights = true;
+		}
+	      }
+	      if ( !do_sample_weights) {
+		Error( "invalid value for -s: '" + myoptarg + "' (maybe you meant --s" + myoptarg + " ?)" );
+		return false;
+	      }
 	    }
-	  else
-	    myVerbosity = NO_VERB;
+	  }
+	  break;
+
+	case 't':
+	  {
+	    AlgorithmType tmp_a = IB1_a;
+	    if ( compare_nocase( myoptarg, "leave_one_out" ) )
+	      tmp_a = LOO_a;
+	    else if ( compare_nocase( myoptarg, "cross_validate" ) )
+	      tmp_a = CV_a;
+	    if ( local_algo != IB1_a && tmp_a != IB1_a ){
+	      Error( "only IB1 algorithm is allowed for: " + toString(tmp_a)  );
+	      return false;
+	    }
+	    local_algo = tmp_a;
+	  }
+	  break;
+	case 'T': {
+	  if ( longOpt ){
+	    if ( long_option == "Threshold" ){
+	      if ( !stringTo<int>(myoptarg, igThreshold )
+		   || igThreshold < 0 ){
+		Error( "invalid value for Threshold: " + myoptarg );
+		return false;
+	      }
+	    }
+	    else if ( long_option == "Treeorder" ){
+	      if ( !stringTo<OrdeningType>( myoptarg, local_order ) ){
+		Error( "invalid value for Treeorder: " + myoptarg );
+		return false;
+	      }
+	    }
+	    else {
+	      Error( "invalid option: Did you mean '--Threshold' or --Treeorder ?" );
+	      return false;
+	    }
+	  }
+	  else if ( myoptarg.find("hreshold") != string::npos ||
+		    myoptarg.find("reeorder") != string::npos ){
+	    Error( "invalid option: Did you mean '--T" + myoptarg + "' ?" );
+	    return false;
+	  }
+	  else if ( ! stringTo<int>( myoptarg, target_pos ) ){
+	    Error( "invalid option: Did you mean '-T value ?" );
+	    return false;
+	  }
+	  else if ( target_pos <= 0 ){
+	    Error( "illegal value for -T option: " + myoptarg );
+	    return false;
+	  }
 	}
-      }
-	break;
+	  break;
 
-      case 'w': {
-	if ( !stringTo<WeightType>( myoptarg, local_weight ) )
-	  return false;
-      };
-      break;
+	case 'v':{
+	  VerbosityFlags Flag = NO_VERB;
+	  if ( !stringTo<VerbosityFlags>( myoptarg, Flag ) ){
+	    Error( "illegal value for +/- v option: " + myoptarg );
+	    return false;
+	  }
+	  else {
+	    if ( mode == 2 &&
+		 ( !(Flag & (SILENT|DISTANCE|DISTRIB|NEAR_N|CONF_MATRIX) ) ) )
+	      return false;
+	    else if ( Flag > 0 )
+	      if ( mood ){
+		myVerbosity |= Flag;
+	      }
+	      else {
+		myVerbosity &= ~Flag;
+	      }
+	    else
+	      myVerbosity = NO_VERB;
+	  }
+	}
+	  break;
 
-      case 'W': {
-	do_all_weights = true;
-      };
-      break;
+	case 'w': {
+	  if ( !stringTo<WeightType>( myoptarg, local_weight ) )
+	    return false;
+	};
+	  break;
 
-      case 'x':
-	do_exact = mood;
-	break;
+	case 'W': {
+	  do_all_weights = true;
+	};
+	  break;
 
-      }
+	case 'x':
+	  do_exact = mood;
+	  break;
+
+	}
       }
       catch( std::runtime_error& err ) {
 	cerr << "invalid value for option '" << option << "'" << endl;
 	return false;
       }
-      ++curr_opt;
     }
     return true;
   }

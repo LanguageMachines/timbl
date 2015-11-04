@@ -36,11 +36,10 @@
 #include "timbl/MsgClass.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
-#include "timbl/CommandLine.h"
 #include "timbl/Instance.h"
 #include "timbl/neighborSet.h"
-#include "timbl/TimblExperiment.h"
 #include "ticcutils/CommandLine.h"
+#include "timbl/TimblExperiment.h"
 
 namespace Timbl{
 

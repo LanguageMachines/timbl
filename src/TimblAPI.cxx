@@ -37,6 +37,7 @@
 #include "timbl/BestArray.h"
 #include "timbl/Statistics.h"
 #include "timbl/MBLClass.h"
+#include "ticcutils/CommandLine.h"
 #include "timbl/GetOptClass.h"
 
 using namespace std;
@@ -92,10 +93,8 @@ namespace Timbl {
   TimblAPI::TimblAPI( const TiCC::CL_Options& opts,
 		      const string& name ):
     pimpl(), i_am_fine(false) {
-    string bla = opts.toString();
-    CL_Options Opts( bla );
-    GetOptClass *OptPars = new GetOptClass( Opts );
-    if ( !OptPars->parse_options( Opts ) ){
+    GetOptClass *OptPars = new GetOptClass( opts );
+    if ( !OptPars->parse_options( opts ) ){
       delete OptPars;
     }
     else if ( OptPars->Algo() != Unknown_a ){
@@ -110,7 +109,8 @@ namespace Timbl {
   TimblAPI::TimblAPI( const string& pars,
 		      const string& name ):
     pimpl(), i_am_fine(false){
-    CL_Options Opts( pars );
+    TiCC::CL_Options Opts;
+    Opts.init( pars );
     GetOptClass *OptPars = new GetOptClass( Opts );
     if ( OptPars->parse_options( Opts ) ){
       if ( OptPars->Algo() != Unknown_a ){
@@ -551,9 +551,7 @@ namespace Timbl {
   }
 
   bool TimblAPI::SetIndirectOptions( const TiCC::CL_Options& opts ){
-    string bla = opts.toString();
-    CL_Options Opts( bla );
-    return Valid() && pimpl->IndirectOptions( Opts );
+    return Valid() && pimpl->IndirectOptions( opts );
   }
 
   string TimblAPI::ExpName() const {

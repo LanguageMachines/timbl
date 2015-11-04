@@ -61,10 +61,9 @@
 #include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
 #include "timbl/MBLClass.h"
-#include "timbl/CommandLine.h"
+#include "ticcutils/CommandLine.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
-#include "ticcutils/CommandLine.h"
 #include "ticcutils/XMLtools.h"
 #include "ticcutils/Timer.h"
 #include "ticcutils/PrettyPrint.h"
@@ -77,6 +76,11 @@ using namespace std;
 using namespace TiCC;
 
 namespace Timbl {
+
+  const string timbl_short_opts = "a:b:B:c:C:d:De:f:F:G::hHi:I:k:l:L:m:M:n:N:o:O:p:P:q:QR:s::t:T:u:U:v:w:W:xX:Z%";
+  const string timbl_long_opts = ",Beam:,clones:,Diversify,occurrences:,sloppy::,silly::,Threshold:,Treeorder:,matrixin:,matrixout:";
+  const string timbl_serv_short_opts = "C:d:G::k:l:L:p:q:v:x";
+  const string timbl_indirect_opts = "d:e:G:k:L:m:o:p:QR:t:v:w:x%";
 
   resultStore::~resultStore( ) {
     clear();
@@ -1998,18 +2002,52 @@ namespace Timbl {
     return result;
   }
 
-  bool TimblExperiment::SetOptions( int i, const char **argv ){
-    CL_Options *Opts = new CL_Options( i, argv );
-    bool result = SetOptions( *Opts  );
-    delete Opts;
-    return result;
+  bool TimblExperiment::SetOptions( int argc, const char **argv ){
+    if ( IsClone() ){
+      CL_Options Opts( timbl_serv_short_opts );
+      try {
+	Opts.init( argc, argv );
+      }
+      catch( exception& e ){
+	Error( string(e.what()) + ": valid options: " + timbl_serv_short_opts );
+      }
+      return SetOptions( Opts  );
+    }
+    else {
+      CL_Options Opts( timbl_short_opts, timbl_long_opts);
+      try {
+	Opts.init( argc, argv );
+      }
+      catch( exception& e ){
+	Error( string(e.what()) + ": valid options: " + timbl_short_opts +
+	       " " + timbl_long_opts );
+      }
+      return SetOptions( Opts  );
+    }
   }
 
   bool TimblExperiment::SetOptions( const string& arg ){
-    CL_Options *Opts = new CL_Options( arg );
-    bool result = SetOptions( *Opts  );
-    delete Opts;
-    return result;
+    if ( IsClone() ){
+      CL_Options Opts( timbl_serv_short_opts );
+      try {
+	Opts.init( arg );
+      }
+      catch( exception& e ){
+	Error( string(e.what()) + ": valid options: " + timbl_serv_short_opts );
+      }
+      return SetOptions( Opts  );
+    }
+    else {
+      CL_Options Opts( timbl_short_opts, timbl_long_opts);
+      try {
+	Opts.init( arg );
+      }
+      catch( exception& e ){
+	Error( string(e.what()) + ": valid options: " + timbl_short_opts +
+	       " " + timbl_long_opts );
+      }
+      return SetOptions( Opts  );
+    }
   }
 
   bool TimblExperiment::SetOptions( const CL_Options& Opts ){

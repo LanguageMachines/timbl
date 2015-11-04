@@ -40,6 +40,7 @@
 #include <cctype>
 
 #include "config.h"
+#include "ticcutils/CommandLine.h"
 #include "timbl/TimblAPI.h"
 
 using namespace std;
@@ -76,11 +77,6 @@ string WgtOutFile = "";
 string ProbInFile = "";
 string ProbOutFile = "";
 string NamesFile = "";
-
-const string timbl_short_opts = "a:A::b:B:c:C:d:De:f:F:G::hHi:I:k:l:L:m:M:n:N:o:O:p:P:q:QR:s::t:T:u:U:v:w:W:xX:Z%";
-const string timbl_long_opts = "Beam:,clones:,Diversify,occurrences:,sloppy::,silly::,Threshold:,Treeorder:,matrixin:,matrixout:";
-
-const string timbl_indirect_opts = "d:e:G:k:L:m:o:p:QR:t:v:w:x%";
 
 inline void usage_full(void){
   cerr << "usage: timbl -f data-file {-t test-file} [options]" << endl;

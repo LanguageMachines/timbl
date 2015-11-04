@@ -42,6 +42,7 @@
 #include "timbl/Options.h"
 #include "timbl/Instance.h"
 #include "timbl/IBtree.h"
+#include "ticcutils/CommandLine.h"
 #include "timbl/TimblExperiment.h"
 #include "ticcutils/Timer.h"
 

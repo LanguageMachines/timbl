@@ -38,15 +38,15 @@
 #include "timbl/Statistics.h"
 #include "timbl/MBLClass.h"
 
-namespace TiCC {
-  class CL_Options;
-}
-
 namespace Timbl {
+
+  extern const std::string timbl_short_opts;
+  extern const std::string timbl_long_opts;
+  extern const std::string timbl_serv_short_opts;
+  extern const std::string timbl_indirect_opts;
 
   class TimblAPI;
   class ConfusionMatrix;
-  class CL_Options;
   class GetOptClass;
 
   class resultStore: public MsgClass {
@@ -132,8 +132,8 @@ namespace Timbl {
     TimblExperiment *splitChild() const;
     bool SetOptions( int, const char ** );
     bool SetOptions( const std::string& );
-    bool SetOptions( const CL_Options&  );
-    bool IndirectOptions( const CL_Options&  );
+    bool SetOptions( const TiCC::CL_Options&  );
+    bool IndirectOptions( const TiCC::CL_Options&  );
     bool ConfirmOptions();
     bool DefaultOptions();
     GetOptClass *getOptParams() const { return OptParams; };

@@ -35,15 +35,14 @@
 #include "Types.h"
 
 namespace Timbl {
-  class CL_Options;
   class TimblExperiment;
 
   class GetOptClass: public MsgClass {
   public:
-    GetOptClass( CL_Options&  );
+    GetOptClass( const TiCC::CL_Options&  );
     virtual ~GetOptClass();
     GetOptClass *Clone( std::ostream * = 0 ) const;
-    bool parse_options( const CL_Options&, const int=0 );
+    bool parse_options( const TiCC::CL_Options&, const int=0 );
     void set_default_options( const int=0 );
     bool definitive_options( TimblExperiment * );
     AlgorithmType Algo() const { return local_algo; };

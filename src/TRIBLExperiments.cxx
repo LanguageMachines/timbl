@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -46,6 +46,7 @@
 #include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
 #include "timbl/MBLClass.h"
+#include "ticcutils/CommandLine.h"
 #include "timbl/TimblExperiment.h"
 
 using namespace TiCC;
@@ -57,23 +58,23 @@ namespace Timbl {
     default_order();
     set_order();
     runningPhase = TrainWords;
-    InstanceBase = new TRIBL_InstanceBase( EffectiveFeatures(), 
+    InstanceBase = new TRIBL_InstanceBase( EffectiveFeatures(),
 					   ibCount,
 					   (RandomSeed()>=0),
 					   KeepDistributions() );
   }
-  
+
   void TRIBL2_Experiment::InitInstanceBase(){
     srand( RandomSeed() );
     default_order();
     set_order();
     runningPhase = TrainWords;
-    InstanceBase = new TRIBL2_InstanceBase( EffectiveFeatures(), 
+    InstanceBase = new TRIBL2_InstanceBase( EffectiveFeatures(),
 					    ibCount,
 					    (RandomSeed()>=0),
 					    KeepDistributions() );
   }
-  
+
   bool TRIBL_Experiment::checkTestFile(){
     if ( !TimblExperiment::checkTestFile() )
       return false;
@@ -88,7 +89,7 @@ namespace Timbl {
     }
     return true;
   }
-  
+
   bool TRIBL2_Experiment::checkTestFile(){
     if ( !TimblExperiment::checkTestFile() )
       return false;
@@ -99,11 +100,11 @@ namespace Timbl {
     }
     return true;
   }
-  
+
   const TargetValue *TRIBL_Experiment::LocalClassify( const Instance& Inst,
 						      double& Distance,
 						      bool& exact ){
-    
+
     const TargetValue *Res = NULL;
     bool Tie = false;
     exact = false;
@@ -122,8 +123,8 @@ namespace Timbl {
       size_t level = 0;
       const ValueDistribution *TrResultDist = 0;
       initExperiment();
-      IB_InstanceBase *SubTree 
-	= InstanceBase->TRIBL_test( Inst, TRIBL_offset(), 
+      IB_InstanceBase *SubTree
+	= InstanceBase->TRIBL_test( Inst, TRIBL_offset(),
 				    Res, TrResultDist,
 				    level );
       if ( !SubTree ){
@@ -182,7 +183,7 @@ namespace Timbl {
       stats.addExact();
     return Res;
   }
-  
+
   bool TRIBL_Experiment::checkLine( const string& line ){
     if ( !TimblExperiment::checkLine( line ) )
       return false;
@@ -193,7 +194,7 @@ namespace Timbl {
     }
     return true;
   }
-  
+
   bool TRIBL2_Experiment::checkLine( const string& line ){
     if ( !TimblExperiment::checkLine( line ) )
       return false;
@@ -204,7 +205,7 @@ namespace Timbl {
     }
     return true;
   }
-  
+
   const TargetValue *TRIBL2_Experiment::LocalClassify( const Instance& Inst,
 						       double& Distance,
 						       bool& exact ){
@@ -264,7 +265,7 @@ namespace Timbl {
 	bestResult.addConstant( TrResultDist );
 	bestArray.init( num_of_neighbors, MaxBests,
 			Verbosity(NEAR_N), Verbosity(DISTANCE),
-			Verbosity(DISTRIB) ); 
+			Verbosity(DISTRIB) );
 	bestArray.addResult( Distance, TrResultDist, get_org_input() );
 	bestArray.initNeighborSet( nSet );
       }
@@ -319,27 +320,27 @@ namespace Timbl {
       }
       else {
 	srand( RandomSeed() );
-	InstanceBase = new TRIBL_InstanceBase( EffectiveFeatures(), 
+	InstanceBase = new TRIBL_InstanceBase( EffectiveFeatures(),
 					       ibCount,
 					       (RandomSeed()>=0),
-					       KeepDistributions() ); 
+					       KeepDistributions() );
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	  Features[i]->SetWeight( 1.0 );
 	  if ( Features[permutation[i]]->Ignore() )
 	    PermFeatures[i] = NULL;
-	  else 
+	  else
 	    PermFeatures[pos++] = Features[permutation[i]];
 	}
 	if ( Hashed )
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 Targets, 
+					 Targets,
 					 TargetStrings, FeatureStrings,
-					 Version ); 
+					 Version );
 	else
-	  result = InstanceBase->ReadIB( is, PermFeatures, 
-					 Targets, 
-					 Version ); 
+	  result = InstanceBase->ReadIB( is, PermFeatures,
+					 Targets,
+					 Version );
       }
     }
     return result;
@@ -366,27 +367,27 @@ namespace Timbl {
       }
       else {
 	srand( RandomSeed() );
-	InstanceBase = new TRIBL2_InstanceBase( EffectiveFeatures(), 
+	InstanceBase = new TRIBL2_InstanceBase( EffectiveFeatures(),
 						ibCount,
 						(RandomSeed()>=0),
-						KeepDistributions() ); 
+						KeepDistributions() );
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	  Features[i]->SetWeight( 1.0 );
 	  if ( Features[permutation[i]]->Ignore() )
 	    PermFeatures[i] = NULL;
-	  else 
+	  else
 	    PermFeatures[pos++] = Features[permutation[i]];
 	}
 	if ( Hashed )
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 Targets, 
+					 Targets,
 					 TargetStrings, FeatureStrings,
-					 Version ); 
+					 Version );
 	else
-	  result = InstanceBase->ReadIB( is, PermFeatures, 
-					 Targets, 
-					 Version ); 
+	  result = InstanceBase->ReadIB( is, PermFeatures,
+					 Targets,
+					 Version );
       }
     }
     return result;

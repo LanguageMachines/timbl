@@ -48,6 +48,7 @@
 #include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
 #include "timbl/MBLClass.h"
+#include "ticcutils/CommandLine.h"
 #include "timbl/TimblExperiment.h"
 
 using namespace TiCC;
