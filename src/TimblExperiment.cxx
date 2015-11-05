@@ -2004,7 +2004,7 @@ namespace Timbl {
 
   bool TimblExperiment::SetOptions( int argc, const char **argv ){
     if ( IsClone() ){
-      CL_Options Opts( timbl_serv_short_opts );
+      CL_Options Opts( timbl_serv_short_opts, "" );
       try {
 	Opts.init( argc, argv );
       }
@@ -2028,7 +2028,7 @@ namespace Timbl {
 
   bool TimblExperiment::SetOptions( const string& arg ){
     if ( IsClone() ){
-      CL_Options Opts( timbl_serv_short_opts );
+      CL_Options Opts( timbl_serv_short_opts, "" );
       try {
 	Opts.init( arg );
       }
