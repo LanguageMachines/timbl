@@ -1,0 +1,132 @@
+---
+cover: true
+slogan: Tilburg Memory-Based Learner
+extracredit: Cover photo by Wayne Robinson
+---
+
+<section>
+
+    <p>
+    <strong>TiMBL</strong> is an open source software package implementing
+    several memory-based learning algorithms, among which
+    <strong>IB1-IG</strong>, an implementation of k-nearest neighbor
+    classification with feature weighting suitable for symbolic feature spaces,
+    and IGTree, a decision-tree approximation of IB1-IG. All implemented
+    algorithms have in common that they store some representation of the
+    training set explicitly in memory. During testing, new cases are classified
+    by extrapolation from the most similar stored cases.</p>
+
+    <p>
+    For over fifteen years <strong>TiMBL</strong> has been mostly used
+    in natural language processing as a machine learning classifier component,
+    but its use extends to virtually any supervised machine learning domain.
+    Due to its particular decision-tree-based implementation,
+    <strong>TiMBL</strong> is in many cases far more efficient in
+    classification than a standard k-nearest neighbor algorithm would be. 
+    </p>
+
+</section>
+
+
+
+<section>
+    <h2>Features</h2>
+
+	<ul>
+		<li>Fast, decision-tree-based implementation of k-nearest neighbor classification</li>
+		<li>Implementations of IB1 and IB2, IGTree, TRIBL, and TRIBL2 algorithms</li>
+		<li>Similarity metrics: Overlap, MVDM, Jensen-Shannon and Jeffrey Divergence, Dot product, Cosine</li>
+		<li>Feature weighting metrics: information gain, gain ratio, chi squared, shared variance</li>
+		<li>Per-value similarity metrics: Levenshtein, Dice coefficient</li>
+		<li>Distance weighting metrics: inverse, inverse linear, exponential decay</li>
+		<li>Multi-CPU support</li>
+		<li>Extensive verbosity options to inspect nearest neighbor sets</li>
+		<li>Server functionality and extensive API</li>
+		<li>Fast leave-one-out testing and internal cross-validation</li>
+		<li>Handles user-defined example weighting </li>
+	</ul>
+
+</section>
+
+
+<section>
+<h2>Download &amp; Installation</h2>
+
+<p>
+Timbl is free software; you can redistribute it and/or modify it under the terms
+of the <a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public
+License</a> as published by the <a href="http://www.fsf.org/">Free Software
+Foundation</a>. 
+</p>
+
+<p>To download and install Timbl:</p>
+
+<ol>
+<li>First check if there are up-to-date packages
+included in your distribution's package manager. There are packages for
+<strong>Debian</strong>,<strong>Ubuntu</strong> and <strong>Arch
+Linux</strong>.</li>
+<li>If not, we <strong>strongly recommend</strong> you use our <a
+href="https://proycon.github.io/LaMachine">LaMachine</a> software distribution,
+which includes Frog and all necessary dependencies, and runs on Linux, BSD and
+Mac OS X. It can also run as a <em>virtual machine</em> under any host OS.</li>
+<li>Alternatively, you can always download, compile and install Timbl manually, as shown next.</li>
+</ol>
+
+<h3>Manual installation</h3>
+
+<ul>
+<li><a href="https://github.com/LanguageMachines/timbl/">Source code</a></li>
+<li><a href="https://github.com/LanguageMachines/timbl/releases">Stable releases</a></li>
+</ul>
+
+
+<p>To compile Timbl manually consult the included <tt>INSTALL</tt> document, you will need current versions of the following dependencies:</p>
+
+<ul>
+<li><a href="https://github.com/LanguageMachines/ticcutils/">ticcutils</a> - A shared utility library </li>
+</ul>
+
+</section>
+
+<section>
+
+<h2>Documentation</h2>
+
+<ul>
+<li>Book: <a href="http://ilk.uvt.nl/mblp">Memory-Based Language Processing</a> - Daelemans, W., and Van den Bosch, A. (2005). Cambridge, UK: Cambridge University Press.</li>
+<li><a href="http://ilk.uvt.nl/downloads/pub/papers/Timbl_6.3_Manual.pdf">Reference Guide</a> (66 pages, 498 kB PDF); Daelemans, W., Zavrel, J., Van der Sloot, K., and Van den Bosch, A. (2010). <em>TiMBL: Tilburg Memory Based Learner, version 6.3, Reference Guide.</em> ILK Research Group Technical Report Series no. 10-01.</li>
+<li><a href="http://ilk.uvt.nl/downloads/pub/papers/Timbl_6.3_API.pdf">API guide</a> (34 pages, 129 kB PDF); Van der Sloot, K. (2010). <em>TiMBL: Tilburg Memory Based Learner, version 6.3, API Guide.</em> ILK Research Group Technical Report Series no. 10-03.</li>
+<li><a href="http://ilk.uvt.nl/downloads/pub/papers/TimblServer_1.0_Manual.pdf">TimblServer Manual</a> (12 pages, 62 Kb PDF); Van der Sloot, K. (2010). <em>TimblServer: Tilburg Memory-Based Learner Server, version 1.0, Manual.</em> ILK Research Group Technical Report Series no. 10-02. </li>
+</ul>
+
+</section>
+
+<section>
+<h2>Extensions</h2>
+
+<p>Several wrappers, bindings and other extensions to TiMBL have been developed:</p>
+
+<ul>
+<li><a href="https://github.com/LanguageMachines/TimblServer">TimblServer</a> -	TiMBL wrapper, adds server functionality to TiMBL</li>
+<li><a href="https://github.com/proycon/python-timbl">python-timbl</a> - Python language binding for TiMBL</li>
+<li><a href="https://github.com/LanguageMachines/dimbl">Dimbl</a> - Parallel TiMBL for multi-core processing; parallelizes by splitting the training set</li>
+<li><a href="https://github.com/LanguageMachines/paramsearch">paramsearch</a> -	Automatic hyperparameter optimization for TiMBL (and other ML algorithms)</li>
+<li><a href="https://github.com/markisisme/rtimbl">rtimbl</a> -  a Ruby interface to TiMBL</li>
+<li><a href="http://ilk.uvt.nl/timpute/">Timpute</a> - TiMBL-based data imputation</li>
+<li><a href="http://ilk.uvt.nl/~emarsi/software/knngraph.html">knngraph</a> - Visualizes nearest neighbors in a TiMBL instance base</li>
+</ul>
+
+<p>
+<strong>TiMBL</strong> is a core component of various NLP software systems such as <a href="https://github.com/LanguageMachines/mbt">MBT</a> (memory-based tagger generator), <a href="https://github.com/LanguageMachines/frog">Frog</a> (Dutch morpho-syntactic analyzer), <a href="https://github.com/LanguageMachines/gecco">Gecco</a> (Context-sensitive spelling corrector, used by <a href="http://valkuil.net">Valkuil.net</a> for Dutch, and <a href="http://fowlt.net">Fowlt.net</a> for English), and <a href="http://soothsayer.cls.ru.nl">SoothSayer</a> (Dutch word completion). </p>
+
+</section>
+
+<section>
+
+<p>The development and improvement of Frog also relies on your bug reports,
+suggestions, and comments. Use the <a
+href="https://github.com/LanguageMachines/timbl/issues">github issue tracker</a>
+or mail a.vandenbosch (at) let.ru.nl.</p>
+
+</section>
