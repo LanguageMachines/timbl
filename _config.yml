@@ -7,16 +7,16 @@ defaults:
      type: pages
     values: 
      layout: lamalayout
-     title: Frog
+     title: TiMBL
      author: Ko van der sloot, Antal van den Bosch, Maarten van Gompel
-     keywords: dutch, tokenisation, lemmatisation, tokenization, lemmatization, part-of-speech tagging, named entity recognition, shallow parsing, chunking, dependency parsing, nederlands, folia, ucto, NLP, natural language processing
-     description: Frog is an integration of memory-based natural language processing (NLP) modules developed for Dutch.
+     keywords: memory-based classifier, kNN, IGtree, machine learning
+     description: Timbl is a memory-based classifier
      lang: en
      menu: 
       - label: Home
-        url: https://languagemachines.github.io/frog/
+        url: https://languagemachines.github.io/timbl/
       - label: Source
-        url: https://github.com/LanguageMachines/frog/
+        url: https://github.com/LanguageMachines/timbl/
       - label: Releases
-        url: https://github.com/LanguageMachines/frog/releases/
+        url: https://github.com/LanguageMachines/timbl/releases/
 ---
