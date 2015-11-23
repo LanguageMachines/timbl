@@ -8,7 +8,7 @@ defaults:
     values: 
      layout: lamalayout
      title: TiMBL
-     author: Ko van der sloot, Antal van den Bosch, Maarten van Gompel
+     author: Ko van der sloot, Antal van den Bosch, Walter Daelemans, Peter Berck, Maarten van Gompel, Ton Weijters, Jakub Zavrel
      keywords: memory-based classifier, kNN, IGtree, machine learning
      description: Timbl is a memory-based classifier
      lang: en
