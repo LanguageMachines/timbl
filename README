@@ -45,8 +45,9 @@ TiMBL is distributed under the GNU Public Licence v3 (see the file COPYING).
 This software has been tested on:
 - Intel platforms running several versions of Linux, including Ubuntu, Debian,
   Arch Linux, Fedora (both 32 and 64 bits)
-- Windows platform using Cygwin
-- MAC platform running OS X 10.5
+- MAC platform running OS X 10.10
+
+Alternatively, with some effort, you may get it to work on a Windows platform using Cygwin.
 
 Compilers:
  - GCC (use at least GCC 4.1)
