@@ -50,7 +50,7 @@ This software has been tested on:
 Alternatively, with some effort, you may get it to work on a Windows platform using Cygwin.
 
 Compilers:
- - GCC (use at least GCC 4.1)
+ - GCC (use 4.8 or later)
  - Clang
 
 Contents of this distribution:
