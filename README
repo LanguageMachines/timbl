@@ -27,16 +27,15 @@ in classification than a standard k-nearest neighbor algorithm would be.
 -----------------------------------------------------------------------
 
 This is a major extension to the sixth main release of TiMBL.
-Most significant change: The main program is now called 'timbl' and not 
+Most significant change: The main program is now called 'timbl' and not
 'Timbl' anymore. Be warned!
-This change is part of our effort to get our MBL software into software 
+This change is part of our effort to get our MBL software into software
 distributions like Debian, Ubuntu, RedHat .
 
-While this is NOT a Beta version it may still contain some bugs or behave not
-exactly as documented or expected. Comments and bug-reports are welcome at our
-issue tracker at https://github.com/LanguageMachines/timbl/issues or by mailing
-a.vandenbosch (at) let.ru.nl. Updates and more info may be found on
-https://languagemachines.github.io/timbl .
+Comments and bug-reports are welcome at our issue tracker at
+https://github.com/LanguageMachines/timbl/issues or by mailing
+lamasoftware (at) science.ru.nl.
+Updates and more info may be found on https://languagemachines.github.io/timbl .
 
 TiMBL is distributed under the GNU Public Licence v3 (see the file COPYING).
 
@@ -71,16 +70,13 @@ following pakages:
 
 To install TiMBL, first consult whether your distribution's package manager has an up-to-date package for TiMBL.
 If not, for easy installation of TiMBL and all dependencies, it is included as part of our software
-distribution LaMachine: https://proycon.github.io/LaMachine . 
- 
+distribution LaMachine: https://proycon.github.io/LaMachine .
+
 To compile and install manually from source instead, provided you have all the dependencies installed:
 
  $ bash bootstrap.sh
- $ ./configure 
+ $ ./configure
  $ make
  $ make install
 
 (See the INSTALL file for more details)
-
-
-
