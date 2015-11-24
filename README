@@ -1,44 +1,79 @@
-TiMBL 6.4.0 (c) ILK/CLiPS 1998 - 2012
+TiMBL 6.4 (c) CLS/ILK/CLiPS 1998 - 2015
 
 Tilburg Memory Based Learner
+ https://languagemachines.github.io/timbl/
 
-Induction of Linguistic Knowledge Research Group, Tilburg University and
-Centre for Dutch Language and Speech, University of Antwerp
+    Centre for Language Studies, Radboud University Nijmegen
+    Induction of Linguistic Knowledge Research Group, Tilburg University and
+    Centre for Dutch Language and Speech, University of Antwerp
+
+
+
+TiMBL is an open source software package implementing several memory-based
+learning algorithms, among which IB1-IG, an implementation of k-nearest
+neighbor classification with feature weighting suitable for symbolic feature
+spaces, and IGTree, a decision-tree approximation of IB1-IG. All implemented
+algorithms have in common that they store some representation of the training
+set explicitly in memory. During testing, new cases are classified by
+extrapolation from the most similar stored cases.
+
+For over fifteen years TiMBL has been mostly used in natural language
+processing as a machine learning classifier component, but its use extends to
+virtually any supervised machine learning domain. Due to its particular
+decision-tree-based implementation, TiMBL is in many cases far more efficient
+in classification than a standard k-nearest neighbor algorithm would be.
+
+
+-----------------------------------------------------------------------
 
 This is a major extension to the sixth main release of TiMBL.
 Most significant change: The main program is now called 'timbl' and not 
 'Timbl' anymore. Be warned!
 This change is part of our effort to get our MBL software into software 
-distributions like Debian, Ubuntu, RedHat and Fink (Mac OSX).
+distributions like Debian, Ubuntu, RedHat .
 
-While this is NOT a Beta version it may still contain some bugs or
-behave not exactly as documented or expected. Comments and
-bug-reports are welcome at: timbl@uvt.nl. Updates and more info
-may be found on http://ilk.uvt.nl/timbl .
+While this is NOT a Beta version it may still contain some bugs or behave not
+exactly as documented or expected. Comments and bug-reports are welcome at our
+issue tracker at https://github.com/LanguageMachines/timbl/issues or by mailing
+a.vandenbosch (at) let.ru.nl. Updates and more info may be found on
+https://languagemachines.github.io/timbl .
 
-TiMBL is distributed under the GNU Public Licence (see the file COPYING).
+TiMBL is distributed under the GNU Public Licence v3 (see the file COPYING).
 
+-----------------------------------------------------------------------
 
 This software has been tested on:
-- Intel platform running several versions of Linux, including Ubuntu and Debian
-  both 32 and 64 bits
+- Intel platforms running several versions of Linux, including Ubuntu, Debian,
+  Arch Linux, Fedora (both 32 and 64 bits)
 - Windows platform using Cygwin
 - MAC platform running OS X 10.5
 
 Compilers:
-- GCC (3.4 - 4.2.0). It is highly recommended to upgrade to at least GCC 4.1
+ - GCC (use at least GCC 4.1)
+ - Clang
 
 Contents of this distribution:
 - Sources
 - Licensing information ( COPYING )
 - Installation instructions ( INSTALL )
-- Build system based om Gnu Autotools
+- Build system based on GNU Autotools
 - Example data files ( in the demos directory )
 - Documentation ( in the docs directory )
 
 Dependencies:
 To be able to succesfully build TiMBL from the tarball, you need the
 following pakages:
+- ticcutils (https://github.com/LanguageMachines/ticcutils)
 - pkg-config
 - libxml2-dev
+
+
+To install TiMBL, first consult whether your distribution's package manager has an up-to-date package for TiMBL.
+If not, for easy installation of TiMBL and all dependencies, it is included as part of our software
+distribution LaMachine: https://proycon.github.io/LaMachine . 
+
+To compile and install manually from source, provided you have all the
+dependencies installed, consult the included INSTALL file.
+
+
 
