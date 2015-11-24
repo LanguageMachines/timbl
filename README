@@ -72,9 +72,15 @@ following pakages:
 To install TiMBL, first consult whether your distribution's package manager has an up-to-date package for TiMBL.
 If not, for easy installation of TiMBL and all dependencies, it is included as part of our software
 distribution LaMachine: https://proycon.github.io/LaMachine . 
+ 
+To compile and install manually from source instead, provided you have all the dependencies installed:
 
-To compile and install manually from source, provided you have all the
-dependencies installed, consult the included INSTALL file.
+ $ bash bootstrap.sh
+ $ ./configure 
+ $ make
+ $ make install
+
+(See the INSTALL file for more details)
 
 
 
