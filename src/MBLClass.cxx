@@ -1,7 +1,4 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
@@ -326,8 +323,8 @@ namespace Timbl {
 	InstanceBase->CleanPartition( false );
       }
     }
-    for ( unsigned int i=0; i < Features.size(); ++i ){
-      delete Features[i];
+    for ( auto const& feat : Features ){
+      delete feat;
     }
     delete GlobalMetric;
     delete tester;
@@ -438,10 +435,10 @@ namespace Timbl {
       return false;
     else {
       int OldPrec = os.precision(DBL_DIG);
-      for ( size_t i=0; i< num_of_features; ++i ){
+      size_t pos = 0;
+      for ( auto const& feat : Features ){
 	os.precision(DBL_DIG);
-	os << "Feature " << i+1 << "\t : "
-	   << Features[i]->Weight() << endl;
+	os << "Feature " << ++pos << "\t : " << feat->Weight() << endl;
       }
       os.precision(OldPrec);
     }
@@ -514,30 +511,30 @@ namespace Timbl {
   }
 
   void MBLClass::InitWeights(void){
-    for ( size_t i=0; i< num_of_features; ++i ){
-      if ( Features[i]->Ignore() )
-	Features[i]->SetWeight( 0.0 );
+    for ( auto& feat : Features ){
+      if ( feat->Ignore() )
+	feat->SetWeight( 0.0 );
       else
 	switch ( Weighting ){
 	case IG_w:
-	  Features[i]->SetWeight( Features[i]->InfoGain() );
+	  feat->SetWeight( feat->InfoGain() );
 	  break;
 	case GR_w:
-	  Features[i]->SetWeight( Features[i]->GainRatio() );
+	  feat->SetWeight( feat->GainRatio() );
 	  break;
 	case X2_w:
-	  Features[i]->SetWeight( Features[i]->ChiSquare() );
+	  feat->SetWeight( feat->ChiSquare() );
 	  break;
 	case SV_w:
-	  Features[i]->SetWeight( Features[i]->SharedVariance() );
+	  feat->SetWeight( feat->SharedVariance() );
 	  break;
 	case SD_w:
-	  Features[i]->SetWeight( Features[i]->StandardDeviation() );
+	  feat->SetWeight( feat->StandardDeviation() );
 	  break;
 	case UserDefined_w:
 	  break;
 	case No_w:
-	  Features[i]->SetWeight( 1.0 );
+	  feat->SetWeight( 1.0 );
 	  break;
 	case Unknown_w:
 	case Max_w:
@@ -550,17 +547,17 @@ namespace Timbl {
 
   void MBLClass::diverseWeights(void){
     double minW = DBL_MAX;
-    for ( size_t i=0; i< num_of_features; ++i ){
-      if ( Features[i]->Ignore() )
+    for ( auto& feat : Features ){
+      if ( feat->Ignore() )
 	continue;
-      if ( Features[i]->Weight() < minW ){
-	minW =  Features[i]->Weight();
+      if ( feat->Weight() < minW ){
+	minW =  feat->Weight();
       }
     }
-    for ( size_t i=0; i< num_of_features; ++i ){
-      if ( Features[i]->Ignore() )
+    for ( auto& feat : Features ){
+      if ( feat->Ignore() )
 	continue;
-      Features[i]->SetWeight( (Features[i]->Weight() - minW ) + Epsilon );
+      feat->SetWeight( (feat->Weight() - minW ) + Epsilon );
     }
   }
 
@@ -598,55 +595,56 @@ namespace Timbl {
   void MBLClass::set_order(){
     calculate_fv_entropy(false);
     vector<double> Order(num_of_features);
-    for ( size_t i=0; i < num_of_features; ++i )
+    size_t i = 0;
+    for ( auto const& feat : Features ){
       switch( TreeOrder ){
       case DataFile:
-	Order[i] = Features[i]->Weight();
+	Order[i] = feat->Weight();
 	break;
       case NoOrder:
 	Order[i] = (double)(num_of_features-i);
 	break;
       case IGOrder:
-	Order[i] = Features[i]->InfoGain();
+	Order[i] = feat->InfoGain();
 	break;
       case GROrder:
-	Order[i] = Features[i]->GainRatio();
+	Order[i] = feat->GainRatio();
 	break;
       case IGEntropyOrder:
-	Order[i] = Features[i]->InfoGain() * Features[i]->SplitInfo();
+	Order[i] = feat->InfoGain() * feat->SplitInfo();
 	break;
       case GREntropyOrder:
-	Order[i] = Features[i]->GainRatio() * Features[i]->SplitInfo();
+	Order[i] = feat->GainRatio() * feat->SplitInfo();
 	break;
       case X2Order:
-	Order[i] = Features[i]->ChiSquare();
+	Order[i] = feat->ChiSquare();
 	break;
       case SVOrder:
-	Order[i] = Features[i]->SharedVariance();
+	Order[i] = feat->SharedVariance();
 	break;
       case SDOrder:
-	Order[i] = Features[i]->StandardDeviation();
+	Order[i] = feat->StandardDeviation();
 	break;
       case OneoverFeature:
-	Order[i] =  1.0 / Features[i]->ValuesArray.size();
+	Order[i] =  1.0 / feat->ValuesArray.size();
 	break;
       case GRoverFeature:
-	Order[i] =  Features[i]->GainRatio() / Features[i]->ValuesArray.size();
+	Order[i] =  feat->GainRatio() / feat->ValuesArray.size();
 	break;
       case IGoverFeature:
-	Order[i] =  Features[i]->InfoGain() / Features[i]->ValuesArray.size();
+	Order[i] =  feat->InfoGain() / feat->ValuesArray.size();
 	break;
       case X2overFeature:
-	Order[i] =  Features[i]->ChiSquare() / Features[i]->ValuesArray.size();
+	Order[i] =  feat->ChiSquare() / feat->ValuesArray.size();
 	break;
       case SVoverFeature:
-	Order[i] =  Features[i]->SharedVariance() / Features[i]->ValuesArray.size();
+	Order[i] =  feat->SharedVariance() / feat->ValuesArray.size();
 	break;
       case SDoverFeature:
-	Order[i] =  Features[i]->StandardDeviation() / Features[i]->ValuesArray.size();
+	Order[i] =  feat->StandardDeviation() / feat->ValuesArray.size();
 	break;
       case OneoverSplitInfo:
-	Order[i] =  1.0 / Features[i]->SplitInfo();
+	Order[i] =  1.0 / feat->SplitInfo();
 	break;
       case UnknownOrdening:
       case MaxOrdening:
@@ -654,6 +652,8 @@ namespace Timbl {
 		    toString( TreeOrder ) );
 	break;
       }
+      ++i;
+    }
     calculatePermutation( Order );
     if ( !Verbosity(SILENT) )
       writePermutation( *mylog );
@@ -668,15 +668,17 @@ namespace Timbl {
   void MBLClass::MatrixInfo( ostream& os ) const {
     unsigned int TotalCount = 0;
     bool dummy;
-    for ( size_t f = 0; f < num_of_features; ++f ){
-      if ( !Features[f]->Ignore() &&
-	   Features[f]->isStorableMetric() &&
-	   Features[f]->matrixPresent( dummy ) ){
-	unsigned int Count = Features[f]->matrix_byte_size();
-	os << "Size of value-matrix[" << f+1 << "] = "
+    size_t m = 1;
+    for ( const auto& feat : Features ){
+      if ( !feat->Ignore() &&
+	   feat->isStorableMetric() &&
+	   feat->matrixPresent( dummy ) ){
+	unsigned int Count = feat->matrix_byte_size();
+	os << "Size of value-matrix[" << m << "] = "
 	   << Count << " Bytes " << endl;
 	TotalCount += Count;
       }
+      ++m;
     }
     if ( TotalCount )
       os << "Total Size of value-matrices " << TotalCount << " Bytes "
@@ -737,15 +739,16 @@ namespace Timbl {
   }
 
   bool MBLClass::writeMatrices( ostream& os ) const {
-    for ( size_t i = 0; i < num_of_features; ++i ){
-      os << "Feature " << i+1;
+    size_t pos = 0;
+    for ( const auto& feat : Features ){
+      os << "Feature " << ++pos;
       bool dummy;
-      if ( !Features[i]->matrixPresent(  dummy ) ){
+      if ( !feat->matrixPresent(  dummy ) ){
 	os << " not available.\n" << endl;
       }
       else {
 	os << endl;
-	Features[i]->print_matrix( os );
+	feat->print_matrix( os );
       }
     }
     return os.good();
@@ -848,29 +851,34 @@ namespace Timbl {
 	  os << ",";
       }
       os << "." << endl << endl;
-      for ( size_t i = 0; i < num_of_features; ++i )
-	if ( Features[i]->Ignore() )
-	  os << "feature # " << i+1 << " Ignored, (-s option)" << endl;
-	else if (Features[i]->isNumerical() )
-	  os << "feature # " << i+1 << " Numeric, (-N option)" << endl;
+      size_t pos = 0;
+      for ( const auto& feat : Features ){
+	os << "feature # " << ++pos ;
+	if ( feat->Ignore() ){
+	  os << " Ignored, (-s option)" << endl;
+	}
+	else if ( feat->isNumerical() ){
+	  os << " Numeric, (-N option)" << endl;
+	}
 	else {
-	  os << "feature # " << i+1 << " Matrix: " << endl;
-	  Features[i]->print_vc_pb_array( os );
+	  os << " Matrix: " << endl;
+	  feat->print_vc_pb_array( os );
 	  os << endl;
 	}
+      }
       return true;
     }
   }
 
   bool MBLClass::allocate_arrays(){
     size_t Dim = Targets->ValuesArray.size();
-    bool result = true;
-    for ( size_t j = 0; result && j < num_of_features; ++j ) {
-      if ( !Features[j]->Ignore() &&
-	   !Features[j]->isNumerical() ) {
-	result = Features[j]->AllocSparseArrays( Dim );
+    for ( const auto& feat : Features ){
+      if ( !feat->Ignore() &&
+	   !feat->isNumerical() ) {
+	if ( !feat->AllocSparseArrays( Dim ) )
+	  return false;
       }
-    } // j
+    }
     return true;
   }
 
@@ -879,15 +887,15 @@ namespace Timbl {
     if ( !is_copy ){
       result = allocate_arrays();
       if ( result ){
-	for ( size_t j = 0; j < num_of_features; ++j ) {
-	  if ( !Features[j]->Ignore() &&
-	       !Features[j]->isNumerical() ){
-	    Features[j]->ClipFreq( (int)rint(clip_factor *
-					     log((double)Features[j]->EffectiveValues())));
-	    if ( !Features[j]->ArrayRead() &&
+	for ( const auto& feat : Features ){
+	  if ( !feat->Ignore() &&
+	       !feat->isNumerical() ){
+	    feat->ClipFreq( (int)rint(clip_factor *
+				      log((double)feat->EffectiveValues())));
+	    if ( !feat->ArrayRead() &&
 		 ( force ||
-		   Features[j]->isStorableMetric() ) ){
-	      Features[j]->InitSparseArrays();
+		   feat->isStorableMetric() ) ){
+	      feat->InitSparseArrays();
 	    }
 	  }
 	} // j
@@ -907,21 +915,24 @@ namespace Timbl {
 	  PermFeatures[j]->store_matrix( mvd_threshold );
 	}
       }
-      if ( Verbosity(VD_MATRIX) )
-	for ( size_t i = 0; i < num_of_features; ++i )
-	  if ( !Features[i]->Ignore() ){
+      if ( Verbosity(VD_MATRIX) ){
+	size_t pos = 0;
+	for ( auto const& feat : Features ){
+	  ++pos;
+	  if ( !feat->Ignore() ){
 	    bool dummy;
-	    if (Features[i]->matrixPresent( dummy ) ){
-	      *mylog << "Value matrix of feature # "
-		     << i+1 << endl;
-	      Features[i]->print_matrix( *mylog, true );
+	    *mylog << "Value Difference matrix of feature # "
+		   << pos << endl;
+	    if ( feat->matrixPresent( dummy ) ){
+	      feat->print_matrix( *mylog, true );
 	      *mylog << endl;
 	    }
 	    else {
-	      *mylog << "Value Difference matrix of feature # "
-		     << i+1 << endl << "Not available." << endl;
+	      *mylog << "Not available." << endl;
 	    }
 	  }
+	}
+      }
     }
   }
 
@@ -1027,17 +1038,18 @@ namespace Timbl {
       if ( Verbosity(FEAT_W) ){
 	if (  CurrentWeighting() == SD_w ){
 	  os << "Feats\tVals\tStandard Deviation" << endl;
-	  for ( size_t i = 0; i < num_of_features; ++i ) {
-	    os << setw(5) << i+1;
+	  size_t pos = 0;
+	  for ( const auto& feat : Features ){
+	    os << setw(5) << ++pos;
 	    os.setf(ios::right, ios::adjustfield);
-	    if ( Features[i]->Ignore() ){
+	    if ( feat->Ignore() ){
 	      os << " (ignored) " << endl;
 	    }
 	    else {
 	      os.setf(ios::right, ios::adjustfield);
-	      os << setw(7) << Features[i]->EffectiveValues()
-		 << "\t" << Features[i]->StandardDeviation();
-	      if ( Features[i]->isNumerical() )
+	      os << setw(7) << feat->EffectiveValues()
+		 << "\t" << feat->StandardDeviation();
+	      if ( feat->isNumerical() )
 		os << " NUMERIC";
 	      os << endl;
 	    }
@@ -1047,20 +1059,21 @@ namespace Timbl {
 	}
 	else if ( need_all_weights ){
 	  os << "Feats\tVals\tX-square\tVariance\tInfoGain\tGainRatio" << endl;
-	  for ( size_t i = 0; i < num_of_features; ++i ) {
-	    os << setw(5) << i+1;
+	  size_t pos = 0;
+	  for ( const auto& feat : Features ) {
+	    os << setw(5) << ++pos;
 	    os.setf(ios::right, ios::adjustfield);
-	    if ( Features[i]->Ignore() ){
+	    if ( feat->Ignore() ){
 	      os << " (ignored) " << endl;
 	    }
 	    else {
 	      os.setf(ios::right, ios::adjustfield);
-	      os << setw(7) << Features[i]->EffectiveValues()
-		 << "\t" << Features[i]->ChiSquare()
-		 << "\t" << Features[i]->SharedVariance()
-		 << "\t" << Features[i]->InfoGain()
-		 << "\t" << Features[i]->GainRatio();
-	      if ( Features[i]->isNumerical() )
+	      os << setw(7) << feat->EffectiveValues()
+		 << "\t" << feat->ChiSquare()
+		 << "\t" << feat->SharedVariance()
+		 << "\t" << feat->InfoGain()
+		 << "\t" << feat->GainRatio();
+	      if ( feat->isNumerical() )
 		os << " NUMERIC";
 	      os << endl;
 	    }
@@ -1070,18 +1083,19 @@ namespace Timbl {
 	}
 	else {
 	  os << "Feats\tVals\tInfoGain\tGainRatio" << endl;
-	  for ( size_t i = 0; i < num_of_features; ++i ) {
-	    os << setw(5) << i+1;
+	  size_t pos = 0;
+	  for ( const auto& feat : Features ) {
+	    os << setw(5) << ++pos;
 	    os.setf(ios::right, ios::adjustfield);
-	    if ( Features[i]->Ignore() ){
+	    if ( feat->Ignore() ){
 	      os << " (ignored) " << endl;
 	    }
 	    else {
 	      os.setf(ios::right, ios::adjustfield);
-	      os << setw(7) << Features[i]->EffectiveValues()
-		 << "\t" << Features[i]->InfoGain()
-		 << "\t" << Features[i]->GainRatio();
-	      if ( Features[i]->isNumerical() )
+	      os << setw(7) << feat->EffectiveValues()
+		 << "\t" << feat->InfoGain()
+		 << "\t" << feat->GainRatio();
+	      if ( feat->isNumerical() )
 		os << " NUMERIC";
 	      os << endl;
 	    }
@@ -1309,12 +1323,12 @@ namespace Timbl {
       }
       // make shure all weights are correct
       // Paranoid?
-      for ( size_t i=0; i< num_of_features; ++i ){
-	Features[i]->InfoGain( Features[i]->Weight() );
-	Features[i]->GainRatio( Features[i]->Weight() );
-	Features[i]->ChiSquare( Features[i]->Weight() );
-	Features[i]->SharedVariance( Features[i]->Weight() );
-	Features[i]->StandardDeviation( 0.0 );
+      for ( const auto& feat : Features ){
+	feat->InfoGain( feat->Weight() );
+	feat->GainRatio( feat->Weight() );
+	feat->ChiSquare( feat->Weight() );
+	feat->SharedVariance( feat->Weight() );
+	feat->StandardDeviation( 0.0 );
       }
       Weighting = UserDefined_w;
     }
