@@ -1088,10 +1088,13 @@ namespace Timbl {
 	  do_exact = mood;
 	  break;
 
+	default:
+	  Warning( string("unhandled option: ") + option + " " + opt_val );
 	}
       }
       catch( std::runtime_error& err ) {
-	cerr << "invalid value for option '" << option << "'" << endl;
+	Error( string("invalid value for option '-") + option + "' ("
+	       + opt_val + ")" );
 	return false;
       }
     }
