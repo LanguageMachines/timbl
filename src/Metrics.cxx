@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -64,14 +64,14 @@ namespace Timbl{
     }
     if (m == 0) {
       return (double)n;
-    }    
+    }
     // Good form to declare a TYPEDEF
-    typedef std::vector< std::vector<size_t> > Tmatrix;     
+    typedef std::vector< std::vector<size_t> > Tmatrix;
     Tmatrix matrix(n+1);
-    
+
     // Size the vectors in the 2.nd dimension. Unfortunately C++ doesn't
     // allow for allocation on declaration of 2.nd dimension of vec of vec
-    
+
     for ( size_t i = 0; i <= n; ++i ) {
       matrix[i].resize(m+1);
     }
@@ -103,7 +103,7 @@ namespace Timbl{
 	size_t cell = min( above + 1, min(left + 1, diag + cost));
 	// Step 6A: Cover transposition, in addition to deletion,
 	// insertion and substitution. This step is taken from:
-	// Berghel, Hal ; Roach, David : "An Extension of Ukkonen's 
+	// Berghel, Hal ; Roach, David : "An Extension of Ukkonen's
 	// Enhanced Dynamic Programming ASM Algorithm"
 	// (http://www.acm.org/~hlb/publications/asm/asm.html)
 	if (i>2 && j>2) {
@@ -117,7 +117,7 @@ namespace Timbl{
     }
     return (double)matrix[n][m];
   }
-  
+
   double dc_distance( const string& string1, const string& string2 ){
     // code taken from:
     // http://en.wikibooks.org/wiki/Algorithm_implementation/Strings/Dice's_coefficient
@@ -130,46 +130,44 @@ namespace Timbl{
       // back-off naar unigrammen
       set<char> string1_unigrams;
       set<char> string2_unigrams;
-      
-      for(unsigned int i = 0; i < ls1; i++) {
-	string1_unigrams.insert(string1[i]);
+
+      for( const auto& c : string1 ){
+	string1_unigrams.insert(c);
       }
-      for(unsigned int i = 0; i < ls2; i++) {
-	string2_unigrams.insert(string2[i]);
+      for( const auto& c : string2 ){
+	string2_unigrams.insert(c);
       }
-      
+
       set<char>::const_iterator it = string2_unigrams.begin();
-      while ( it != string2_unigrams.end() ){
-	if ( string1_unigrams.find( *it ) != string1_unigrams.end() )
+      for ( const auto& ug : string2_unigrams ){
+	if ( string1_unigrams.find( ug ) != string1_unigrams.end() )
 	  ++overlap;
-	++it;
       }
       total = string1_unigrams.size() + string2_unigrams.size();
     }
     else {
       set<string> string1_bigrams;
       set<string> string2_bigrams;
-      
-      for(unsigned int i = 0; i < (ls1 - 1); i++) {      // extract character bigrams from string1
+
+      for( unsigned int i = 0; i < (ls1 - 1); ++i ) {
+	// extract character bigrams from string1
 	string1_bigrams.insert(string1.substr(i, 2));
       }
-      for(unsigned int i = 0; i < (ls2 - 1); i++) {      // extract character bigrams from string2
+      for( unsigned int i = 0; i < (ls2 - 1); ++i ) {
+	// extract character bigrams from string2
 	string2_bigrams.insert(string2.substr(i, 2));
       }
-      
-      set<string>::const_iterator it = string2_bigrams.begin();
-      while ( it != string2_bigrams.end() ){
-	if ( string1_bigrams.find( *it ) != string1_bigrams.end() )
+
+      for ( const auto& bg : string2_bigrams ){
+	if ( string1_bigrams.find( bg ) != string1_bigrams.end() )
 	  ++overlap;
-	++ it;
       }
       total = string1_bigrams.size() + string2_bigrams.size();
     }
     dice = (double)(overlap * 2) / (double)total;
-    // we will return 1 - dice coefficient ad distance
-    dice = 1.0 - dice;
-    return dice;
-  }  
+    // we will return 1 - dice coefficient as distance
+    return 1.0 - dice;
+  }
 
   double vd_distance( SparseValueProbClass *r, SparseValueProbClass *s ){
     double result = 0.0;
@@ -191,7 +189,7 @@ namespace Timbl{
       else {
 	result += p1->second;
 	++p1;
-      }	  
+      }
     }
     while ( p1 != r->end() ){
       result += p1->second;
@@ -204,13 +202,13 @@ namespace Timbl{
     result = result / 2.0;
     return result;
   }
-  
+
   double p_log_p_div_q( double p, double q ) {
     if ( abs(q) < Epsilon )
       return 0;
     return p * Log2( p/q );
   }
-  
+
   double jd_distance( SparseValueProbClass *r, SparseValueProbClass *s ){
     double part1 = 0.0;
     double part2 = 0.0;
@@ -231,7 +229,7 @@ namespace Timbl{
       else {
 	part1 += p1->second;
 	++p1;
-      }	  
+      }
     }
     while ( p1 != r->end() ){
       part1 += p1->second;
@@ -250,7 +248,7 @@ namespace Timbl{
     if ( abs(k+l) < Epsilon )
       return 0;
     return k * Log2( (2.0 * k)/( k + l ) );
-  }  
+  }
 
   double js_distance( SparseValueProbClass *r, SparseValueProbClass *s ){
     double part1 = 0.0;
@@ -272,7 +270,7 @@ namespace Timbl{
       else {
 	part1 += p1->second;
 	++p1;
-      }	  
+      }
     }
     while ( p1 != r->end() ){
       part1 += p1->second;
@@ -286,7 +284,7 @@ namespace Timbl{
     result = result / 2.0;
     return result;
   }
-  
+
 
   metricClass *getMetricClass( MetricType mt ){
     switch ( mt ){
@@ -329,7 +327,7 @@ namespace Timbl{
   }
 
   double OverlapMetric::distance( FeatureValue *F,
-				  FeatureValue *G, 
+				  FeatureValue *G,
 				  size_t,
 				  double ) const {
     if ( F == G )
@@ -345,9 +343,9 @@ namespace Timbl{
 	return true;
     }
     return false;
-  }  
+  }
 
-  double JeffreyMetric::distance( FeatureValue *F, FeatureValue *G, 
+  double JeffreyMetric::distance( FeatureValue *F, FeatureValue *G,
 				  size_t limit,
 				  double ) const {
     double result = 0.0;
@@ -356,7 +354,7 @@ namespace Timbl{
 	   G->ValFreq() < limit ){
 #ifdef METRIC_DEBUG
 	cerr << "result = 1.0 vanwege F.valFreq=" <<  F->ValFreq()
-	     << " en G.valFreq()=" << G ->ValFreq() 
+	     << " en G.valFreq()=" << G ->ValFreq()
 	     << " met limiet= " << limit << endl;
 #endif
 	result = 1.0;
@@ -368,7 +366,7 @@ namespace Timbl{
     return result;
   }
 
-  double JSMetric::distance( FeatureValue *F, FeatureValue *G, 
+  double JSMetric::distance( FeatureValue *F, FeatureValue *G,
 			     size_t limit,
 			     double ) const {
     double result = 0.0;
@@ -377,7 +375,7 @@ namespace Timbl{
 	   G->ValFreq() < limit ){
 #ifdef METRIC_DEBUG
 	cerr << "result = 1.0 vanwege F.valFreq=" <<  F->ValFreq()
-	     << " en G.valFreq()=" << G ->ValFreq() 
+	     << " en G.valFreq()=" << G ->ValFreq()
 	     << " met limiet= " << limit << endl;
 #endif
 	result = 1.0;
@@ -389,16 +387,16 @@ namespace Timbl{
     return result;
   }
 
-  double LevenshteinMetric::distance( FeatureValue *F, FeatureValue *G, 
+  double LevenshteinMetric::distance( FeatureValue *F, FeatureValue *G,
 				      size_t, double) const {
     double result = 0.0;
     if ( G != F ){
       result = lv_distance( F->Name(), G->Name() );
     }
     return result;
-  }  
+  }
 
-  double DiceMetric::distance( FeatureValue *F, FeatureValue *G, 
+  double DiceMetric::distance( FeatureValue *F, FeatureValue *G,
 			       size_t, double ) const {
     double result = 0.0;
     if ( G != F ){
@@ -406,8 +404,8 @@ namespace Timbl{
     }
     return result;
   }
-  
-  double ValueDiffMetric::distance( FeatureValue *F, FeatureValue *G, 
+
+  double ValueDiffMetric::distance( FeatureValue *F, FeatureValue *G,
 				    size_t limit,
 				    double ) const {
     double result = 0.0;
@@ -416,7 +414,7 @@ namespace Timbl{
 	   G->ValFreq() < limit ){
 #ifdef METRIC_DEBUG
 	cerr << "result = 1.0 vanwege F.valFreq=" <<  F->ValFreq()
-	     << " en G.valFreq()=" << G ->ValFreq() 
+	     << " en G.valFreq()=" << G ->ValFreq()
 	     << " met limiet= " << limit << endl;
 #endif
 	result = 1.0;
@@ -427,8 +425,8 @@ namespace Timbl{
     return result;
   }
 
-  double NumericMetric::distance( FeatureValue *F, FeatureValue *G, 
-				  size_t, 
+  double NumericMetric::distance( FeatureValue *F, FeatureValue *G,
+				  size_t,
 				  double scale ) const {
     double r1, r2, result;
     if ( FV_to_real( F, r1 ) &&
@@ -438,9 +436,9 @@ namespace Timbl{
       result = 1.0;
     return result;
   }
-  
-  double EuclideanMetric::distance( FeatureValue *F, FeatureValue *G, 
-				    size_t, 
+
+  double EuclideanMetric::distance( FeatureValue *F, FeatureValue *G,
+				    size_t,
 				    double scale ) const {
     double r1, r2, result;
     if ( FV_to_real( F, r1 ) &&
@@ -450,19 +448,18 @@ namespace Timbl{
       result = 1.0;
     return result;
   }
-  
-  double DotProductMetric::distance( FeatureValue *, FeatureValue *, 
+
+  double DotProductMetric::distance( FeatureValue *, FeatureValue *,
 				     size_t, double ) const {
     throw( logic_error( "unimplemented distance() for Dotproduct metric!" ) );
     return -1.0;
   }
 
-  double CosineMetric::distance( FeatureValue *, FeatureValue *, 
+  double CosineMetric::distance( FeatureValue *, FeatureValue *,
 				 size_t, double ) const {
     throw( logic_error( "unimplemented distance() for Cosine metric!" ) );
     return -1.0;
   }
 
-  
-}  
 
+}
