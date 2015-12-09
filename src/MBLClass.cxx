@@ -511,7 +511,7 @@ namespace Timbl {
   }
 
   void MBLClass::InitWeights(void){
-    for ( auto& feat : Features ){
+    for ( auto const& feat : Features ){
       if ( feat->Ignore() )
 	feat->SetWeight( 0.0 );
       else
@@ -547,14 +547,14 @@ namespace Timbl {
 
   void MBLClass::diverseWeights(void){
     double minW = DBL_MAX;
-    for ( auto& feat : Features ){
+    for ( auto const& feat : Features ){
       if ( feat->Ignore() )
 	continue;
       if ( feat->Weight() < minW ){
 	minW =  feat->Weight();
       }
     }
-    for ( auto& feat : Features ){
+    for ( auto const& feat : Features ){
       if ( feat->Ignore() )
 	continue;
       feat->SetWeight( (feat->Weight() - minW ) + Epsilon );
@@ -1122,65 +1122,77 @@ namespace Timbl {
 	  os << "#" << endl;
 	  os << "# " << toString( SD_w ) << endl;
 	  os << "# Fea." << "\t" << "Weight" << endl;
-	  for (  size_t i = 0; i < num_of_features; ++i ) {
+	  size_t pos = 0;
+	  for ( const auto& feat : Features ){
 	    os.precision(DBL_DIG);
-	    if ( Features[i]->Ignore() )
-	      os << i+1 << "\t" << "Ignore" << endl;
+	    os << ++pos << "\t";
+	    if ( feat->Ignore() )
+	      os << "Ignore" << endl;
 	    else
-	      os << i+1 << "\t" << Features[i]->StandardDeviation() << endl;
+	      os << feat->StandardDeviation() << endl;
 	  }
 	  os << "#" << endl;
 	}
 	else {
 	  os << "# " << toString( No_w ) << endl;
 	  os << "# Fea." << "\t" << "Weight" << endl;
-	  for (  size_t i = 0; i < num_of_features; ++i ) {
+	  size_t pos = 0;
+	  for (  const auto& feat : Features ){
 	    os.precision(DBL_DIG);
-	    if ( Features[i]->Ignore() )
-	      os << i+1 << "\t" << "Ignore" << endl;
+	    os << ++pos << "\t";
+	    if ( feat->Ignore() )
+	      os << "Ignore" << endl;
 	    else
-	      os << i+1 << "\t" << 1.0 << endl;
+	      os << 1.0 << endl;
 	  }
 	  os << "#" << endl;
 	  os << "# " << toString( GR_w ) << endl;
 	  os << "# Fea." << "\t" << "Weight" << endl;
-	  for (  size_t i = 0; i < num_of_features; ++i ) {
+	  pos = 0;
+	  for (  const auto& feat : Features ){
 	    os.precision(DBL_DIG);
-	    if ( Features[i]->Ignore() )
-	      os << i+1 << "\t" << "Ignore" << endl;
+	    os << ++pos << "\t";
+	    if ( feat->Ignore() )
+	      os << "Ignore" << endl;
 	    else
-	      os << i+1 << "\t" << Features[i]->GainRatio() << endl;
+	      os << feat->GainRatio() << endl;
 	  }
 	  os << "#" << endl;
 	  os << "# " << toString( IG_w ) << endl;
 	  os << "# Fea." << "\t" << "Weight" << endl;
-	  for (  size_t i = 0; i < num_of_features; ++i ) {
+	  pos = 0;
+	  for (  const auto& feat : Features ){
 	    os.precision(DBL_DIG);
-	    if ( Features[i]->Ignore() )
-	      os << i+1 << "\t" << "Ignore" << endl;
+	    os << ++pos << "\t";
+	    if ( feat->Ignore() )
+	      os << "Ignore" << endl;
 	    else
-	      os << i+1 << "\t" << Features[i]->InfoGain() << endl;
+	      os << feat->InfoGain() << endl;
 	  }
 	  if ( need_all_weights ){
 	    os << "#" << endl;
 	    os << "# " << toString( SV_w ) << endl;
 	    os << "# Fea." << "\t" << "Weight" << endl;
-	    for (  size_t i = 0; i < num_of_features; ++i ) {
+	    pos = 0;
+	    for (  const auto& feat : Features ){
 	      os.precision(DBL_DIG);
-	      if ( Features[i]->Ignore() )
-		os << i+1 << "\t" << "Ignore" << endl;
+	      os << ++pos << "\t";
+	      if ( feat->Ignore() )
+		os << "Ignore" << endl;
 	      else
-		os << i+1 << "\t" << Features[i]->SharedVariance() << endl;
+		os << feat->SharedVariance() << endl;
 	    }
 	    os << "#" << endl;
 	    os << "# " << toString( X2_w ) << endl;
 	    os << "# Fea." << "\t" << "Weight" << endl;
-	    for (  size_t i = 0; i < num_of_features; ++i ) {
+	    pos = 0;
+	    for (  const auto& feat : Features ){
 	      os.precision(DBL_DIG);
-	      if ( Features[i]->Ignore() )
-		os << i+1 << "\t" << "Ignore" << endl;
+	      os << ++pos << "\t";
+	      if ( feat->Ignore() )
+		os << "Ignore" << endl;
 	      else
-		os << i+1 << "\t" << Features[i]->ChiSquare() << endl;
+		os << feat->ChiSquare() << endl;
 	    }
 	    os << "#" << endl;
 	  }
@@ -1410,7 +1422,7 @@ namespace Timbl {
       bool first = true;
       ostringstream ostr1;
       ostringstream ostr2;
-      for ( size_t ff = 0; ff < num_of_features; ++ff )
+      for ( size_t ff = 0; ff < num_of_features; ++ff ){
 	if ( feat_status[ff] == NotNumeric ){
 	  if ( first ){
 	    ostr1 << "The following feature(s) have non numeric value: ";
@@ -1428,6 +1440,7 @@ namespace Timbl {
 	  else
 	    ostr1 << ff+1;
 	}
+      }
       if ( !first  ){
 	Error( ostr1.str() );
 	if ( GlobalMetric->isSimilarityMetric() )
@@ -1490,17 +1503,16 @@ namespace Timbl {
       }
     }
     if ( always || realy_first ){
-      for ( size_t i = 0; i < num_of_features; ++i ) {
+      for ( const auto& feat : Features ){
 	if ( Weighting != UserDefined_w ){
 	  if ( CurrentWeighting() == SD_w )
-	    Features[i]->StandardDeviationStatistics( );
-	  else if ( Features[i]->isNumerical() ){
-	    Features[i]->NumStatistics( DBEntropy, Targets, Bin_Size,
-					need_all_weights );
+	    feat->StandardDeviationStatistics( );
+	  else if ( feat->isNumerical() ){
+	    feat->NumStatistics( DBEntropy, Targets, Bin_Size,
+				 need_all_weights );
 	  }
 	  else {
-	    Features[i]->Statistics( DBEntropy, Targets,
-				     need_all_weights );
+	    feat->Statistics( DBEntropy, Targets, need_all_weights );
 	  }
 	}
       }
@@ -1524,26 +1536,21 @@ namespace Timbl {
 	  os << ",";
       }
       os << "." << endl << endl;
-
-      // Loop over the Features.
-      //
-      for ( size_t f = 0; f < num_of_features; ++f ) {
-
-	// Print the Feature name, and a colon.
-	//
-	os << "a" << f+1 << ": ";
-	if ( Features[f]->Ignore() )
+      size_t pos = 0;
+      for ( auto const& feat : Features ){
+	os << "a" << ++pos << ": ";
+	if ( feat->Ignore() )
 	  os << "Ignore" << endl;
-	else if ( Features[f]->isNumerical() )
+	else if ( feat->isNumerical() )
 	  os << "Numeric" << endl;
 	else {
 	  // Loop over the values.
 	  //
-	  VCarrtype::const_iterator it2 = Features[f]->ValuesArray.begin();
-	  while( it2 != Features[f]->ValuesArray.end() ){
+	  auto it2 = feat->ValuesArray.begin();
+	  while( it2 != feat->ValuesArray.end() ){
 	    os << (FeatureValue *)*it2;
 	    ++it2;
-	    if ( it2 != Features[f]->ValuesArray.end() )
+	    if ( it2 != feat->ValuesArray.end() )
 	      os << ",";
 	  }
 	  os << "." << endl;
@@ -2021,15 +2028,15 @@ namespace Timbl {
     Targets = new Target( TargetStrings );
     for ( size_t i=0; i< num_of_features; ++i ){
       Features[i] = new Feature( FeatureStrings );
-      PermFeatures[i] = NULL; //Features[i];
+      PermFeatures[i] = NULL;
     }
     CurrInst.Init( num_of_features );
-    // the user thinks about features running from 1 to Num
-    // we know better, so shift one down.
     effective_feats = num_of_features;
     num_of_num_features = 0;
     delete GlobalMetric;
     GlobalMetric = getMetricClass( globalMetricOption );
+    // the user thinks about features running from 1 to Num
+    // we know better, so shift the UserOptions one down.
     for ( size_t j = 0; j < num_of_features; ++j ){
       MetricType m = UserOptions[j+1];
       if ( m == Ignore ){
