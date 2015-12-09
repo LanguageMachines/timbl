@@ -5,7 +5,7 @@
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -33,6 +33,7 @@
 #include <string>
 #include <cassert>
 #include "ticcutils/StringOps.h"
+#include "ticcutils/PrettyPrint.h"
 #include "timbl/Types.h"
 #include "timbl/Choppers.h"
 
@@ -41,7 +42,7 @@ using namespace TiCC;
 
 namespace Timbl{
 
-  Chopper *Chopper::create( InputFormatType IF, bool doEx, 
+  Chopper *Chopper::create( InputFormatType IF, bool doEx,
 			    int fLen, bool doOcc ){
     Chopper *result = 0;
     switch ( IF ){
@@ -92,7 +93,7 @@ namespace Timbl{
 	result = new Tabbed_ExChopper();
       else
 	result = new Tabbed_Chopper();
-      break;      
+      break;
     case Compact:
       if ( doOcc )
 	result = new Compact_OccChopper( fLen );
@@ -113,8 +114,8 @@ namespace Timbl{
     choppedInput.resize(vSize);
     string::iterator it = strippedInput.end();
     --it;
-    // first trim trailing spaces 
-    while ( it != strippedInput.begin() && 
+    // first trim trailing spaces
+    while ( it != strippedInput.begin() &&
 	    isspace(*it) ) --it;
     strippedInput.erase( ++it , strippedInput.end() );
     it = strippedInput.end();
@@ -125,7 +126,7 @@ namespace Timbl{
 	--it;
     }
     // strip remaining trailing spaces
-    while ( it != strippedInput.begin() && 
+    while ( it != strippedInput.begin() &&
 	    isspace(*it) ) --it;
     strippedInput.erase( ++it , strippedInput.end() );
   }
@@ -154,8 +155,8 @@ namespace Timbl{
     return stripExemplarWeight( Buffer, wght );
   }
 
-  size_t Chopper::countFeatures( const string& inBuffer, 
-				 InputFormatType IF,  
+  size_t Chopper::countFeatures( const string& inBuffer,
+				 InputFormatType IF,
 				 int F_length,
 				 bool chopTail ) {
     size_t result = 0;
@@ -170,9 +171,9 @@ namespace Timbl{
     switch ( IF ){
     case ARFF:
     case C4_5:
-      for ( size_t i = 0; i < len; ++i ) {
-	if (buffer[i] == ',')
-	  result++;
+      for ( auto const& c : buffer ){
+	if ( c == ',')
+	  ++result;
       };
       break;
     case Compact:
@@ -185,33 +186,27 @@ namespace Timbl{
 	result = (len / F_length) - 1;
       break;
     case Columns:
-      for ( size_t j = 0; j < len; ++j ) {
-	if ( isspace(buffer[j]) ){
-	  result++;
-	  while ( isspace( buffer[++j] ) ){};
-	  if ( buffer[j] == '\0' )
-	    result--; // we had some trailing spaces
-	}
+      {
+	vector<string> parts;
+	size_t num = split( buffer, parts );
+	result = num - 1;
       };
       break;
     case Tabbed:
-      for ( size_t j = 0; j < len; ++j ) {
-	if ( buffer[j] == '\t' ){
-	  result++;
-	  while ( buffer[++j]  == '\t' ){};
-	  if ( buffer[j] == '\0' )
-	    result--; // we had some trailing spaces
-	}
+      {
+	vector<string> parts;
+	size_t num = split_at( buffer, parts, "\t" );
+	result = num - 1;
       };
-      break;      
+      break;
     default:
       throw logic_error( "CountFeatures: Illegal value in switch:" +
 			 toString(IF) );
     };
     return result;
   }
-  
- 
+
+
   InputFormatType Chopper::getInputFormat( const string& inBuffer,
 					   bool stripTail ) {
     InputFormatType IF = UnknownInputFormat;
@@ -253,8 +248,8 @@ namespace Timbl{
     choppedInput.resize(vSize);
     string::iterator it = strippedInput.end();
     --it;
-    // first trim trailing spaces 
-    while ( it != strippedInput.begin() && 
+    // first trim trailing spaces
+    while ( it != strippedInput.begin() &&
 	    isspace(*it) ) --it;
     strippedInput.erase( ++it , strippedInput.end() );
     string wght;
@@ -279,7 +274,7 @@ namespace Timbl{
 	--it;
     }
     // strip remaining trailing spaces
-    while ( it != strippedInput.begin() && 
+    while ( it != strippedInput.begin() &&
 	    isspace(*it) ) --it;
     strippedInput.erase( ++it , strippedInput.end() );
   }
@@ -291,8 +286,8 @@ namespace Timbl{
     choppedInput.resize(vSize);
     string::iterator it = strippedInput.end();
     --it;
-    // first trim trailing spaces 
-    while ( it != strippedInput.begin() && 
+    // first trim trailing spaces
+    while ( it != strippedInput.begin() &&
 	    isspace(*it) ) --it;
     strippedInput.erase( ++it , strippedInput.end() );
     string occS;
@@ -317,7 +312,7 @@ namespace Timbl{
 	--it;
     }
     // strip remaining trailing spaces
-    while ( it != strippedInput.begin() && 
+    while ( it != strippedInput.begin() &&
 	    isspace(*it) ) --it;
     strippedInput.erase( ++it , strippedInput.end() );
   }
@@ -327,7 +322,7 @@ namespace Timbl{
     // which represent the feature-values and the target-value.
     init( InBuf, len, true );
     vector<string> splits;
-    size_t res = TiCC::split_at( strippedInput, splits, "," );
+    size_t res = split_at( strippedInput, splits, "," );
     if ( res != vSize )
       return false;
     for ( size_t i=0; i < res ; ++i ){
@@ -335,8 +330,8 @@ namespace Timbl{
     }
     return true;
   }
-  
-  string C45_Chopper::getString() const{ 
+
+  string C45_Chopper::getString() const{
     string res;
     for ( size_t i = 0; i < vSize; ++i ) {
       res += CodeToStr( choppedInput[i] ) + ",";
@@ -351,7 +346,7 @@ namespace Timbl{
     // WhiteSpace is skipped!
     return C45_Chopper::chop( InBuf, len );
   }
-  
+
   bool Bin_Chopper::chop( const string& InBuf, size_t len ) {
     // Lines look like this:
     // 12, 25, 333, bla.
@@ -374,8 +369,8 @@ namespace Timbl{
     choppedInput[vSize-1] = string( strippedInput, s_pos );
     return true;
   }
-  
-  string Bin_Chopper::getString() const { 
+
+  string Bin_Chopper::getString() const {
     string res;
     for ( size_t i = 0; i < vSize-1; ++i ) {
       if ( choppedInput[i][0] == '1' )
@@ -384,7 +379,7 @@ namespace Timbl{
     res += choppedInput[vSize-1] + ",";
     return res;
   }
-  
+
   bool Compact_Chopper::chop( const string& InBuf, size_t leng ){
     init( InBuf, leng, false );
     size_t i;
@@ -398,7 +393,7 @@ namespace Timbl{
       return false;
     }
     for ( i = 0; i < vSize; ++i ) {
-      size_t index = i * fLen; 
+      size_t index = i * fLen;
       // Scan the value.
       //
       choppedInput[i] = "";
@@ -408,7 +403,7 @@ namespace Timbl{
     }
     return ( i == vSize ); // Enough?
   }
-  
+
   string Compact_Chopper::getString() const {
     string res;
     for ( size_t i = 0; i < vSize; ++i ) {
@@ -416,67 +411,53 @@ namespace Timbl{
     }
     return res;
   }
-  
+
   bool Columns_Chopper::chop( const string& InBuf, size_t len ){
     // Lines look like this:
     // one  two three bla
     init( InBuf, len, false );
-    unsigned int i = 0;
-    string::size_type s_pos = 0;
-    string::size_type e_pos = strippedInput.find_first_of( " \t" );
-    while ( e_pos != s_pos && e_pos != string::npos && i < vSize ){
-      // stop if a zero length string is found or if too many entries show up
-      choppedInput[i++] = string( strippedInput, s_pos, e_pos - s_pos );
-      s_pos = strippedInput.find_first_not_of( " \t", e_pos );
-      e_pos = strippedInput.find_first_of( " \t", s_pos );
-    }
-    if ( e_pos != string::npos )
+    vector<string> splits;
+    size_t res = split( strippedInput, splits );
+    if ( res != vSize )
       return false;
-    if ( s_pos != string::npos && i < vSize ){
-      choppedInput[i++] = string( strippedInput, s_pos );
+    for ( size_t i=0; i < res ; ++i ){
+      choppedInput[i] = StrToCode( splits[i] );
     }
-    return ( i == vSize ); // Enough?
+    return ( res == vSize ); // Enough?
   }
-  
-  string Columns_Chopper::getString() const { 
+
+  string Columns_Chopper::getString() const {
     string res;
     for ( size_t i = 0; i < vSize; ++i ) {
       res += choppedInput[i] + " ";
     }
     return res;
   }
-  
 
-  
+
+
   bool Tabbed_Chopper::chop( const string& InBuf, size_t len ){
     // Lines look like this:
     // one  two three bla
     init( InBuf, len, false );
-    unsigned int i = 0;
-    string::size_type s_pos = 0;
-    string::size_type e_pos = strippedInput.find_first_of( "\t" );
-    while ( e_pos != s_pos && e_pos != string::npos && i < vSize ){
-      // stop if a zero length string is found or if too many entries show up
-      choppedInput[i++] = StrToCode( string( strippedInput, s_pos, e_pos - s_pos ) );
-      s_pos = strippedInput.find_first_not_of( "\t", e_pos );
-      e_pos = strippedInput.find_first_of( "\t", s_pos );
-    }
-    if ( e_pos != string::npos )
+    vector<string> splits;
+    size_t res = split_at( strippedInput, splits, "\t" );
+    if ( res != vSize )
       return false;
-    if ( s_pos != string::npos && i < vSize ){
-      choppedInput[i++] = StrToCode( string( strippedInput, s_pos ) );
+    for ( size_t i=0; i < res ; ++i ){
+      choppedInput[i] = StrToCode( splits[i] );
     }
-    return ( i == vSize ); // Enough?
+    return ( res == vSize ); // Enough?
   }
-  
-  string Tabbed_Chopper::getString() const { 
+
+  string Tabbed_Chopper::getString() const {
     string res;
     for ( size_t i = 0; i < vSize; ++i ) {
       res += CodeToStr( choppedInput[i] ) + "\t";
     }
     return res;
   }
-  
+
   bool Sparse_Chopper::chop( const string& InBuf, size_t len ){
     // Lines look like this:
     // (12,value1) (25,value2) (333,value3) bla.
@@ -485,37 +466,34 @@ namespace Timbl{
     for ( size_t m = 0; m < vSize-1; ++m )
       choppedInput[m] = DefaultSparseString;
     choppedInput[vSize-1] = "";
-    string::size_type s_pos = strippedInput.find( "(" );
-    if ( s_pos == string::npos )
-      choppedInput[vSize-1] = TiCC::trim(strippedInput);
-    else {
-      string::size_type m_pos, e_pos = strippedInput.find( ")" );
-      while ( s_pos < e_pos &&
-	      s_pos != string::npos  && e_pos != string::npos ){
-	m_pos = strippedInput.find( ',', s_pos );
-	string temp = string( strippedInput, s_pos + 1, m_pos - s_pos - 1 );
-	size_t k = 0;
-	if ( !stringTo<size_t>( temp, k, 1, vSize-1 ) )
-	  return false;
-	else {
-	  choppedInput[k-1] = string( strippedInput, m_pos + 1, e_pos - m_pos -1 );
-	  choppedInput[k-1] = StrToCode( choppedInput[k-1] );
+    vector<string> entries;
+    size_t num_ent = split_at_first_of( strippedInput, entries, "()" );
+    if ( num_ent < 1 )
+      return false;
+    for ( const auto& ent : entries ){
+      --num_ent;
+      vector<string> parts;
+      size_t num = split_at( ent, parts, "," );
+      if ( num != 2 ){
+	if ( num == 1 && num_ent == 0 ){
+	  // the target has no ','
+	  choppedInput[vSize-1] = trim(parts[0]);
+	  return !choppedInput[vSize-1].empty();
 	}
-	s_pos = strippedInput.find( '(', e_pos );
-	if ( s_pos == string::npos ){
-	  e_pos = strippedInput.find_first_not_of( ") \t", e_pos );
-	  if ( e_pos != string::npos ){
-	    choppedInput[vSize-1] = string( strippedInput, e_pos );
-	    choppedInput[vSize-1] = TiCC::trim( choppedInput[vSize-1] );
-	  }
-	}
-	else
-	  e_pos = strippedInput.find( ')', s_pos );
+	return false;
       }
+      if ( num_ent == 0 ){
+	// missing a target!
+	return false;
+      }
+      size_t index;
+      if ( !stringTo( parts[0], index ) )
+	return false;
+      choppedInput[index-1] = StrToCode( parts[1] );
     }
-    return !choppedInput[vSize-1].empty();
+    return true;
   }
-  
+
   string Sparse_Chopper::getString() const {
     string res;
     for ( size_t i = 0; i < vSize-1; ++i ) {
@@ -524,6 +502,6 @@ namespace Timbl{
     }
     res += choppedInput[vSize-1] + ",";
     return res;
-  }  
-  
+  }
+
 }
