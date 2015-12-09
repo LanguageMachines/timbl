@@ -1,7 +1,4 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
@@ -673,7 +670,7 @@ namespace Timbl {
       bool mood = false;
       bool longOpt = false;
       string long_option;
-      string myoptarg = curr_opt.Option();
+      string opt_val = curr_opt.Option();
       char option = curr_opt.OptChar();
 
       if ( curr_opt.isLong() ){
@@ -684,15 +681,15 @@ namespace Timbl {
 	mood = curr_opt.getMood();
       }
       //      cerr << "long option:" << long_option << endl;
-      //      cerr << "   myoptarg:" << myoptarg << endl;
+      //      cerr << "   opt_val:" << opt_val << endl;
       try {
 	//	cerr << "try " << option << endl;
 	switch (option) {
 	case 'a':
 	  {
 	    AlgorithmType tmp_a = IB1_a;
-	    if ( !stringTo<AlgorithmType>( myoptarg, tmp_a ) ){
-	      Error( "illegal -a value: " + myoptarg );
+	    if ( !stringTo<AlgorithmType>( opt_val, tmp_a ) ){
+	      Error( "illegal -a value: " + opt_val );
 	      return false;
 	    }
 	    else if ( tmp_a != IB1_a ){
@@ -708,9 +705,9 @@ namespace Timbl {
 	  break;
 
 	case 'b':
-	  bootstrap_lines = stringTo<int>( myoptarg );
+	  bootstrap_lines = stringTo<int>( opt_val );
 	  if ( bootstrap_lines < 1 ){
-	    Error( "illegal value for -b option: " + myoptarg );
+	    Error( "illegal value for -b option: " + opt_val );
 	    return false;
 	  }
 	  break;
@@ -718,25 +715,21 @@ namespace Timbl {
 	case 'B':
 	  if ( longOpt ){
 	    if ( long_option == "Beam" ){
-	      if ( !stringTo<int>( myoptarg, BeamSize )
+	      if ( !stringTo<int>( opt_val, BeamSize )
 		   || BeamSize <= 0 ){
-		Error( "illegal value for -Beam option: " + myoptarg );
+		Error( "illegal value for --Beam option: " + opt_val );
 		return false;
 	      }
 	    }
-	    else {
-	      Error( "invalid option: Did you mean '--Beam'?" );
-	      return false;
-	    }
 	  }
-	  else if ( myoptarg.find("eam") != string::npos ){
-	    Error( "invalid option: Did you mean '--B" + myoptarg + "'?" );
+	  else if ( opt_val.find("eam") != string::npos ){
+	    Error( "invalid option: Did you mean '--B" + opt_val + "'?" );
 	    return false;
 	  }
 	  else {
-	    BinSize = stringTo<int>( myoptarg );
+	    BinSize = stringTo<int>( opt_val );
 	    if ( BinSize <= 1 ){
-	      Error( "illegal value for -B option: " + myoptarg );
+	      Error( "illegal value for -B option: " + opt_val );
 	      return false;
 	    }
 	  }
@@ -745,67 +738,67 @@ namespace Timbl {
 	case 'c':
 	  if ( longOpt ){
 	    if ( long_option == "clones" ){
-	      clones = stringTo<int>( myoptarg );
-	      if ( clones <= 0 ){
-		Error( "invalid value for " + long_option + ": '"
-		       + myoptarg + "'" );
+	      if ( !stringTo<int>( opt_val, clones )
+		   || clones <= 0 ){
+		Error( "invalid value for --clones option: '"
+		       + opt_val + "'" );
 		return false;
 	      }
 	    }
 	  }
 	  else {
-	    clip_freq = stringTo<int>( myoptarg );
-	    if ( clip_freq < 0 ){
-	      Error( "illegal value for -c option: " + myoptarg );
+	    if ( !stringTo<int>( opt_val, clip_freq )
+		 || clip_freq < 0 ){
+	      Error( "illegal value for -c option: " + opt_val );
 	      return false;
 	    }
 	  }
 	  break;
 
 	case 'd': {
-	  string::size_type pos1 = myoptarg.find( ":" );
+	  string::size_type pos1 = opt_val.find( ":" );
 	  if ( pos1 == string::npos ){
-	    pos1 = myoptarg.find_first_of( "0123456789" );
+	    pos1 = opt_val.find_first_of( "0123456789" );
 	    if ( pos1 != string::npos ){
-	      if ( ! ( stringTo<DecayType>( string( myoptarg, 0, pos1 ),
+	      if ( ! ( stringTo<DecayType>( string( opt_val, 0, pos1 ),
 					    local_decay ) &&
-		       stringTo<double>( string( myoptarg, pos1 ),
+		       stringTo<double>( string( opt_val, pos1 ),
 					 local_decay_alfa ) ) ){
-		Error( "illegal value for -d option: " + myoptarg );
+		Error( "illegal value for -d option: " + opt_val );
 		return false;
 	      }
 	    }
-	    else if ( !stringTo<DecayType>( myoptarg, local_decay ) ){
-	      Error( "illegal value for -d option: " + myoptarg );
+	    else if ( !stringTo<DecayType>( opt_val, local_decay ) ){
+	      Error( "illegal value for -d option: " + opt_val );
 	      return false;
 	    }
 	  }
 	  else {
-	    string::size_type pos2 = myoptarg.find( ':', pos1+1 );
+	    string::size_type pos2 = opt_val.find( ':', pos1+1 );
 	    if ( pos2 == string::npos ){
-	      pos2 = myoptarg.find_first_of( "0123456789", pos1+1 );
+	      pos2 = opt_val.find_first_of( "0123456789", pos1+1 );
 	      if ( pos2 != string::npos ){
-		if ( ! ( stringTo<DecayType>( string( myoptarg, 0, pos1 ),
+		if ( ! ( stringTo<DecayType>( string( opt_val, 0, pos1 ),
 					      local_decay ) &&
-			 stringTo<double>( string( myoptarg, pos2 ),
+			 stringTo<double>( string( opt_val, pos2 ),
 					   local_decay_alfa ) ) ){
-		  Error( "illegal value for -d option: " + myoptarg );
+		  Error( "illegal value for -d option: " + opt_val );
 		  return false;
 		}
 	      }
 	      else {
-		Error( "illegal value for -d option: " + myoptarg );
+		Error( "illegal value for -d option: " + opt_val );
 		return false;
 	      }
 	    }
 	    else {
-	      if ( ! ( stringTo<DecayType>( string( myoptarg, 0, pos1 ),
+	      if ( ! ( stringTo<DecayType>( string( opt_val, 0, pos1 ),
 					    local_decay ) &&
-		       stringTo<double>( string( myoptarg, pos1+1, pos2-pos1-1 ),
+		       stringTo<double>( string( opt_val, pos1+1, pos2-pos1-1 ),
 					 local_decay_alfa ) &&
-		       stringTo<double>( string( myoptarg, pos2+1 ),
+		       stringTo<double>( string( opt_val, pos2+1 ),
 					 local_decay_beta ) ) ){
-		Error( "illegal value for -d option: " + myoptarg );
+		Error( "illegal value for -d option: " + opt_val );
 		return false;
 	      }
 	    }
@@ -822,49 +815,46 @@ namespace Timbl {
 	      return false;
 	    }
 	  }
-	  else if ( myoptarg.size() > 1 ){
-	    Error( "invalid option: Did you mean '--Diversify'?" );
-	    return false;
-	  }
-	  else
+	  else {
 	    keep_distributions = mood;
+	  }
 	  break;
 
 	case 'e':
-	  estimate = stringTo<int>( myoptarg );
-	  if ( estimate < 0 ){
-	    Error( "illegal value for -e option: " + myoptarg );
+	  if ( !stringTo<int>( opt_val, estimate )
+	       || estimate < 0 ){
+	    Error( "illegal value for -e option: " + opt_val );
 	    return false;
 	  }
 	  break;
 
 	case 'F':
-	  if ( !stringTo<InputFormatType>( myoptarg, LocalInputFormat ) ){
-	    Error( "illegal value for -F option: " + myoptarg );
+	  if ( !stringTo<InputFormatType>( opt_val, LocalInputFormat ) ){
+	    Error( "illegal value for -F option: " + opt_val );
 	    return false;
 	  }
 	  break;
 
 	case 'G':
-	  if ( myoptarg.empty() )
+	  if ( opt_val.empty() )
 	    local_normalisation = probabilityNorm;
 	  else {
-	    string::size_type pos1 = myoptarg.find( ":" );
+	    string::size_type pos1 = opt_val.find( ":" );
 	    if ( pos1 == string::npos ){
-	      local_normalisation = stringTo<normType>( myoptarg );
+	      local_normalisation = stringTo<normType>( opt_val );
 	      local_norm_factor = 1;
 	    }
 	    else {
-	      local_normalisation = stringTo<normType>( string( myoptarg, 0, pos1 ) );
-	      if ( !stringTo<double>( string( myoptarg, pos1+1 ),
+	      local_normalisation = stringTo<normType>( string( opt_val, 0, pos1 ) );
+	      if ( !stringTo<double>( string( opt_val, pos1+1 ),
 				      local_norm_factor ) ||
 		   local_norm_factor < Epsilon ){
-		Error( "illegal value for -G option: " + myoptarg );
+		Error( "illegal value for -G option: " + opt_val );
 		return false;
 	      }
 	    }
 	    if ( local_normalisation == unknownNorm ){
-	      Error( "illegal value for -G option: " + myoptarg );
+	      Error( "illegal value for -G option: " + opt_val );
 	      return false;
 	    }
 	  }
@@ -875,51 +865,51 @@ namespace Timbl {
 	  break;
 
 	case 'k':
-	  no_neigh = stringTo<int>(myoptarg);
-	  if ( no_neigh <= 0 ){
-	    Error( "illegal value for -k option: " + myoptarg );
+	  if ( !stringTo<int>( opt_val, no_neigh )
+	       || no_neigh <= 0 ){
+	    Error( "illegal value for -k option: " + opt_val );
 	    return false;
 	  }
 	  break;
 
 	case 'l':
-	  f_length = stringTo<int>( myoptarg );
-	  if ( f_length <= 0 ){
-	    Error( "illegal value for -l option: " + myoptarg );
+	  if ( !stringTo<int>( opt_val, f_length )
+	       || f_length <= 0 ){
+	    Error( "illegal value for -l option: " + opt_val );
 	    return false;
 	  }
 	  break;
 
 	case 'L': {
-	  string::size_type pos1 = myoptarg.find( ":" );
+	  string::size_type pos1 = opt_val.find( ":" );
 	  if ( pos1 == string::npos ){
-	    pos1 = myoptarg.find_first_of( "0123456789" );
+	    pos1 = opt_val.find_first_of( "0123456789" );
 	    if ( pos1 != string::npos ){
-	      mvd_limit = stringTo<int>( myoptarg );
-	      if ( mvd_limit <= 0 ){
-		Error( "illegal value for -L option: " + myoptarg );
+	      if ( !stringTo<int>( opt_val, mvd_limit )
+		   || mvd_limit <= 0 ){
+		Error( "illegal value for -L option: " + opt_val );
 		return false;
 	      }
 	    }
 	  }
 	  else {
-	    mvd_limit = stringTo<int>( string( myoptarg, pos1+1 ) );
-	    if ( mvd_limit <= 0 ){
-	      Error( "illegal value for -L option: " + myoptarg );
+	    if ( !stringTo<int>( string( opt_val, pos1+1 ), mvd_limit )
+		 || mvd_limit <= 0 ){
+	      Error( "illegal value for -L option: " + opt_val );
 	      return false;
 	    }
 	  }
 	  break;
 	}
 	case 'm':
-	  if ( !parse_metrics( myoptarg, local_metric ) )
+	  if ( !parse_metrics( opt_val, local_metric ) )
 	    return false;
 	  break;
 
 	case 'M':
-	  maxbests = stringTo<int>( myoptarg );
-	  if ( maxbests <= 0 ){
-	    Error( "illegal value for -M option: " + myoptarg );
+	  if ( !stringTo<int>( opt_val, maxbests )
+	       || maxbests <= 0 ){
+	    Error( "illegal value for -M option: " + opt_val );
 	    return false;
 	  }
 	  break;
@@ -929,44 +919,32 @@ namespace Timbl {
 	  break;
 
 	case 'O':
-	  outPath = myoptarg;
+	  outPath = opt_val;
 	  break;
 
 	case 'o':
 	  if ( longOpt ){
 	    if ( long_option == "occurrences" ){
-	      if ( myoptarg.empty() ){
-		Error( "missing value for '--occurrences'" );
-		return false;
-	      }
-	      if ( myoptarg == "train" )
+	      if ( opt_val == "train" )
 		occIn = 1;
-	      else if ( myoptarg == "test" )
+	      else if ( opt_val == "test" )
 		occIn = 2;
-	      else if ( myoptarg == "both" )
+	      else if ( opt_val == "both" )
 		occIn = 3;
 	      else {
-		Error( "invalid --ocurrences value." );
+		Error( "invalid --ocurrences value. (expected train,test or both)" );
 		return false;
 	      }
 	    }
-	    else {
-	      Error( "invalid option: Did you mean '--ocurrences' ?" );
-	      return false;
-	    }
-	  }
-	  else if ( myoptarg.find("ccurences") != string::npos ){
-	    Error( "invalid option: Did you mean '--occurrences' ?" );
-	    return false;
 	  }
 	  break;
 
 	case 'p':
-	  local_progress = stringTo<int>( myoptarg );
+	  local_progress = stringTo<int>( opt_val );
 	  break;
 
 	case 'q':
-	  threshold = stringTo<int>( myoptarg );
+	  threshold = stringTo<int>( opt_val );
 	  break;
 
 	case 'Q':
@@ -974,9 +952,7 @@ namespace Timbl {
 	  break;
 
 	case 'R':
-	  if ( isdigit(myoptarg[0]) )
-	    seed = stringTo<int>( myoptarg );
-	  else {
+	  if ( !stringTo<int>( opt_val, seed ) ){
 	    Error( "Integer argument for Random Seed expected (-R option)" );
 	    return false;
 	  }
@@ -986,34 +962,30 @@ namespace Timbl {
 	  if ( longOpt ){
 	    if ( long_option == "sloppy" ){
 	      bool val;
-	      if ( !isBoolOrEmpty(myoptarg,val) ){
+	      if ( !isBoolOrEmpty(opt_val,val) ){
 		Error( "invalid value for sloppy: '"
-		       + myoptarg + "'" );
+		       + opt_val + "'" );
 		return false;
 	      }
 	      do_sloppy_loo = val;
 	    }
 	    else if ( long_option == "silly" ){
 	      bool val;
-	      if ( !isBoolOrEmpty(myoptarg,val) ){
+	      if ( !isBoolOrEmpty(opt_val,val) ){
 		Error( "invalid value for silly: '"
-		       + myoptarg + "'" );
+		       + opt_val + "'" );
 		return false;
 	      }
 	      do_silly = val;
 	    }
-	    else {
-	      Error( "invalid option: Did you mean '--sloppy or --silly' ?" );
-	      return false;
-	    }
 	  }
-	  else {
-	    if ( myoptarg.empty() ){
+	  else { //short opt, so -s
+	    if ( opt_val.empty() ){
 	      do_sample_weights = true;
 	    }
 	    else {
-	      if ( isdigit(myoptarg[0]) ){
-		int val = stringTo<int>( myoptarg );
+	      int val;
+	      if ( stringTo<int>( opt_val, val ) ){
 		if ( val == 0 ){
 		  do_ignore_samples = true;
 		  do_ignore_samples_test = false;
@@ -1025,7 +997,7 @@ namespace Timbl {
 		}
 	      }
 	      if ( !do_sample_weights) {
-		Error( "invalid value for -s: '" + myoptarg + "' (maybe you meant --s" + myoptarg + " ?)" );
+		Error( "invalid value for -s: '" + opt_val + "' (maybe you meant --s" + opt_val + " ?)" );
 		return false;
 	      }
 	    }
@@ -1035,9 +1007,9 @@ namespace Timbl {
 	case 't':
 	  {
 	    AlgorithmType tmp_a = IB1_a;
-	    if ( compare_nocase( myoptarg, "leave_one_out" ) )
+	    if ( compare_nocase( opt_val, "leave_one_out" ) )
 	      tmp_a = LOO_a;
-	    else if ( compare_nocase( myoptarg, "cross_validate" ) )
+	    else if ( compare_nocase( opt_val, "cross_validate" ) )
 	      tmp_a = CV_a;
 	    if ( local_algo != IB1_a && tmp_a != IB1_a ){
 	      Error( "only IB1 algorithm is allowed for: " + toString(tmp_a)  );
@@ -1049,34 +1021,27 @@ namespace Timbl {
 	case 'T': {
 	  if ( longOpt ){
 	    if ( long_option == "Threshold" ){
-	      if ( !stringTo<int>(myoptarg, igThreshold )
+	      if ( !stringTo<int>(opt_val, igThreshold )
 		   || igThreshold < 0 ){
-		Error( "invalid value for Threshold: " + myoptarg );
+		Error( "invalid value for Threshold: " + opt_val );
 		return false;
 	      }
 	    }
 	    else if ( long_option == "Treeorder" ){
-	      if ( !stringTo<OrdeningType>( myoptarg, local_order ) ){
-		Error( "invalid value for Treeorder: " + myoptarg );
+	      if ( !stringTo<OrdeningType>( opt_val, local_order ) ){
+		Error( "invalid value for Treeorder: " + opt_val );
 		return false;
 	      }
 	    }
-	    else {
-	      Error( "invalid option: Did you mean '--Threshold' or --Treeorder ?" );
-	      return false;
-	    }
 	  }
-	  else if ( myoptarg.find("hreshold") != string::npos ||
-		    myoptarg.find("reeorder") != string::npos ){
-	    Error( "invalid option: Did you mean '--T" + myoptarg + "' ?" );
+	  else if ( opt_val.find("hreshold") != string::npos ||
+		    opt_val.find("reeorder") != string::npos ){
+	    Error( "invalid option: Did you mean '--T" + opt_val + "' ?" );
 	    return false;
 	  }
-	  else if ( ! stringTo<int>( myoptarg, target_pos ) ){
-	    Error( "invalid option: Did you mean '-T value ?" );
-	    return false;
-	  }
-	  else if ( target_pos <= 0 ){
-	    Error( "illegal value for -T option: " + myoptarg );
+	  else if ( !stringTo<int>( opt_val, target_pos )
+		    || target_pos <= 0 ){
+	    Error( "illegal value for -T option: " + opt_val );
 	    return false;
 	  }
 	}
@@ -1084,14 +1049,17 @@ namespace Timbl {
 
 	case 'v':{
 	  VerbosityFlags Flag = NO_VERB;
-	  if ( !stringTo<VerbosityFlags>( myoptarg, Flag ) ){
-	    Error( "illegal value for +/- v option: " + myoptarg );
+	  if ( !stringTo<VerbosityFlags>( opt_val, Flag ) ){
+	    Error( "illegal value for +/- v option: " + opt_val );
 	    return false;
 	  }
 	  else {
 	    if ( mode == 2 &&
-		 ( !(Flag & (SILENT|DISTANCE|DISTRIB|NEAR_N|CONF_MATRIX) ) ) )
+		 ( !(Flag & (SILENT|DISTANCE|DISTRIB|NEAR_N|CONF_MATRIX) ) ) ){
+	      Error( "-v option: " + toString(Flag) +
+		     " is not allowed at this stage." );
 	      return false;
+	    }
 	    else if ( Flag > 0 )
 	      if ( mood ){
 		myVerbosity |= Flag;
@@ -1106,7 +1074,7 @@ namespace Timbl {
 	  break;
 
 	case 'w': {
-	  if ( !stringTo<WeightType>( myoptarg, local_weight ) )
+	  if ( !stringTo<WeightType>( opt_val, local_weight ) )
 	    return false;
 	};
 	  break;
