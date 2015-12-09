@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -55,17 +52,17 @@ namespace Timbl {
     }
     catch( bad_alloc ){
       Error ( "Not enough memory for ConfusionMatrix" );
-      throw;      
+      throw;
     }
   }
-  
+
   ConfusionMatrix::~ConfusionMatrix(){
     for ( unsigned int i=0; i <= size; ++i )
       mat[i].clear();
     mat.clear();
   }
-  
-  void ConfusionMatrix::Increment( const TargetValue *t1, 
+
+  void ConfusionMatrix::Increment( const TargetValue *t1,
 				   const TargetValue *t2 ){
     if ( t2 ){
       if ( t1 )
@@ -76,20 +73,21 @@ namespace Timbl {
     else
       throw std::out_of_range( "ConfusionMatrix, index out of range" );
   }
-  
+
   void ConfusionMatrix::Print( ostream& os, const Target *tg ) const {
     os << "Confusion Matrix:" << endl;
     os << "        ";
-    for ( unsigned int i=0; i < tg->ValuesArray.size(); ++i ){
+    for ( const auto& val : tg->ValuesArray ){
       // Print the class names.
       os.width(6);
       os.setf(ios::right, ios::adjustfield);
-      os << tg->ValuesArray[i] << " ";
+      os << val << " ";
     }
     os << endl;
     os << "        ";
-    for ( unsigned int i=0; i < size; ++i )
+    for ( unsigned int i=0; i < size; ++i ){
       os << "-------";
+    }
     os << endl;
     for ( unsigned int i=0; i < tg->ValuesArray.size(); ++i ){
       os.width(6);
@@ -113,12 +111,12 @@ namespace Timbl {
     }
     os << endl;
   }
-  
+
   void pf( ostream& os, size_t d ){
     os.width(4);
     os << " \t" << d;
   }
-  
+
   void pf( ostream& os, double d ){
     if ( d < 0 )
       os << " \t (nan)\t";
@@ -127,8 +125,8 @@ namespace Timbl {
       os << " \t" << d;
     }
   }
-  
-  void ConfusionMatrix::FScore( ostream& os, 
+
+  void ConfusionMatrix::FScore( ostream& os,
 				const Target* tg, bool cs_too ) const {
     double maf = 0.0;
     double mif = 0.0;
@@ -202,7 +200,7 @@ namespace Timbl {
 	AUC = -1;
       }
       else {
-	AUC = ( 0.5 * TPR * FPR ) + ( TPR * ( 1.0 - FPR ) ) + 
+	AUC = ( 0.5 * TPR * FPR ) + ( TPR * ( 1.0 - FPR ) ) +
 	  ( 0.5 * ( ( 1.0 - TPR ) * ( 1.0 - FPR ) ) );
 	++effA;
 	maa += AUC;
@@ -253,5 +251,5 @@ namespace Timbl {
     _tieFalse += in._tieFalse;
     _exact += in._exact;
   }
-  
+
 }
