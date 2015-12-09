@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -47,16 +44,17 @@ namespace Timbl {
   BestRec::BestRec():
     bestDistance( 0.0 )
   {}
-  
+
   BestRec::~BestRec(){
-    for ( unsigned int i=0; i < bestDistributions.size(); ++i ){
-      delete bestDistributions[i];
+    for ( auto const& b : bestDistributions ){
+      delete b;
     }
   }
 
   BestArray::~BestArray(){
-    for ( unsigned int i=0; i < bestArray.size(); ++i )
-      delete bestArray[i];
+    for ( auto const& b : bestArray ){
+      delete b;
+    }
   }
 
   ostream& operator<< ( ostream& os, const BestRec *b ){
@@ -73,9 +71,9 @@ namespace Timbl {
     }
     return os;
   }
-  
-  void BestArray::init( unsigned int numN, unsigned int maxB, 
-			bool storeI, bool showDi, bool showDb ){ 
+
+  void BestArray::init( unsigned int numN, unsigned int maxB,
+			bool storeI, bool showDi, bool showDb ){
     _storeInstances = storeI;
     _showDi = showDi;
     _showDb = showDb;
@@ -92,26 +90,27 @@ namespace Timbl {
 	bestArray.push_back( new BestRec() );
       }
     }
-    for ( size_t i = 0; i < size; ++i ) {
-      bestArray[i]->bestDistance = (DBL_MAX - numN) + i;
-      if ( bestArray[i]->bestInstances.empty() ){
+    size_t penalty = 0;
+    for ( const auto& best : bestArray ){
+      best->bestDistance = (DBL_MAX - numN) + penalty++;
+      if ( best->bestInstances.empty() ){
 	if ( _storeInstances ){
-	  bestArray[i]->bestInstances.reserve( maxBests );
-	  bestArray[i]->bestDistributions.reserve( maxBests );
+	  best->bestInstances.reserve( maxBests );
+	  best->bestDistributions.reserve( maxBests );
 	}
       }
       else {
-	for ( size_t j = 0; j < bestArray[i]->bestInstances.size(); ++j ){
-	  delete bestArray[i]->bestDistributions[j];
+	for ( auto const& bd : best->bestDistributions ){
+	  delete bd;
 	}
-	bestArray[i]->bestInstances.clear();
-	bestArray[i]->bestDistributions.clear();
+	best->bestInstances.clear();
+	best->bestDistributions.clear();
       }
-      bestArray[i]->aggregateDist.clear();
+      best->aggregateDist.clear();
     }
   }
-  
-  double BestArray::addResult( double Distance, 
+
+  double BestArray::addResult( double Distance,
 			       const ValueDistribution *Distr,
 			       const string& neighbor ){
     // We have the similarity in Distance, and a num_of_neighbors
@@ -139,7 +138,7 @@ namespace Timbl {
 	0       2             3
 	1       4             2
 	2       6             1
-	
+
 	sim = 1 (dus beste)
       */
       else if (Distance < best->bestDistance) {
@@ -159,14 +158,14 @@ namespace Timbl {
 	  }
 	  best->aggregateDist.clear();
 	  best->aggregateDist.Merge( *Distr );
-	} 
+	}
 	else {
 	  //
 	  // Insert. First shift the rest up.
 	  //
 	  BestRec *keep = bestArray[size-1];
 	  for ( size_t i = size - 1; i > k; i--) {
-	    bestArray[i] = bestArray[i-1]; 
+	    bestArray[i] = bestArray[i-1];
 	  } // i
 	  //
 	  // And now insert.
@@ -189,18 +188,18 @@ namespace Timbl {
       } // Distance < fBest
     } // k
     return bestArray[size-1]->bestDistance;
-  }    
-  
+  }
+
   void BestArray::initNeighborSet( neighborSet& ns ) const {
     ns.clear();
     for ( unsigned int k = 0; k < size; ++k ) {
-      ns.push_back( bestArray[k]->bestDistance, 
+      ns.push_back( bestArray[k]->bestDistance,
 		    bestArray[k]->aggregateDist );
     }
   }
 
   void BestArray::addToNeighborSet( neighborSet& ns, size_t n ) const {
-    ns.push_back( bestArray[n-1]->bestDistance, 
+    ns.push_back( bestArray[n-1]->bestDistance,
 		  bestArray[n-1]->aggregateDist );
   }
 
@@ -222,21 +221,21 @@ namespace Timbl {
 	  xmlNode *nb = XmlNewChild( nbs, "neighbor" );
 	  XmlNewTextChild( nb, "instance", best->bestInstances[m] );
 	  if ( _showDb )
-	    XmlNewTextChild( nb, "distribution", 
+	    XmlNewTextChild( nb, "distribution",
 			     best->bestDistributions[m]->DistToString() );
 	}
       }
-      else { 
+      else {
 	if ( best->aggregateDist.ZeroDist() )
 	  break;
 	xmlNode *nbs = XmlNewChild( top, "neighbors" );
 	XmlSetAttribute( nbs, "k", toString(k+1) );
 	if ( _showDb ){
-	  XmlNewTextChild( nbs, "distribution", 
+	  XmlNewTextChild( nbs, "distribution",
 			   best->aggregateDist.DistToString() );
 	}
 	if ( _showDi ){
-	  XmlNewTextChild( nbs, "distance", 
+	  XmlNewTextChild( nbs, "distance",
 			   toString(best->bestDistance) );
 	}
       }
@@ -251,7 +250,7 @@ namespace Timbl {
 	size_t totalBests = best->totalBests();
 	if ( totalBests == 0 )
 	  break; // TRIBL algorithms do this!
-	os << "# k=" << k+1 << ", " << totalBests 
+	os << "# k=" << k+1 << ", " << totalBests
 	   <<  " Neighbor(s) at distance: ";
 	int OldPrec = os.precision(DBL_DIG-1);
 	os.setf(ios::showpoint);
@@ -268,7 +267,7 @@ namespace Timbl {
 	    os << " -*-" << endl;
 	}
       }
-      else { 
+      else {
 	if ( best->aggregateDist.ZeroDist() )
 	  break;
 	os << "# k=" << k+1;
