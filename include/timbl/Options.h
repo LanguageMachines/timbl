@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -36,7 +33,7 @@
 
 namespace Timbl {
   const int MAX_TABLE_SIZE =  50;
-  
+
   class OptionClass {
     friend class OptionTableClass;
   public:
@@ -51,13 +48,13 @@ namespace Timbl {
     OptionClass(const OptionClass&);
     OptionClass& operator = (const OptionClass&);
   };
-  
+
   template <class Type>
     class OptionClassT: public OptionClass {
     public:
     OptionClassT( const std::string& n, Type *tp, Type t ):OptionClass(n),
       Content(tp) { *Content = t; };
-    virtual bool set_option( const std::string& line ){ 
+    virtual bool set_option( const std::string& line ){
       Type T;
       bool result = TiCC::stringTo<Type>( line, T );
       if ( result ) *Content = T;
@@ -77,9 +74,9 @@ namespace Timbl {
     OptionClassT(const OptionClassT&);
     OptionClassT& operator = (const OptionClassT&);
   };
-  
+
   typedef OptionClassT<bool> BoolOption;
-  
+
   template <>
     inline std::ostream& OptionClassT<bool>::show_opt( std::ostream &os ) const {
       os.width(20);
@@ -88,7 +85,7 @@ namespace Timbl {
       os << Name << " : " << *Content;
       return os;
   }
-  
+
   template <>
     inline std::ostream& OptionClassT<bool>::show_full( std::ostream &os ) const {
     os.width(20);
@@ -97,9 +94,9 @@ namespace Timbl {
     os << Name << " :  false or true [" << *Content << "]";
     return os;
   }
-  
+
   typedef OptionClassT<VerbosityFlags> VerbosityOption;
-  
+
   template <>
     inline std::ostream& OptionClassT<VerbosityFlags>::show_full( std::ostream &os ) const {
     os.width(20);
@@ -107,9 +104,9 @@ namespace Timbl {
     os << Name << " : " << TiCC::toString<VerbosityFlags>(*Content,true);
     return os;
   }
-  
+
   typedef OptionClassT<InputFormatType> InputFormatOption;
-  
+
   template <>
     inline std::ostream& InputFormatOption::show_full( std::ostream &os ) const {
     os.width(20);
@@ -122,10 +119,10 @@ namespace Timbl {
        << TiCC::toString<InputFormatType>(*Content) << "]";
     return os;
   }
-  
-  
+
+
   typedef OptionClassT<MetricType> MetricOption;
-  
+
   template <>
     inline std::ostream& OptionClassT<MetricType>::show_full( std::ostream &os )const {
     os.width(20);
@@ -140,7 +137,7 @@ namespace Timbl {
   }
 
   typedef OptionClassT<AlgorithmType> AlgorithmOption;
-  
+
   template <>
     inline std::ostream& OptionClassT<AlgorithmType>::show_full( std::ostream &os ) const {
     os.width(20);
@@ -153,9 +150,9 @@ namespace Timbl {
        << TiCC::toString<AlgorithmType>(*Content) << "]";
     return os;
   }
-  
+
   typedef OptionClassT<DecayType> DecayOption;
-  
+
   template <>
     inline std::ostream& DecayOption::show_full( std::ostream &os ) const {
     os.width(20);
@@ -168,9 +165,9 @@ namespace Timbl {
        << TiCC::toString<DecayType>(*Content) << "]";
     return os;
   }
-  
+
   typedef OptionClassT<SmoothingType> SmoothOption;
-  
+
   template <>
     inline std::ostream& SmoothOption::show_full( std::ostream &os ) const {
     os.width(20);
@@ -183,9 +180,9 @@ namespace Timbl {
        << TiCC::toString<SmoothingType>(*Content) << "]";
     return os;
   }
-  
+
   typedef OptionClassT<WeightType> WeightOption;
-  
+
   template <>
     inline std::ostream& OptionClassT<WeightType>::show_full( std::ostream &os ) const {
     os.width(20);
@@ -198,9 +195,9 @@ namespace Timbl {
        << TiCC::toString<WeightType>(*Content) << "]";
     return os;
   }
-  
+
   typedef OptionClassT<OrdeningType> OrdeningOption;
-  
+
   template <>
     inline std::ostream& OptionClassT<OrdeningType>::show_full( std::ostream &os ) const {
     os.width(20);
@@ -215,7 +212,7 @@ namespace Timbl {
   }
 
   typedef OptionClassT<normType> NormalisationOption;
-  
+
   template <>
     inline std::ostream& NormalisationOption::show_full( std::ostream &os ) const {
     os.width(20);
@@ -231,13 +228,13 @@ namespace Timbl {
 
   //
   // Array of options types
-  //  
+  //
   template <class Type>
     class OptionArrayClass: public OptionClass {
     public:
-    OptionArrayClass( const std::string& n, 
+    OptionArrayClass( const std::string& n,
 		      std::vector<Type>& ta,
-		      const size_t size ): 
+		      const size_t size ):
       OptionClass( n ), TA(ta), Size(size ){};
     protected:
     std::vector<Type>& TA;
@@ -246,15 +243,15 @@ namespace Timbl {
     OptionArrayClass(const OptionArrayClass&);
     OptionArrayClass& operator = (const OptionArrayClass&);
   };
-  
-  
+
+
   class MetricArrayOption: public OptionArrayClass<MetricType> {
   public:
-    MetricArrayOption( const std::string& n, 
-		       std::vector<MetricType>& mp, 
+    MetricArrayOption( const std::string& n,
+		       std::vector<MetricType>& mp,
 		       MetricType& m,
 		       size_t s ):
-    OptionArrayClass<MetricType>( n, mp, s ), def(m){ 
+    OptionArrayClass<MetricType>( n, mp, s ), def(m){
       for ( size_t i=0; i < s; i++ )
 	TA[i] = m;
     };
@@ -265,18 +262,18 @@ namespace Timbl {
     const MetricType& def;
   };
 
-  inline bool MetricArrayOption::set_option( const std::string& line ){ 
+  inline bool MetricArrayOption::set_option( const std::string& line ){
     MetricType m = UnknownMetric;
     size_t i=0;
     std::vector<std::string> res;
     bool result = TiCC::split_at( line, res, "=" ) == 2 &&
-      TiCC::stringTo<MetricType>( res[1], m ) && 
+      TiCC::stringTo<MetricType>( res[1], m ) &&
       TiCC::stringTo<size_t>( res[0], i, 0, Size );
-    if ( result ) 
+    if ( result )
       TA[i] = m;
     return result;
   }
-  
+
   inline std::ostream& MetricArrayOption::show_opt( std::ostream &os ) const {
     os.width(20);
     os.setf( std::ios::left, std::ios::adjustfield );
@@ -286,7 +283,7 @@ namespace Timbl {
 	os << i << ":" << TiCC::toString<MetricType>(TA[i]) << ", ";
     return os;
   }
-  
+
   inline std::ostream& MetricArrayOption::show_full( std::ostream &os ) const {
     os.width(20);
     os.setf( std::ios::left, std::ios::adjustfield );
@@ -304,10 +301,10 @@ namespace Timbl {
     os << "]";
     return os;
   }
-  
+
   //
   // Limited Type, with min and maxVal
-  //  
+  //
   template <class Type>
     class OptionClassLT: public OptionClass {
     public:
@@ -315,8 +312,8 @@ namespace Timbl {
 		   Type Min, Type Max ):OptionClass(n),
       Content( tp), minVal( Min ), maxVal( Max )
       { *Content = t; };
-    
-    virtual bool set_option( const std::string& line ){ 
+
+    virtual bool set_option( const std::string& line ){
       Type T;
       bool result = TiCC::stringTo<Type>( line, T, minVal, maxVal );
       if ( result ) *Content = T;
@@ -333,7 +330,7 @@ namespace Timbl {
       os.width(20);
       os.setf( std::ios::showpoint );
       os.setf( std::ios::left, std::ios::adjustfield );
-      os << Name << " :  { " 
+      os << Name << " :  { "
 	 << minVal << " - " << maxVal << "}, [" << *Content << "]";
       return os;
     };
@@ -344,14 +341,14 @@ namespace Timbl {
     OptionClassLT(const OptionClassLT&);
     OptionClassLT& operator = (const OptionClassLT&);
   };
-  
+
   typedef OptionClassLT<int> IntegerOption;
   typedef OptionClassLT<unsigned int> UnsignedOption;
   typedef OptionClassLT<size_t> SizeOption;
   typedef OptionClassLT<double> RealOption;
-  
+
   enum SetOptRes { Opt_OK, Opt_Frozen, Opt_Unknown, Opt_Ill_Val};
-  
+
   class OptionTableClass {
   public:
     bool Add( OptionClass *opt ){
@@ -381,19 +378,19 @@ namespace Timbl {
     OptionTableClass( const OptionTableClass& );
     OptionTableClass& operator=( const OptionTableClass& );
   };
-  
+
   inline void OptionTableClass::Show_Settings( std::ostream& os ) const{
     for ( int i=0; i <table_size; i++)
       Table[i]->show_opt( os ) << std::endl;
   }
-  
+
   inline void OptionTableClass::Show_Options( std::ostream& os ) const {
     for ( int i=0; i <table_size; i++)
       Table[i]->show_full( os ) << std::endl;
   }
 
-  inline void split_line( const std::string& line, 
-			  std::string& name, 
+  inline void split_line( const std::string& line,
+			  std::string& name,
 			  std::string& value ){
     std::vector<std::string> results;
     size_t i = TiCC::split_at( line, results, ":" );
@@ -405,9 +402,9 @@ namespace Timbl {
     default:
       break;
     }
-  }  
+  }
 
-  inline OptionClass *OptionTableClass::look_up( const std::string& option_name, 
+  inline OptionClass *OptionTableClass::look_up( const std::string& option_name,
 						 bool &runtime ){
     for ( int i=0; i < table_size; i++ )
       if ( compare_nocase( option_name, Table[i]->Name ) ){
@@ -416,8 +413,8 @@ namespace Timbl {
       }
     return NULL;
   }
-  
-  inline SetOptRes OptionTableClass::SetOption( const std::string& line ){ 
+
+  inline SetOptRes OptionTableClass::SetOption( const std::string& line ){
     SetOptRes result = Opt_OK;
     bool runtime = false;
     std::string option_name;
@@ -431,13 +428,12 @@ namespace Timbl {
 	if ( !option->set_option( value ) )
 	  result = Opt_Ill_Val; // illegal value
     }
-    else 
+    else
       result = Opt_Unknown; // What the hell ???
     return result;
-  }  
+  }
 
 
 }
 
 #endif
-

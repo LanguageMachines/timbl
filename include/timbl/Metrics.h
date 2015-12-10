@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -30,13 +27,13 @@
 #ifndef TIMBL_METRICS_H
 #define TIMBL_METRICS_H
 
-#include <limits> 
+#include <limits>
 
 namespace Timbl{
 
+  class FeatureValue;
+
   extern const double maxSimilarity;
-  
-  metricClass *getMetricClass( MetricType );
 
   class metricClass {
   public:
@@ -46,11 +43,13 @@ namespace Timbl{
     virtual bool isSimilarityMetric() const = 0;
     virtual bool isNumerical() const = 0;
     virtual bool isStorable() const = 0;
-    virtual double distance( FeatureValue *, FeatureValue *, 
+    virtual double distance( FeatureValue *, FeatureValue *,
 			     size_t=1, double = 1.0 ) const = 0;
   private:
     MetricType _type;
   };
+
+  metricClass *getMetricClass( MetricType );
 
   class distanceMetricClass: public metricClass {
   public:
@@ -66,7 +65,7 @@ namespace Timbl{
     bool isStorable() const { return false; };
     double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
   };
-  
+
   class NumericMetricClass: public distanceMetricClass {
   public:
   NumericMetricClass( MetricType m ): distanceMetricClass( m ){};
@@ -94,7 +93,7 @@ namespace Timbl{
     bool isStorable() const { return true; };
     double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
   };
-  
+
   class DiceMetric: public distanceMetricClass {
   public:
   DiceMetric(): distanceMetricClass( Dice ){};
@@ -148,6 +147,6 @@ namespace Timbl{
     double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
   };
 
-}  
+}
 
 #endif // TIMBL_METRICS_H

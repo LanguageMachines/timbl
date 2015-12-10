@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -34,8 +31,8 @@ namespace Timbl{
   class metricTestFunction {
   public:
     virtual ~metricTestFunction(){};
-    virtual double test( FeatureValue *, 
-			 FeatureValue *, 
+    virtual double test( FeatureValue *,
+			 FeatureValue *,
 			 Feature * ) const = 0;
   };
 
@@ -55,14 +52,14 @@ namespace Timbl{
   protected:
     int threshold;
   };
-  
+
   class TesterClass {
   public:
-    TesterClass( const std::vector<Feature*>&, 
+    TesterClass( const std::vector<Feature*>&,
 		 const std::vector<size_t> & );
     virtual ~TesterClass(){};
     void init( const Instance&, size_t, size_t );
-    virtual size_t test( std::vector<FeatureValue *>&, 
+    virtual size_t test( std::vector<FeatureValue *>&,
 			 size_t,
 			 double ) = 0;
     virtual double getDistance( size_t ) const = 0;
@@ -76,59 +73,59 @@ namespace Timbl{
     const std::vector<size_t> &permutation;
     std::vector<double> distances;
   };
-  
+
   class DistanceTester: public TesterClass {
   public:
-    DistanceTester( const std::vector<Feature*>&, 
+    DistanceTester( const std::vector<Feature*>&,
 		    const std::vector<size_t>&,
 		    int );
     ~DistanceTester();
     double getDistance( size_t ) const;
-    size_t test( std::vector<FeatureValue *>&, 
+    size_t test( std::vector<FeatureValue *>&,
 		 size_t,
-		 double ); 
+		 double );
   private:
     metricTestFunction **metricTest;
 
   };
-  
+
   class SimilarityTester: public TesterClass {
   public:
   SimilarityTester( const std::vector<Feature*>& pf,
-		    const std::vector<size_t>& p ): 
+		    const std::vector<size_t>& p ):
     TesterClass( pf, p ){};
     ~SimilarityTester() {};
     double getDistance( size_t ) const;
-    virtual size_t test( std::vector<FeatureValue *>&, 
+    virtual size_t test( std::vector<FeatureValue *>&,
 			 size_t,
 			 double ) = 0;
   };
-  
+
   class CosineTester: public SimilarityTester {
   public:
   CosineTester( const std::vector<Feature*>& pf,
-		const std::vector<size_t>& p ): 
-    SimilarityTester( pf, p ){};  
-    size_t test( std::vector<FeatureValue *>&, 
+		const std::vector<size_t>& p ):
+    SimilarityTester( pf, p ){};
+    size_t test( std::vector<FeatureValue *>&,
 		 size_t,
 		 double );
   };
-  
+
   class DotProductTester: public SimilarityTester {
   public:
   DotProductTester( const std::vector<Feature*>& pf,
-		    const std::vector<size_t>& p ): 
-    SimilarityTester( pf, p ){};  
-    size_t test( std::vector<FeatureValue *>&, 
+		    const std::vector<size_t>& p ):
+    SimilarityTester( pf, p ){};
+    size_t test( std::vector<FeatureValue *>&,
 		 size_t,
 		 double );
   };
 
   TesterClass* getTester( MetricType,
-			  const std::vector<Feature*>&, 
+			  const std::vector<Feature*>&,
 			  const std::vector<size_t>&,
 			  int );
 
-}  
+}
 
 #endif // TIMBL_TESTERS_H

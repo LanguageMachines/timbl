@@ -1,7 +1,4 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
@@ -31,8 +28,6 @@
 
 #include <list>
 #include <iosfwd>
-
-#include "Types.h"
 
 namespace Timbl {
   class TimblExperiment;

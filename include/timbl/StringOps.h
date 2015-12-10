@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -37,17 +34,13 @@
 #include <stdexcept>
 
 namespace Timbl {
-  
-  std::string string_tok( const std::string&, 
-			  std::string::size_type&,
-			  const std::string& );
-  
+
   bool compare_nocase( const std::string&, const std::string& );
   bool compare_nocase_n( const std::string&, const std::string& );
-  
+
   std::string StrToCode( const std::string& );
   std::string CodeToStr( const std::string& );
-  
+
 }
 
 #endif

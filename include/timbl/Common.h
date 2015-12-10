@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -37,7 +34,7 @@
 namespace Common {
   const double Epsilon = DBL_EPSILON;   // smallest x so that 1+x != 1
   const int DEFAULT_MAX_FEATS = 2500;   // default maximun number of Features
-  
+
   std::string Version();
   std::string VersionName();
   std::string BuildInfo();
@@ -53,7 +50,7 @@ namespace Common {
     }
     return -1;
   }
-  
+
   inline void skip_spaces( std::istream &is ){
     int nc;
     while( is ){
@@ -63,7 +60,7 @@ namespace Common {
       nc = is.get();
     }
   }
-  
+
   inline double Log2(double number){
     // LOG base 2.
     if ( fabs(number) < Epsilon)

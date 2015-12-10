@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -38,7 +35,7 @@
 
 using namespace std;
 namespace Timbl {
-  
+
   string StrToCode( const string &par ){
     string In = TiCC::trim(par);
     string Out;
@@ -64,7 +61,7 @@ namespace Timbl {
     }
     return Out;
   }
-  
+
   string CodeToStr( const string& in ){
     string out;
     string::const_iterator it = in.begin();
@@ -98,28 +95,11 @@ namespace Timbl {
     }
     return out;
   }
-  
-  string string_tok( const string& s, 
-		     string::size_type& pos,
-		     const string& seps ){
-    string::size_type b_pos = s.find_first_not_of( seps, pos ); 
-    if ( b_pos != string::npos ){
-      pos = s.find_first_of( seps, b_pos ); 
-      if ( pos == string::npos )
-	return string( s, b_pos );
-      else
-	return string( s, b_pos, pos - b_pos );
-    }
-    else {
-      pos = string::npos;
-    }
-    return "";
-  }
-  
+
   bool nocase_cmp( char c1, char c2 ){
     return toupper(c1) == toupper(c2);
   }
-  
+
   bool compare_nocase( const string& s1, const string& s2 ){
     if ( s1.size() == s2.size() &&
 	 equal( s1.begin(), s1.end(), s2.begin(), nocase_cmp ) )
@@ -127,7 +107,7 @@ namespace Timbl {
     else
       return false;
   }
-  
+
   bool compare_nocase_n( const string& s1, const string& s2 ){
     if ( s1.size() <= s2.size() &&
 	 equal( s1.begin(), s1.end(), s2.begin(), nocase_cmp ) )

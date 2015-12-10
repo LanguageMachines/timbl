@@ -1,13 +1,10 @@
 #ifndef TIMBL_CHOPPERS_H
 #define TIMBL_CHOPPERS_H
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -53,8 +50,8 @@ namespace Timbl{
     static Chopper *create( InputFormatType , bool, int, bool );
     static InputFormatType getInputFormat( const std::string&,
 					   bool=false );
-    static size_t countFeatures( const std::string&, 
-				 InputFormatType,  
+    static size_t countFeatures( const std::string&,
+				 InputFormatType,
 				 int,
 				 bool=false );
   protected:
@@ -63,7 +60,7 @@ namespace Timbl{
     std::string strippedInput;
     std::vector<std::string> choppedInput;
   };
-  
+
   class ExChopper: public virtual Chopper {
   public:
     double getExW() const { return exW; };
@@ -71,7 +68,7 @@ namespace Timbl{
     void init( const std::string&, size_t, bool );
     double exW;
   };
-  
+
   class OccChopper: public virtual Chopper {
   public:
     int getOcc() const { return occ; };
@@ -79,7 +76,7 @@ namespace Timbl{
     void init( const std::string&, size_t, bool );
     int occ;
   };
-  
+
   class C45_Chopper : public virtual Chopper {
   public:
     bool chop( const std::string&, size_t );
@@ -96,25 +93,25 @@ namespace Timbl{
   public:
     bool chop( const std::string&, size_t );
   };
-  
+
   class ARFF_ExChopper : public C45_ExChopper {
   };
-  
+
   class ARFF_OccChopper : public C45_OccChopper {
   };
-  
+
   class Bin_Chopper : public virtual Chopper {
   public:
     bool chop( const std::string&, size_t );
     std::string getString() const;
   };
-  
+
   class Bin_ExChopper : public Bin_Chopper, public ExChopper {
   };
-  
+
   class Bin_OccChopper : public Bin_Chopper, public OccChopper {
   };
-  
+
   class Compact_Chopper : public virtual Chopper {
   public:
   Compact_Chopper( int L ): fLen(L){};
@@ -124,21 +121,21 @@ namespace Timbl{
     int fLen;
     Compact_Chopper();
   };
-  
+
   class Compact_ExChopper : public Compact_Chopper, public ExChopper {
   public:
   Compact_ExChopper( int L ): Compact_Chopper( L ){};
   private:
     Compact_ExChopper();
   };
-  
+
   class Compact_OccChopper : public Compact_Chopper, public OccChopper {
   public:
   Compact_OccChopper( int L ): Compact_Chopper( L ){};
   private:
     Compact_OccChopper();
   };
-  
+
   class Columns_Chopper : public virtual Chopper {
   public:
     bool chop( const std::string&, size_t );
@@ -150,7 +147,7 @@ namespace Timbl{
 
   class Columns_OccChopper : public Columns_Chopper, public OccChopper {
   };
-  
+
   class Tabbed_Chopper : public virtual Chopper {
   public:
     bool chop( const std::string&, size_t );
@@ -162,19 +159,19 @@ namespace Timbl{
 
   class Tabbed_OccChopper : public Tabbed_Chopper, public OccChopper {
   };
-  
+
 
   class Sparse_Chopper : public virtual Chopper {
   public:
     bool chop( const std::string&, size_t );
     std::string getString() const;
-  };  
+  };
 
   class Sparse_ExChopper : public Sparse_Chopper, public ExChopper {
-  };  
+  };
 
   class Sparse_OccChopper : public Sparse_Chopper, public OccChopper {
-  };  
+  };
 
 }
 #endif // TIMBL_CHOPPERS_H

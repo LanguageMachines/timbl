@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -43,28 +40,28 @@ namespace Timbl{
     double alpha;
     double beta;
   };
-  
+
   class zeroDecay: public decayStruct {
   public:
     zeroDecay():decayStruct(){};
     std::ostream& put( std::ostream& ) const;
     DecayType type() const { return Zero;};
   };
-  
+
   class invLinDecay: public decayStruct {
   public:
     invLinDecay():decayStruct(){};
     std::ostream& put( std::ostream& ) const;
     DecayType type() const { return InvLinear;};
   };
-  
+
   class invDistDecay: public decayStruct {
   public:
     invDistDecay():decayStruct(){};
     std::ostream& put( std::ostream& ) const;
     DecayType type() const { return InvDist;};
   };
-  
+
   class expDecay: public decayStruct {
   public:
     expDecay( double alp ): decayStruct(alp,1.0){};
@@ -72,7 +69,7 @@ namespace Timbl{
     std::ostream& put( std::ostream& ) const;
     DecayType type() const { return ExpDecay;};
   };
-  
+
   class neighborSet {
     friend std::ostream& operator<<( std::ostream&, const neighborSet& );
     friend std::ostream& operator<<( std::ostream&, const neighborSet * );
@@ -93,12 +90,12 @@ namespace Timbl{
     WValueDistribution *bestDistribution( const decayStruct * =0,
 					  size_t =0 ) const ;
     double relativeWeight( const decayStruct *, size_t ) const;
-    bool setShowDistance( bool b ) const { 
+    bool setShowDistance( bool b ) const {
       bool ret = showDistance;
       showDistance = b;
       return ret;
     }
-    bool setShowDistribution( bool b ) const { 
+    bool setShowDistribution( bool b ) const {
       bool ret = showDistribution;
       showDistribution = b;
       return ret;
@@ -109,7 +106,7 @@ namespace Timbl{
     void push_back( double, const ValueDistribution & );
     std::vector<double> distances;
     std::vector<ValueDistribution *> distributions;
-  };  
-  
+  };
+
 }
 #endif

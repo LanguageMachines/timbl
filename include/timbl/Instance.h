@@ -1,7 +1,4 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
@@ -34,10 +31,13 @@
 #include <vector>
 #include <map>
 #include "timbl/MsgClass.h"
-#include "ticcutils/TreeHash.h"
 
 template<typename T>
 class SparseSymetricMatrix;
+
+namespace Hash {
+  class StringHash;
+}
 
 namespace Timbl {
 
@@ -291,7 +291,7 @@ namespace Timbl {
     void NumStatistics( double, Target *, int, bool );
     void ClipFreq( size_t f ){ matrix_clip_freq = f; };
     size_t ClipFreq() const { return matrix_clip_freq; };
-    SparseSymetricMatrix<FeatureValue *> *metric_matrix;
+    SparseSymetricMatrix<ValueClass *> *metric_matrix;
  private:
     metricClass *metric;
     bool ignore;

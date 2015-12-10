@@ -1,7 +1,4 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
@@ -32,13 +29,12 @@
 
 #include <string>
 #include <vector>
+#include "ticcutils/CommandLine.h"
 #include "timbl/Common.h"
 #include "timbl/MsgClass.h"
 #include "timbl/Types.h"
-#include "timbl/Options.h"
 #include "timbl/Instance.h"
 #include "timbl/neighborSet.h"
-#include "ticcutils/CommandLine.h"
 #include "timbl/TimblExperiment.h"
 
 namespace Timbl{

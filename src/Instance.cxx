@@ -1,7 +1,4 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
@@ -81,9 +78,9 @@ namespace Timbl {
   }
 
   void ValueDistribution::clear(){
-    VDlist::iterator it;
-    for ( it = distribution.begin(); it != distribution.end(); ++it )
-      delete it->second;
+    for ( const auto& d : distribution ){
+      delete d.second;
+    }
     distribution.clear();
     total_items = 0;
   }
@@ -244,17 +241,16 @@ namespace Timbl {
   }
 
   void WValueDistribution::Normalize_1( double factor, const Target *targ ) {
-    for ( unsigned int i=0; i < targ->ValuesArray.size(); ++i ){
+    for ( const auto& val : targ->ValuesArray ){
       // search for val, if not there: add entry with frequency factor;
       // otherwise increment the ExamplarWeight
-      TargetValue *val = (TargetValue*)targ->ValuesArray[i];
       size_t id = val->Index();
       VDlist::const_iterator it = distribution.find( id );
       if ( it != distribution.end() ){
 	it->second->SetWeight( it->second->Weight() + factor );
       }
       else {
-	distribution[id] = new Vfield( val, 1, factor );
+	distribution[id] = new Vfield( (TargetValue*)val, 1, factor );
       }
     }
     total_items += targ->ValuesArray.size();
@@ -262,26 +258,20 @@ namespace Timbl {
   }
 
   void WValueDistribution::Normalize_2( ) {
-    VDlist::iterator it = distribution.begin();
-    while ( it != distribution.end() ){
-      it->second->SetWeight( log( it->second->Weight() + 1 ));
-      ++it;
+    for ( const auto& d : distribution ){
+      d.second->SetWeight( log( d.second->Weight() + 1 ));
     }
     Normalize();
   }
 
   ValueDistribution *ValueDistribution::to_VD_Copy( ) const {
     ValueDistribution *res = new ValueDistribution();
-    size_t key;
-    Vfield *vdf;
-    VDlist::const_iterator It = distribution.begin();
-    while ( It != distribution.end() ){
-      key = It->first;
-      vdf = It->second;
+    for ( const auto& d : distribution ){
+      size_t key = d.first;
+      Vfield *vdf = d.second;
       res->distribution[key] = new Vfield( vdf->Value(),
 					   vdf->Freq(),
 					   vdf->Freq() );
-      ++It;
     }
     res->total_items = total_items;
     return res;
@@ -289,16 +279,12 @@ namespace Timbl {
 
   WValueDistribution *ValueDistribution::to_WVD_Copy() const {
     WValueDistribution *res = new WValueDistribution();
-    size_t key;
-    Vfield *vdf;
-    VDlist::const_iterator It = distribution.begin();
-    while ( It != distribution.end() ){
-      key = It->first;
-      vdf = It->second;
+    for ( const auto& d : distribution ){
+      size_t key = d.first;
+      Vfield *vdf = d.second;
       res->distribution[key] = new Vfield( vdf->Value(),
 					   vdf->Freq(),
 					   vdf->Freq() );
-      ++It;
     }
     res->total_items = total_items;
     return res;
@@ -306,16 +292,12 @@ namespace Timbl {
 
   WValueDistribution *WValueDistribution::to_WVD_Copy( ) const {
     WValueDistribution *result = new WValueDistribution();
-    VDlist::const_iterator it = distribution.begin();
-    Vfield *vdf;
-    size_t key;
-    while ( it != distribution.end() ){
-      key = it->first;
-      vdf = it->second;
+    for ( const auto& d : distribution ){
+      size_t key = d.first;
+      Vfield *vdf = d.second;
       result->distribution[key] = new Vfield( vdf->Value(),
 					      vdf->Freq(),
 					      vdf->Weight() );
-      ++it;
     }
     result->total_items = total_items;
     return result;
@@ -331,18 +313,16 @@ namespace Timbl {
 
   const string ValueDistribution::SaveHashed() const{
     ostringstream oss;
-    VDlist::const_iterator it = distribution.begin();
     oss << "{ ";
     bool first = true;
-    while ( oss.good() && it != distribution.end() ){
-      Vfield *f = it->second;
+    for( const auto& it : distribution ){
+      Vfield *f = it.second;
       if ( f->frequency > 0 ){
 	if ( !first )
 	  oss << ", ";
 	oss << f->value->Index() << " " << f->frequency;
 	first = false;
       }
-      ++it;
     }
     oss << " }";
     return oss.str();
@@ -350,11 +330,10 @@ namespace Timbl {
 
   const string WValueDistribution::SaveHashed() const{
     ostringstream oss;
-    VDlist::const_iterator it = distribution.begin();
     bool first = true;
     oss << "{ ";
-    while ( oss.good() && it != distribution.end() ){
-      Vfield *f = it->second;
+    for( const auto& it : distribution ){
+      Vfield *f = it.second;
       if ( f->frequency > 0 ){
 	if ( !first )
 	  oss << ", ";
@@ -362,7 +341,6 @@ namespace Timbl {
 	    << f->frequency << " " << f->weight;
 	first = false;
       }
-      ++it;
     }
     oss << " }";
     return oss.str();
@@ -374,18 +352,16 @@ namespace Timbl {
 
   const string ValueDistribution::Save() const{
     ostringstream oss;
-    VDlist::const_iterator it = distribution.begin();
     oss << "{ ";
     bool first = true;
-    while ( oss.good() && it != distribution.end() ){
-      Vfield *f = it->second;
+    for( const auto& it : distribution ){
+      Vfield *f = it.second;
       if ( f->frequency > 0 ){
 	if ( !first )
 	  oss << ", ";
 	oss << f->value << " " << f->frequency;
 	first = false;
       }
-      ++it;
     }
     oss << " }";
     return oss.str();
@@ -393,11 +369,10 @@ namespace Timbl {
 
   const string WValueDistribution::Save() const{
     ostringstream oss;
-    VDlist::const_iterator it = distribution.begin();
     oss << "{ ";
     bool first = true;
-    while ( oss.good() && it != distribution.end() ){
-      Vfield *f = it->second;
+    for( const auto& it : distribution ){
+      Vfield *f = it.second;
       if ( f->frequency > 0 ){
 	if ( !first )
 	  oss << ", ";
@@ -405,7 +380,6 @@ namespace Timbl {
 	oss << f->value << " " << f->frequency << " " << f->weight;
 	first = false;
       }
-      ++it;
     }
     oss << " }";
     return oss.str();
@@ -473,12 +447,9 @@ namespace Timbl {
   }
 
   void ValueDistribution::Merge( const ValueDistribution& VD ){
-    VDlist::const_iterator It = VD.distribution.begin();
-    size_t key;
-    Vfield *vd;
-    while ( It != VD.distribution.end() ){
-      key = It->first;
-      vd = It->second;
+    for ( const auto& it : VD.distribution ){
+      size_t key = it.first;
+      Vfield *vd = it.second;
       if ( distribution.find(key) != distribution.end() ){
 	distribution[key]->AddFreq( vd->Freq() );
       }
@@ -487,17 +458,15 @@ namespace Timbl {
 	// Weight == Freq is more convenient
 	distribution[key] = new Vfield( vd->Value(), vd->Freq(),
 					vd->Freq() );
-      ++It;
     }
     total_items += VD.total_items;
   }
 
   void WValueDistribution::MergeW( const ValueDistribution& VD,
 				   double Weight ){
-    VDlist::const_iterator It = VD.distribution.begin();
-    while ( It != VD.distribution.end() ){
-      Vfield *vd = It->second;
-      size_t key = It->first;
+    for ( const auto& it : VD.distribution ){
+      Vfield *vd = it.second;
+      size_t key = it.first;
       if ( distribution.find(key) != distribution.end() ){
 	distribution[key]->SetWeight( distribution[key]->Weight() + vd->Weight() *Weight );
       }
@@ -505,7 +474,6 @@ namespace Timbl {
 	distribution[key] = new Vfield( vd->Value(), 1,
 					vd->Weight() * Weight);
       }
-      ++It;
     }
     total_items += VD.total_items;
   }
@@ -1531,18 +1499,18 @@ namespace Timbl {
     if ( PrestoreStatus == ps_read )
       return true;
     if ( !metric_matrix )
-      metric_matrix = new SparseSymetricMatrix<FeatureValue*>();
+      metric_matrix = new SparseSymetricMatrix<ValueClass*>();
     if ( PrestoreStatus != ps_failed && metric->isStorable( ) ) {
       try {
-	for ( unsigned int ii=0; ii < ValuesArray.size(); ++ii ){
-	  FeatureValue *FV_i = (FeatureValue *)ValuesArray[ii];
-	  for ( unsigned int jj=0; jj < ValuesArray.size(); ++jj ){
-	    FeatureValue *FV_j = (FeatureValue *)ValuesArray[jj];
+	for ( const auto& FV_i : ValuesArray ){
+	  for ( const auto& FV_j : ValuesArray ){
 	    if ( FV_i->ValFreq() >= matrix_clip_freq &&
 		 FV_j->ValFreq() >= matrix_clip_freq &&
 		 ( Prestored_metric != metric->type() ||
 		   fabs(metric_matrix->Extract(FV_i,FV_j)) < Epsilon ) ){
-	      double dist = metric->distance( FV_i, FV_j, limit );
+	      double dist = metric->distance( (FeatureValue*)FV_i,
+					      (FeatureValue*)FV_j,
+					      limit );
 	      metric_matrix->Assign( FV_i, FV_j, dist );
 	    }
 	  }
@@ -1678,7 +1646,7 @@ namespace Timbl {
 
   bool Feature::fill_matrix( istream &is ) {
     if ( !metric_matrix )
-      metric_matrix = new SparseSymetricMatrix<FeatureValue*>();
+      metric_matrix = new SparseSymetricMatrix<ValueClass*>();
     else
       metric_matrix->Clear();
     string line;

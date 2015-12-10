@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -33,15 +30,12 @@
 #include <map>
 #include <cassert>
 
-#include "timbl/MsgClass.h"
+#include "ticcutils/StringOps.h"
 #include "timbl/IBtree.h"
 #include "timbl/Common.h"
 #include "timbl/Types.h"
-#include "timbl/Instance.h"
 #include "timbl/Options.h"
-#include "timbl/BestArray.h"
 #include "timbl/MBLClass.h"
-#include "timbl/Metrics.h"
 
 using namespace std;
 using namespace TiCC;
@@ -54,7 +48,7 @@ namespace Timbl {
     MBL_init = do_sloppy_loo; // must be only true if you are REALY sure
     for ( size_t i=0; i < effective_feats && result; ++i ){
       PermFeatures[i]->clear_matrix();
-      if ( !PermFeatures[i]->decrement_value( Inst.FV[i], 
+      if ( !PermFeatures[i]->decrement_value( Inst.FV[i],
 					      Inst.TV ) ){
 	FatalError( "Unable to Hide an Instance!" );
 	result = false;
@@ -64,14 +58,14 @@ namespace Timbl {
       Targets->decrement_value( Inst.TV );
     return result;
   }
-  
+
   bool MBLClass::UnHideInstance( const Instance& Inst ){
     bool result = true;
     InstanceBase->AddInstance( Inst );
     MBL_init = do_sloppy_loo; // must be only true if you are REALY sure
     for ( size_t i=0; i < effective_feats && result; ++i ){
       PermFeatures[i]->clear_matrix();
-      if ( !PermFeatures[i]->increment_value( Inst.FV[i], 
+      if ( !PermFeatures[i]->increment_value( Inst.FV[i],
 					      Inst.TV ) ){
 	FatalError( "Unable to UnHide this Instance!" );
 	result = false;
@@ -81,7 +75,7 @@ namespace Timbl {
       Targets->increment_value( Inst.TV );
     return result;
   }
-  
+
   MBLClass::IB_Stat MBLClass::IBStatus() const {
     if (!InstanceBase )
       return Invalid;
@@ -90,7 +84,7 @@ namespace Timbl {
     else
       return Normal;
   }
-  
+
   void MBLClass::IBInfo( ostream& os ) const {
     double Compres;
     unsigned long int CurSize;
@@ -116,7 +110,7 @@ namespace Timbl {
 	int nodes;
 	if ( i == 0 ){
 	  nodes = 1;
-	  os << setw(8) << 0 << " |" << setw(8) << "top" << " |" 
+	  os << setw(8) << 0 << " |" << setw(8) << "top" << " |"
 	     << setw(10) << 1 << " |"
 	     << setw(10) << 1 << " |" << setw(10) << 0 << " |"
 	     << setw(10) << double(*nIt + *tIt) << " |"
@@ -137,12 +131,29 @@ namespace Timbl {
 	++nIt;
 	++tIt;
       }
-      os << "total: nodes = " << summedNodes 
-	 << " endnodes = " << endNodes 
+      os << "total: nodes = " << summedNodes
+	 << " endnodes = " << endNodes
 	 << " factor = " << summedNodes/double(endNodes) << endl;
     }
     os.precision( OldPrec );
     os.setf( OldFlg );
+  }
+
+  string string_tok( const string& s,
+		     string::size_type& pos,
+		     const string& seps ){
+    string::size_type b_pos = s.find_first_not_of( seps, pos );
+    if ( b_pos != string::npos ){
+      pos = s.find_first_of( seps, b_pos );
+      if ( pos == string::npos )
+	return string( s, b_pos );
+      else
+	return string( s, b_pos, pos - b_pos );
+    }
+    else {
+      pos = string::npos;
+    }
+    return "";
   }
 
   bool MBLClass::get_IB_Info( istream& is,
@@ -160,7 +171,7 @@ namespace Timbl {
 	       " experiment is already loaded" );
       return false;
     }
-    
+
     bool info_ok = true;
     bool more = true;
     size_t depth = 0;
@@ -224,7 +235,7 @@ namespace Timbl {
 	      index = stringTo<size_t>( tmp );
 	      permutation.push_back( --index );
 	      if ( index >= MaxFeatures ){
-		Error ( "illegal value " + toString<size_t>(index) + 
+		Error ( "illegal value " + toString<size_t>(index) +
 			" in permutation, not between 1 and " +
 			toString<size_t>( MaxFeatures ) );
 		info_ok = false;
@@ -283,7 +294,7 @@ namespace Timbl {
 	  }
 	}
       }
-      more = ( look_ahead(is) == '#' && 
+      more = ( look_ahead(is) == '#' &&
 	       getline( is, buffer ) );
     }
     if ( version < 0 ) {
@@ -291,7 +302,7 @@ namespace Timbl {
       info_ok = false;
     }
     else if ( version < 4 ) {
-      Error( "A Version " + toString<int>(version) + 
+      Error( "A Version " + toString<int>(version) +
 	     " type InstanceBase file is found:\n"
 	     "        You should recreate it as it is no longer supported"
 	     "\n        in this version of the timbl package" );
@@ -307,7 +318,7 @@ namespace Timbl {
       return false;
     }
   }
-  
+
   bool MBLClass::get_ranges( const string& rangeline ){
     if ( NumNumFeatures() == 0 )
       return true;
@@ -327,7 +338,7 @@ namespace Timbl {
       }
       else {
 	do {
-	  is >> k; 
+	  is >> k;
 	  if ( UserOptions[k] != Numeric ){
 	    Error( "Found range info for feature " + toString<int>(k) +
 		   ", which is Not defined as Numeric!" );
@@ -360,10 +371,10 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   inline void MBLClass::writePermSpecial( ostream &os ) const{
     // write out the permutation and mark the last feature which is
-    // NOT to be ignored with an exclamation mark, for instance: 
+    // NOT to be ignored with an exclamation mark, for instance:
     // < 5, 2, 3! 1, 4 >
     bool excl = false;
     os << "< ";
@@ -376,7 +387,7 @@ namespace Timbl {
 	os << permutation[j]+1 << ", ";
     }
     os << permutation[num_of_features-1]+1 << " >" << endl;
-  }  
+  }
 
   bool MBLClass::PutInstanceBase( ostream& os ) const {
     bool result = true;
@@ -387,11 +398,11 @@ namespace Timbl {
       Warning( "unable to write an Instance Base, nothing learned yet" );
     }
     else {
-      os << "# Status: " 
+      os << "# Status: "
 	      << (InstanceBase->IsPruned()?"pruned":"complete") << endl;
-      os << "# Permutation: "; 
+      os << "# Permutation: ";
       writePermSpecial( os );
-      os << "# Numeric: "; 
+      os << "# Numeric: ";
       bool first = true;
       for ( size_t i=0; i < num_of_features; ++i )
 	if ( !Features[i]->Ignore() &&
@@ -404,7 +415,7 @@ namespace Timbl {
 	}
       os << '.' << endl;
       if ( NumNumFeatures() > 0 ){
-	os << "# Ranges: "; 
+	os << "# Ranges: ";
 	first = true;
 	for ( size_t j=0; j < num_of_features; ++j )
 	  if ( !Features[j]->Ignore() &&
@@ -413,7 +424,7 @@ namespace Timbl {
 	      os << " , ";
 	    else
 	      first = false;
-	    os << j+1 << " [" << Features[j]->Min() 
+	    os << j+1 << " [" << Features[j]->Min()
 		    << "-" << Features[j]->Max() << "]";
 	  }
 	os << " ." << endl;
@@ -421,7 +432,7 @@ namespace Timbl {
       os << "# Bin_Size: " << Bin_Size << endl;
       if ( hashed_trees ){
 	InstanceBase->Save( os,
-			    TargetStrings, FeatureStrings, 
+			    TargetStrings, FeatureStrings,
 			    keep_distributions );
       }
       else
@@ -429,6 +440,6 @@ namespace Timbl {
     }
     return result;
   }
-  
-  
+
+
 }

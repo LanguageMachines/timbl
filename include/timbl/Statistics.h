@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -26,28 +23,32 @@
   or send mail to:
       timbl@uvt.nl
 */
-
 #ifndef TIMBL_STATISTICS_H
 #define TIMBL_STATISTICS_H
 
+#include "timbl/MsgClass.h"
+
 namespace Timbl {
+  class Target;
+  class TargetValue;
+
   class ConfusionMatrix: public MsgClass {
     size_t size;
     std::vector<std::vector<size_t> > mat;
   public:
-    ConfusionMatrix( size_t );  
+    ConfusionMatrix( size_t );
     virtual ~ConfusionMatrix();
     void Increment( const TargetValue*, const TargetValue* );
     void Print( std::ostream&, const Target * ) const;
     void FScore( std::ostream&, const Target *, bool ) const;
     void merge( const ConfusionMatrix * );
   };
-  
+
   class StatisticsClass {
   public:
   StatisticsClass(): _data(0), _skipped(0), _correct(0),
       _tieOk(0), _tieFalse(0), _exact(0) {};
-    void clear() { _data =0; _skipped = 0; _correct = 0; 
+    void clear() { _data =0; _skipped = 0; _correct = 0;
       _tieOk = 0; _tieFalse = 0; _exact = 0; };
     void addLine() { ++_data; }
     void addSkipped() { ++_skipped; }

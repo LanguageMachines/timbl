@@ -1,7 +1,4 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
@@ -29,10 +26,14 @@
 #ifndef TIMBL_IBTREE_H
 #define TIMBL_IBTREE_H
 
-#include "ticcutils/TreeHash.h"
 #include "ticcutils/XMLtools.h"
+#include "timbl/MsgClass.h"
 
 //#define IBSTATS
+
+namespace Hash {
+  class StringHash;
+}
 
 namespace Timbl {
 

@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -29,7 +26,16 @@
 #ifndef TIMBL_MBLCLASS_H
 #define TIMBL_MBLCLASS_H
 
+#include "timbl/Instance.h"
+#include "timbl/BestArray.h"
+#include "timbl/neighborSet.h"
+#include "timbl/Options.h"
+
 typedef struct _xmlNode xmlNode;
+
+namespace Hash {
+  class StringHash;
+}
 
 namespace Timbl {
   using namespace Common;
@@ -37,19 +43,20 @@ namespace Timbl {
   class InstanceBase_base;
   class TesterClass;
   class Chopper;
+  class neighborSet;
 
   class MBLClass {
   public:
     bool SetOption( const std::string& );
     xmlNode *settingsToXml() const;
     bool ShowWeights( std::ostream& ) const;
-    bool Verbosity( VerbosityFlags v ) const { 
+    bool Verbosity( VerbosityFlags v ) const {
       return verbosity & v; };
     void SetVerbosityFlag( VerbosityFlags v ) { verbosity |= v; };
     void ResetVerbosityFlag( VerbosityFlags v ) { verbosity &= ~v; };
     bool MBLInit() const { return MBL_init; };
     void MBLInit( bool b ) { MBL_init = b; };
-    bool ExpInvalid( bool b = true ) const { 
+    bool ExpInvalid( bool b = true ) const {
       if ( err_count > 0 ){
 	if ( b )
 	  InvalidMessage();
@@ -95,7 +102,7 @@ namespace Timbl {
 				std::vector<FeatureValue *>&,
 				size_t,	size_t ) const;
     bool setInputFormat( const InputFormatType );
-    size_t countFeatures( const std::string&, 
+    size_t countFeatures( const std::string&,
 			  const InputFormatType ) const;
     InputFormatType getInputFormat( const std::string& ) const;
     size_t examineData( const std::string& );
@@ -138,7 +145,7 @@ namespace Timbl {
     unsigned int IB2_offset() const { return ib2_offset; };
     void IB2_offset( unsigned int n ) { ib2_offset = n; };
     bool Do_Sloppy_LOO() const { return do_sloppy_loo; };
-    bool doSamples() const { 
+    bool doSamples() const {
       return do_sample_weighting && !do_ignore_samples; };
     bool Do_Exact() const { return do_exact_match; };
     void Do_Exact( bool b ) { do_exact_match = b; };
@@ -216,7 +223,7 @@ namespace Timbl {
     TesterClass *tester;
     int doOcc;
     bool chopExamples() const {
-      return do_sample_weighting && 
+      return do_sample_weighting &&
 	!( runningPhase == TestWords && no_samples_test ); }
     bool chopOcc() const {
       switch( runningPhase ) {
@@ -241,32 +248,32 @@ namespace Timbl {
     void test_instance_sim( const Instance& ,
 			    InstanceBase_base * = NULL,
 			    size_t = 0 );
-    
+
     void test_instance_ex( const Instance&,
 			   InstanceBase_base * = NULL,
 			   size_t = 0 );
 
     bool allocate_arrays();
 
-    double RelativeWeight( unsigned int ) const;    
+    double RelativeWeight( unsigned int ) const;
     void writePermSpecial(std::ostream&) const;
     bool read_the_vals( std::istream& );
     MBLClass( const MBLClass& );
   };
- 
-  inline std::ostream& operator<< ( std::ostream& os, 
+
+  inline std::ostream& operator<< ( std::ostream& os,
 				    const MBLClass::PhaseValue& ph ){
     switch( ph ){
-    case MBLClass::TrainWords: 
+    case MBLClass::TrainWords:
       os << "TrainWords";
       break;
-    case MBLClass::LearnWords: 
+    case MBLClass::LearnWords:
       os << "LearnWords";
       break;
     case MBLClass::TestWords:
       os << "TestWords";
       break;
-    case MBLClass::TrainLearnWords: 
+    case MBLClass::TrainLearnWords:
       os << "TrainlearnWords";
       break;
     default:
@@ -274,7 +281,7 @@ namespace Timbl {
     }
     return os;
   }
-  
+
   bool empty_line( const std::string& , const InputFormatType );
 }
 

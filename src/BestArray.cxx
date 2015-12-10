@@ -192,9 +192,9 @@ namespace Timbl {
 
   void BestArray::initNeighborSet( neighborSet& ns ) const {
     ns.clear();
-    for ( unsigned int k = 0; k < size; ++k ) {
-      ns.push_back( bestArray[k]->bestDistance,
-		    bestArray[k]->aggregateDist );
+    for ( auto const& best : bestArray ){
+      ns.push_back( best->bestDistance,
+		    best->aggregateDist );
     }
   }
 
@@ -205,14 +205,15 @@ namespace Timbl {
 
   xmlNode *BestArray::toXML() const {
     xmlNode *top = XmlNewNode( "neighborset" );
-    for ( unsigned int k = 0; k < size; ++k ) {
-      BestRec *best = bestArray[k];
+    size_t k = 0;
+    for ( auto const& best : bestArray ){
+      ++k;
       if ( _storeInstances ){
 	size_t totalBests = best->totalBests();
 	if ( totalBests == 0 )
 	  break; // TRIBL algorithms do this!
 	xmlNode *nbs = XmlNewChild( top, "neighbors" );
-	XmlSetAttribute( nbs, "k", toString(k+1) );
+	XmlSetAttribute( nbs, "k", toString(k) );
 	XmlSetAttribute( nbs, "total", toString(totalBests) );
 	XmlSetAttribute( nbs, "distance", toString( best->bestDistance ) );
 	if ( maxBests < totalBests )
@@ -229,7 +230,7 @@ namespace Timbl {
 	if ( best->aggregateDist.ZeroDist() )
 	  break;
 	xmlNode *nbs = XmlNewChild( top, "neighbors" );
-	XmlSetAttribute( nbs, "k", toString(k+1) );
+	XmlSetAttribute( nbs, "k", toString(k) );
 	if ( _showDb ){
 	  XmlNewTextChild( nbs, "distribution",
 			   best->aggregateDist.DistToString() );
@@ -244,13 +245,14 @@ namespace Timbl {
   }
 
   ostream& operator<< ( ostream& os, const BestArray& bA ){
-    for ( unsigned int k = 0; k < bA.size; ++k ) {
-      BestRec *best = bA.bestArray[k];
+    size_t k = 0;
+    for ( auto const& best : bA.bestArray ){
+      ++k;
       if ( bA._storeInstances ){
 	size_t totalBests = best->totalBests();
 	if ( totalBests == 0 )
 	  break; // TRIBL algorithms do this!
-	os << "# k=" << k+1 << ", " << totalBests
+	os << "# k=" << k << ", " << totalBests
 	   <<  " Neighbor(s) at distance: ";
 	int OldPrec = os.precision(DBL_DIG-1);
 	os.setf(ios::showpoint);
@@ -270,14 +272,14 @@ namespace Timbl {
       else {
 	if ( best->aggregateDist.ZeroDist() )
 	  break;
-	os << "# k=" << k+1;
+	os << "# k=" << k << "\t";
 	if ( bA._showDb ){
-	  os << "\t" << best->aggregateDist.DistToString();
+	  os << best->aggregateDist.DistToString();
 	}
 	if ( bA._showDi ){
 	  int OldPrec = os.precision(DBL_DIG-1);
 	  os.setf(ios::showpoint);
-	  os << "\t" << best->bestDistance;
+	  os << best->bestDistance;
 	  os.precision(OldPrec);
 	}
 	os << endl;

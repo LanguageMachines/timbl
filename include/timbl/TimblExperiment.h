@@ -1,7 +1,4 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
@@ -34,8 +31,8 @@
 #include <fstream>
 #include <set>
 #include "ticcutils/XMLtools.h"
-#include "timbl/BestArray.h"
 #include "timbl/Statistics.h"
+#include "timbl/MsgClass.h"
 #include "timbl/MBLClass.h"
 
 namespace Timbl {
@@ -48,6 +45,8 @@ namespace Timbl {
   class TimblAPI;
   class ConfusionMatrix;
   class GetOptClass;
+  class TargetValue;
+  class Instance;
 
   class resultStore: public MsgClass {
   public:

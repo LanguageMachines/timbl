@@ -34,7 +34,7 @@
 #include "timbl/Common.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
-#include "timbl/Instance.h"
+#include "timbl/MsgClass.h"
 #include "timbl/Metrics.h"
 #include "ticcutils/CommandLine.h"
 #include "timbl/GetOptClass.h"
