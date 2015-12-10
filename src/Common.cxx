@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -44,7 +41,7 @@ namespace Common {
   }
   string Version() { return VERSION; }
   string VersionName() { return PACKAGE_STRING; }
-  string BuildInfo() { 
+  string BuildInfo() {
     return Version() + ", compiled on " + __DATE__ + ", " +  __TIME__;
   }
 

@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -84,8 +81,8 @@ namespace Timbl{
     return result;
   }
 
-  TesterClass* getTester( MetricType m, 
-			  const std::vector<Feature*>& features, 
+  TesterClass* getTester( MetricType m,
+			  const std::vector<Feature*>& features,
 			  const std::vector<size_t>& permutation,
 			  int mvdThreshold ){
     if ( m == Cosine )
@@ -108,9 +105,9 @@ namespace Timbl{
     }
     distances.resize(_size+1, 0.0);
   }
-  
+
   void TesterClass::init( const Instance& inst,
-			  size_t effective, 
+			  size_t effective,
 			  size_t oset ){
 #ifdef DBGTEST
     cerr << "tester Initialized!" << endl;
@@ -126,10 +123,10 @@ namespace Timbl{
     }
     delete [] metricTest;
   }
-  
+
   DistanceTester::DistanceTester( const vector<Feature*>& feat,
 				  const vector<size_t>& perm,
-				  int mvdmThreshold ): 
+				  int mvdmThreshold ):
     TesterClass( feat, perm ){
 #ifdef DBGTEST
     cerr << "create a tester with threshold = " << mvdmThreshold << endl;
@@ -155,16 +152,16 @@ namespace Timbl{
 	metricTest[i] = new overlapTestFunction();
       }
     }
-  }  
+  }
 
-  size_t DistanceTester::test( vector<FeatureValue *>& G, 
+  size_t DistanceTester::test( vector<FeatureValue *>& G,
 			       size_t CurPos,
 			       double Threshold ) {
     size_t i;
     size_t TrueF;
     for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
 #ifdef DBGTEST
-      cerr << "feature " << TrueF << " (perm=" << permutation[TrueF] 
+      cerr << "feature " << TrueF << " (perm=" << permutation[TrueF]
 	   << ")" << endl;
 #endif
       double result = metricTest[permutation[TrueF]]->test( (*FV)[TrueF],
@@ -173,7 +170,7 @@ namespace Timbl{
       distances[i+1] = distances[i] + result;
       if ( distances[i+1] > Threshold ){
 #ifdef DBGTEST
-	cerr << "threshold reached at " << i << " distance=" 
+	cerr << "threshold reached at " << i << " distance="
 	     << distances[i+1] << endl;
 #endif
 	return i;
@@ -195,7 +192,7 @@ namespace Timbl{
 	return true;
     }
     return false;
-  }  
+  }
 
   double innerProduct( FeatureValue *FV,
 		       FeatureValue *G ) {
@@ -218,7 +215,7 @@ namespace Timbl{
     return result;
   }
 
-  size_t CosineTester::test( vector<FeatureValue *>& G, 
+  size_t CosineTester::test( vector<FeatureValue *>& G,
 			     size_t CurPos,
 			     double ){
     double denom1 = 0.0;
@@ -235,9 +232,9 @@ namespace Timbl{
     double denom = sqrt( denom1 * denom2 );
     distances[effSize] = result/ (denom + Common::Epsilon);
     return effSize;
-  }  
+  }
 
-  size_t DotProductTester::test( vector<FeatureValue *>& G, 
+  size_t DotProductTester::test( vector<FeatureValue *>& G,
 				 size_t CurPos,
 				 double ) {
     double result;
@@ -262,6 +259,5 @@ namespace Timbl{
 #endif
     return maxSimilarity - distances[pos];
   }
-  
-}  
 
+}

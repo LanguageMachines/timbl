@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -37,7 +34,7 @@ using std::endl;
 using std::string;
 
 namespace Timbl {
-  
+
   void MsgClass::Info( const string& out_line ) const {
     cerr << out_line << endl;
   }
@@ -61,5 +58,5 @@ namespace Timbl {
 	 << "- Which input was used, and which output was produced" << endl;
     throw std::runtime_error( "aborted" );
   }
-  
+
 }

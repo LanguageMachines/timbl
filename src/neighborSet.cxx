@@ -1,11 +1,8 @@
 /*
-  $Id$
-  $URL$
-
   Copyright (c) 1998 - 2015
   ILK   - Tilburg University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -42,7 +39,7 @@ namespace Timbl {
   using namespace std;
   using namespace TiCC;
   using namespace Common;
-  
+
   neighborSet::neighborSet(): showDistance(false),showDistribution(false){}
 
   neighborSet::~neighborSet(){
@@ -64,7 +61,7 @@ namespace Timbl {
     }
     return *this;
   }
-  
+
   size_t neighborSet::size() const{
     return distances.size();
   }
@@ -75,12 +72,12 @@ namespace Timbl {
       delete distributions[i];
     }
     distributions.clear();
-  }  
+  }
 
   void neighborSet::reserve( size_t s ){
     distances.reserve( s );
     distributions.reserve( s );
-  }  
+  }
 
   void neighborSet::truncate( size_t len ){
     if ( len < distributions.size() ){
@@ -91,16 +88,16 @@ namespace Timbl {
       distances.resize( len);
     }
   }
-  
+
   void neighborSet::push_back( double d, const ValueDistribution &dist ){
     distances.push_back( d );
     distributions.push_back( dist.to_VD_Copy() );
   }
-  
+
   void neighborSet::merge( const neighborSet& s ){
     // reserve enough space to avoid reallocations
     // reallocation invalidates pointers!
-    reserve( size() + s.size() ); 
+    reserve( size() + s.size() );
     vector<double>::iterator dit1 = distances.begin();
     vector<double>::const_iterator dit2 = s.distances.begin();
     vector<ValueDistribution *>::iterator dis1 = distributions.begin();
@@ -137,9 +134,9 @@ namespace Timbl {
       distributions.push_back( (*dis2)->to_VD_Copy() );
       ++dis2;
     }
-  }  
-  
-  double neighborSet::relativeWeight( const decayStruct *d, 
+  }
+
+  double neighborSet::relativeWeight( const decayStruct *d,
 				      size_t k ) const{
     double result = 1.0;
     if ( !d )
@@ -179,14 +176,14 @@ namespace Timbl {
     }
     return distances[n];
   }
-  
+
   const ValueDistribution *neighborSet::getDistribution( size_t n ) const {
     if ( size() <= n ){
       throw std::range_error( "getDistribution() parameter exceeds size of neighborSet" );
     }
     return distributions[n];
   }
-  
+
   WValueDistribution *neighborSet::bestDistribution( const decayStruct *d,
 						     size_t max ) const {
     // Analyse the set to find THE best ValueDistribution.
@@ -201,7 +198,7 @@ namespace Timbl {
     }
     return result;
   }
-  
+
   ostream& operator<<( ostream& os, const neighborSet& set ){
     for ( unsigned int i=0; i < set.size(); ++i ){
       os << "# k=" << i+1;
@@ -240,13 +237,13 @@ namespace Timbl {
     os << "Decay         : " << toString( type(), true);
     return os;
   }
-  
+
   ostream& expDecay::put( ostream& os ) const {
     os << "Decay         : " << toString( type(), true);
     os << " a=" << alpha << " b= " << beta;
     return os;
   }
-  
+
   ostream& operator<<( ostream& os, const decayStruct *dc ){
     if ( dc )
       os << *dc;
