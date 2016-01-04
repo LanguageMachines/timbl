@@ -1,8 +1,9 @@
 /*
-  Copyright (c) 1998 - 2015
+  Copyright (c) 1998 - 2016
   ILK   - Tilburg University
+  CLST  - Radboud University
   CLiPS - University of Antwerp
- 
+
   This file is part of timbl
 
   timbl is free software; you can redistribute it and/or modify
@@ -19,9 +20,9 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
   For questions and suggestions, see:
-      http://ilk.uvt.nl/software.html
+      https://github.com/LanguageMachines/timbl/issues
   or send mail to:
-      timbl@uvt.nl
+      lamasoftware (at ) science.ru.nl
 */
 
 #include "timbl/TimblAPI.h"
@@ -30,10 +31,10 @@
 int main(){
   std::string path = std::getenv( "topsrcdir" );
   std::cerr << path << std::endl;
-  
+
   Timbl::TimblAPI exp( "+vdi+db", "test1" );
   if ( exp.isValid() ){
-    exp.Learn( path + "/demos/dimin.train" );  
+    exp.Learn( path + "/demos/dimin.train" );
     if ( exp.isValid() ){
       exp.Test( path + "/demos/dimin.test", "dimin.out" );
       if ( exp.isValid() )

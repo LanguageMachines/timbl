@@ -1,6 +1,7 @@
 /*
-  Copyright (c) 1998 - 2015
+  Copyright (c) 1998 - 2016
   ILK   - Tilburg University
+  CLST  - Radboud University
   CLiPS - University of Antwerp
 
   This file is part of timbl
@@ -19,9 +20,9 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
   For questions and suggestions, see:
-      http://ilk.uvt.nl/software.html
+      https://github.com/LanguageMachines/timbl/issues
   or send mail to:
-      timbl@uvt.nl
+      lamasoftware (at ) science.ru.nl
 */
 
 #include <exception>
@@ -706,8 +707,9 @@ int main(int argc, char *argv[]){
     // Start.
     //
     cerr << "TiMBL " << TimblAPI::VersionInfo()
-	 << " (c) ILK 1998 - 2015.\n"
+	 << " (c) CLST/ILK/CLIPS 1998 - 2016.\n"
 	 << "Tilburg Memory Based Learner\n"
+	 << "Centre for Language and Speech Technology, Radboud University\n"
 	 << "Induction of Linguistic Knowledge Research Group, Tilburg University\n"
 	 << "CLiPS Computational Linguistics Group, University of Antwerp" << endl;
     time(&Time);
