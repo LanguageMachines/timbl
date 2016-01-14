@@ -1,5 +1,3 @@
-# $Id$
-# $URL$
 
 ACLOCAL_AMFLAGS =-I m4 --install
 
@@ -11,4 +9,4 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = timbl.pc
 
 ChangeLog: NEWS
-	svn update; svn2cl --include-rev
+	git pull; git2cl > ChangeLog
