@@ -212,7 +212,7 @@ inline void usage_full(void){
   cerr << "-O d      : save output using path 'd'" << endl;
   cerr << "Internal representation options:" << endl;
   cerr << "-B n      : number of bins used for discretization of numeric "
-       << "feature values" << endl;
+       << "feature values (default B=20)" << endl;
   cerr << "-c n      : clipping frequency for prestoring MVDM matrices"
        << endl;
   cerr << "+D        : store distributions on all nodes" << endl
