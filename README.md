@@ -1,12 +1,15 @@
-TiMBL 6.4 (c) CLS/ILK/CLiPS 1998 - 2015
+[![Build Status](https://travis-ci.org/LanguageMachines/timbl.svg?branch=master)](https://travis-ci.org/LanguageMachines/timbl) [![Language Machines Badge](http://applejack.science.ru.nl/lamabadge.php/timbl)](http://applejack.science.ru.nl/languagemachines/) 
 
-Tilburg Memory Based Learner
- https://languagemachines.github.io/timbl/
+===========================================
+TiMBL: Tilburg Memory Based Learner
+===========================================
 
+    TiMBL 6.4 (c) CLS/ILK/CLiPS 1998 - 2015
     Centre for Language Studies, Radboud University Nijmegen
     Induction of Linguistic Knowledge Research Group, Tilburg University and
     Centre for Dutch Language and Speech, University of Antwerp
 
+**Website:** https://languagemachines.github.io/timbl/
 
 
 TiMBL is an open source software package implementing several memory-based
@@ -70,13 +73,13 @@ following pakages:
 
 To install TiMBL, first consult whether your distribution's package manager has an up-to-date package for TiMBL.
 If not, for easy installation of TiMBL and all dependencies, it is included as part of our software
-distribution LaMachine: https://proycon.github.io/LaMachine .
+distribution **LaMachine**: https://proycon.github.io/LaMachine .
 
 To compile and install manually from source instead, provided you have all the dependencies installed:
 
- $ bash bootstrap.sh
- $ ./configure
- $ make
- $ make install
+    $ bash bootstrap.sh
+    $ ./configure
+    $ make
+    $ make install
 
-(See the INSTALL file for more details)
+(See the ``INSTALL`` file for more details)
