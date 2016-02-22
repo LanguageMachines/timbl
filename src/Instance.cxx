@@ -688,7 +688,7 @@ namespace Timbl {
   }
 
   struct D_D {
-    D_D(){ dist = NULL; value = 0.0; };
+    D_D(): dist(0), value(0.0) {};
     D_D( FeatureValue *fv ){
       if ( !stringTo<double>( fv->Name(), value ) )
 	throw( logic_error("called DD with an non-numeric value" ) );
@@ -1199,12 +1199,12 @@ namespace Timbl {
 
   FeatureValue::FeatureValue( const std::string& value,
 			      size_t hash_val ):
-    ValueClass( value, hash_val ), ValueClassProb( NULL ) {
+    ValueClass( value, hash_val ), ValueClassProb( 0 ) {
   }
 
   FeatureValue::FeatureValue( const string& s ):
     ValueClass( s, 0 ),
-    ValueClassProb(NULL){
+    ValueClassProb(0){
     Frequency = 0;
   }
 

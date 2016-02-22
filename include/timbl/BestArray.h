@@ -51,7 +51,12 @@ namespace Timbl {
   class BestArray {
     friend std::ostream& operator<< ( std::ostream&, const BestArray& );
   public:
-  BestArray(): size(0){};
+  BestArray(): _storeInstances(false),
+      _showDi(false),
+      _showDb(false),
+      size(0),
+      maxBests(0)
+	{};
     ~BestArray();
     void init( unsigned int, unsigned int, bool, bool, bool );
     double addResult( double, const ValueDistribution *, const std::string& );

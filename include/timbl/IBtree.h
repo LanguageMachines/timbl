@@ -204,9 +204,12 @@ namespace Timbl {
 
   class IB_InstanceBase: public InstanceBase_base {
   public:
-    IB_InstanceBase( size_t size, unsigned long& cnt, bool rand ):
-      InstanceBase_base( size, cnt, rand , false ) {
-    };
+  IB_InstanceBase( size_t size, unsigned long& cnt, bool rand ):
+    InstanceBase_base( size, cnt, rand , false ),
+      offSet(0),
+      effFeat(0),
+      testInst(0)
+	{};
     IB_InstanceBase *Copy() const;
     IB_InstanceBase *clone() const;
     const ValueDistribution *InitGraphTest( std::vector<FeatureValue *>&,
@@ -216,6 +219,8 @@ namespace Timbl {
     const ValueDistribution *NextGraphTest( std::vector<FeatureValue *>&,
 				      size_t& );
   private:
+    IB_InstanceBase( const IB_InstanceBase& ); // inhibit copy
+    IB_InstanceBase& operator=( const IB_InstanceBase& ); // inhibit copy
     size_t offSet;
     size_t effFeat;
     const std::vector<FeatureValue *> *testInst;

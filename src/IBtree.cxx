@@ -972,6 +972,7 @@ namespace Timbl {
     TopDistribution( new ValueDistribution ),
     WTop( 0 ),
     TopT( 0 ),
+    tiedTop(false),
     InstBase( 0 ),
     LastInstBasePos( 0 ),
     RestartSearch( new const IBtree *[depth] ),

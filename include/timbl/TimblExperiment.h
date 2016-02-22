@@ -52,7 +52,15 @@ namespace Timbl {
 
   class resultStore: public MsgClass {
   public:
-  resultStore(): dist(0), disposable(false), isTop(false), beam(0) {};
+  resultStore(): rawDist(0),
+      dist(0),
+      disposable(false),
+      isTop(false),
+      beam(0),
+      norm(unknownNorm),
+      factor(0.0),
+      targets(0)
+	{};
     ~resultStore();
     bool reset( int, normType, double, const Target * );
     void clear();
@@ -67,6 +75,8 @@ namespace Timbl {
       return dist->Confidence( tv );
     };
   private:
+    resultStore( const resultStore& ); // inhibit copies
+    resultStore& operator=( const resultStore& ); // inhibit copies
     const ValueDistribution *rawDist;
     WValueDistribution *dist;
     bool disposable;

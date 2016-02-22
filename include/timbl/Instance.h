@@ -203,8 +203,8 @@ namespace Timbl {
   private:
     SparseValueProbClass *ValueClassProb;
     ValueDistribution TargetDist;
-    FeatureValue( const FeatureValue& );
-    FeatureValue& operator=( const FeatureValue& );
+    FeatureValue( const FeatureValue& ); // inhibit copies
+    FeatureValue& operator=( const FeatureValue& ); // inhibit copies
   };
 
   typedef std::map< size_t, ValueClass *> IVCmaptype;
@@ -333,7 +333,8 @@ namespace Timbl {
     friend std::ostream& operator<<(std::ostream&, const Instance * );
   public:
     Instance();
-    Instance( size_t s ){ Init( s ); };
+  Instance( size_t s ): TV(NULL), sample_weight(0.0), occ(1)
+      { Init( s ); };
     ~Instance();
     void Init( size_t );
     void clear();
@@ -346,6 +347,8 @@ namespace Timbl {
     void permute( const std::vector<size_t> );
     TargetValue *TV;
   private:
+    Instance( const Instance& ); // inhibit copies
+    Instance& operator=( const Instance& ); // inhibit copies
     double sample_weight; // relative weight
     int occ;
   };
