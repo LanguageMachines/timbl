@@ -485,8 +485,12 @@ namespace Timbl{
 	return false;
       }
       size_t index;
-      if ( !stringTo( parts[0], index ) )
+      if ( !stringTo( parts[0], index ) ){
 	return false;
+      }
+      if ( index < 1 || index >= vSize ){
+	return false;
+      }
       choppedInput[index-1] = StrToCode( parts[1] );
     }
     return true;
