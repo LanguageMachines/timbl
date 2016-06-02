@@ -40,6 +40,7 @@
 #include "timbl/Types.h"
 #include "timbl/Options.h"
 #include "timbl/Instance.h"
+#include "timbl/StringOps.h"
 #include "timbl/Statistics.h"
 #include "timbl/neighborSet.h"
 #include "timbl/BestArray.h"
@@ -135,34 +136,6 @@ namespace Timbl {
     return result;
   }
 
-  static string fixPath( const string& fileName,
-			 const string& path ){
-    // if fileName contains pathinformation, it is replaced with path
-    // if filename contains NO pathinformation, path is always appended.
-    // of course we don't append if the path is empty
-
-    if ( !path.empty() ){
-      bool addSlash = path[path.length()] != '/';
-      string tmp;
-      string::size_type pos = fileName.rfind( '/' );
-      if ( pos == string::npos ){
-	tmp = path;
-	if ( addSlash )
-	  tmp += "/";
-	tmp += fileName;
-      }
-      else {
-	tmp = path;
-	if ( addSlash )
-	tmp += "/";
-	tmp += fileName.substr( pos+1 );
-      }
-      return tmp;
-    }
-    else
-      return fileName;
-  }
-
   bool CV_Experiment::Test( const string& FileName,
 			    const string& OutFile ){
     if ( !ConfirmOptions() )
@@ -182,7 +155,7 @@ namespace Timbl {
       string outName;
       string percName;
       for ( int SkipFile = 0; SkipFile < NumOfFiles-1; ++SkipFile ) {
-	outName = fixPath( FileNames[SkipFile], outPath );
+	outName = correct_path( FileNames[SkipFile], outPath, false );
 	outName += ".cv";
 	percName = outName;
 	percName += ".%";
@@ -200,7 +173,7 @@ namespace Timbl {
 	Expand( FileNames[SkipFile] );
 	Remove( FileNames[SkipFile+1] );
       }
-      outName = fixPath( FileNames[NumOfFiles-1], outPath );
+      outName = correct_path( FileNames[NumOfFiles-1], outPath, false );
       outName += ".cv";
       percName = outName;
       percName += ".%";

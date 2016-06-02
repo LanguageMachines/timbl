@@ -43,6 +43,9 @@ namespace Timbl {
   std::string StrToCode( const std::string& );
   std::string CodeToStr( const std::string& );
 
+  std::string correct_path( const std::string&,
+			    const std::string&,
+			    bool = true );
 }
 
 #endif

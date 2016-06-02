@@ -117,4 +117,36 @@ namespace Timbl {
       return false;
   }
 
+  string correct_path( const string& filename,
+		       const string& path,
+		       bool keep_origpath ){
+    // if filename contains pathinformation, it is replaced with path, except
+    // when keep_origpath is true.
+    // if filename contains NO pathinformation, path is always appended.
+    // of course we don't append if the filename is empty or just '-' !
+
+    if ( path != "" && filename != "" && filename[0] != '-' ){
+      bool add_slash = path.back() != '/';
+      string result = path;
+      if ( add_slash ){
+	  result += "/";
+      }
+      string::size_type pos = filename.rfind( '/' );
+      if ( pos == string::npos ){
+	result += filename;
+      }
+      else {
+	if ( keep_origpath ){
+	  result += filename;
+	}
+	else{
+	  result += filename.substr( pos+1 );
+	}
+      }
+      return result;
+    }
+    else
+      return filename;
+  }
+
 } // namespace Timbl

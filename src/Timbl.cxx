@@ -267,40 +267,6 @@ void get_command_lines( const string& value, list<string>& result ){
   }
 }
 
-string correct_path( const string& filename,
-		     const string& path,
-		     bool keep_origpath ){
-  // if filename contains pathinformation, it is replaced with path, except
-  // when keep_origpath is true.
-  // if filename contains NO pathinformation, path is always appended.
-  // of course we don't append if the filename is empty or just '-' !
-
-  if ( path != "" && filename != "" && filename[0] != '-' ){
-    bool add_slash = path[path.length()] != '/';
-    string tmp;
-    string::size_type pos = filename.rfind( '/' );
-    if ( pos == string::npos ){
-      tmp = path;
-      if ( add_slash )
-	tmp += "/";
-      tmp += filename;
-    }
-    else {
-      tmp = path;
-      if ( add_slash )
-	tmp += "/";
-      if ( !keep_origpath ){
-	tmp += filename.substr( pos+1 );
-      }
-      else
-	tmp += filename;
-    }
-    return tmp;
-  }
-  else
-    return filename;
-}
-
 class softExit : public exception {};
 
 void Preset_Values( TiCC::CL_Options& opts ){
@@ -361,7 +327,7 @@ void Preset_Values( TiCC::CL_Options& opts ){
     O_Path = value;
   }
   if ( opts.extract( 'f', value ) ){
-    dataFile = correct_path( value, I_Path, true );
+    dataFile = correct_path( value, I_Path );
   }
   opts.is_present( 'q', Q_value );
   opts.insert( 'v', "F", true );
@@ -439,55 +405,55 @@ bool get_file_names( TiCC::CL_Options& opts ){
     TestFile = dataFile;
   }
   else if ( opts.extract( 't', value ) ){
-    TestFile = correct_path( value, I_Path, true );
+    TestFile = correct_path( value, I_Path );
   }
   if ( opts.extract( 'n', value ) ){
-    NamesFile = correct_path( value, O_Path, true );
+    NamesFile = correct_path( value, O_Path );
   }
   if ( opts.extract( "matrixout", value ) ){
-    MatrixOutFile = correct_path( value, O_Path, true );
+    MatrixOutFile = correct_path( value, O_Path );
   }
   if ( opts.extract( "matrixin", value ) ){
-    MatrixInFile = correct_path( value, I_Path, true );
+    MatrixInFile = correct_path( value, I_Path );
   }
   if ( opts.extract( 'o', value ) ){
     if ( Do_CV ){
       cerr << "-o option not possible for Cross Validation testing" << endl;
       return false;
     }
-    OutputFile = correct_path( value, O_Path, true );
+    OutputFile = correct_path( value, O_Path );
   }
   if ( opts.extract( "IL", value ) ){
     vector<string> vec;
     int num = TiCC::split_at( value, vec, ":" );
     if ( num > 1 ){
-      levelTreeOutFile = correct_path( vec[0], O_Path, true );
+      levelTreeOutFile = correct_path( vec[0], O_Path );
       levelTreeLevel = stringTo<int>( vec[1] );
     }
     else
-      levelTreeOutFile = correct_path( value, O_Path, true );
+      levelTreeOutFile = correct_path( value, O_Path );
   }
   if ( opts.extract( 'I', value ) ){
-    TreeOutFile = correct_path( value, O_Path, true );
+    TreeOutFile = correct_path( value, O_Path );
   }
   if ( opts.extract( 'X', value ) ){
-    XOutFile = correct_path( value, O_Path, true );
+    XOutFile = correct_path( value, O_Path );
   }
   if ( opts.extract( 'i', value ) ){
-    TreeInFile = correct_path( value, I_Path, true );
+    TreeInFile = correct_path( value, I_Path );
   }
   if ( opts.extract( 'U', value ) ){
-    ProbOutFile = correct_path( value, O_Path, true );
+    ProbOutFile = correct_path( value, O_Path );
   }
   if ( opts.extract( 'u', value ) ){
     if ( algorithm == IGTREE ){
       cerr << "-u option is useless for IGtree" << endl;
       return false;
     }
-    ProbInFile = correct_path( value, I_Path, true );
+    ProbInFile = correct_path( value, I_Path );
   }
   if ( opts.is_present( 'W', value ) ){
-    WgtOutFile = correct_path( value, O_Path, true );
+    WgtOutFile = correct_path( value, O_Path );
     // leave the option, to signal that we need ALL feature weights
   }
   if ( opts.is_present( 'w', value ) ){
@@ -501,12 +467,12 @@ bool get_file_names( TiCC::CL_Options& opts ){
 	  cerr << "invalid weighting option: " << value << endl;
 	  return false;
 	}
-	WgtInFile = correct_path( parts[0], I_Path, true );
+	WgtInFile = correct_path( parts[0], I_Path );
 	WgtType = W;
 	opts.remove( 'w' );
       }
       else if ( num == 1 ){
-	WgtInFile = correct_path( value, I_Path, true );
+	WgtInFile = correct_path( value, I_Path );
 	opts.remove( 'w' );
       }
       else {
