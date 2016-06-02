@@ -333,9 +333,8 @@ namespace Timbl {
   class CV_Experiment: public IB1_Experiment {
   public:
   CV_Experiment( int N = DEFAULT_MAX_FEATS, const std::string& s = "" ):
-    IB1_Experiment( N, s ), NumOfFiles( 0 ), FileNames( NULL )
+    IB1_Experiment( N, s )
       { };
-    ~CV_Experiment(){ delete [] FileNames; };
     bool Learn( const std::string& = "", bool = true );
     bool Prepare( const std::string& = "", bool = true, bool = false );
     bool Test( const std::string&,
@@ -350,8 +349,7 @@ namespace Timbl {
   private:
     CV_Experiment( const CV_Experiment& );
     CV_Experiment& operator=( const CV_Experiment& );
-    int NumOfFiles;
-    std::string *FileNames;
+    std::vector<std::string> FileNames;
     std::string CV_WfileName;
     std::string CV_PfileName;
     WeightType CV_fileW;

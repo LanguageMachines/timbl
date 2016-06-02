@@ -86,54 +86,48 @@ namespace Timbl {
   }
 
   bool CV_Experiment::get_file_names( const string& FileName ){
-    bool result = false;
     if ( !ExpInvalid() ){
-      NumOfFiles = 0;
+      size_t size = 0;
       ifstream file_names( FileName, ios::in );
+      if ( !file_names ){
+	Error( "Unable to read CV filenames from " + FileName );
+	return false;
+      }
       string name;
-      if ( file_names.good() ) {
-	while ( getline( file_names, name ) )
-	  ++NumOfFiles;
-	file_names.close();
-	FileNames = new string[NumOfFiles];
-	ifstream file_names2( FileName, ios::in );
-	size_t size = 0;
-	int pos = 0;
-	while ( getline( file_names2, name ) ){
-	  size_t tmp = examineData( name );
-	  if ( tmp != 0 ){
-	    if ( !Verbosity(SILENT) ){
-	      *mylog << "Examine datafile '" << FileName
-		     << "' gave the following results:"
-		     << endl
-		     << "Number of Features: " << tmp << endl;
-	      showInputFormat( *mylog );
-	    }
-	    FileNames[pos++] = name;
-	    if ( size == 0 )
-	      size = tmp;
-	    else
-	      if ( tmp != size ) {
-		Error( "mismatching number of features in file " +
-		       name + "of CV filelist " + FileName );
-		return false;
-	      }
+      while ( getline( file_names, name ) ){
+	size_t tmp = examineData( name );
+	if ( tmp != 0 ){
+	  if ( !Verbosity(SILENT) ){
+	    *mylog << "Examine datafile '" << name
+		   << "' gave the following results:"
+		   << endl
+		   << "Number of Features: " << tmp << endl;
+	    showInputFormat( *mylog );
 	  }
+	  FileNames.push_back(name);
+	  if ( size == 0 )
+	    size = tmp;
 	  else
-	    return false;
+	    if ( tmp != size ) {
+	      Error( "mismatching number of features in file " +
+		     name + "of CV filelist " + FileName );
+	      return false;
+	    }
 	}
-	if ( pos != NumOfFiles ){
-	  Error( "Unable to read all " + toString<int>(NumOfFiles) +
-		 " CV filenames from " + FileName );
+	else {
+	  Error( "unable to determine number of features in file " +
+		 name + "of CV filelist " + FileName );
 	  return false;
 	}
-	else
-	  result = true;
       }
-      else
-	Error( "Unable to read CV filenames from " + FileName );
+      if ( FileNames.size() < 3 ){
+	Error( "Not enough filenames found in CV filelist " + FileName
+	       + " at least 3 required" );
+	return false;
+      }
+      return true;
     }
-    return result;
+    return false;
   }
 
   bool CV_Experiment::Test( const string& FileName,
@@ -146,15 +140,17 @@ namespace Timbl {
     set_verbosity( SILENT );
     if ( get_file_names( FileName ) ){
       *mylog << "Starting Cross validation test on files:" << endl;
-      for ( int i = 0; i < NumOfFiles; ++i )
-	*mylog << FileNames[i] << endl;
+      for ( const auto& name : FileNames ){
+	*mylog << name << endl;
+      }
+      size_t NumOfFiles = FileNames.size();
       TimblExperiment::Prepare( FileNames[1], false );
       TimblExperiment::Learn( FileNames[1], false );
-      for ( int filenum = 2; filenum < NumOfFiles; ++filenum )
+      for ( size_t filenum = 2; filenum < NumOfFiles; ++filenum )
 	Expand( FileNames[filenum] );
       string outName;
       string percName;
-      for ( int SkipFile = 0; SkipFile < NumOfFiles-1; ++SkipFile ) {
+      for ( size_t SkipFile = 0; SkipFile < NumOfFiles-1; ++SkipFile ) {
 	outName = correct_path( FileNames[SkipFile], outPath, false );
 	outName += ".cv";
 	percName = outName;
