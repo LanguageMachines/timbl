@@ -337,19 +337,20 @@ namespace Timbl{
     init( InBuf, len, true );
     for ( size_t m = 0; m < vSize-1; ++m )
       choppedInput[m] = "0";
-    string::size_type s_pos = 0;
-    string::size_type e_pos = strippedInput.find( ',' );
-    while ( e_pos != string::npos ){
-      string tmp = string( strippedInput, s_pos, e_pos - s_pos );
+    vector<string> parts;
+    TiCC::split_at( strippedInput, parts, ",", true );
+    for ( auto const& p : parts ){
+      if ( &p == &parts.back() ){
+	choppedInput[vSize-1] = p;
+	break;
+      }
       size_t k;
-      if ( !TiCC::stringTo<size_t>( tmp, k, 1, vSize-1 ) )
+      if ( !TiCC::stringTo<size_t>( p, k, 1, vSize ) ){
 	return false;
+      }
       else
 	choppedInput[k-1] = "1";
-      s_pos = e_pos + 1;
-      e_pos = strippedInput.find( ',', s_pos );
     }
-    choppedInput[vSize-1] = string( strippedInput, s_pos );
     return true;
   }
 
