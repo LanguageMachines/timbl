@@ -36,7 +36,6 @@
 #include "timbl/Choppers.h"
 
 using namespace std;
-using namespace TiCC;
 
 namespace Timbl{
 
@@ -107,30 +106,25 @@ namespace Timbl{
   }
 
   void Chopper::init( const string& s, size_t len, bool stripDot ) {
-    strippedInput = s;
     vSize = len+1;
     choppedInput.resize(vSize);
-    string::iterator it = strippedInput.end();
-    --it;
-    // first trim trailing spaces
-    while ( it != strippedInput.begin() &&
-	    isspace(*it) ) --it;
-    strippedInput.erase( ++it , strippedInput.end() );
-    it = strippedInput.end();
-    --it;
+    strippedInput = s;
+    // trim spaces at end
+    strippedInput = TiCC::trim_back( strippedInput );
     if ( stripDot ){
-      // first trim trailing dot
-      if ( it != strippedInput.begin() && *it == '.' )
-	--it;
+      // now trim at most 1 trailing dot
+      auto it = strippedInput.end();
+      --it;
+      if ( *it == '.' ){
+	strippedInput.erase(it);
+      }
     }
-    // strip remaining trailing spaces
-    while ( it != strippedInput.begin() &&
-	    isspace(*it) ) --it;
-    strippedInput.erase( ++it , strippedInput.end() );
+    // trim more spaces at end
+    strippedInput = TiCC::trim_back( strippedInput );
   }
 
-  static string stripExemplarWeight( const string& Buffer,
-				     string& wght ) {
+  static string extractWeight( const string& Buffer,
+			       string& wght ) {
     string::size_type t_pos, e_pos = Buffer.length();
     // first remove trailing whitespace and dot
     e_pos = Buffer.find_last_not_of( ". \t", e_pos );
@@ -148,9 +142,9 @@ namespace Timbl{
     return string( Buffer, 0, e_pos+1 );
   }
 
-  static string stripOcc( const string& Buffer,
+  static string extractOcc( const string& Buffer,
 			  string& wght ) {
-    return stripExemplarWeight( Buffer, wght );
+    return extractWeight( Buffer, wght );
   }
 
   size_t Chopper::countFeatures( const string& inBuffer,
@@ -161,7 +155,7 @@ namespace Timbl{
     string buffer;
     if ( chopTail ){
       string dummy;
-      buffer = stripExemplarWeight( inBuffer, dummy );
+      buffer = extractWeight( inBuffer, dummy );
     }
     else
       buffer = inBuffer;
@@ -186,20 +180,20 @@ namespace Timbl{
     case Columns:
       {
 	vector<string> parts;
-	size_t num = split( buffer, parts );
+	size_t num = TiCC::split( buffer, parts );
 	result = num - 1;
       };
       break;
     case Tabbed:
       {
 	vector<string> parts;
-	size_t num = split_at( buffer, parts, "\t" );
+	size_t num = TiCC::split_at( buffer, parts, "\t" );
 	result = num - 1;
       };
       break;
     default:
       throw logic_error( "CountFeatures: Illegal value in switch:" +
-			 toString(IF) );
+			 TiCC::toString(IF) );
     };
     return result;
   }
@@ -211,7 +205,7 @@ namespace Timbl{
     string buffer;
     if ( stripTail ){
       string dummy;
-      buffer = stripExemplarWeight( inBuffer, dummy );
+      buffer = extractWeight( inBuffer, dummy );
     }
     else
       buffer = inBuffer;
@@ -244,37 +238,32 @@ namespace Timbl{
     strippedInput = s;
     vSize = len+1;
     choppedInput.resize(vSize);
-    string::iterator it = strippedInput.end();
-    --it;
-    // first trim trailing spaces
-    while ( it != strippedInput.begin() &&
-	    isspace(*it) ) --it;
-    strippedInput.erase( ++it , strippedInput.end() );
+    // trim trailing spaces
+    strippedInput = TiCC::trim_back( strippedInput );
     string wght;
-    strippedInput = stripExemplarWeight( strippedInput, wght );
+    strippedInput = extractWeight( strippedInput, wght );
     if ( wght.empty() ){
       throw logic_error( "Missing sample weight" );
     }
     else {
       double tmp;
-      if ( !stringTo<double>( wght, tmp ) ){
+      if ( !TiCC::stringTo<double>( wght, tmp ) ){
 	throw runtime_error( "Wrong sample weight: '" + wght + "'" );
       }
       else {
 	exW = tmp;
       }
     }
-    it = strippedInput.end();
-    --it;
     if ( stripDot ){
-      // first trim trailing dot
-      if ( it != strippedInput.begin() && *it == '.' )
-	--it;
+      // now trim at most 1 trailing dot
+      auto it = strippedInput.end();
+      --it;
+      if ( *it == '.' ){
+	strippedInput.erase(it);
+      }
     }
-    // strip remaining trailing spaces
-    while ( it != strippedInput.begin() &&
-	    isspace(*it) ) --it;
-    strippedInput.erase( ++it , strippedInput.end() );
+    // trim more trailing spaces
+    strippedInput = TiCC::trim_back( strippedInput );
   }
 
   void OccChopper::init( const string& s, size_t len, bool stripDot ) {
@@ -282,37 +271,33 @@ namespace Timbl{
     strippedInput = s;
     vSize = len+1;
     choppedInput.resize(vSize);
-    string::iterator it = strippedInput.end();
-    --it;
     // first trim trailing spaces
-    while ( it != strippedInput.begin() &&
-	    isspace(*it) ) --it;
-    strippedInput.erase( ++it , strippedInput.end() );
+    strippedInput = TiCC::trim_back( strippedInput );
     string occS;
-    strippedInput = stripOcc( strippedInput, occS );
+    // get occ
+    strippedInput = extractOcc( strippedInput, occS );
     if ( occS.empty() ){
       throw logic_error( "Missing occurence" );
     }
     else {
       int tmp;
-      if ( !stringTo<int>( occS, tmp ) ){
+      if ( !TiCC::stringTo<int>( occS, tmp ) ){
 	throw runtime_error( "Wrong (non-integer) occurence value: '" + occS + "'" );
       }
       else {
 	occ = tmp;
       }
     }
-    it = strippedInput.end();
-    --it;
     if ( stripDot ){
-      // first trim trailing dot
-      if ( it != strippedInput.begin() && *it == '.' )
-	--it;
+      // now trim at most 1 trailing dot
+      auto it = strippedInput.end();
+      --it;
+      if ( *it == '.' ){
+	strippedInput.erase(it);
+      }
     }
     // strip remaining trailing spaces
-    while ( it != strippedInput.begin() &&
-	    isspace(*it) ) --it;
-    strippedInput.erase( ++it , strippedInput.end() );
+    strippedInput = TiCC::trim_back( strippedInput );
   }
 
   bool C45_Chopper::chop( const string& InBuf, size_t len ){
@@ -320,7 +305,7 @@ namespace Timbl{
     // which represent the feature-values and the target-value.
     init( InBuf, len, true );
     vector<string> splits;
-    size_t res = split_at( strippedInput, splits, "," );
+    size_t res = TiCC::split_at( strippedInput, splits, "," );
     if ( res != vSize )
       return false;
     for ( size_t i=0; i < res ; ++i ){
@@ -357,7 +342,7 @@ namespace Timbl{
     while ( e_pos != string::npos ){
       string tmp = string( strippedInput, s_pos, e_pos - s_pos );
       size_t k;
-      if ( !stringTo<size_t>( tmp, k, 1, vSize-1 ) )
+      if ( !TiCC::stringTo<size_t>( tmp, k, 1, vSize-1 ) )
 	return false;
       else
 	choppedInput[k-1] = "1";
@@ -372,7 +357,7 @@ namespace Timbl{
     string res;
     for ( size_t i = 0; i < vSize-1; ++i ) {
       if ( choppedInput[i][0] == '1' )
-	res += toString(i+1) + ",";
+	res += TiCC::toString(i+1) + ",";
     }
     res += choppedInput[vSize-1] + ",";
     return res;
@@ -415,7 +400,7 @@ namespace Timbl{
     // one  two three bla
     init( InBuf, len, false );
     vector<string> splits;
-    size_t res = split( strippedInput, splits );
+    size_t res = TiCC::split( strippedInput, splits );
     if ( res != vSize )
       return false;
     for ( size_t i=0; i < res ; ++i ){
@@ -439,7 +424,7 @@ namespace Timbl{
     // one  two three bla
     init( InBuf, len, false );
     vector<string> splits;
-    size_t res = split_at( strippedInput, splits, "\t" );
+    size_t res = TiCC::split_at( strippedInput, splits, "\t" );
     if ( res != vSize )
       return false;
     for ( size_t i=0; i < res ; ++i ){
@@ -465,17 +450,17 @@ namespace Timbl{
       choppedInput[m] = DefaultSparseString;
     choppedInput[vSize-1] = "";
     vector<string> entries;
-    size_t num_ent = split_at_first_of( strippedInput, entries, "()" );
+    size_t num_ent = TiCC::split_at_first_of( strippedInput, entries, "()" );
     if ( num_ent < 1 )
       return false;
     for ( const auto& ent : entries ){
       --num_ent;
       vector<string> parts;
-      size_t num = split_at( ent, parts, "," );
+      size_t num = TiCC::split_at( ent, parts, "," );
       if ( num != 2 ){
 	if ( num == 1 && num_ent == 0 ){
 	  // the target has no ','
-	  choppedInput[vSize-1] = trim(parts[0]);
+	  choppedInput[vSize-1] = TiCC::trim(parts[0]);
 	  return !choppedInput[vSize-1].empty();
 	}
 	return false;
@@ -485,7 +470,7 @@ namespace Timbl{
 	return false;
       }
       size_t index;
-      if ( !stringTo( parts[0], index ) ){
+      if ( !TiCC::stringTo( parts[0], index ) ){
 	return false;
       }
       if ( index < 1 || index >= vSize ){
@@ -500,7 +485,7 @@ namespace Timbl{
     string res;
     for ( size_t i = 0; i < vSize-1; ++i ) {
       if ( choppedInput[i] != DefaultSparseString )
-	res += "(" + toString( i+1 ) + "," + CodeToStr(choppedInput[i]) + ")";
+	res += "(" + TiCC::toString( i+1 ) + "," + CodeToStr(choppedInput[i]) + ")";
     }
     res += choppedInput[vSize-1] + ",";
     return res;
