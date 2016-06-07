@@ -29,8 +29,7 @@
 #include <set>
 #include <string>
 #include <iostream>
-#include <algorithm>
-#include <sstream>
+#include <algorithm> // for sort()
 #include <iomanip>
 #include <cassert>
 

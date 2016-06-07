@@ -71,7 +71,6 @@
 #endif
 
 using namespace std;
-using namespace TiCC;
 
 namespace Timbl {
 
@@ -181,7 +180,7 @@ namespace Timbl {
 	dist->Normalize_2();
 	break;
       default:
-	throw runtime_error( "unimplemented case " + toString(norm) );
+	throw runtime_error( "unimplemented case " + TiCC::toString(norm) );
 	break;
       }
     }
@@ -243,7 +242,7 @@ namespace Timbl {
       break;
     default:
       FatalError( "You may not split experiments for Special cases like " +
-		  toString(algorithm) );
+		  TiCC::toString(algorithm) );
     }
     *result = *this;
     if ( OptParams ){
@@ -288,7 +287,7 @@ namespace Timbl {
 	  else {
 	    Error( string("not enough memory for Probability Arrays")
 		   + "' in ("
-		   + __FILE__  + "," + toString(__LINE__) + ")\n"
+		   + __FILE__  + "," + TiCC::toString(__LINE__) + ")\n"
 		   + "ABORTING now" );
 	    throw std::bad_alloc();
 	  }
@@ -399,7 +398,7 @@ namespace Timbl {
 	      result = false;
 	    }
 	    else {
-	      Timer prepT;
+	      TiCC::Timer prepT;
 	      prepT.start();
 	      bool found;
 	      bool go_on = true;
@@ -421,7 +420,7 @@ namespace Timbl {
 		  found = chopLine( Buffer );
 		  if ( !found ){
 		    Warning( "datafile, skipped line #" +
-			     toString<int>( stats.totalLines() ) +
+			     TiCC::toString<int>( stats.totalLines() ) +
 			     "\n" + Buffer );
 		  }
 		}
@@ -522,7 +521,7 @@ namespace Timbl {
   bool TimblExperiment::ClassicLearn( const string& FileName,
 				      bool warnOnSingleTarget ){
     bool result = true;
-    Timer learnT;
+    TiCC::Timer learnT;
     if ( is_synced ){
       CurrentDataFile = FileName; // assume magic!
     }
@@ -544,14 +543,14 @@ namespace Timbl {
       result = false;
     }
     if ( result ) {
-      Timer learnT;
+      TiCC::Timer learnT;
       learnT.start();
       InitInstanceBase();
       if ( ExpInvalid() )
 	return false;
       if ( EffectiveFeatures() < 2 ) {
 	fileIndex fmIndex;
-	//      Timer t;
+	//      TiCC::Timer t;
 	//      t.start();
 	result = build_file_index( CurrentDataFile, fmIndex );
 	//      t.stop();
@@ -573,7 +572,7 @@ namespace Timbl {
       }
       else {
 	fileDoubleIndex fIndex;
-	//      Timer t;
+	//      TiCC::Timer t;
 	//      t.start();
 	result = build_file_multi_index( CurrentDataFile, fIndex );
 	//	cerr << "index: " << fIndex << endl;
@@ -737,7 +736,7 @@ namespace Timbl {
 	  bool happy = InstanceBase->AddInstance( CurrInst );
 	  if ( !happy ){
 	    Warning( "deviating exemplar weight in line #" +
-		     toString<int>(stats.totalLines() ) + ":\n" +
+		     TiCC::toString<int>(stats.totalLines() ) + ":\n" +
 		     Buffer + "\nIgnoring the new weight" );
 	  }
 	  // Progress update.
@@ -749,7 +748,7 @@ namespace Timbl {
 	    found = chopLine( Buffer );
 	    if ( !found ){
 	      Warning( "datafile, skipped line #" +
-		       toString<int>( stats.totalLines() ) +
+		       TiCC::toString<int>( stats.totalLines() ) +
 		       "\n" + Buffer );
 	    }
 	  }
@@ -814,7 +813,7 @@ namespace Timbl {
 	    found = chopLine( Buffer );
 	    if ( !found ){
 	      Warning( "datafile, skipped line #" +
-		       toString<int>( stats.totalLines() ) +
+		       TiCC::toString<int>( stats.totalLines() ) +
 		       "\n" + Buffer );
 	    }
 	  }
@@ -1105,7 +1104,7 @@ namespace Timbl {
     }
     else {
       bool result = true;
-      Timer learnT;
+      TiCC::Timer learnT;
       if ( ExpInvalid() ||
 	   !ConfirmOptions() ){
 	result = false;
@@ -1166,7 +1165,7 @@ namespace Timbl {
 	    bool happy = InstanceBase->AddInstance( CurrInst );
 	    if ( !happy ){
 	      Warning( "deviating exemplar weight in line #" +
-		       toString<int>(stats.totalLines()) + ":\n" +
+		       TiCC::toString<int>(stats.totalLines()) + ":\n" +
 		       Buffer + "\nIgnoring the new weight" );
 	    }
 	    // Progress update.
@@ -1182,7 +1181,7 @@ namespace Timbl {
 		found = chopLine( Buffer );
 		if ( !found ){
 		  Warning( "datafile, skipped line #" +
-			   toString<int>( stats.totalLines() ) +
+			   TiCC::toString<int>( stats.totalLines() ) +
 			   "\n" + Buffer );
 		}
 	      }
@@ -1277,7 +1276,7 @@ namespace Timbl {
 	  }
 	  else if ( !chopLine( Buffer ) ){
 	    Warning( "datafile, skipped line #" +
-		     toString<int>( stats.totalLines() ) +
+		     TiCC::toString<int>( stats.totalLines() ) +
 		     "\n" + Buffer );
 	  }
 	}
@@ -1286,7 +1285,7 @@ namespace Timbl {
 	  time(&lStartTime);
 	  if ( !Verbosity(SILENT) ) {
 	    Info( "Phase 2: Appending from Datafile: " + FileName +
-		  " (starting at line " + toString<int>( stats.dataLines() ) + ")" );
+		  " (starting at line " + TiCC::toString<int>( stats.dataLines() ) + ")" );
 	    time_stamp( "Start:     ", stats.dataLines() );
 	  }
 	  bool found;
@@ -1306,7 +1305,7 @@ namespace Timbl {
 	      bool happy = InstanceBase->AddInstance( CurrInst );
 	      if ( !happy ){
 		Warning( "deviating exemplar weight in line #" +
-			 toString<int>(stats.totalLines() ) + ":\n" +
+			 TiCC::toString<int>(stats.totalLines() ) + ":\n" +
 			 Buffer + "\nIgnoring the new weight" );
 	      }
 	      ++Added;
@@ -1325,7 +1324,7 @@ namespace Timbl {
 	      found = chopLine( Buffer );
 	      if ( !found ){
 		Warning( "datafile, skipped line #" +
-			 toString<int>( stats.totalLines() ) +
+			 TiCC::toString<int>( stats.totalLines() ) +
 			 "\n" + Buffer );
 	      }
 	    }
@@ -1382,7 +1381,7 @@ namespace Timbl {
 
   bool TimblExperiment::checkTestFile(){
     if ( IBStatus() == Invalid )
-      Warning( "you tried to apply the " + toString( algorithm ) +
+      Warning( "you tried to apply the " + TiCC::toString( algorithm ) +
 	       " algorithm, but no Instance Base is available yet" );
     else {
       runningPhase = TestWords;
@@ -1395,8 +1394,8 @@ namespace Timbl {
 	else
 	  Error( "mismatch between number of features in Testfile " +
 		 testStreamName + " and the Instancebase (" +
-		 toString<size_t>(numF) + " vs. " +
-		 toString<size_t>(NumOfFeatures()) + ")" );
+		 TiCC::toString<size_t>(numF) + " vs. " +
+		 TiCC::toString<size_t>(NumOfFeatures()) + ")" );
 	return false;
       }
       if ( !Verbosity(SILENT) ){
@@ -1414,7 +1413,7 @@ namespace Timbl {
     if ( !TimblExperiment::checkTestFile() )
       return false;
     else if ( IBStatus() == Pruned ){
-      Warning( "you tried to apply the " + toString( algorithm) +
+      Warning( "you tried to apply the " + TiCC::toString( algorithm) +
 	       " algorithm on a pruned Instance Base" );
       return false;
     }
@@ -1443,8 +1442,8 @@ namespace Timbl {
       if ( (i = countFeatures( line, IF )) != NumOfFeatures() ){
 	if ( i > 0 )
 	  Warning( "mismatch between number of features in testline " +
-		   line + " and the Instancebase (" + toString<size_t>(i)
-		   + " vs. " + toString<size_t>(NumOfFeatures()) + ")" );
+		   line + " and the Instancebase (" + TiCC::toString<size_t>(i)
+		   + " vs. " + TiCC::toString<size_t>(NumOfFeatures()) + ")" );
       }
       else {
 	if ( Initialized ){
@@ -1453,7 +1452,7 @@ namespace Timbl {
 	else if ( IBStatus() == Invalid )
 	  Warning( "no Instance Base is available yet" );
 	else if ( !setInputFormat( IF ) ){
-	  Error( "Couldn't set input format to " + toString( IF ) );
+	  Error( "Couldn't set input format to " + TiCC::toString( IF ) );
 	}
 	else {
 	  if ( Verbosity(NEAR_N) ){
@@ -1652,7 +1651,7 @@ namespace Timbl {
   }
 
   void TimblExperiment::show_metric_info( ostream& os ) const {
-    os << "Global metric : " << toString( globalMetricOption, true);
+    os << "Global metric : " << TiCC::toString( globalMetricOption, true);
     if ( GlobalMetric->isStorable() ){
       os << ", Prestored matrix";
     }
@@ -1670,7 +1669,7 @@ namespace Timbl {
 	MetricType mt =  Features[i]->getMetricType();
 	if ( mt != globalMetricOption ){
 	  ++cnt;
-	  os << endl << "   Feature[" << i+1 << "] : " << toString( mt, true );
+	  os << endl << "   Feature[" << i+1 << "] : " << TiCC::toString( mt, true );
 	  if ( Features[i]->isStorableMetric() ){
 	    bool readM = false;
 	    if ( Features[i]->matrixPresent( readM ) )
@@ -1694,7 +1693,7 @@ namespace Timbl {
   }
 
   void TimblExperiment::show_weight_info( ostream& os ) const {
-    os << "Weighting     : " << toString(CurrentWeighting(), true);
+    os << "Weighting     : " << TiCC::toString(CurrentWeighting(), true);
     if ( CurrentWeighting() == UserDefined_w ){
       if ( WFileName != "" )
 	os << "  (" << WFileName << ")";
@@ -1729,7 +1728,7 @@ namespace Timbl {
 	ShowSettings( os );
       os << endl << "Starting to test, Testfile: " << testStreamName << endl
 	 << "Writing output in:          " << outStreamName << endl
-	 << "Algorithm     : " << toString( Algorithm() ) << endl;
+	 << "Algorithm     : " << TiCC::toString( Algorithm() ) << endl;
       show_metric_info( os );
       show_weight_info( os );
       os << decay << endl;
@@ -1761,7 +1760,7 @@ namespace Timbl {
     }
     if ( !exp->chopLine( Buffer ) ){
       exp->Warning( "testfile, skipped line #" +
-		    toString<int>( lineNo ) +
+		    TiCC::toString<int>( lineNo ) +
 		    "\n" + Buffer );
       return false;
     }
@@ -1916,7 +1915,7 @@ namespace Timbl {
       while ( nextLine( testStream, Buffer ) ){
 	if ( !chopLine( Buffer ) ) {
 	  Warning( "testfile, skipped line #" +
-		   toString<int>( stats.totalLines() ) +
+		   TiCC::toString<int>( stats.totalLines() ) +
 		   "\n" + Buffer );
 	}
 	else {
@@ -1979,7 +1978,7 @@ namespace Timbl {
       while ( nextLine( testStream, Buffer ) ){
 	if ( !chopLine( Buffer ) ) {
 	  Warning( "testfile, skipped line #" +
-		   toString<int>( stats.totalLines() ) +
+		   TiCC::toString<int>( stats.totalLines() ) +
 		   "\n" + Buffer );
 	}
 	else {
@@ -2002,7 +2001,7 @@ namespace Timbl {
 
   bool TimblExperiment::SetOptions( int argc, const char **argv ){
     if ( IsClone() ){
-      CL_Options Opts( timbl_serv_short_opts, "" );
+      TiCC::CL_Options Opts( timbl_serv_short_opts, "" );
       try {
 	Opts.init( argc, argv );
       }
@@ -2012,7 +2011,7 @@ namespace Timbl {
       return SetOptions( Opts  );
     }
     else {
-      CL_Options Opts( timbl_short_opts, timbl_long_opts);
+      TiCC::CL_Options Opts( timbl_short_opts, timbl_long_opts);
       try {
 	Opts.init( argc, argv );
       }
@@ -2026,7 +2025,7 @@ namespace Timbl {
 
   bool TimblExperiment::SetOptions( const string& arg ){
     if ( IsClone() ){
-      CL_Options Opts( timbl_serv_short_opts, "" );
+      TiCC::CL_Options Opts( timbl_serv_short_opts, "" );
       try {
 	Opts.init( arg );
       }
@@ -2036,7 +2035,7 @@ namespace Timbl {
       return SetOptions( Opts  );
     }
     else {
-      CL_Options Opts( timbl_short_opts, timbl_long_opts);
+      TiCC::CL_Options Opts( timbl_short_opts, timbl_long_opts);
       try {
 	Opts.init( arg );
       }
@@ -2048,7 +2047,7 @@ namespace Timbl {
     }
   }
 
-  bool TimblExperiment::SetOptions( const CL_Options& Opts ){
+  bool TimblExperiment::SetOptions( const TiCC::CL_Options& Opts ){
     bool result;
     if ( IsClone() )
       result = OptParams->parse_options( Opts, 2 );
@@ -2057,7 +2056,7 @@ namespace Timbl {
     return result;
   }
 
-  bool TimblExperiment::IndirectOptions( const CL_Options& Opts ){
+  bool TimblExperiment::IndirectOptions( const TiCC::CL_Options& Opts ){
     OptParams->set_default_options();
     return OptParams->parse_options( Opts, 1 );
   }
@@ -2089,13 +2088,17 @@ namespace Timbl {
   }
 
   xmlNode *TimblExperiment::weightsToXML(){
-    xmlNode *result = XmlNewNode( "currentWeights" );
-    XmlSetAttribute( result, "weighting", toString( CurrentWeighting() ) );
+    xmlNode *result = TiCC::XmlNewNode( "currentWeights" );
+    TiCC::XmlSetAttribute( result,
+			   "weighting",
+			   TiCC::toString( CurrentWeighting() ) );
     vector<double> wghts;
     GetCurrentWeights( wghts );
     for ( unsigned int i=0; i < wghts.size(); ++i ){
-      xmlNode *n = XmlNewTextChild( result, "feature", toString(wghts[i]) );
-      XmlSetAttribute( n, "index", toString(i+1) );
+      xmlNode *n = TiCC::XmlNewTextChild( result,
+					  "feature",
+					  TiCC::toString(wghts[i]) );
+      TiCC::XmlSetAttribute( n, "index", TiCC::toString(i+1) );
     }
     return result;
   }
@@ -2202,10 +2205,10 @@ namespace Timbl {
 	if ( w == Unknown_w ){
 	  w = GR_w;
 	  // 	Warning( "Unspecified weighting, using default: "
-	  // 		 + toString(w) );
+	  // 		 + TiCC::toString(w) );
 	}
 	if ( !Verbosity(SILENT) )
-	  //	  Info( "Reading " + toString(w) + " weights from " + FileName );
+	  //	  Info( "Reading " + TiCC::toString(w) + " weights from " + FileName );
 	  Info( "Reading weights from " + FileName );
 	if ( readWeights( weightsfile, w ) ){
 	  WFileName = FileName;
@@ -2298,7 +2301,7 @@ namespace Timbl {
     }
     else if ( Pruned ){
       Error( "Instance-base is Pruned!, NOT valid for " +
-	     toString(algorithm) + " Algorithm" );
+	     TiCC::toString(algorithm) + " Algorithm" );
     }
     else {
       TreeOrder = DataFile;
@@ -2445,7 +2448,7 @@ namespace Timbl {
 	  found = chopLine( Buffer );
 	  if ( !found ){
 	    Warning( "datafile, skipped line #" +
-		     toString<int>( stats.totalLines() ) +
+		     TiCC::toString<int>( stats.totalLines() ) +
 		     "\n" + Buffer );
 	  }
 	}
@@ -2507,7 +2510,7 @@ namespace Timbl {
 	  found = chopLine( Buffer );
 	  if ( !found ){
 	    Warning( "datafile, skipped line #" +
-		     toString<int>( stats.totalLines() ) +
+		     TiCC::toString<int>( stats.totalLines() ) +
 		     "\n" + Buffer );
 	  }
 	}

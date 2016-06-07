@@ -43,7 +43,6 @@
 
 using namespace std;
 using namespace Timbl;
-using namespace TiCC;
 
 static list<string> ind_lines;
 
@@ -428,7 +427,7 @@ bool get_file_names( TiCC::CL_Options& opts ){
     int num = TiCC::split_at( value, vec, ":" );
     if ( num > 1 ){
       levelTreeOutFile = correct_path( vec[0], O_Path );
-      levelTreeLevel = stringTo<int>( vec[1] );
+      levelTreeLevel = TiCC::stringTo<int>( vec[1] );
     }
     else
       levelTreeOutFile = correct_path( value, O_Path );

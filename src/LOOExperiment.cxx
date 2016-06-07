@@ -28,10 +28,7 @@
 #include <string>
 #include <map>
 #include <fstream>
-#include <sstream>
-#include <iomanip>
 #include <cassert>
-#include <cstdlib>
 
 #include <sys/time.h>
 

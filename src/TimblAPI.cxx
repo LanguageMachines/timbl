@@ -43,8 +43,6 @@ using namespace std;
 #include "timbl/TimblAPI.h"
 #include "timbl/TimblExperiment.h"
 
-using namespace TiCC;
-
 namespace Timbl {
 
   TimblExperiment *Create_Pimpl( AlgorithmType algo, const string& ex_name,
@@ -167,7 +165,7 @@ namespace Timbl {
   bool string_to( const string& s, Algorithm& A ){
     A = UNKNOWN_ALG;
     AlgorithmType tmp;
-    if ( stringTo<AlgorithmType>( s, tmp ) ){
+    if ( TiCC::stringTo<AlgorithmType>( s, tmp ) ){
       switch ( tmp ){
       case IB1_a: A = IB1;
 	break;
@@ -248,7 +246,7 @@ namespace Timbl {
   bool string_to( const string& s, Weighting& w ){
     w = UNKNOWN_W;
     WeightType tmp;
-    if ( stringTo<WeightType>( s, tmp ) ){
+    if ( TiCC::stringTo<WeightType>( s, tmp ) ){
       w = WT_to_W( tmp );
       if( w == UNKNOWN_W )
 	return false;

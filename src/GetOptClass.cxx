@@ -42,7 +42,6 @@
 #include "timbl/TimblExperiment.h"
 
 using namespace std;
-using namespace TiCC;
 
 namespace Timbl {
 
@@ -86,8 +85,8 @@ namespace Timbl {
     }
     target_pos = -1;
     metricsArray.resize(MaxFeats+1);
-    for ( int i=0; i < MaxFeats+1; ++i ){
-      metricsArray[i] = UnknownMetric;
+    for ( auto& m : metricsArray ){
+      m = UnknownMetric;
     }
     outPath = "";
     occIn = 0;
@@ -109,7 +108,7 @@ namespace Timbl {
     string optie;
     if ( opts.is_present( 'N', optie ) ){
       N_present = true;
-      MaxF = stringTo<int>( optie );
+      MaxF = TiCC::stringTo<int>( optie );
     }
     set_default_options( MaxF );
   }
@@ -204,12 +203,12 @@ namespace Timbl {
 	  }
 	}
 	if ( LocalInputFormat != UnknownInputFormat ){
-	  optline = "INPUTFORMAT: " + toString(LocalInputFormat);
+	  optline = "INPUTFORMAT: " + TiCC::toString(LocalInputFormat);
 	  if (!Exp->SetOption( optline ))
 	    return false;
 	}
 	if ( target_pos != -1 ){
-	  optline = "TARGET_POS: " + toString<int>(target_pos-1);
+	  optline = "TARGET_POS: " + TiCC::toString<int>(target_pos-1);
 	  if (!Exp->SetOption( optline ))
 	    return false;
 	}
@@ -240,26 +239,26 @@ namespace Timbl {
 	    return false;
 	}
 	if ( f_length > 0 ){
-	  optline = "FLENGTH: " + toString<int>(f_length);
+	  optline = "FLENGTH: " + TiCC::toString<int>(f_length);
 	  if (!Exp->SetOption( optline ))
 	    return false;
 	}
 	if ( local_weight != Unknown_w ){
-	  optline = "WEIGHTING: " + toString(local_weight);
+	  optline = "WEIGHTING: " + TiCC::toString(local_weight);
 	  Exp->SetOption( optline );
 	}
 	if ( do_all_weights ){
 	  optline = "ALL_WEIGHTS: true";
 	  Exp->SetOption( optline );
 	}
-	optline = "MAXBESTS: " + toString<int>(maxbests);
+	optline = "MAXBESTS: " + TiCC::toString<int>(maxbests);
 	Exp->SetOption( optline );
 	if ( BinSize > 0 ){
-	  optline = "BIN_SIZE: " + toString<int>(BinSize);
+	  optline = "BIN_SIZE: " + TiCC::toString<int>(BinSize);
 	  Exp->SetOption( optline );
 	}
 	if ( BeamSize > 0 ){
-	  optline = "BEAM_SIZE: " + toString<int>(BeamSize);
+	  optline = "BEAM_SIZE: " + TiCC::toString<int>(BeamSize);
 	  Exp->SetOption( optline );
 	}
 	if ( local_algo == TRIBL_a && threshold < 0 ){
@@ -275,15 +274,15 @@ namespace Timbl {
 	    Error( "invalid -q option. Must be > 0 " );
 	    return false;
 	  }
-	  optline = "TRIBL_OFFSET: " + toString<int>(threshold);
+	  optline = "TRIBL_OFFSET: " + TiCC::toString<int>(threshold);
 	  Exp->SetOption( optline );
 	}
 	if ( igThreshold > 0 ){
-	  optline = "IG_THRESHOLD: " + toString<int>(igThreshold);
+	  optline = "IG_THRESHOLD: " + TiCC::toString<int>(igThreshold);
 	  Exp->SetOption( optline );
 	}
 	if ( local_order != UnknownOrdening ){
-	  optline = "TREE_ORDER: " + toString(local_order);
+	  optline = "TREE_ORDER: " + TiCC::toString(local_order);
 	  Exp->SetOption( optline );
 	}
 	if ( !outPath.empty() ){
@@ -342,7 +341,7 @@ namespace Timbl {
 	return false;
       }
       if ( occIn > 0 ){
-	Exp->SetOption( "HANDLE_OCCURRENCES: " + toString(occIn) );
+	Exp->SetOption( "HANDLE_OCCURRENCES: " + TiCC::toString(occIn) );
       }
       else if ( do_sample_weights ){
 	Exp->SetOption(  "EXEMPLAR_WEIGHTS: true" );
@@ -360,47 +359,47 @@ namespace Timbl {
       if ( local_metric == UnknownMetric ){
 	// Ok, so NO defaults at all (API usage for instance)
 	local_metric = Overlap;
-	for ( size_t j=0; j < metricsArray.size(); ++j ){
-	  metricsArray[j] = Overlap;
+	for ( auto& m : metricsArray ){
+	  m = Overlap;
 	}
 
       }
-      optline = "GLOBAL_METRIC: " + toString(local_metric);
+      optline = "GLOBAL_METRIC: " + TiCC::toString(local_metric);
       Exp->SetOption( optline );
       if ( bootstrap_lines > 0 ){
-	optline = "IB2_OFFSET: " + toString<int>(bootstrap_lines);
+	optline = "IB2_OFFSET: " + TiCC::toString<int>(bootstrap_lines);
 	Exp->SetOption( optline );
       }
       if ( local_normalisation != unknownNorm ){
-	optline = "NORMALISATION: " + toString<normType>( local_normalisation );
+	optline = "NORMALISATION: " + TiCC::toString<normType>( local_normalisation );
 	Exp->SetOption( optline );
 	if ( local_normalisation == addFactorNorm ){
-	  optline = "NORM_FACTOR: " + toString<double>( local_norm_factor );
+	  optline = "NORM_FACTOR: " + TiCC::toString<double>( local_norm_factor );
 	  Exp->SetOption( optline );
 	}
       }
-      optline = "MVD_LIMIT: " + toString<int>(mvd_limit);
+      optline = "MVD_LIMIT: " + TiCC::toString<int>(mvd_limit);
       Exp->SetOption( optline );
-      optline = "NEIGHBORS: " + toString<int>(no_neigh);
+      optline = "NEIGHBORS: " + TiCC::toString<int>(no_neigh);
       if ( Exp->SetOption( optline ) ){
-	optline = "DECAY: " + toString(local_decay);
+	optline = "DECAY: " + TiCC::toString(local_decay);
 	if ( Exp->SetOption( optline ) ){
-	  optline = "DECAYPARAM_A: " + toString<double>(local_decay_alfa);
+	  optline = "DECAYPARAM_A: " + TiCC::toString<double>(local_decay_alfa);
 	  if ( Exp->SetOption( optline ) ){
-	    optline = "DECAYPARAM_B: " + toString<double>(local_decay_beta);
+	    optline = "DECAYPARAM_B: " + TiCC::toString<double>(local_decay_beta);
 	    if ( Exp->SetOption( optline ) ){
-	      optline = "CLIP_FACTOR: " + toString<int>(clip_freq);
+	      optline = "CLIP_FACTOR: " + TiCC::toString<int>(clip_freq);
 	      if ( Exp->SetOption( optline ) ){
-		optline = "SEED: " + toString<int>(seed);
+		optline = "SEED: " + TiCC::toString<int>(seed);
 		if ( Exp->SetOption( optline ) ){
-		  optline = "PROGRESS: " + toString<int>(local_progress);
+		  optline = "PROGRESS: " + TiCC::toString<int>(local_progress);
 		  if ( Exp->SetOption( optline ) ){
 		    optline = "VERBOSITY: " +
-		      toString(myVerbosity);
+		      TiCC::toString(myVerbosity);
 		    if ( Exp->SetOption( optline ) ){
 		      for ( size_t i=0; i < metricsArray.size(); ++i ){
-			optline = "METRICS: " + toString<int>( i ) + "=" +
-			  toString(metricsArray[i]);
+			optline = "METRICS: " + TiCC::toString<int>( i ) + "=" +
+			  TiCC::toString(metricsArray[i]);
 			if (!Exp->SetOption( optline ) ){
 			  Error( "changing metric is not possible at this stage" );
 			  return false;
@@ -434,7 +433,7 @@ namespace Timbl {
       while( eit != line.end() && isdigit( *eit ) ) ++eit;
       string tmp = string( it, eit );
       size_t k;
-      if ( stringTo<size_t>( tmp, k, 1, metricsArray.size() ) ){
+      if ( TiCC::stringTo<size_t>( tmp, k, 1, metricsArray.size() ) ){
 	if ( metricsArray[k] != UnknownMetric && metricsArray[k] != Value ){
 	  Error( "metric of feature " + tmp +
 		 " is multiply changed!" );
@@ -457,7 +456,7 @@ namespace Timbl {
 	eit = it;
 	while( eit != line.end() && isdigit( *eit ) ) ++eit;
 	tmp = string( it, eit );
-	m = stringTo<int>(tmp);
+	m = TiCC::stringTo<int>(tmp);
 	if ( m <= 0 || m > metricsArray.size() ){
 	  Error( "illegal value in metric description: -m " + line );
 	  return false;
@@ -475,7 +474,7 @@ namespace Timbl {
 	  for ( size_t j=k+1; j <= m && j <= metricsArray.size(); ++j ){
 	    if ( metricsArray[j] != UnknownMetric
 		 && metricsArray[j] != Value ){
-	      Error( "metric of feature " + toString<int>(j) +
+	      Error( "metric of feature " + TiCC::toString<int>(j) +
 		     " is multiply changed!" );
 	      return false;
 	    }
@@ -545,10 +544,8 @@ namespace Timbl {
 	}
 	else {
 	  // set the defaults
-	  for ( vector<MetricType>::iterator it=metricsArray.begin();
-		it != metricsArray.end();
-		++it ){
-	    *it = Def;
+	  for ( auto& mt : metricsArray ){
+	    mt = Def;
 	  }
 	  return true;
 	}
@@ -559,10 +556,8 @@ namespace Timbl {
       }
       else {
 	// deviating options expected. reset the array
-	for ( vector<MetricType>::iterator it=metricsArray.begin();
-	      it != metricsArray.end();
-	      ++it ){
-	  *it = UnknownMetric;
+	for ( auto& mt : metricsArray ){
+	  mt = UnknownMetric;
 	}
 	++p;
 	MetricType TmpMT;
@@ -605,7 +600,7 @@ namespace Timbl {
 	  }
 	  metricClass *tmpMC = getMetricClass(Def);
 	  if ( TmpMT != Ignore && tmpMC->isSimilarityMetric() ){
-	    Error( "Similarity metric " + toString( Def )
+	    Error( "Similarity metric " + TiCC::toString( Def )
 		   + " only accepts -I specifications: -m " + Mline );
 	    delete tmpMC;
 	    return false;
@@ -632,11 +627,9 @@ namespace Timbl {
 	  //
 	  // set defaults for those still unset
 	  //
-	  for ( vector<MetricType>::iterator it=metricsArray.begin();
-		it != metricsArray.end();
-		++it ){
-	    if ( *it == UnknownMetric )
-	      *it = Def;
+	  for ( auto& mt : metricsArray ){
+	    if ( mt == UnknownMetric )
+	      mt = Def;
 	  }
 	}
       }
@@ -669,14 +662,13 @@ namespace Timbl {
     for( auto const& curr_opt: opts ){
       //      cerr << "process " << curr_opt << endl;
       bool mood = false;
-      bool longOpt = false;
       string long_option;
+      bool longOpt = curr_opt.isLong();
       string opt_val = curr_opt.Option();
-      char option = curr_opt.OptChar();
+      char opt_char = curr_opt.OptChar();
 
-      if ( curr_opt.isLong() ){
+      if ( longOpt ){
 	long_option = curr_opt.OptWord();
-	longOpt = true;
       }
       else {
 	mood = curr_opt.getMood();
@@ -684,18 +676,18 @@ namespace Timbl {
       //      cerr << "long option:" << long_option << endl;
       //      cerr << "   opt_val:" << opt_val << endl;
       try {
-	//	cerr << "try " << option << endl;
-	switch (option) {
+	//	cerr << "try " << opt_char << endl;
+	switch (opt_char) {
 	case 'a':
 	  {
 	    AlgorithmType tmp_a = IB1_a;
-	    if ( !stringTo<AlgorithmType>( opt_val, tmp_a ) ){
+	    if ( !TiCC::stringTo<AlgorithmType>( opt_val, tmp_a ) ){
 	      Error( "illegal -a value: " + opt_val );
 	      return false;
 	    }
 	    else if ( tmp_a != IB1_a ){
 	      if ( local_algo == LOO_a || local_algo == CV_a ){
-		Error( "only IB1 algorithm is allowed for: " + toString(local_algo)  );
+		Error( "only IB1 algorithm is allowed for: " + TiCC::toString(local_algo)  );
 		return false;
 	      }
 	      else {
@@ -706,7 +698,7 @@ namespace Timbl {
 	  break;
 
 	case 'b':
-	  bootstrap_lines = stringTo<int>( opt_val );
+	  bootstrap_lines = TiCC::stringTo<int>( opt_val );
 	  if ( bootstrap_lines < 1 ){
 	    Error( "illegal value for -b option: " + opt_val );
 	    return false;
@@ -716,7 +708,7 @@ namespace Timbl {
 	case 'B':
 	  if ( longOpt ){
 	    if ( long_option == "Beam" ){
-	      if ( !stringTo<int>( opt_val, BeamSize )
+	      if ( !TiCC::stringTo<int>( opt_val, BeamSize )
 		   || BeamSize <= 0 ){
 		Error( "illegal value for --Beam option: " + opt_val );
 		return false;
@@ -728,7 +720,7 @@ namespace Timbl {
 	    return false;
 	  }
 	  else {
-	    BinSize = stringTo<int>( opt_val );
+	    BinSize = TiCC::stringTo<int>( opt_val );
 	    if ( BinSize <= 1 ){
 	      Error( "illegal value for -B option: " + opt_val );
 	      return false;
@@ -739,7 +731,7 @@ namespace Timbl {
 	case 'c':
 	  if ( longOpt ){
 	    if ( long_option == "clones" ){
-	      if ( !stringTo<int>( opt_val, clones )
+	      if ( !TiCC::stringTo<int>( opt_val, clones )
 		   || clones <= 0 ){
 		Error( "invalid value for --clones option: '"
 		       + opt_val + "'" );
@@ -748,7 +740,7 @@ namespace Timbl {
 	    }
 	  }
 	  else {
-	    if ( !stringTo<int>( opt_val, clip_freq )
+	    if ( !TiCC::stringTo<int>( opt_val, clip_freq )
 		 || clip_freq < 0 ){
 	      Error( "illegal value for -c option: " + opt_val );
 	      return false;
@@ -761,15 +753,15 @@ namespace Timbl {
 	  if ( pos1 == string::npos ){
 	    pos1 = opt_val.find_first_of( "0123456789" );
 	    if ( pos1 != string::npos ){
-	      if ( ! ( stringTo<DecayType>( string( opt_val, 0, pos1 ),
+	      if ( ! ( TiCC::stringTo<DecayType>( string( opt_val, 0, pos1 ),
 					    local_decay ) &&
-		       stringTo<double>( string( opt_val, pos1 ),
+		       TiCC::stringTo<double>( string( opt_val, pos1 ),
 					 local_decay_alfa ) ) ){
 		Error( "illegal value for -d option: " + opt_val );
 		return false;
 	      }
 	    }
-	    else if ( !stringTo<DecayType>( opt_val, local_decay ) ){
+	    else if ( !TiCC::stringTo<DecayType>( opt_val, local_decay ) ){
 	      Error( "illegal value for -d option: " + opt_val );
 	      return false;
 	    }
@@ -779,9 +771,9 @@ namespace Timbl {
 	    if ( pos2 == string::npos ){
 	      pos2 = opt_val.find_first_of( "0123456789", pos1+1 );
 	      if ( pos2 != string::npos ){
-		if ( ! ( stringTo<DecayType>( string( opt_val, 0, pos1 ),
+		if ( ! ( TiCC::stringTo<DecayType>( string( opt_val, 0, pos1 ),
 					      local_decay ) &&
-			 stringTo<double>( string( opt_val, pos2 ),
+			 TiCC::stringTo<double>( string( opt_val, pos2 ),
 					   local_decay_alfa ) ) ){
 		  Error( "illegal value for -d option: " + opt_val );
 		  return false;
@@ -793,11 +785,11 @@ namespace Timbl {
 	      }
 	    }
 	    else {
-	      if ( ! ( stringTo<DecayType>( string( opt_val, 0, pos1 ),
+	      if ( ! ( TiCC::stringTo<DecayType>( string( opt_val, 0, pos1 ),
 					    local_decay ) &&
-		       stringTo<double>( string( opt_val, pos1+1, pos2-pos1-1 ),
+		       TiCC::stringTo<double>( string( opt_val, pos1+1, pos2-pos1-1 ),
 					 local_decay_alfa ) &&
-		       stringTo<double>( string( opt_val, pos2+1 ),
+		       TiCC::stringTo<double>( string( opt_val, pos2+1 ),
 					 local_decay_beta ) ) ){
 		Error( "illegal value for -d option: " + opt_val );
 		return false;
@@ -822,7 +814,7 @@ namespace Timbl {
 	  break;
 
 	case 'e':
-	  if ( !stringTo<int>( opt_val, estimate )
+	  if ( !TiCC::stringTo<int>( opt_val, estimate )
 	       || estimate < 0 ){
 	    Error( "illegal value for -e option: " + opt_val );
 	    return false;
@@ -830,7 +822,7 @@ namespace Timbl {
 	  break;
 
 	case 'F':
-	  if ( !stringTo<InputFormatType>( opt_val, LocalInputFormat ) ){
+	  if ( !TiCC::stringTo<InputFormatType>( opt_val, LocalInputFormat ) ){
 	    Error( "illegal value for -F option: " + opt_val );
 	    return false;
 	  }
@@ -842,12 +834,12 @@ namespace Timbl {
 	  else {
 	    string::size_type pos1 = opt_val.find( ":" );
 	    if ( pos1 == string::npos ){
-	      local_normalisation = stringTo<normType>( opt_val );
+	      local_normalisation = TiCC::stringTo<normType>( opt_val );
 	      local_norm_factor = 1;
 	    }
 	    else {
-	      local_normalisation = stringTo<normType>( string( opt_val, 0, pos1 ) );
-	      if ( !stringTo<double>( string( opt_val, pos1+1 ),
+	      local_normalisation = TiCC::stringTo<normType>( string( opt_val, 0, pos1 ) );
+	      if ( !TiCC::stringTo<double>( string( opt_val, pos1+1 ),
 				      local_norm_factor ) ||
 		   local_norm_factor < Epsilon ){
 		Error( "illegal value for -G option: " + opt_val );
@@ -866,7 +858,7 @@ namespace Timbl {
 	  break;
 
 	case 'k':
-	  if ( !stringTo<int>( opt_val, no_neigh )
+	  if ( !TiCC::stringTo<int>( opt_val, no_neigh )
 	       || no_neigh <= 0 ){
 	    Error( "illegal value for -k option: " + opt_val );
 	    return false;
@@ -874,7 +866,7 @@ namespace Timbl {
 	  break;
 
 	case 'l':
-	  if ( !stringTo<int>( opt_val, f_length )
+	  if ( !TiCC::stringTo<int>( opt_val, f_length )
 	       || f_length <= 0 ){
 	    Error( "illegal value for -l option: " + opt_val );
 	    return false;
@@ -886,7 +878,7 @@ namespace Timbl {
 	  if ( pos1 == string::npos ){
 	    pos1 = opt_val.find_first_of( "0123456789" );
 	    if ( pos1 != string::npos ){
-	      if ( !stringTo<int>( opt_val, mvd_limit )
+	      if ( !TiCC::stringTo<int>( opt_val, mvd_limit )
 		   || mvd_limit <= 0 ){
 		Error( "illegal value for -L option: " + opt_val );
 		return false;
@@ -894,7 +886,7 @@ namespace Timbl {
 	    }
 	  }
 	  else {
-	    if ( !stringTo<int>( string( opt_val, pos1+1 ), mvd_limit )
+	    if ( !TiCC::stringTo<int>( string( opt_val, pos1+1 ), mvd_limit )
 		 || mvd_limit <= 0 ){
 	      Error( "illegal value for -L option: " + opt_val );
 	      return false;
@@ -908,7 +900,7 @@ namespace Timbl {
 	  break;
 
 	case 'M':
-	  if ( !stringTo<int>( opt_val, maxbests )
+	  if ( !TiCC::stringTo<int>( opt_val, maxbests )
 	       || maxbests <= 0 ){
 	    Error( "illegal value for -M option: " + opt_val );
 	    return false;
@@ -941,11 +933,11 @@ namespace Timbl {
 	  break;
 
 	case 'p':
-	  local_progress = stringTo<int>( opt_val );
+	  local_progress = TiCC::stringTo<int>( opt_val );
 	  break;
 
 	case 'q':
-	  threshold = stringTo<int>( opt_val );
+	  threshold = TiCC::stringTo<int>( opt_val );
 	  break;
 
 	case 'Q':
@@ -953,7 +945,7 @@ namespace Timbl {
 	  break;
 
 	case 'R':
-	  if ( !stringTo<int>( opt_val, seed ) ){
+	  if ( !TiCC::stringTo<int>( opt_val, seed ) ){
 	    Error( "Integer argument for Random Seed expected (-R option)" );
 	    return false;
 	  }
@@ -986,7 +978,7 @@ namespace Timbl {
 	    }
 	    else {
 	      int val;
-	      if ( stringTo<int>( opt_val, val ) ){
+	      if ( TiCC::stringTo<int>( opt_val, val ) ){
 		if ( val == 0 ){
 		  do_ignore_samples = true;
 		  do_ignore_samples_test = false;
@@ -1013,7 +1005,7 @@ namespace Timbl {
 	    else if ( compare_nocase( opt_val, "cross_validate" ) )
 	      tmp_a = CV_a;
 	    if ( local_algo != IB1_a && tmp_a != IB1_a ){
-	      Error( "only IB1 algorithm is allowed for: " + toString(tmp_a)  );
+	      Error( "only IB1 algorithm is allowed for: " + TiCC::toString(tmp_a)  );
 	      return false;
 	    }
 	    local_algo = tmp_a;
@@ -1022,14 +1014,14 @@ namespace Timbl {
 	case 'T': {
 	  if ( longOpt ){
 	    if ( long_option == "Threshold" ){
-	      if ( !stringTo<int>(opt_val, igThreshold )
+	      if ( !TiCC::stringTo<int>(opt_val, igThreshold )
 		   || igThreshold < 0 ){
 		Error( "invalid value for Threshold: " + opt_val );
 		return false;
 	      }
 	    }
 	    else if ( long_option == "Treeorder" ){
-	      if ( !stringTo<OrdeningType>( opt_val, local_order ) ){
+	      if ( !TiCC::stringTo<OrdeningType>( opt_val, local_order ) ){
 		Error( "invalid value for Treeorder: " + opt_val );
 		return false;
 	      }
@@ -1040,7 +1032,7 @@ namespace Timbl {
 	    Error( "invalid option: Did you mean '--T" + opt_val + "' ?" );
 	    return false;
 	  }
-	  else if ( !stringTo<int>( opt_val, target_pos )
+	  else if ( !TiCC::stringTo<int>( opt_val, target_pos )
 		    || target_pos <= 0 ){
 	    Error( "illegal value for -T option: " + opt_val );
 	    return false;
@@ -1050,14 +1042,14 @@ namespace Timbl {
 
 	case 'v':{
 	  VerbosityFlags Flag = NO_VERB;
-	  if ( !stringTo<VerbosityFlags>( opt_val, Flag ) ){
+	  if ( !TiCC::stringTo<VerbosityFlags>( opt_val, Flag ) ){
 	    Error( "illegal value for +/- v option: " + opt_val );
 	    return false;
 	  }
 	  else {
 	    if ( mode == 2 &&
 		 ( !(Flag & (SILENT|DISTANCE|DISTRIB|NEAR_N|CONF_MATRIX) ) ) ){
-	      Error( "-v option: " + toString(Flag) +
+	      Error( "-v option: " + TiCC::toString(Flag) +
 		     " is not allowed at this stage." );
 	      return false;
 	    }
@@ -1075,7 +1067,7 @@ namespace Timbl {
 	  break;
 
 	case 'w': {
-	  if ( !stringTo<WeightType>( opt_val, local_weight ) )
+	  if ( !TiCC::stringTo<WeightType>( opt_val, local_weight ) )
 	    return false;
 	};
 	  break;
@@ -1090,11 +1082,11 @@ namespace Timbl {
 	  break;
 
 	default:
-	  Warning( string("unhandled option: ") + option + " " + opt_val );
+	  Warning( string("unhandled option: ") + opt_char + " " + opt_val );
 	}
       }
       catch( std::runtime_error& err ) {
-	Error( string("invalid value for option '-") + option + "' ("
+	Error( string("invalid value for option '-") + opt_char + "' ("
 	       + opt_val + ")" );
 	return false;
       }

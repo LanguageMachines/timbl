@@ -40,7 +40,6 @@
 #include "timbl/Testers.h"
 
 using namespace std;
-using namespace TiCC;
 using Common::Epsilon;
 using Common::Log2;
 
@@ -189,7 +188,7 @@ namespace Timbl{
 
   inline bool FV_to_real( FeatureValue *FV, double &result ){
     if ( FV ){
-      if ( stringTo<double>( FV->Name(), result ) )
+      if ( TiCC::stringTo<double>( FV->Name(), result ) )
 	return true;
     }
     return false;

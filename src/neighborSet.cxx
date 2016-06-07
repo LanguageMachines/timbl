@@ -38,7 +38,6 @@
 namespace Timbl {
 
   using namespace std;
-  using namespace TiCC;
   using namespace Common;
 
   neighborSet::neighborSet(): showDistance(false),showDistribution(false){}
@@ -69,8 +68,8 @@ namespace Timbl {
 
   void neighborSet::clear(){
     distances.clear();
-    for ( unsigned int i=0; i < distributions.size(); ++i ){
-      delete distributions[i];
+    for ( auto const& db : distributions ){
+      delete db;
     }
     distributions.clear();
   }
@@ -230,17 +229,17 @@ namespace Timbl {
   }
 
   ostream& invLinDecay::put( ostream& os ) const {
-    os << "Decay         : " << toString( type(), true);
+    os << "Decay         : " << TiCC::toString( type(), true);
     return os;
   }
 
   ostream& invDistDecay::put( ostream& os ) const {
-    os << "Decay         : " << toString( type(), true);
+    os << "Decay         : " << TiCC::toString( type(), true);
     return os;
   }
 
   ostream& expDecay::put( ostream& os ) const {
-    os << "Decay         : " << toString( type(), true);
+    os << "Decay         : " << TiCC::toString( type(), true);
     os << " a=" << alpha << " b= " << beta;
     return os;
   }

@@ -27,26 +27,19 @@
 
 #include <string>
 #include <map>
-#include <algorithm>
+#include <iostream>
 #include <fstream>
-#include <sstream>
-#include <iomanip>
 #include <cassert>
-#include <cstdlib>
 
 #include "timbl/MsgClass.h"
 #include "timbl/Common.h"
 #include "timbl/Types.h"
-#include "timbl/Options.h"
-#include "timbl/Instance.h"
 #include "timbl/IBtree.h"
-#include "ticcutils/CommandLine.h"
 #include "timbl/TimblExperiment.h"
 #include "ticcutils/Timer.h"
 
 namespace Timbl {
   using namespace std;
-  using namespace TiCC;
 
   void IG_Experiment::InitInstanceBase(){
     srand( RandomSeed() );
@@ -122,7 +115,7 @@ namespace Timbl {
       result = false;
     }
     if ( result ) {
-      Timer learnT;
+      TiCC::Timer learnT;
       learnT.start();
       InitInstanceBase();
       if ( ExpInvalid() )
@@ -466,7 +459,7 @@ namespace Timbl {
     }
     else if ( !Pruned ){
       Error( "Instance-base is NOT Pruned!, invalid for " +
-	     toString(algorithm) + " Algorithm" );
+	     TiCC::toString(algorithm) + " Algorithm" );
     }
     else {
       TreeOrder = DataFile;

@@ -44,10 +44,8 @@
 #include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
 #include "timbl/MBLClass.h"
-#include "ticcutils/CommandLine.h"
 #include "timbl/TimblExperiment.h"
 
-using namespace TiCC;
 namespace Timbl {
   using namespace std;
 
@@ -77,7 +75,7 @@ namespace Timbl {
     if ( !TimblExperiment::checkTestFile() )
       return false;
     else if ( IBStatus() == Pruned ){
-      Warning( "you tried to apply the " + toString( algorithm) +
+      Warning( "you tried to apply the " + TiCC::toString( algorithm) +
 	       " algorithm on a pruned Instance Base" );
       return false;
     }
@@ -92,7 +90,7 @@ namespace Timbl {
     if ( !TimblExperiment::checkTestFile() )
       return false;
     else if ( IBStatus() == Pruned ){
-      Warning( "you tried to apply the " + toString( algorithm) +
+      Warning( "you tried to apply the " + TiCC::toString( algorithm) +
 	       " algorithm on a pruned Instance Base" );
       return false;
     }
@@ -308,7 +306,7 @@ namespace Timbl {
     }
     else if ( Pruned ){
       Error( "Instance-base is Pruned!, NOT valid for " +
-	     toString(algorithm) + " Algorithm" );
+	     TiCC::toString(algorithm) + " Algorithm" );
     }
     else {
       TreeOrder = DataFile;
@@ -355,7 +353,7 @@ namespace Timbl {
     }
     else if ( Pruned ){
       Error( "Instance-base is Pruned!, NOT valid for " +
-	     toString(algorithm) + " Algorithm" );
+	     TiCC::toString(algorithm) + " Algorithm" );
     }
     else {
       TreeOrder = DataFile;

@@ -94,18 +94,18 @@ namespace Timbl {
       os.width(6);
       os.setf(ios::right, ios::adjustfield);
       os << tg->ValuesArray[i] << " | ";
-      for ( unsigned int j=0; j < size; ++j ){
+      for ( const auto& mv : mat[i] ){
 	os.width(6);
 	os.setf(ios::right, ios::adjustfield);
-	os << mat[i][j] << " ";
+	os << mv << " ";
       }
       os << endl;
       if ( i == tg->ValuesArray.size() - 1 ){
 	os <<  "   -*- | ";
-	for ( unsigned int j=0; j < size; ++j ){
+	for ( const auto& mv : mat[size] ){
 	  os.width(6);
 	  os.setf(ios::right, ios::adjustfield);
-	  os << mat[size][j] << " ";
+	  os << mv << " ";
 	}
 	os << endl;
       }

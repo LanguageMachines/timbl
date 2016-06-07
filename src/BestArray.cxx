@@ -39,7 +39,6 @@
 
 namespace Timbl {
   using namespace std;
-  using namespace TiCC;
   using namespace Common;
 
   BestRec::BestRec():
@@ -205,7 +204,7 @@ namespace Timbl {
   }
 
   xmlNode *BestArray::toXML() const {
-    xmlNode *top = XmlNewNode( "neighborset" );
+    xmlNode *top = TiCC::XmlNewNode( "neighborset" );
     size_t k = 0;
     for ( auto const& best : bestArray ){
       ++k;
@@ -213,32 +212,45 @@ namespace Timbl {
 	size_t totalBests = best->totalBests();
 	if ( totalBests == 0 )
 	  break; // TRIBL algorithms do this!
-	xmlNode *nbs = XmlNewChild( top, "neighbors" );
-	XmlSetAttribute( nbs, "k", toString(k) );
-	XmlSetAttribute( nbs, "total", toString(totalBests) );
-	XmlSetAttribute( nbs, "distance", toString( best->bestDistance ) );
+	xmlNode *nbs = TiCC::XmlNewChild( top, "neighbors" );
+	TiCC::XmlSetAttribute( nbs,
+			       "k",
+			       TiCC::toString(k) );
+	TiCC::XmlSetAttribute( nbs,
+			       "total",
+			       TiCC::toString(totalBests) );
+	TiCC::XmlSetAttribute( nbs,
+			       "distance",
+			       TiCC::toString( best->bestDistance ) );
 	if ( maxBests < totalBests )
-	  XmlSetAttribute( nbs, "limited", toString( maxBests ) );
+	  TiCC::XmlSetAttribute( nbs,
+				 "limited",
+				 TiCC::toString( maxBests ) );
 	for ( unsigned int m=0; m < best->bestInstances.size(); ++m ){
-	  xmlNode *nb = XmlNewChild( nbs, "neighbor" );
-	  XmlNewTextChild( nb, "instance", best->bestInstances[m] );
+	  xmlNode *nb = TiCC::XmlNewChild( nbs, "neighbor" );
+	  TiCC::XmlNewTextChild( nb,
+				 "instance",
+				 best->bestInstances[m] );
 	  if ( _showDb )
-	    XmlNewTextChild( nb, "distribution",
-			     best->bestDistributions[m]->DistToString() );
+	    TiCC::XmlNewTextChild( nb,
+				   "distribution",
+				   best->bestDistributions[m]->DistToString() );
 	}
       }
       else {
 	if ( best->aggregateDist.ZeroDist() )
 	  break;
-	xmlNode *nbs = XmlNewChild( top, "neighbors" );
-	XmlSetAttribute( nbs, "k", toString(k) );
+	xmlNode *nbs = TiCC::XmlNewChild( top, "neighbors" );
+	TiCC::XmlSetAttribute( nbs, "k", TiCC::toString(k) );
 	if ( _showDb ){
-	  XmlNewTextChild( nbs, "distribution",
-			   best->aggregateDist.DistToString() );
+	  TiCC::XmlNewTextChild( nbs,
+				 "distribution",
+				 best->aggregateDist.DistToString() );
 	}
 	if ( _showDi ){
-	  XmlNewTextChild( nbs, "distance",
-			   toString(best->bestDistance) );
+	  TiCC::XmlNewTextChild( nbs,
+				 "distance",
+				 TiCC::toString(best->bestDistance) );
 	}
       }
     }

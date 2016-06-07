@@ -33,14 +33,7 @@
 #include <iomanip>
 #include <typeinfo>
 
-#include <cmath>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
 #include <ctime>
-#include <climits>
-#include <cfloat>
-#include <cctype>
 #include <cassert>
 
 #include "ticcutils/StringOps.h"
@@ -60,7 +53,6 @@
 #include "timbl/MBLClass.h"
 
 using namespace std;
-using namespace TiCC;
 
 namespace Timbl {
 
@@ -419,13 +411,13 @@ namespace Timbl {
     Options.Show_Settings( tmp );
     vector<string> lines;
     int num = TiCC::split_at( tmp.str(), lines, "\n" );
-    xmlNode *result = XmlNewNode("settings");
+    xmlNode *result = TiCC::XmlNewNode("settings");
     for ( int i=0; i < num; ++i ){
       vector<string> parts;
       if ( TiCC::split_at( lines[i], parts, ":" ) ==2 ){
 	string tag = TiCC::trim( parts[0] );
 	string val = TiCC::trim( parts[1] );
-	XmlNewTextChild( result, tag, val );
+	TiCC::XmlNewTextChild( result, tag, val );
       }
     }
     return result;
@@ -476,7 +468,7 @@ namespace Timbl {
 
   void MBLClass::writePermutation( ostream& os ) const {
     os << "Feature Permutation based on "
-       << ( Weighting==UserDefined_w?"weightfile":toString(TreeOrder, true))
+       << ( Weighting==UserDefined_w?"weightfile":TiCC::toString(TreeOrder, true))
        << " :" << endl << "< ";
     for ( size_t j=0; j < num_of_features-1; ++j ){
       os << permutation[j]+1 << ", ";
@@ -540,7 +532,7 @@ namespace Timbl {
 	case Unknown_w:
 	case Max_w:
 	  FatalError( "InitWeights: Invalid Weight in switch: " +
-		      toString( Weighting ) );
+		      TiCC::toString( Weighting ) );
 	  break;
 	}
     }
@@ -588,7 +580,7 @@ namespace Timbl {
 	break;
       default:
 	FatalError( "Illegal Weighting Value in Switch: " +
-		    toString( Weighting ) );
+		    TiCC::toString( Weighting ) );
 	break;
       }
   }
@@ -650,7 +642,7 @@ namespace Timbl {
       case UnknownOrdening:
       case MaxOrdening:
 	FatalError( "Setorder: Illegal Order Value in Switch: " +
-		    toString( TreeOrder ) );
+		    TiCC::toString( TreeOrder ) );
 	break;
       }
       ++i;
@@ -706,7 +698,7 @@ namespace Timbl {
 	string::size_type pos = line.find_first_not_of("0123456789");
 	string nums = line.substr( 0, pos );
 	size_t num;
-	if ( !stringTo( nums, num ) ){
+	if ( !TiCC::stringTo( nums, num ) ){
 	  FatalError( "no feature index found in the inputfile" );
 	}
 	else {
@@ -773,8 +765,8 @@ namespace Timbl {
 	else {
 	  is >> num;
 	  if ( num != index ){
-	    Error( "Wrong feature number " + toString<size_t>(num) +
-		   " in file, " + toString<size_t>(index) + " expected" );
+	    Error( "Wrong feature number " + TiCC::toString<size_t>(num) +
+		   " in file, " + TiCC::toString<size_t>(index) + " expected" );
 	    result = false;
 	  }
 	  else if ( index > num_of_features ){
@@ -789,7 +781,7 @@ namespace Timbl {
 		continue;
 	      }
 	      else {
-		Error( "Feature #" + toString<size_t>(index) +
+		Error( "Feature #" + TiCC::toString<size_t>(index) +
 		       " may not be ignored...");
 		result = false;
 	      }
@@ -800,7 +792,7 @@ namespace Timbl {
 		continue;
 	      }
 	      else {
-		Error( "Feature #" + toString<size_t>(index) + " is not Numeric..." );
+		Error( "Feature #" + TiCC::toString<size_t>(index) + " is not Numeric..." );
 		result = false;
 	      }
 	    }
@@ -811,7 +803,7 @@ namespace Timbl {
 	    else if ( Features[index-1]->Ignore() ||
 		      Features[index-1]->isNumerical() ){
 	      Warning( "Matrix info found for feature #"
-		       + toString<size_t>(index)
+		       + TiCC::toString<size_t>(index)
 		       + " (skipped)" );
 	      ++index;
 	    }
@@ -1004,7 +996,7 @@ namespace Timbl {
       break;
     default:
       FatalError( "Wrong value in Switch: "
-		  + toString<PhaseValue>(phase) );
+		  + TiCC::toString<PhaseValue>(phase) );
     }
     if ( ( phase != TestWords ) && doSamples() ){
       double exW = ChopInput->getExW();
@@ -1121,7 +1113,7 @@ namespace Timbl {
 	int OldPrec = os.precision(DBL_DIG);
 	if ( CurrentWeighting() == SD_w ){
 	  os << "#" << endl;
-	  os << "# " << toString( SD_w ) << endl;
+	  os << "# " << TiCC::toString( SD_w ) << endl;
 	  os << "# Fea." << "\t" << "Weight" << endl;
 	  size_t pos = 0;
 	  for ( const auto& feat : Features ){
@@ -1135,7 +1127,7 @@ namespace Timbl {
 	  os << "#" << endl;
 	}
 	else {
-	  os << "# " << toString( No_w ) << endl;
+	  os << "# " << TiCC::toString( No_w ) << endl;
 	  os << "# Fea." << "\t" << "Weight" << endl;
 	  size_t pos = 0;
 	  for (  const auto& feat : Features ){
@@ -1147,7 +1139,7 @@ namespace Timbl {
 	      os << 1.0 << endl;
 	  }
 	  os << "#" << endl;
-	  os << "# " << toString( GR_w ) << endl;
+	  os << "# " << TiCC::toString( GR_w ) << endl;
 	  os << "# Fea." << "\t" << "Weight" << endl;
 	  pos = 0;
 	  for (  const auto& feat : Features ){
@@ -1159,7 +1151,7 @@ namespace Timbl {
 	      os << feat->GainRatio() << endl;
 	  }
 	  os << "#" << endl;
-	  os << "# " << toString( IG_w ) << endl;
+	  os << "# " << TiCC::toString( IG_w ) << endl;
 	  os << "# Fea." << "\t" << "Weight" << endl;
 	  pos = 0;
 	  for (  const auto& feat : Features ){
@@ -1172,7 +1164,7 @@ namespace Timbl {
 	  }
 	  if ( need_all_weights ){
 	    os << "#" << endl;
-	    os << "# " << toString( SV_w ) << endl;
+	    os << "# " << TiCC::toString( SV_w ) << endl;
 	    os << "# Fea." << "\t" << "Weight" << endl;
 	    pos = 0;
 	    for (  const auto& feat : Features ){
@@ -1184,7 +1176,7 @@ namespace Timbl {
 		os << feat->SharedVariance() << endl;
 	    }
 	    os << "#" << endl;
-	    os << "# " << toString( X2_w ) << endl;
+	    os << "# " << TiCC::toString( X2_w ) << endl;
 	    os << "# Fea." << "\t" << "Weight" << endl;
 	    pos = 0;
 	    for (  const auto& feat : Features ){
@@ -1223,10 +1215,10 @@ namespace Timbl {
 	//
 	vector<string> vals;
 	if ( TiCC::split( Buffer, vals ) == 2 ){
-	  size_t i_f = stringTo<size_t>( vals[0] );
+	  size_t i_f = TiCC::stringTo<size_t>( vals[0] );
 	  if ( i_f > num_of_features ){
 	    Error( "in weightsfile, Feature index > Maximum, (" +
-		   toString<size_t>(num_of_features) + ")" );
+		   TiCC::toString<size_t>(num_of_features) + ")" );
 	  }
 	  else if ( done[i_f-1] ){
 	    Error( "in weightsfile, Feature index " + vals[0] +
@@ -1236,7 +1228,7 @@ namespace Timbl {
 	    done[i_f-1] = true;
 	    if ( !compare_nocase( vals[1], "Ignore" ) ){
 	      double w;
-	      if ( !stringTo<double>( vals[1], w  ) ){
+	      if ( !TiCC::stringTo<double>( vals[1], w  ) ){
 		Error( "in weightsfile, Feature " + vals[0] +
 		       " has illegal value: " + vals[1] );
 	      }
@@ -1245,7 +1237,7 @@ namespace Timbl {
 		if ( Features[i_f-1]->Ignore() )
 		  Warning( "in weightsfile, "
 			   "Feature " + vals[0] + " has value: " +
-			   toString<double>( w ) +
+			   TiCC::toString<double>( w ) +
 			   " assigned, but will be ignored" );
 	      }
 	    }
@@ -1262,7 +1254,7 @@ namespace Timbl {
     if ( result ){
       for ( size_t j=0; j < num_of_features; ++j )
 	if ( !done[j] ) {
-	  Error( "in weightsfile, Feature index " + toString<size_t>(j+1) +
+	  Error( "in weightsfile, Feature index " + TiCC::toString<size_t>(j+1) +
 		 " is not mentioned" );
 	  result = false;
 	}
@@ -1287,7 +1279,7 @@ namespace Timbl {
 	    vector<string> vals;
 	    if ( TiCC::split_at( Buffer, vals, " " ) == 2  ){
 	      WeightType tmp_w = Unknown_w;
-	      if ( !stringTo<WeightType>( vals[1], tmp_w ) )
+	      if ( !TiCC::stringTo<WeightType>( vals[1], tmp_w ) )
 		continue;
 	      else {
 		old_style = false;
@@ -1330,7 +1322,7 @@ namespace Timbl {
       }
       if ( !result ){
 	Warning( "Unable to retrieve "
-		 + toString( wanted ) + " Weights" );
+		 + TiCC::toString( wanted ) + " Weights" );
 	Warning( "unable to continue" );
 	return false;
       }
@@ -1404,8 +1396,8 @@ namespace Timbl {
 	     Features[g]->isStorableMetric() &&
 	     Features[g]->matrixPresent( isRead ) &&
 	     isRead ){
-	  Error( "The metric " + toString(Features[g]->getMetricType()) +
-		 " for feature " + toString( g+1 ) +
+	  Error( "The metric " + TiCC::toString(Features[g]->getMetricType()) +
+		 " for feature " + TiCC::toString( g+1 ) +
 		 " is set from a file. It cannot be changed!" );
 	  return;
 	}
@@ -1447,7 +1439,7 @@ namespace Timbl {
 	if ( GlobalMetric->isSimilarityMetric() )
 	  Error( "Therefore InnerProduct/Cosine operations are impossible" );
 	else
-	  Error( "Therefore " + toString(CurrentWeighting()) + " weighting is impossible" );
+	  Error( "Therefore " + TiCC::toString(CurrentWeighting()) + " weighting is impossible" );
 	return;
       }
     }
@@ -1628,12 +1620,12 @@ namespace Timbl {
 	break;
       case Sparse:
 	if ( inst.FV[InvPerm[j]]->Name() != DefaultSparseString )
-	  result += string("(")  + toString<size_t>(j+1) + ","
+	  result += string("(")  + TiCC::toString<size_t>(j+1) + ","
 	    + CodeToStr( inst.FV[InvPerm[j]]->Name() ) + ")";
 	break;
       case SparseBin:
 	if ( inst.FV[InvPerm[j]]->Name()[0] == '1' )
-	  result += toString<size_t>( j+1 ) + ",";
+	  result += TiCC::toString<size_t>( j+1 ) + ",";
 	break;
       case Columns:
 	if ( Features[j]->Ignore() )
@@ -1759,11 +1751,11 @@ namespace Timbl {
 							       ib_offset,
 							       effective_feats );
     tester->init( Inst, effective_feats, ib_offset );
-    //    cerr << "start test Instance = " << &Inst << " met " << toString(CurrentFV) << endl;
+    //    cerr << "start test Instance = " << &Inst << " met " << TiCC::toString(CurrentFV) << endl;
     //    cerr << "BA at start = " << bestArray << endl;
     size_t CurPos = 0;
     while ( best_distrib ){
-      //      cerr << "test:" << toString(CurrentFV) << endl;
+      //      cerr << "test:" << TiCC::toString(CurrentFV) << endl;
       size_t EndPos = tester->test( CurrentFV,
 				    CurPos,
 				    Threshold + Epsilon );
@@ -1785,7 +1777,7 @@ namespace Timbl {
 	    Threshold = DBL_MAX;
 	}
 	else {
-	  Error( "DISTANCE == " + toString<double>(Distance) );
+	  Error( "DISTANCE == " + TiCC::toString<double>(Distance) );
 	  FatalError( "we are dead" );
 	}
       }
@@ -1801,7 +1793,7 @@ namespace Timbl {
 	  //	  cerr << "voor next test " << endl;
 	  best_distrib = IB->NextGraphTest( CurrentFV,
 					    CurPos );
-	  //	  cerr << "na next test, curpos=" << CurPos << "-" << toString(CurrentFV) << endl;
+	  //	  cerr << "na next test, curpos=" << CurPos << "-" << TiCC::toString(CurrentFV) << endl;
 	  break;
 	}
 	if ( pos == 0 )
@@ -1847,7 +1839,7 @@ namespace Timbl {
 	  FatalError( "timbl terminated" );
 	}
 	else {
-	  Error( "DISTANCE == " + toString<double>(Distance) );
+	  Error( "DISTANCE == " + TiCC::toString<double>(Distance) );
 	  FatalError( "we are dead" );
 	}
       }
@@ -2002,7 +1994,7 @@ namespace Timbl {
       else {
 	if ( NumF > MaxFeatures ){
 	  Error( "Number of Features exceeds the maximum number. "
-		 "(currently " + toString<size_t>(MaxFeatures) +
+		 "(currently " + TiCC::toString<size_t>(MaxFeatures) +
 		 ")\nPlease increase.\n" );
 	  return 0;
 	}
@@ -2021,7 +2013,7 @@ namespace Timbl {
       target_pos = num_of_features; // the default
     else if ( target_pos > num_of_features )
       FatalError( "Initialize: TARGET_POS cannot exceed NUM_OF_FEATURES+1 " +
-		  toString<size_t>( num_of_features+1 ) );
+		  TiCC::toString<size_t>( num_of_features+1 ) );
     Features.resize(num_of_features,NULL);
     PermFeatures.resize(num_of_features,NULL);
     FeatureStrings = new Hash::StringHash(); // all features share the same hash

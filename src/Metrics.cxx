@@ -40,7 +40,6 @@
 #include "timbl/Metrics.h"
 
 using namespace std;
-using namespace TiCC;
 using Common::Epsilon;
 using Common::Log2;
 
@@ -320,7 +319,7 @@ namespace Timbl{
       return 0;
       break;
     default:
-      throw logic_error("getMetricClass: unknown MetricType " + toString(mt) );
+      throw logic_error("getMetricClass: unknown MetricType " + TiCC::toString(mt) );
     }
   }
 
@@ -337,7 +336,7 @@ namespace Timbl{
 
   inline bool FV_to_real( FeatureValue *FV, double &result ){
     if ( FV ){
-      if ( stringTo<double>( FV->Name(), result ) )
+      if ( TiCC::stringTo<double>( FV->Name(), result ) )
 	return true;
     }
     return false;
