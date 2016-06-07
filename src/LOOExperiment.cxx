@@ -38,17 +38,9 @@
 #include "timbl/MsgClass.h"
 #include "timbl/Common.h"
 #include "timbl/Types.h"
-#include "timbl/Options.h"
-#include "timbl/Instance.h"
-#include "timbl/Statistics.h"
-#include "timbl/neighborSet.h"
-#include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
 #include "timbl/MBLClass.h"
-#include "ticcutils/CommandLine.h"
 #include "timbl/TimblExperiment.h"
-
-using namespace TiCC;
 
 namespace Timbl {
   using namespace std;
@@ -64,7 +56,7 @@ namespace Timbl {
 	  else {
 	    Error( string("not enough memory for Probability Arrays")
 		   + "' in ("
-		   + __FILE__  + "," + toString(__LINE__) + ")\n"
+		   + __FILE__  + "," + TiCC::toString(__LINE__) + ")\n"
 		   + "ABORTING now" );
 	    throw std::bad_alloc();
 	  }
@@ -133,7 +125,7 @@ namespace Timbl {
       while ( nextLine( testStream, Buffer ) ){
 	if ( !chopLine( Buffer ) ) {
 	  Warning( "testfile, skipped line #" +
-		   toString<int>( stats.totalLines() ) +
+		   TiCC::toString<int>( stats.totalLines() ) +
 		   "\n" + Buffer );
 	}
 	else {
