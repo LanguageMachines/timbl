@@ -118,8 +118,8 @@ namespace Timbl{
   }
 
   DistanceTester::~DistanceTester(){
-    for ( const auto& m : metricTest ){
-      delete m;
+    for ( size_t i=0; i < _size; ++i ){
+      delete metricTest[i];
     }
     delete [] metricTest;
   }
