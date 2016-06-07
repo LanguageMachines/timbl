@@ -20,7 +20,6 @@
 #include "timbl/IBtree.h"
 
 using namespace std;
-using namespace TiCC;
 
 namespace Timbl {
   using namespace Common;
@@ -248,20 +247,20 @@ namespace Timbl {
   }
 
   xmlNode *to_node( const FeatureValue *fv ){
-    xmlNode *result = XmlNewNode( "feature" );
-    XmlAddContent( result, fv->Name() );
+    xmlNode *result = TiCC::XmlNewNode( "feature" );
+    TiCC::XmlAddContent( result, fv->Name() );
     return result;
   }
 
   xmlNode *to_node( const TargetValue *tv ){
-    xmlNode *result = XmlNewNode( "target" );
-    XmlAddContent( result, tv->Name() );
+    xmlNode *result = TiCC::XmlNewNode( "target" );
+    TiCC::XmlAddContent( result, tv->Name() );
     return result;
   }
 
   xmlNode *to_node( const ValueDistribution *d ){
-    xmlNode *result = XmlNewNode( "distribution" );
-    XmlAddContent( result, d->DistToString() );
+    xmlNode *result = TiCC::XmlNewNode( "distribution" );
+    TiCC::XmlAddContent( result, d->DistToString() );
     return result;
   }
 
@@ -283,11 +282,11 @@ namespace Timbl {
   }
 
   xmlNode *to_xml( IBtree *pnt ) {
-    xmlNode *nodes = XmlNewNode( "nodes" );
+    xmlNode *nodes = TiCC::XmlNewNode( "nodes" );
     int cnt = count_next( pnt );
-    XmlSetAttribute( nodes, "nodecount", toString( cnt ) );
+    TiCC::XmlSetAttribute( nodes, "nodecount", TiCC::toString( cnt ) );
     while ( pnt ){
-      xmlNode *node = XmlNewChild( nodes, "node" );
+      xmlNode *node = TiCC::XmlNewChild( nodes, "node" );
       if ( pnt->FValue )
 	xmlAddChild( node, to_node( pnt->FValue ) );
       if ( pnt->TValue )
@@ -307,9 +306,10 @@ namespace Timbl {
 
   void InstanceBase_base::toXML( ostream &os )  {
     // save an IBtree for later use.
-    XmlDoc doc( "root" );
+    TiCC::XmlDoc doc( "root" );
     xmlNode *root = doc.getRoot();
-    xmlAddChild( root, XmlNewComment( "Version " + toString(Version) ) );
+    xmlAddChild( root,
+		 TiCC::XmlNewComment( "Version " + TiCC::toString(Version) ) );
     bool dummy;
     xmlAddChild( root, to_node( TopTarget( dummy ) ) );
     if ( PersistentDistributions )
@@ -322,10 +322,8 @@ namespace Timbl {
 
   string toString( const vector<FeatureValue*> vec ){
     string result;
-    vector<FeatureValue*>::const_iterator it = vec.begin();
-    while ( it != vec.end() ){
-      result += " " + (*it)->Name();
-      ++it;
+    for ( auto const& fv : vec ){
+      result += " " + fv->Name();
     }
     return result;
   }

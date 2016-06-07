@@ -32,9 +32,6 @@
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
-#include <typeinfo>
-#include <cmath>
-#include <cstdio>
 #include <cassert>
 
 #include "ticcutils/StringOps.h"
@@ -48,7 +45,6 @@
 #include "timbl/Metrics.h"
 
 using namespace std;
-using namespace TiCC;
 
 namespace Timbl {
   using namespace Common;
@@ -690,7 +686,7 @@ namespace Timbl {
   struct D_D {
     D_D(): dist(0), value(0.0) {};
     D_D( FeatureValue *fv ){
-      if ( !stringTo<double>( fv->Name(), value ) )
+      if ( !TiCC::stringTo<double>( fv->Name(), value ) )
 	throw( logic_error("called DD with an non-numeric value" ) );
       dist = &fv->TargetDist;
     }
@@ -1410,7 +1406,7 @@ namespace Timbl {
       FeatureValue *fv = (FeatureValue*)*it;
       freq = fv->ValFreq();
       if ( freq > 0 ){
-	if ( !stringTo<double>( fv->Name(), tmp ) ){
+	if ( !TiCC::stringTo<double>( fv->Name(), tmp ) ){
 	  Warning( "a Non Numeric value '" +
 		   string(fv->Name()) +
 		   "' in Numeric Feature!" );
@@ -1452,7 +1448,7 @@ namespace Timbl {
     vector<double> store( ValuesArray.size() );
     for ( unsigned int i=0; i < ValuesArray.size(); ++i ){
       FeatureValue *FV = (FeatureValue *)ValuesArray[i];
-      double val = stringTo<double>( FV->Name() );
+      double val = TiCC::stringTo<double>( FV->Name() );
       store[i] = val;
       sum += val;
     }
@@ -1613,14 +1609,14 @@ namespace Timbl {
 	  while ( *p && isspace(*p) ) ++p; // skip trailing whitespace
 	  if ( *p ){
 	    if ( ui == Num ){
-	      FatalError( "Running out range: " + toString<size_t>(ui) );
+	      FatalError( "Running out range: " + TiCC::toString<size_t>(ui) );
 	      return false;
 	    }
 	    name = "";
 	    while( *p && !isspace( *p ) )
 	      name += *p++;
 	    double value = 0.0;
-	    if ( !stringTo<double>( name, value ) ){
+	    if ( !TiCC::stringTo<double>( name, value ) ){
 	      Error( "Found illegal value '" + name + "'" );
 	      return false;
 	    }
@@ -1663,7 +1659,7 @@ namespace Timbl {
 	Error( "wrong line in inputfile" );
 	return false;
       }
-      else if ( !stringTo( arr[1], d ) ) {
+      else if ( !TiCC::stringTo( arr[1], d ) ) {
 	Error( "wrong line in inputfile" );
 	return false;
       }

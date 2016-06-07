@@ -35,11 +35,9 @@
 #include "timbl/IBtree.h"
 #include "timbl/Common.h"
 #include "timbl/Types.h"
-#include "timbl/Options.h"
 #include "timbl/MBLClass.h"
 
 using namespace std;
-using namespace TiCC;
 
 namespace Timbl {
 
@@ -233,12 +231,12 @@ namespace Timbl {
 	      if ( !excl )
 		effective_feats++;
 	      string tmp = string_tok( perms, pos, ", !" );
-	      index = stringTo<size_t>( tmp );
+	      index = TiCC::stringTo<size_t>( tmp );
 	      permutation.push_back( --index );
 	      if ( index >= MaxFeatures ){
-		Error ( "illegal value " + toString<size_t>(index) +
+		Error ( "illegal value " + TiCC::toString<size_t>(index) +
 			" in permutation, not between 1 and " +
-			toString<size_t>( MaxFeatures ) );
+			TiCC::toString<size_t>( MaxFeatures ) );
 		info_ok = false;
 		break;
 	      }
@@ -271,7 +269,7 @@ namespace Timbl {
 	    while ( pos != string::npos ){
 	      string tmp = string_tok( splits[2], pos, ",. " );
 	      if ( tmp != "" ){
-		int k = stringTo<int>( tmp );
+		int k = TiCC::stringTo<int>( tmp );
 		UserOptions[k] = Numeric;
 	      }
 	    }
@@ -279,7 +277,7 @@ namespace Timbl {
 	  }
 	}
 	else if ( compare_nocase_n( "Bin_Size:", splits[1] ) ){
-	  int siz = stringTo<int>( splits[2] );
+	  int siz = TiCC::stringTo<int>( splits[2] );
 	  if ( siz < 2 || siz > 1000000 ){
 	    Error( "invalid Bin_Size found: " + splits[2] );
 	    info_ok = false;
@@ -288,7 +286,7 @@ namespace Timbl {
 	    Bin_Size = siz;
 	}
 	else if ( compare_nocase_n( "Version", splits[1] ) ){
-	  version = stringTo<int>( splits[2] );
+	  version = TiCC::stringTo<int>( splits[2] );
 	  if ( version >= 3  && num > 3 ){
 	    if ( compare_nocase_n( "(Hashed)", splits[3] ) )
 	      Hashed = true;
@@ -303,7 +301,7 @@ namespace Timbl {
       info_ok = false;
     }
     else if ( version < 4 ) {
-      Error( "A Version " + toString<int>(version) +
+      Error( "A Version " + TiCC::toString<int>(version) +
 	     " type InstanceBase file is found:\n"
 	     "        You should recreate it as it is no longer supported"
 	     "\n        in this version of the timbl package" );
@@ -341,7 +339,7 @@ namespace Timbl {
 	do {
 	  is >> k;
 	  if ( UserOptions[k] != Numeric ){
-	    Error( "Found range info for feature " + toString<int>(k) +
+	    Error( "Found range info for feature " + TiCC::toString<int>(k) +
 		   ", which is Not defined as Numeric!" );
 	    result = false;
 	  }
