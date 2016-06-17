@@ -267,6 +267,7 @@ void get_command_lines( const string& value, list<string>& result ){
 }
 
 class softExit : public exception {};
+class hardExit : public exception {};
 
 void Preset_Values( TiCC::CL_Options& opts ){
   string value;
@@ -281,13 +282,13 @@ void Preset_Values( TiCC::CL_Options& opts ){
   if ( opts.is_present( 'S' ) ){
     cerr << "Server mode is no longer available in timbl" << endl;
     cerr << "Please use the 'timblserver' command instead." << endl;
-    throw( softExit() );
+    throw( hardExit() );
   }
   if ( opts.extract( 'a', value ) ){
     // the user gave an algorithm
     if ( !string_to( value, algorithm ) ){
       cerr << "illegal -a value: " << value << endl;
-      throw( softExit() ); // no chance to proceed
+      throw( hardExit() ); // no chance to proceed
     }
   }
   else
@@ -315,7 +316,7 @@ void Preset_Values( TiCC::CL_Options& opts ){
     if ( Do_LOO || Do_CV )
       if ( algorithm != IB1 ){
 	cerr << "Invalid Algorithm: Only IB1 possible for LOO and CV " << endl;
-	throw( softExit() ); // no chance to proceed
+	throw( hardExit() ); // no chance to proceed
       }
   }
   if ( opts.extract( 'P', value ) ){
@@ -821,24 +822,24 @@ int main(int argc, char *argv[]){
 	}
       }
       delete Run;
+      if ( !do_test || !Run->isValid() ){
+	return EXIT_FAILURE;
+      }
     }
-    return 0;
+    return EXIT_SUCCESS;
+  }
+  catch( softExit& e ){
+    return EXIT_SUCCESS;
+  }
+  catch(std::string& what){
+    cerr << what << ", sorry" << endl;
   }
   catch(std::bad_alloc){
     cerr << "ran out of memory somewhere" << endl;
     cerr << "timbl terminated, Sorry for that" << endl;
   }
-  catch( softExit& e ){
-    return 0;
-  }
-  catch(std::string& what){
-    cerr << what << ", sorry" << endl;
-  }
   catch(std::exception& e){
     cerr << e.what() << ", sorry" << endl;
   }
-  catch(...){
-    cerr << "some exception was raised" << endl;
-    cerr << "timbl terminated, Sorry for that" << endl;
-  }
+  return EXIT_FAILURE;
 }
