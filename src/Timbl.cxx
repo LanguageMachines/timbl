@@ -172,8 +172,8 @@ inline void usage_full(void){
   cerr << "-p n      : show progress every n lines (default p = 100,000)"
        << endl;
   cerr << "-U f      : save value_class probabilities in file 'f'" << endl;
-  cerr << "-V        : Show VERSION" << endl;
-  cerr << "+v or -v level : set or unset verbosity level, where level is"
+  cerr << "-V or --version : Show VERSION" << endl;
+  cerr << "+v or -v level  : set or unset verbosity level, where level is"
        << endl;
   cerr << "      s:  work silently" << endl;
   cerr << "      o:  show all options set" << endl;
@@ -275,7 +275,8 @@ void Preset_Values( TiCC::CL_Options& opts ){
     usage_full();
     throw( softExit() );
   }
-  if ( opts.is_present( 'V' ) ){
+  if ( opts.is_present( 'V' )
+       || opts.is_present( "version" ) ){
     cerr << "TiMBL " << Timbl::BuildInfo() << endl;
     throw( softExit() );
   }

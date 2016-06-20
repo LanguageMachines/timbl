@@ -75,7 +75,7 @@ using namespace std;
 namespace Timbl {
 
   const string timbl_short_opts = "a:b:B:c:C:d:De:f:F:G::hHi:I:k:l:L:m:M:n:N:o:O:p:P:q:QR:s::t:T:u:U:v:Vw:W:xX:Z%";
-  const string timbl_long_opts = ",Beam:,clones:,Diversify,occurrences:,sloppy::,silly::,Threshold:,Treeorder:,matrixin:,matrixout:";
+  const string timbl_long_opts = ",Beam:,clones:,Diversify,occurrences:,sloppy::,silly::,Threshold:,Treeorder:,matrixin:,matrixout:,version";
   const string timbl_serv_short_opts = "C:d:G::k:l:L:p:Qv:x";
   const string timbl_indirect_opts = "d:e:G:k:L:m:o:p:QR:t:v:w:x%";
 
