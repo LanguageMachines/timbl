@@ -271,7 +271,8 @@ class hardExit : public exception {};
 
 void Preset_Values( TiCC::CL_Options& opts ){
   string value;
-  if ( opts.is_present( 'h' ) ){
+  if ( opts.is_present( 'h' )
+       || opts.is_present( "help" ) ){
     usage_full();
     throw( softExit() );
   }
