@@ -1,3 +1,12 @@
+6.4.8 2016-07-11
+[Ko van der Sloot]
+Maintance release:
+- code refactoring and improvement
+- relying more on ticcutils
+- fixed exit codes
+- accept long options: --version and --help
+- fix out-of-range problem in Sparse Format
+
 6.4.7 2016-01-14
 [Ko van der Sloot][Maarten van Gompel]
   * repository moved to GitHub
