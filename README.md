@@ -38,7 +38,7 @@ distributions like Debian, Ubuntu, RedHat .
 Comments and bug-reports are welcome at our issue tracker at
 https://github.com/LanguageMachines/timbl/issues or by mailing
 lamasoftware (at) science.ru.nl.
-Updates and more info may be found on https://languagemachines.github.io/timbl .
+Documentation and more info may be found on https://languagemachines.github.io/timbl .
 
 TiMBL is distributed under the GNU Public Licence v3 (see the file COPYING).
 
