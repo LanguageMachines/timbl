@@ -58,7 +58,6 @@ Compilers:
 Contents of this distribution:
 - Sources
 - Licensing information ( COPYING )
-- Installation instructions ( INSTALL )
 - Build system based on GNU Autotools
 - Example data files ( in the demos directory )
 - Documentation ( in the docs directory )
@@ -82,4 +81,3 @@ To compile and install manually from source instead, provided you have all the d
     $ make
     $ make install
 
-(See the ``INSTALL`` file for more details)
