@@ -30,8 +30,8 @@ in classification than a standard k-nearest neighbor algorithm would be.
 -----------------------------------------------------------------------
 
 This is a major extension to the sixth main release of TiMBL.
-Most significant change: The main program is now called 'timbl' and not
-'Timbl' anymore. Be warned!
+Most significant change: **The main program is now called 'timbl' and not
+'Timbl' anymore. Be warned!**
 This change is part of our effort to get our MBL software into software
 distributions like Debian, Ubuntu, RedHat .
 
