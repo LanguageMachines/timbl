@@ -675,7 +675,7 @@ int main(int argc, char *argv[]){
     // Start.
     //
     cerr << "TiMBL " << TimblAPI::VersionInfo()
-	 << " (c) CLST/ILK/CLIPS 1998 - 2016.\n"
+	 << " (c) CLST/ILK/CLIPS 1998 - 2017.\n"
 	 << "Tilburg Memory Based Learner\n"
 	 << "Centre for Language and Speech Technology, Radboud University\n"
 	 << "Induction of Linguistic Knowledge Research Group, Tilburg University\n"
