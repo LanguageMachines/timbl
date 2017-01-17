@@ -48,7 +48,7 @@ namespace Common {
       nc=is.peek();
       if ( !isspace(nc) )
 	return nc;
-      nc = is.get();
+      is.get();
     }
     return -1;
   }
@@ -59,7 +59,7 @@ namespace Common {
       nc=is.peek();
       if ( !isspace(nc) )
 	return;
-      nc = is.get();
+      is.get();
     }
   }
 
