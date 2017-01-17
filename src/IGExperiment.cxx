@@ -435,13 +435,13 @@ namespace Timbl {
 	  ofstream wf( tmp );
 	  if ( !wf ){
 	    Error( "can't write default weightfile " + tmp );
-	    result = false;
 	  }
-	  else if ( !writeWeights( wf ) )
-	    result = false;
-	  else if ( !Verbosity(SILENT) )
-	    Info( "Saving Weights in " + tmp );
-	  result = true;
+	  else if ( writeWeights( wf ) ){
+	    if ( !Verbosity(SILENT) ){
+	      Info( "Saving Weights in " + tmp );
+	    }
+	    result = true;
+	  }
 	}
       }
     }

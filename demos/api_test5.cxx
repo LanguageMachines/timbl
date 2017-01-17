@@ -42,22 +42,30 @@ int main(){
     if ( neighbours1 ){
       cout << "Classify OK on " << line << endl;
       cout << neighbours1;
-    } else
+    }
+    else {
       cout << "Classify failed on " << line << endl;
+      neighbours1 = new neighborSet();
+    }
     neighborSet neighbours2;
     line = "+,zw,A,rt,-,k,O,p,-,n,O,n,E";
     if ( My_Experiment->classifyNS( line, neighbours2 ) ){
       cout << "Classify OK on " << line << endl;
       cout << neighbours2;
-    } else
+    }
+    else {
       cout << "Classify failed on " << line << endl;
+    }
     line = "+,z,O,n,-,d,A,xs,-,=,A,rm,P";
     const neighborSet *neighbours3 = My_Experiment->classifyNS( line );
     if ( neighbours3 ){
       cout << "Classify OK on " << line << endl;
       cout << neighbours3;
-    } else
+    }
+    else {
       cout << "Classify failed on " << line << endl;
+      neighbours3 = new neighborSet();
+    }
     neighborSet uit2;
     {
       neighborSet uit;

@@ -823,10 +823,11 @@ int main(int argc, char *argv[]){
 	  Run->WriteMatrices( MatrixOutFile );
 	}
       }
-      delete Run;
       if ( !do_test || !Run->isValid() ){
+	delete Run;
 	return EXIT_FAILURE;
       }
+      delete Run;
     }
     return EXIT_SUCCESS;
   }
