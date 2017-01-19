@@ -887,8 +887,7 @@ namespace Timbl {
 	    (float)Estimate();
 	  time_t EstimatedTime = (long)Estimated + start;
 	  string time_string = ctime(&EstimatedTime);
-	  //	  time_string.pop_back(); // the newline from ctime
-	  time_string.erase(time_string.end()-1 ); // the newline from ctime
+	  time_string.pop_back(); // the newline from ctime
 	  os << ", " << Estimate() << ": " << time_string;
 	}
       }
@@ -939,8 +938,7 @@ namespace Timbl {
 	    ( (float)Estimate() - IB2_offset() );
 	  time_t EstimatedTime = (long)Estimated + start;
 	  string time_string = ctime(&EstimatedTime);
-	  //	  time_string.pop_back(); // the newline from ctime
-	  time_string.erase(time_string.end()-1 ); // the newline from ctime
+	  time_string.pop_back(); // the newline from ctime
 	  os << "\t, " << Estimate() << ": " << time_string;
 	}
       }
