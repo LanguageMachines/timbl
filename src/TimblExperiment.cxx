@@ -856,14 +856,10 @@ namespace Timbl {
 
   void TimblExperiment::show_progress( ostream& os,
 				       time_t start, unsigned int line ){
-    struct tm *curtime;
-    time_t Time;
-    time_t SecsUsed;
-    time_t EstimatedTime;
-    double Estimated;
     int local_progress = Progress();
     if ( ( (line % local_progress ) == 0) || ( line <= 10 ) ||
 	 ( line == 100 || line == 1000 || line == 10000 ) ){
+      time_t Time;
       time(&Time);
       if ( line == 1000 ){
 	// check if we are slow, if so, change progress value
@@ -876,29 +872,23 @@ namespace Timbl {
 	  // quit slow !
 	  Progress( 10000 );
       }
-      curtime = localtime(&Time);
       if ( exp_name != "" )
 	os  << "-" << exp_name << "-";
       os << "Tested: ";
       os.width(6);
       os.setf(ios::right, ios::adjustfield);
-      char time_string[26];
-      strcpy( time_string, asctime(curtime));
-      time_string[24] = '\0';
-      os << line << " @ " << time_string;
-
-      // Estime time until Estimate.
+      os << line << " @ " << TiCC::Timer::now();
+      // Estimate time until Estimate.
       //
-      if ( Estimate() > 0 &&  (unsigned int)Estimate() < line ) {
-	SecsUsed = Time - start;
+      if ( Estimate() > 0 &&  (unsigned int)Estimate() > line ) {
+	time_t SecsUsed = Time - start;
 	if ( SecsUsed > 0 ) {
-	  Estimated = (SecsUsed / (float)line) *
+	  double Estimated = (SecsUsed / (float)line) *
 	    (float)Estimate();
-	  EstimatedTime = (long)Estimated + start;
-	  os << ", ";
-	  strcpy(time_string, ctime(&EstimatedTime));
-	  time_string[24] = '\0';
-	  os << Estimate() << ": " << time_string;
+	  time_t EstimatedTime = (long)Estimated + start;
+	  string time_string = ctime(&EstimatedTime);
+	  time_string.pop_back(); // the newline from ctime
+	  os << ", " << Estimate() << ": " << time_string;
 	}
       }
       os << endl;
@@ -908,17 +898,12 @@ namespace Timbl {
   bool IB2_Experiment::show_learn_progress( ostream& os,
 					    time_t start,
 					    size_t added ){
-    char time_string[26];
-    struct tm *curtime;
-    time_t Time;
-    time_t SecsUsed;
-    time_t EstimatedTime;
-    double Estimated;
     int local_progress = Progress();
     unsigned int lines = stats.dataLines();
     unsigned int line = lines - IB2_offset() ;
     if ( ( (line % local_progress ) == 0) || ( line <= 10 ) ||
 	 ( line == 100 || line == 1000 || line == 10000 ) ){
+      time_t Time;
       time(&Time);
       if ( line == 100 ){
 	// check if we are slow, if so, change progress value
@@ -937,28 +922,24 @@ namespace Timbl {
 	  // quit slow !
 	  Progress( 10000 );
       }
-      curtime = localtime(&Time);
       if ( exp_name != "" )
 	os  << "-" << exp_name << "-";
       os << "Learning:  ";
       os.width(6);
       os.setf(ios::right, ios::adjustfield);
-      strcpy( time_string, asctime(curtime));
-      time_string[24] = '\0';
-      os << lines << " @ " << time_string;
+      os << lines << " @ " << TiCC::Timer::now();
       os << "\t added:" << added;
       // Estime time until Estimate.
       //
-      if ( Estimate() > 0 && (unsigned int)Estimate() < lines ) {
-	SecsUsed = Time - start;
+      if ( Estimate() > 0 && (unsigned int)Estimate() > lines ) {
+	time_t SecsUsed = Time - start;
 	if ( SecsUsed > 0 ) {
-	  Estimated = (SecsUsed / (float)line) *
+	  double Estimated = (SecsUsed / (float)line) *
 	    ( (float)Estimate() - IB2_offset() );
-	  EstimatedTime = (long)Estimated + start;
-	  os << "\t, ";
-	  strcpy(time_string, ctime(&EstimatedTime));
-	  time_string[24] = '\0';
-	  os << Estimate() << ": " << time_string;
+	  time_t EstimatedTime = (long)Estimated + start;
+	  string time_string = ctime(&EstimatedTime);
+	  time_string.pop_back(); // the newline from ctime
+	  os << "\t, " << Estimate() << ": " << time_string;
 	}
       }
       os << endl;
@@ -1814,11 +1795,10 @@ namespace Timbl {
 
   bool threadBlock::readLines( istream& is  ){
     bool result = true;
-    bool goon = true;
     for ( size_t i=0; i < size; ++i ){
       exps[i].Buffer = "";
       int cnt;
-      goon = exps[0].exp->nextLine( is, exps[i].Buffer, cnt );
+      bool goon = exps[0].exp->nextLine( is, exps[i].Buffer, cnt );
       exps[i].lineNo += cnt;
       if ( !goon && i == 0 )
 	result = false;
@@ -2420,9 +2400,8 @@ namespace Timbl {
 	Info( "Phase 2: Building index on Datafile: " + file_name );
 	time_stamp( "Start:     ", 0 );
       }
-      bool found;
       bool go_on = true;
-      while( go_on ){
+      while ( go_on ){
 	// The next Instance to store.
 	//	cerr << "line at pos " << cur_pos << " : " << Buffer << endl;
 	chopped_to_instance( TrainWords );
@@ -2439,7 +2418,7 @@ namespace Timbl {
 	}
 	if ((stats.dataLines() % Progress() ) == 0)
 	  time_stamp( "Indexing:  ", stats.dataLines() );
-	found = false;
+	bool found = false;
 	while ( !found &&
 		( cur_pos = datafile.tellg(),
 		  nextLine( datafile, Buffer ) ) ){
@@ -2482,7 +2461,6 @@ namespace Timbl {
 	Info( "Phase 2: Building multi index on Datafile: " + file_name );
 	time_stamp( "Start:     ", 0 );
       }
-      bool found;
       bool go_on = true;
       while( go_on ){
 	// The next Instance to store.
@@ -2499,9 +2477,10 @@ namespace Timbl {
 	  mi[fv1].insert( cur_pos );
 	  fmIndex[fv0] = mi;
 	}
-	if ((stats.dataLines() % Progress() ) == 0)
+	if ( (stats.dataLines() % Progress() ) == 0 ){
 	  time_stamp( "Indexing:  ", stats.dataLines() );
-	found = false;
+	}
+	bool found = false;
 	while ( !found &&
 		( cur_pos = datafile.tellg(),
 		  nextLine( datafile, Buffer ) ) ){
