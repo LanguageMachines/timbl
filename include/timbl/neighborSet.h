@@ -66,7 +66,7 @@ namespace Timbl{
 
   class expDecay: public decayStruct {
   public:
-    expDecay( double alp ): decayStruct(alp,1.0){};
+    explicit expDecay( double alp ): decayStruct(alp,1.0){};
     expDecay( double alp, double bet ): decayStruct(alp,bet){};
     std::ostream& put( std::ostream& ) const;
     DecayType type() const { return ExpDecay;};

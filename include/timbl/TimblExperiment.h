@@ -337,8 +337,7 @@ namespace Timbl {
   class CV_Experiment: public IB1_Experiment {
   public:
   CV_Experiment( int N = DEFAULT_MAX_FEATS, const std::string& s = "" ):
-    IB1_Experiment( N, s )
-      { };
+    IB1_Experiment( N, s ), CV_fileW(Unknown_w) { };
     bool Learn( const std::string& = "", bool = true );
     bool Prepare( const std::string& = "", bool = true, bool = false );
     bool Test( const std::string&,

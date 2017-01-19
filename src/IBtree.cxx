@@ -1726,8 +1726,9 @@ namespace Timbl {
 	bool dummy;
 	TV = TopTarget( dummy );
       }
-      else
+      else {
 	level = pos;
+      }
     }
     return subt;
   }

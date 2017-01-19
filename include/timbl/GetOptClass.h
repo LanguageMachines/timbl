@@ -36,7 +36,7 @@ namespace Timbl {
 
   class GetOptClass: public MsgClass {
   public:
-    GetOptClass( const TiCC::CL_Options&  );
+    explicit GetOptClass( const TiCC::CL_Options&  );
     virtual ~GetOptClass();
     GetOptClass *Clone( std::ostream * = 0 ) const;
     bool parse_options( const TiCC::CL_Options&, const int=0 );

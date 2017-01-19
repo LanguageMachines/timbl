@@ -95,7 +95,12 @@ namespace Timbl{
 
   TesterClass::TesterClass( const vector<Feature*>& feat,
 			    const vector<size_t>& perm ):
-    _size(feat.size()), features(feat), permutation(perm) {
+    _size(feat.size()),
+    effSize(_size),
+    offSet(0),
+    FV(0),
+    features(feat),
+    permutation(perm) {
     permFeatures.resize(_size,0);
 #ifdef DBGTEST
     cerr << "created TesterClass(" << _size << ")" << endl;

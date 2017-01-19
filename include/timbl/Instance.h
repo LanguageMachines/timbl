@@ -54,10 +54,10 @@ namespace Timbl {
     friend std::ostream& operator<<( std::ostream&, const Vfield& );
     friend std::ostream& operator<<( std::ostream&, const Vfield * );
   public:
-    Vfield( const TargetValue *val, int freq, double w ):
-      value(val), frequency(freq), weight(w) {};
-    Vfield( const Vfield& in ):
-      value(in.value), frequency(in.frequency), weight(in.weight) {};
+  Vfield( const TargetValue *val, int freq, double w ):
+    value(val), frequency(freq), weight(w) {};
+  Vfield( const Vfield& in ):
+    value(in.value), frequency(in.frequency), weight(in.weight) {};
     ~Vfield(){};
     std::ostream& put( std::ostream& ) const;
     const TargetValue *Value() const { return value; };
@@ -177,7 +177,7 @@ namespace Timbl {
   public:
     typedef std::map< size_t, double > IDmaptype;
     typedef IDmaptype::const_iterator IDiterator;
-    SparseValueProbClass( size_t d ): dimension(d) {};
+    explicit SparseValueProbClass( size_t d ): dimension(d) {};
     void Assign( const size_t i, const double d ) { vc_map[i] = d; };
     void Clear() { vc_map.clear(); };
     IDiterator begin() const { return vc_map.begin(); };
@@ -191,7 +191,7 @@ namespace Timbl {
     friend class Feature;
     friend struct D_D;
   public:
-    FeatureValue( const std::string& );
+    explicit FeatureValue( const std::string& );
     FeatureValue( const std::string&, size_t );
     ~FeatureValue();
     void ReconstructDistribution( const ValueDistribution& vd ) {
@@ -212,7 +212,7 @@ namespace Timbl {
 
   class BaseFeatTargClass: public MsgClass {
   public:
-    BaseFeatTargClass( Hash::StringHash * );
+    explicit BaseFeatTargClass( Hash::StringHash * );
     virtual ~BaseFeatTargClass();
     size_t EffectiveValues() const;
     size_t TotalValues() const;
@@ -230,7 +230,7 @@ namespace Timbl {
 
   class Target: public BaseFeatTargClass {
   public:
-  Target( Hash::StringHash *T ): BaseFeatTargClass(T) {};
+    explicit Target( Hash::StringHash *T ): BaseFeatTargClass(T) {};
     TargetValue *add_value( const std::string&, int freq = 1 );
     TargetValue *add_value( size_t, int freq = 1 );
     TargetValue *Lookup( const std::string& ) const;
@@ -245,7 +245,7 @@ namespace Timbl {
   class Feature: public BaseFeatTargClass {
     friend class MBLClass;
   public:
-    Feature( Hash::StringHash *T );
+    explicit Feature( Hash::StringHash *T );
     ~Feature();
     bool Ignore() const { return ignore; };
     void Ignore( const bool val ){ ignore = val; };
@@ -333,7 +333,7 @@ namespace Timbl {
     friend std::ostream& operator<<(std::ostream&, const Instance * );
   public:
     Instance();
-  Instance( size_t s ): TV(NULL), sample_weight(0.0), occ(1)
+    explicit Instance( size_t s ): TV(NULL), sample_weight(0.0), occ(1)
       { Init( s ); };
     ~Instance();
     void Init( size_t );
@@ -344,7 +344,8 @@ namespace Timbl {
     void Occurrences( const int o ) { occ = o; };
     size_t size() const { return FV.size(); };
     std::vector<FeatureValue *> FV;
-    void permute( const std::vector<size_t> );
+    void permute( const std::vector<size_t>& ); // Obsolete
+    //         NO implementation provided, so the linker will punish us!
     TargetValue *TV;
   private:
     Instance( const Instance& ); // inhibit copies

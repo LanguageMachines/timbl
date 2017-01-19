@@ -73,6 +73,8 @@ namespace Timbl {
     std::ostream *sock_os;
     int getOcc() const { return doOcc; };
   protected:
+    explicit MBLClass( const std::string& = "" );
+    MBLClass& operator=( const MBLClass& );
     enum PhaseValue { TrainWords, LearnWords, TestWords, TrainLearnWords };
     friend std::ostream& operator<< ( std::ostream&, const PhaseValue& );
     enum IB_Stat { Invalid, Normal, Pruned };
@@ -88,10 +90,8 @@ namespace Timbl {
     bool ShowSettings( std::ostream& ) const;
     void writePermutation( std::ostream& ) const;
     void LearningInfo( std::ostream& );
-    MBLClass( const std::string& = "" );
     virtual ~MBLClass();
     void InitClass( const size_t );
-    MBLClass& operator=( const MBLClass& );
     void Initialize( size_t = 0 );
     bool PutInstanceBase( std::ostream& ) const;
     VerbosityFlags get_verbosity() const { return verbosity; };

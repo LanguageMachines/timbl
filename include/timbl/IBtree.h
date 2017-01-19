@@ -71,7 +71,7 @@ namespace Timbl {
     IBtree *next;
 
     IBtree();
-    IBtree( FeatureValue * );
+    explicit IBtree( FeatureValue * );
     ~IBtree();
     IBtree *Reduce( const TargetValue *, unsigned long&, long );
 #ifdef IBSTATS

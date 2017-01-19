@@ -38,7 +38,7 @@ namespace Timbl {
     size_t size;
     std::vector<std::vector<size_t> > mat;
   public:
-    ConfusionMatrix( size_t );
+    explicit ConfusionMatrix( size_t );
     virtual ~ConfusionMatrix();
     void Increment( const TargetValue*, const TargetValue* );
     void Print( std::ostream&, const Target * ) const;

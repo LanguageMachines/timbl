@@ -47,7 +47,10 @@ namespace Timbl{
 
   class valueDiffTestFunction: public metricTestFunction {
   public:
-  valueDiffTestFunction( int t ): metricTestFunction(), threshold( t ){};
+    explicit valueDiffTestFunction( int t ):
+    metricTestFunction(),
+      threshold( t )
+      {};
     double test( FeatureValue *,
 		 FeatureValue *,
 		 Feature * ) const;

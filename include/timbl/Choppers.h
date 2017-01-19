@@ -116,7 +116,7 @@ namespace Timbl{
 
   class Compact_Chopper : public virtual Chopper {
   public:
-  Compact_Chopper( int L ): fLen(L){};
+    explicit Compact_Chopper( int L ): fLen(L){};
     bool chop( const std::string&, size_t );
     std::string getString() const;
   private:
@@ -126,14 +126,14 @@ namespace Timbl{
 
   class Compact_ExChopper : public Compact_Chopper, public ExChopper {
   public:
-  Compact_ExChopper( int L ): Compact_Chopper( L ){};
+    explicit Compact_ExChopper( int L ): Compact_Chopper( L ){};
   private:
     Compact_ExChopper();
   };
 
   class Compact_OccChopper : public Compact_Chopper, public OccChopper {
   public:
-  Compact_OccChopper( int L ): Compact_Chopper( L ){};
+    explicit Compact_OccChopper( int L ): Compact_Chopper( L ){};
   private:
     Compact_OccChopper();
   };

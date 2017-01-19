@@ -39,7 +39,7 @@ namespace Timbl {
   class OptionClass {
     friend class OptionTableClass;
   public:
-    OptionClass( const std::string& n ): Name( n ) {};
+    explicit OptionClass( const std::string& n ): Name( n ) {};
     virtual ~OptionClass() {};
     virtual bool set_option( const std::string& ) = 0;
     virtual std::ostream& show_opt( std::ostream & ) const = 0;

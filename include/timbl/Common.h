@@ -43,9 +43,8 @@ namespace Common {
   std::string VersionInfo( bool ); // obsolete
 
   inline int look_ahead( std::istream &is ){
-    int nc;
     while( is ){
-      nc=is.peek();
+      int nc=is.peek();
       if ( !isspace(nc) )
 	return nc;
       is.get();
@@ -54,9 +53,8 @@ namespace Common {
   }
 
   inline void skip_spaces( std::istream &is ){
-    int nc;
     while( is ){
-      nc=is.peek();
+      int nc=is.peek();
       if ( !isspace(nc) )
 	return;
       is.get();

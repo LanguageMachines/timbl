@@ -401,8 +401,9 @@ namespace Timbl {
       if ( sock_os && sock_os->good() ){
 	return true;
       }
-      else
+      else {
 	FatalError( "connecting streams to socket failed" );
+      }
     }
     return false;
   }

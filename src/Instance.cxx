@@ -245,7 +245,8 @@ namespace Timbl {
 	it->second->SetWeight( it->second->Weight() + factor );
       }
       else {
-	distribution[id] = new Vfield( (TargetValue*)val, 1, factor );
+	distribution[id] = new Vfield( reinterpret_cast<TargetValue*>(val),
+				       1, factor );
       }
     }
     total_items += targ->ValuesArray.size();
@@ -1237,7 +1238,7 @@ namespace Timbl {
     if ( index ) {
       IVCmaptype::const_iterator it = ValuesMap.find( index );
       if ( it != ValuesMap.end() )
-	result = (FeatureValue *)(it->second);
+	result =  reinterpret_cast<FeatureValue*>(it->second);
     }
     return result;
   }
@@ -1265,7 +1266,7 @@ namespace Timbl {
     else {
       it->second->IncValFreq( freq );
     }
-    FeatureValue *result = (FeatureValue *)ValuesMap[index];
+    FeatureValue *result =  reinterpret_cast<FeatureValue*>(ValuesMap[index]);
     if ( tv )
       result->TargetDist.IncFreq(tv, freq );
     return result;
@@ -1332,9 +1333,10 @@ namespace Timbl {
 
   BaseFeatTargClass::BaseFeatTargClass( const BaseFeatTargClass& in ):
     MsgClass( in ),
-    TokenTree( in.TokenTree ){
-    ValuesArray = in.ValuesArray;
-    ValuesMap = in.ValuesMap;
+    ValuesArray( in.ValuesArray ),
+    ValuesMap( in.ValuesMap ),
+    TokenTree( in.TokenTree )
+  {
     is_copy = true;
   }
 
@@ -1354,14 +1356,14 @@ namespace Timbl {
     size_t index = TokenTree->Lookup( str );
     if ( index ) {
       IVCmaptype::const_iterator it = ValuesMap.find( index );
-      result = (TargetValue *)it->second;
+      result = reinterpret_cast<TargetValue*>(it->second);
     }
     return result;
   }
 
   TargetValue *Target::ReverseLookup( size_t index ) const {
     IVCmaptype::const_iterator it = ValuesMap.find( index );
-    return dynamic_cast<TargetValue *>(it->second);
+    return reinterpret_cast<TargetValue *>(it->second);
   }
 
   Feature::~Feature(){
@@ -1444,7 +1446,7 @@ namespace Timbl {
     double sum = 0.0;
     vector<double> store( ValuesArray.size() );
     for ( unsigned int i=0; i < ValuesArray.size(); ++i ){
-      FeatureValue *FV = (FeatureValue *)ValuesArray[i];
+      FeatureValue *FV =  reinterpret_cast<FeatureValue*>(ValuesArray[i]);
       double val = TiCC::stringTo<double>( FV->Name() );
       store[i] = val;
       sum += val;
@@ -1502,9 +1504,10 @@ namespace Timbl {
 		 FV_j->ValFreq() >= matrix_clip_freq &&
 		 ( Prestored_metric != metric->type() ||
 		   fabs(metric_matrix->Extract(FV_i,FV_j)) < Epsilon ) ){
-	      double dist = metric->distance( (FeatureValue*)FV_i,
-					      (FeatureValue*)FV_j,
-					      limit );
+	      double dist =
+		metric->distance( reinterpret_cast<FeatureValue*>(FV_i),
+				  reinterpret_cast<FeatureValue*>(FV_j),
+				  limit );
 	      metric_matrix->Assign( FV_i, FV_j, dist );
 	    }
 	  }
@@ -1740,7 +1743,7 @@ namespace Timbl {
     else {
       it->second->IncValFreq( freq );
     }
-    return (TargetValue *)ValuesMap[index];
+    return reinterpret_cast<TargetValue*>(ValuesMap[index]);
   }
 
   TargetValue *Target::MajorityClass() const {
@@ -1754,7 +1757,7 @@ namespace Timbl {
       }
       ++it;
     }
-    return (TargetValue*)result;
+    return reinterpret_cast<TargetValue*>(result);
   }
 
   bool Target::increment_value( TargetValue *TV ){
@@ -1815,16 +1818,6 @@ namespace Timbl {
       os << I.FV[i] << ", ";
     os << I.TV << " " << I.sample_weight;
     return os;
-  }
-
-  void Instance::permute( const std::vector<size_t> permutation ){
-    std::vector<FeatureValue *> vals( FV.size(), 0 );
-    for ( size_t i=0; i < FV.size(); ++i ){
-      vals[i] = FV[permutation[i]];
-    }
-    for ( size_t i=0; i < FV.size(); ++i ){
-      FV[i] = vals[i];
-    }
   }
 
 }
