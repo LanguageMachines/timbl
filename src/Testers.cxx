@@ -237,11 +237,10 @@ namespace Timbl{
   size_t DotProductTester::test( vector<FeatureValue *>& G,
 				 size_t CurPos,
 				 double ) {
-    double result;
     size_t TrueF;
     size_t i;
     for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
-      result = innerProduct( (*FV)[TrueF], G[i] );
+      double result = innerProduct( (*FV)[TrueF], G[i] );
       result *= permFeatures[TrueF]->Weight();
       distances[i+1] = distances[i] + result;
 #ifdef DBGTEST

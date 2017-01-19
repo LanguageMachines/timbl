@@ -457,7 +457,7 @@ namespace Timbl {
 	while( eit != line.end() && isdigit( *eit ) ) ++eit;
 	tmp = string( it, eit );
 	m = TiCC::stringTo<int>(tmp);
-	if ( m <= 0 || m > metricsArray.size() ){
+	if ( m == 0 || m > metricsArray.size() ){
 	  Error( "illegal value in metric description: -m " + line );
 	  return false;
 	}

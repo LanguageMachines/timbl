@@ -172,15 +172,13 @@ namespace Timbl {
     }
 
     bool info_ok = true;
-    bool more = true;
     size_t depth = 0;
     int version = -1;
     Hashed = false;
     range_buf = "";
     string buffer;
     vector<string> splits;
-    more = ( look_ahead(is) == '#' &&
-	     getline( is, buffer ) );
+    bool more = ( look_ahead(is) == '#' && getline( is, buffer ) );
     while ( info_ok && more ){
       size_t num = TiCC::split( buffer, splits );
       if ( num > 2 ){
@@ -223,7 +221,6 @@ namespace Timbl {
 	    bool excl = false;
 	    effective_feats = 0;
 	    size_t i = 0;
-	    size_t index;
 	    string::size_type pos = 0; // skip <
 	    while ( info_ok && pos != string::npos &&
 		    i < MaxFeatures ){
@@ -231,7 +228,7 @@ namespace Timbl {
 	      if ( !excl )
 		effective_feats++;
 	      string tmp = string_tok( perms, pos, ", !" );
-	      index = TiCC::stringTo<size_t>( tmp );
+	      size_t index = TiCC::stringTo<size_t>( tmp );
 	      permutation.push_back( --index );
 	      if ( index >= MaxFeatures ){
 		Error ( "illegal value " + TiCC::toString<size_t>(index) +
@@ -331,12 +328,12 @@ namespace Timbl {
       Error( "missing Ranges line in Instance-Base file" );
     else {
       is >> ws;
-      int k;
       if ( look_ahead(is) == '.' ){
 	result = true;
       }
       else {
 	do {
+	  int k;
 	  is >> k;
 	  if ( UserOptions[k] != Numeric ){
 	    Error( "Found range info for feature " + TiCC::toString<int>(k) +

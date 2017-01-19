@@ -37,6 +37,7 @@
 #include <cassert>
 
 #include "ticcutils/StringOps.h"
+#include "ticcutils/Timer.h"
 #include "ticcutils/TreeHash.h"
 
 #include "timbl/MsgClass.h"
@@ -476,17 +477,6 @@ namespace Timbl {
     os << permutation[num_of_features-1]+1 << " >" << endl;
   }
 
-  inline char *CurTime(){
-    time_t lTime;
-    struct tm *curtime;
-    char *time_string;
-    time(&lTime);
-    curtime = localtime(&lTime);
-    time_string = asctime(curtime);
-    time_string[24] = '\0'; // defeat the newline!
-    return time_string;
-  }
-
   void MBLClass::time_stamp( const char *line, int number ) const {
     if ( !Verbosity(SILENT) ){
       ostringstream ostr;
@@ -498,7 +488,7 @@ namespace Timbl {
       }
       else
 	ostr << "        ";
-      ostr << CurTime();
+      ostr << TiCC::Timer::now();
       Info( ostr.str() );
     }
   }
@@ -816,7 +806,7 @@ namespace Timbl {
 	}
       }
     }
-    while ( result && !is.eof() & !is.bad() );
+    while ( result && !is.eof() && !is.bad() );
     if ( index < num_of_features+1 ){
       Error( "Not enough features matrices in this file " );
       result = false;
@@ -1265,9 +1255,9 @@ namespace Timbl {
 
   bool MBLClass::readWeights( istream& is, WeightType wanted ){
     set<WeightType> ret_weights;
-    bool result = false;
-    bool old_style = true;
     if ( !ExpInvalid() ){
+      bool old_style = true;
+      bool result = false;
       string Buffer;
       while( getline( is, Buffer ) ) {
 	// A comment starts with '#'
@@ -1345,12 +1335,12 @@ namespace Timbl {
     if ( always || realy_first ){
       // if it's the first time (DBEntropy == 0 ) or
       // if always, we have to (re)calculate everything
-      double Entropy = 0.0, Ratio;
+      double Entropy = 0.0;
       // first get the Database Entropy
       size_t totval = Targets->TotalValues();
       VCarrtype::const_iterator it = Targets->ValuesArray.begin();
       while ( it != Targets->ValuesArray.end() ){
-	Ratio = (*it)->ValFreq() /
+	double Ratio = (*it)->ValFreq() /
 	  (double)totval;
 	if ( Ratio > 0 )
 	  Entropy += Ratio * Log2(Ratio);
@@ -1361,7 +1351,7 @@ namespace Timbl {
     }
     // Loop over the Features, see if the numerics are non-singular
     // and do the statistics for those features where the metric is changed.
-    FeatVal_Stat *feat_status = new FeatVal_Stat[num_of_features];
+    vector<FeatVal_Stat> feat_status(num_of_features);
     bool nothing_changed = true;
     for ( size_t g = 0; g < num_of_features; ++g ) {
       feat_status[g] = Unknown;
@@ -1414,7 +1404,6 @@ namespace Timbl {
       // or Similarity Metrics!
       bool first = true;
       ostringstream ostr1;
-      ostringstream ostr2;
       for ( size_t ff = 0; ff < num_of_features; ++ff ){
 	if ( feat_status[ff] == NotNumeric ){
 	  if ( first ){
@@ -1510,7 +1499,6 @@ namespace Timbl {
 	}
       }
     }
-    delete [] feat_status;
   }
 
   bool MBLClass::writeNamesFile( ostream& os ) const {

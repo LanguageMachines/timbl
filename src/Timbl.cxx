@@ -39,6 +39,7 @@
 
 #include "config.h"
 #include "ticcutils/CommandLine.h"
+#include "ticcutils/Timer.h"
 #include "timbl/TimblAPI.h"
 
 using namespace std;
@@ -349,7 +350,6 @@ void Preset_Values( TiCC::CL_Options& opts ){
 }
 
 void Adjust_Default_Values( TiCC::CL_Options& opts ){
-  string value;
   if ( !opts.is_present( 'm' ) ){
     opts.insert( 'm', "O", false );
     // Default Metric = Overlap
@@ -670,8 +670,6 @@ bool checkOutputFile( const string& name ){
 
 int main(int argc, char *argv[]){
   try {
-    struct tm *curtime;
-    time_t Time;
     // Start.
     //
     cerr << "TiMBL " << TimblAPI::VersionInfo()
@@ -680,9 +678,7 @@ int main(int argc, char *argv[]){
 	 << "Centre for Language and Speech Technology, Radboud University\n"
 	 << "Induction of Linguistic Knowledge Research Group, Tilburg University\n"
 	 << "CLiPS Computational Linguistics Group, University of Antwerp" << endl;
-    time(&Time);
-    curtime = localtime(&Time);
-    cerr << asctime(curtime) << endl;
+    cerr << TiCC::Timer::now() << endl << endl;
     if ( argc <= 1 ){
       usage();
       return 1;

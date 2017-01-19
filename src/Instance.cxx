@@ -204,7 +204,6 @@ namespace Timbl {
   }
 
   double ValueDistribution::Entropy() const {
-    double Prob = 0.0;
     double entropy = 0.0;
     size_t TotalVals = total_items;
     if ( TotalVals > 0 ){
@@ -213,7 +212,7 @@ namespace Timbl {
       while ( it != distribution.end() ){
 	size_t Freq = it->second->Freq();
 	if ( Freq > 0 ){
-	  Prob = Freq / (double)TotalVals;
+	  double Prob = Freq / (double)TotalVals;
 	  entropy += Prob * Log2(Prob);
 	}
 	++it;
@@ -255,7 +254,7 @@ namespace Timbl {
 
   void WValueDistribution::Normalize_2( ) {
     for ( const auto& d : distribution ){
-      d.second->SetWeight( log( d.second->Weight() + 1 ));
+      d.second->SetWeight( log1p( d.second->Weight() ) );
     }
     Normalize();
   }
@@ -684,7 +683,7 @@ namespace Timbl {
 
   struct D_D {
     D_D(): dist(0), value(0.0) {};
-    D_D( FeatureValue *fv ){
+    explicit D_D( FeatureValue *fv ): value(0.0) {
       if ( !TiCC::stringTo<double>( fv->Name(), value ) )
 	throw( logic_error("called DD with an non-numeric value" ) );
       dist = &fv->TargetDist;
@@ -817,9 +816,9 @@ namespace Timbl {
     while ( it != ValuesArray.end() ){
       FeatureValue *fv = (FeatureValue*)*it;
       // Entropy for this FV pair.
-      double FVEntropy = 0.0;
       size_t Freq = fv->ValFreq();
       if ( Freq > 0 ){
+	double FVEntropy = 0.0;
 	ValueDistribution::dist_iterator It = fv->TargetDist.begin();
 	while ( It != fv->TargetDist.end() ){
 	  Prob = It->second->Freq() / (double)Freq;
@@ -863,7 +862,6 @@ namespace Timbl {
 				     Target *Targets ){
     chi_square = 0.0;
     long int n_dot_dot = 0;
-    double tmp;
     size_t Size = Targets->ValuesArray.size();
     if ( !n_dot_j ) {
       n_dot_j = new long int[Size];
@@ -905,12 +903,12 @@ namespace Timbl {
 	size_t n = 0;
 	while ( It != fv->TargetDist.end() && n < Size ){
 	  while ( n < It->second->Index()-1 ){
-	    tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
+	    double tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
 	      (double)n_dot_dot;
 	    chi_square += tmp;
 	  }
 	  if ( n == It->second->Index()-1 ){
-	    tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
+	    double tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
 	      (double)n_dot_dot;
 	    if ( fabs(tmp) > Epsilon){
 	      chi_square += ( (tmp - It->second->Freq()) *
@@ -922,7 +920,7 @@ namespace Timbl {
 	    break;
 	}
 	while ( n < Size ){
-	  tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
+	  double tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
 	    (double)n_dot_dot;
 	  chi_square += tmp;
 	}
@@ -933,7 +931,6 @@ namespace Timbl {
   void Feature::ChiSquareStatistics( Target *Targets ){
     chi_square = 0.0;
     long int n_dot_dot = 0;
-    double tmp;
     size_t Size = Targets->ValuesArray.size();
     size_t Num_Vals = ValuesArray.size();
     if ( !n_dot_j ) {
@@ -985,12 +982,12 @@ namespace Timbl {
 	  size_t id = It->second->Index()-1;
 	  long int fr = It->second->Freq();
 	  while ( n < id ){
-	    tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
+	    double tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
 	      (double)n_dot_dot;
 	    chi_square += tmp;
 	  }
 	  if ( n == id ){
-	    tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
+	    double tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
 	      (double)n_dot_dot;
 	    if ( fabs(tmp) > Epsilon ){
 	      chi_square += ( (tmp - fr ) * (tmp - fr ) ) / tmp;
@@ -1001,7 +998,7 @@ namespace Timbl {
 	    break;
 	}
 	while ( n < Size ){
-	  tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
+	  double tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
 	    (double)n_dot_dot;
 	  chi_square += tmp;
 	}
@@ -1013,9 +1010,9 @@ namespace Timbl {
 
   double Feature::fvDistance( FeatureValue *F, FeatureValue *G,
 			      size_t limit ) const {
-    bool dummy;
     double result = 0.0;
     if ( F != G ){
+      bool dummy;
       if ( metric->isStorable() && matrixPresent( dummy )&&
 	   F->ValFreq() >= matrix_clip_freq &&
 	   G->ValFreq() >= matrix_clip_freq ){
@@ -1054,10 +1051,7 @@ namespace Timbl {
     // otherwise 1. Special case when reading the TopDistribution.
     //
     ValueDistribution *result = 0;
-    TargetValue *target;
     string buf;
-    size_t freq;
-    double sw;
     char nextCh;
     is >> nextCh;   // skip {
     if ( nextCh != '{' ){
@@ -1066,13 +1060,16 @@ namespace Timbl {
     else {
       int next;
       do {
+	size_t freq;
 	is >> ws >> buf;
 	is >> freq;
+	TargetValue *target;
 	if ( do_fr ){
 	  target = Targ->add_value( buf, freq );
 	}
-	else
+	else {
 	  target = Targ->Lookup( buf );
+	}
 	if ( !target ){
 	  delete result;
 	  result = 0;
@@ -1080,8 +1077,9 @@ namespace Timbl {
 	}
 	next = look_ahead(is);
 	if ( next == ',' ){
-	  if ( !result )
+	  if ( !result ) {
 	    result = new ValueDistribution();
+	  }
 	  result->SetFreq( target, freq );
 	  is >> nextCh;
 	  next = look_ahead(is);
@@ -1094,6 +1092,7 @@ namespace Timbl {
 	else if ( isdigit(next) ){
 	  if ( !result )
 	    result = new WValueDistribution();
+	  double sw;
 	  is >> sw;
 	  result->SetFreq( target, freq, sw );
 	  next = look_ahead(is);
@@ -1123,10 +1122,6 @@ namespace Timbl {
     // if do_f we also adjust the value of Frequency of the Target, which is
     // otherwise 1. Special case when reading the TopDistribution.
     //
-    TargetValue *target;
-    size_t freq;
-    unsigned int index;
-    double sw;
     char nextCh;
     is >> nextCh;   // skip {
     if ( nextCh != '{' ){
@@ -1135,8 +1130,11 @@ namespace Timbl {
     else {
       int next;
       do {
+	unsigned int index;
+	size_t freq;
 	is >> index;
 	is >> freq;
+	TargetValue *target;
 	if ( do_fr ){
 	  target = Targ->add_value( index, freq );
 	}
@@ -1161,6 +1159,7 @@ namespace Timbl {
 	  result->SetFreq( target, freq );
 	}
 	else if ( isdigit(next) ){
+	  double sw;
 	  is >> sw;
 	  if ( !result )
 	    result = new WValueDistribution();
@@ -1398,12 +1397,11 @@ namespace Timbl {
 
   FeatVal_Stat Feature::prepare_numeric_stats(){
     double tmp;
-    size_t freq;
     bool first = true;
     VCarrtype::const_iterator it = ValuesArray.begin();
     while ( it != ValuesArray.end() ){
       FeatureValue *fv = (FeatureValue*)*it;
-      freq = fv->ValFreq();
+      size_t freq = fv->ValFreq();
       if ( freq > 0 ){
 	if ( !TiCC::stringTo<double>( fv->Name(), tmp ) ){
 	  Warning( "a Non Numeric value '" +
@@ -1476,7 +1474,7 @@ namespace Timbl {
   }
 
   bool Feature::setMetricType( const MetricType M ){
-    if ( !metric || ( metric && M != metric->type() ) ){
+    if ( !metric || M != metric->type() ){
       delete metric;
       metric = getMetricClass(M);
       return true;

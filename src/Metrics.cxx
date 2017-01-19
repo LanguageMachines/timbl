@@ -135,7 +135,6 @@ namespace Timbl{
 	string2_unigrams.insert(c);
       }
 
-      set<char>::const_iterator it = string2_unigrams.begin();
       for ( const auto& ug : string2_unigrams ){
 	if ( string1_unigrams.find( ug ) != string1_unigrams.end() )
 	  ++overlap;

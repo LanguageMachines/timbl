@@ -1,4 +1,28 @@
 /*
+  Copyright (c) 1998 - 2017
+  ILK   - Tilburg University
+  CLST  - Radboud University
+  CLiPS - University of Antwerp
+
+  This file is part of timbl
+
+  timbl is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  timbl is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+  For questions and suggestions, see:
+      https://github.com/LanguageMachines/timbl/issues
+  or send mail to:
+      lamasoftware (at ) science.ru.nl
 */
 #include <string>
 #include <vector>
@@ -320,7 +344,7 @@ namespace Timbl {
     os << doc << endl;
   }
 
-  string toString( const vector<FeatureValue*> vec ){
+  string toString( const vector<FeatureValue*>& vec ){
     string result;
     for ( auto const& fv : vec ){
       result += " " + fv->Name();
@@ -477,7 +501,7 @@ namespace Timbl {
 	result->TDistribution
 	  = ValueDistribution::read_distribution( is, Targ, false );
       }
-      catch ( const string what ){
+      catch ( const string& what ){
 	Warning( what );
 	Error( "problems reading a distribution from InstanceBase file" );
 	delete result;
@@ -546,7 +570,7 @@ namespace Timbl {
 	result->TDistribution
 	  = ValueDistribution::read_distribution_hashed( is, Targ, false );
       }
-      catch ( const string what ){
+      catch ( const string& what ){
 	Warning( what );
 	Error( "problems reading a hashed distribution from InstanceBase file" );
 	delete result;
@@ -745,7 +769,6 @@ namespace Timbl {
 				   Hash::StringHash *feats,
 				   int expected_version ){
     char delim;
-    int dum;
     NumOfTails = 0;
     DefAss = true;  // always for a restored tree
     DefaultsValid = true; // always for a restored tree
@@ -756,8 +779,9 @@ namespace Timbl {
       Error( "missing first `(` in Instance Base file" );
     }
     else {
-    // first we get the value of the TopTarget. It's in the file
+      // first we get the value of the TopTarget. It's in the file
       // for backward compability
+      int dum;
       is >> dum;
       delete TopDistribution;
       TopDistribution = 0;
@@ -1614,12 +1638,11 @@ namespace Timbl {
     // The Test function for the IG algorithm, returns a pointer to the
     // distribution of the last matching position in the Tree, it's position
     // in the Instance Base and the default TargetValue
-    const IBtree *pnt = InstBase;
     result = NULL;
     ValueDistribution *Dist = NULL;
     int pos = 0;
     leaf = false;
-    pnt = fast_search_node( Inst.FV[pos] );
+    const IBtree *pnt = fast_search_node( Inst.FV[pos] );
     while ( pnt ){
       result = pnt->TValue;
       if ( PersistentDistributions )

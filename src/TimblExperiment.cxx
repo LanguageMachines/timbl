@@ -400,7 +400,6 @@ namespace Timbl {
 	    else {
 	      TiCC::Timer prepT;
 	      prepT.start();
-	      bool found;
 	      bool go_on = true;
 	      if ( !Verbosity(SILENT) ){
 		Info( "Phase 1: Reading Datafile: " + FileName );
@@ -414,7 +413,7 @@ namespace Timbl {
 		  if (( stats.dataLines() % Progress() ) == 0)
 		    time_stamp( "Examining: ", stats.dataLines() );
 		}
-		found = false;
+		bool found = false;
 		while ( !found &&
 			nextLine( datafile, Buffer ) ){
 		  found = chopLine( Buffer );
@@ -585,7 +584,6 @@ namespace Timbl {
 	    Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
 	    time_stamp( "Start:     ", 0 );
 	  }
-	  string Buffer;
 	  // Open the file.
 	  //
 	  ifstream datafile( CurrentDataFile, ios::in);
@@ -858,7 +856,6 @@ namespace Timbl {
 
   void TimblExperiment::show_progress( ostream& os,
 				       time_t start, unsigned int line ){
-    char time_string[26];
     struct tm *curtime;
     time_t Time;
     time_t SecsUsed;
@@ -885,6 +882,7 @@ namespace Timbl {
       os << "Tested: ";
       os.width(6);
       os.setf(ios::right, ios::adjustfield);
+      char time_string[26];
       strcpy( time_string, asctime(curtime));
       time_string[24] = '\0';
       os << line << " @ " << time_string;
@@ -1431,7 +1429,6 @@ namespace Timbl {
   }
 
   bool TimblExperiment::checkLine( const string& line ){
-    size_t i;
     bool result = false;
     if ( !ExpInvalid() &&
 	 ConfirmOptions() ) {
@@ -1439,7 +1436,8 @@ namespace Timbl {
       InputFormatType IF = InputFormat();
       if ( IF == UnknownInputFormat )
 	IF = getInputFormat( line );
-      if ( (i = countFeatures( line, IF )) != NumOfFeatures() ){
+      size_t i = countFeatures( line, IF );
+      if ( i != NumOfFeatures() ){
 	if ( i > 0 )
 	  Warning( "mismatch between number of features in testline " +
 		   line + " and the Instancebase (" + TiCC::toString<size_t>(i)
