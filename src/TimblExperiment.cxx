@@ -1562,8 +1562,9 @@ namespace Timbl {
 	delete ResultDist;
 	ResultDist = ResultDist2;
       }
-      else
+      else {
 	delete ResultDist2;
+      }
     }
 
     exact = fabs(Distance) < Epsilon ;
