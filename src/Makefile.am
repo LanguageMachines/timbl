@@ -1,8 +1,5 @@
-# $Id$
-# $URL$
-
 AM_CPPFLAGS = -I@top_srcdir@/include
-AM_CXXFLAGS = -std=c++0x # -Weffc++
+AM_CXXFLAGS = -std=c++11 # -Weffc++
 
 bin_PROGRAMS = timbl
 
