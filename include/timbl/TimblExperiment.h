@@ -150,7 +150,6 @@ namespace Timbl {
     bool SetOptions( const TiCC::CL_Options&  );
     bool IndirectOptions( const TiCC::CL_Options&  );
     bool ConfirmOptions();
-    bool DefaultOptions();
     GetOptClass *getOptParams() const { return OptParams; };
     void setOptParams( GetOptClass *op ) { OptParams = op; };
     bool WriteArrays( const std::string& );
@@ -283,7 +282,6 @@ namespace Timbl {
 		    const bool init = true );
     bool Increment( const std::string& );
     bool Decrement( const std::string& );
-    //    bool Expand( const std::string& );
     bool Remove( const std::string& );
     AlgorithmType Algorithm() const { return IB1_a; };
     void InitInstanceBase();

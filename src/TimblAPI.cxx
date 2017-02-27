@@ -653,23 +653,6 @@ namespace Timbl {
     return Valid() && pimpl->showStatistics( os );
   }
 
-  bool TimblAPI::StartServer( const int , const int ){
-    return false;
-  }
-
-  bool TimblAPI::StartMultiServer( const string& ){
-    return false;
-  }
-
-  bool TimblAPI::SetThreads( int c ){
-    if ( Valid() ){
-      pimpl->Clones( c );
-      return true;
-    }
-    else
-      return false;
-  }
-
   string TimblAPI::VersionInfo( bool full ){
     // obsolete
     return Common::VersionInfo( full );

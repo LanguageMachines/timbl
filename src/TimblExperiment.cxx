@@ -2044,11 +2044,6 @@ namespace Timbl {
     return OptParams->definitive_options( this );
   }
 
-  bool TimblExperiment::DefaultOptions(){
-    OptParams->set_default_options();
-    return true;
-  }
-
   bool TimblExperiment::ShowOptions( ostream& os ){
     return ( ConfirmOptions() &&
 	     MBLClass::ShowOptions( os ) );
