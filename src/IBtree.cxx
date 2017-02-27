@@ -288,13 +288,6 @@ namespace Timbl {
     return result;
   }
 
-  string spaces( int id ){
-    string res;
-    for ( int j=0; j<id; ++j )
-      res += " ";
-    return res;
-  }
-
   int count_next( const IBtree *pnt ){
     int cnt = 0;
     const IBtree *tmp = pnt;

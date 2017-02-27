@@ -1255,7 +1255,6 @@ namespace Timbl {
   }
 
   bool MBLClass::readWeights( istream& is, WeightType wanted ){
-    set<WeightType> ret_weights;
     if ( !ExpInvalid() ){
       bool old_style = true;
       bool result = false;
