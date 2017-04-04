@@ -1,3 +1,14 @@
+6.4.9 2017-05-04
+[Ko van der Sloot]
+Maintenance release:
+- removed unused/non-functional functions from the API
+- code refactoring. Mostlu based on CPPCHECK static analyzer.
+- small bugs:
+   -e options didn't always what you expected
+- added missing files in docs
+[Maarten van Gompel]
+- updated README.md
+
 6.4.8 2016-07-11
 [Ko van der Sloot]
 Maintance release:
