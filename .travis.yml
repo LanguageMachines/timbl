@@ -1,6 +1,13 @@
 sudo: required
 dist: trusty
 
+notifications:
+  irc:
+    channels:
+      - "irc.uvt.nl#gitlama"
+      - "%{repository_slug}#%{build_number} %{message} --> %{build_url}"
+    skip_join: true
+
 language: cpp
 matrix:
   include:
