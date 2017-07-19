@@ -33,7 +33,7 @@ matrix:
             - libiomp-dev
 
       env:
-        - CXXFLAGS="-fopenmp=libiomp5
+        - CXXFLAGS="-fopenmp=libiomp5"
 
 before_install:
     - sudo apt-get update
