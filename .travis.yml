@@ -29,6 +29,11 @@ matrix:
       compiler: clang
       addons:
         apt:
+          packages:
+            - libiomp-dev
+
+      env:
+        - CXXFLAGS="-fopenmp=libiomp5
 
 before_install:
     - sudo apt-get update
@@ -41,9 +46,11 @@ before_install:
     - sudo make install
     - cd ..
 install:
-    - bash bootstrap.sh
-    - ./configure
-    - make
-    - sudo make install
+  - bash bootstrap.sh
+  - ./configure
+  - make
+  - sudo make install
 script:
-    - LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib make check
+  - LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib make check
+after_failure:
+  - cat src/test_suite.log
