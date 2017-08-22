@@ -37,8 +37,14 @@
 using namespace std;
 namespace Timbl {
 
-  string StrToCode( const string &par ){
-    string In = TiCC::trim(par);
+  string StrToCode( const string &par, bool trim ){
+    string In;
+    if ( trim){
+      In = TiCC::trim(par);
+    }
+    else {
+      In = par;
+    }
     string Out;
     string::const_iterator it = In.begin();
     while ( it != In.end() ){

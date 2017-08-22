@@ -422,14 +422,14 @@ namespace Timbl{
 
   bool Tabbed_Chopper::chop( const string& InBuf, size_t len ){
     // Lines look like this:
-    // one  two three bla
+    // oneTABtwoTAB TABthreeTABbla
     init( InBuf, len, false );
     vector<string> splits;
     size_t res = TiCC::split_at( strippedInput, splits, "\t" );
     if ( res != vSize )
       return false;
     for ( size_t i=0; i < res ; ++i ){
-      choppedInput[i] = StrToCode( splits[i] );
+      choppedInput[i] = StrToCode( splits[i], false );
     }
     return ( res == vSize ); // Enough?
   }
