@@ -399,6 +399,7 @@ namespace Timbl {
     switch (i){
     case 2:
       name = TiCC::trim(results[0]);
+      // fallthrough
     case 1:
       value = TiCC::trim(results[1]);
     default:
