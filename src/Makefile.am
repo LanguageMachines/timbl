@@ -1,5 +1,5 @@
 AM_CPPFLAGS = -I@top_srcdir@/include
-AM_CXXFLAGS = -std=c++11 -W -Wall -O3
+AM_CXXFLAGS = -std=c++11 -W -Wall -O3 -g -pedantic
 
 bin_PROGRAMS = timbl
 
