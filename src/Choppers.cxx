@@ -316,8 +316,8 @@ namespace Timbl{
 
   string C45_Chopper::getString() const{
     string res;
-    for ( size_t i = 0; i < vSize; ++i ) {
-      res += CodeToStr( choppedInput[i] ) + ",";
+    for ( const auto& chop : choppedInput ) {
+      res += CodeToStr( chop ) + ",";
     }
     return res;
   }
@@ -356,17 +356,22 @@ namespace Timbl{
 
   string Bin_Chopper::getString() const {
     string res;
-    for ( size_t i = 0; i < vSize-1; ++i ) {
-      if ( choppedInput[i][0] == '1' )
-	res += TiCC::toString(i+1) + ",";
+    int i = 1;
+    for ( const auto& chop : choppedInput ){
+      if ( &chop == &choppedInput.back() ){
+	break;
+      }
+      if ( chop[0] == '1' ){
+	res += TiCC::toString(i) + ",";
+      }
+      ++i;
     }
-    res += choppedInput[vSize-1] + ",";
+    res += choppedInput.back() + ",";
     return res;
   }
 
   bool Compact_Chopper::chop( const string& InBuf, size_t leng ){
     init( InBuf, leng, false );
-    size_t i;
     // Lines look like this:
     // ====AKBVAK
     // v1v2v3v4tt
@@ -376,22 +381,24 @@ namespace Timbl{
     if ( len != vSize * fLen ){
       return false;
     }
-    for ( i = 0; i < vSize; ++i ) {
+    size_t i = 0;
+    for ( auto& chop : choppedInput ){
       size_t index = i * fLen;
       // Scan the value.
       //
-      choppedInput[i] = "";
+      chop.clear();
       for ( int j = 0; j < fLen; ++j ) {
-	choppedInput[i] += strippedInput[index++];
+	chop += strippedInput[index++];
       }
+      ++i;
     }
     return ( i == vSize ); // Enough?
   }
 
   string Compact_Chopper::getString() const {
     string res;
-    for ( size_t i = 0; i < vSize; ++i ) {
-      res += CodeToStr( choppedInput[i] );
+    for ( const auto& chop : choppedInput ){
+      res += CodeToStr( chop );
     }
     return res;
   }
@@ -412,8 +419,8 @@ namespace Timbl{
 
   string Columns_Chopper::getString() const {
     string res;
-    for ( size_t i = 0; i < vSize; ++i ) {
-      res += choppedInput[i] + " ";
+    for ( const auto& chop : choppedInput ) {
+      res += chop + " ";
     }
     return res;
   }
@@ -436,8 +443,8 @@ namespace Timbl{
 
   string Tabbed_Chopper::getString() const {
     string res;
-    for ( size_t i = 0; i < vSize; ++i ) {
-      res += CodeToStr( choppedInput[i] ) + "\t";
+    for ( const auto& chop : choppedInput ){
+      res += CodeToStr( chop ) + "\t";
     }
     return res;
   }
@@ -484,11 +491,17 @@ namespace Timbl{
 
   string Sparse_Chopper::getString() const {
     string res;
-    for ( size_t i = 0; i < vSize-1; ++i ) {
-      if ( choppedInput[i] != DefaultSparseString )
-	res += "(" + TiCC::toString( i+1 ) + "," + CodeToStr(choppedInput[i]) + ")";
+    int i = 1;
+    for ( const auto& chop : choppedInput ){
+      if ( &chop == &choppedInput.back() ){
+	break;
+      }
+      if ( chop != DefaultSparseString ){
+	res += "(" + TiCC::toString( i ) + "," + CodeToStr(chop) + ")";
+      }
+      ++i;
     }
-    res += choppedInput[vSize-1] + ",";
+    res += choppedInput.back() + ",";
     return res;
   }
 
