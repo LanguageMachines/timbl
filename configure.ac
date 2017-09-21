@@ -46,12 +46,14 @@ AC_TYPE_SIZE_T
 
 # Checks for library functions.
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([floor gettimeofday localtime_r pow rint sqrt strchr])
+AC_CHECK_FUNCS([floor gettimeofday pow rint sqrt ])
 
-# ugly hack when PKG_CONFIG_PATH isn't defined.
-# couldn't get it to work otherwise
+PKG_PROG_PKG_CONFIG
+
 if test "x$PKG_CONFIG_PATH" = x; then
-    export PKG_CONFIG_PATH=""
+    export PKG_CONFIG_PATH="$prefix/lib/pkgconfig"
+else
+    export PKG_CONFIG_PATH="$prefix/lib/pkgconfig:$PKG_CONFIG_PATH"
 fi
 
 PKG_PROG_PKG_CONFIG
@@ -59,13 +61,6 @@ PKG_CHECK_MODULES([XML2], [libxml-2.0 >= 2.6.16] )
 CXXFLAGS="$CXXFLAGS $XML2_CFLAGS"
 LIBS="$LIBS $XML2_LIBS"
 
-AC_ARG_WITH(ticcutils,
-       [  --with-ticcutils=DIR      use libticcutils installed in <DIR>;
-        note that you can install libticcutils in a non-default directory with
-        ./configure --prefix=<DIR> in the libticutils installation directory],
-       [PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$withval/lib/pkgconfig"],
-       [PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$prefix/lib/pkgconfig"])
-AC_MSG_NOTICE( [pkg-config search path: $PKG_CONFIG_PATH] )
 PKG_CHECK_MODULES([ticcutils], [ticcutils >= 0.10] )
 CXXFLAGS="$CXXFLAGS $ticcutils_CFLAGS"
 LIBS="$LIBS $ticcutils_LIBS"
