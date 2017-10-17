@@ -46,6 +46,7 @@ using Common::Log2;
 namespace Timbl{
 
   //#define DBGTEST
+  //#define DBGTEST_DOT
 
   double overlapTestFunction::test( FeatureValue *F,
 				    FeatureValue *G,
@@ -68,7 +69,7 @@ namespace Timbl{
 				      FeatureValue *G,
 				      Feature *Feat ) const {
 #ifdef DBGTEST
-    cerr << toString(Feat->getMetricType()) << "_distance(" << F << "," << G << ") = ";
+    cerr << TiCC::toString(Feat->getMetricType()) << "_distance(" << F << "," << G << ") = ";
 #endif
     double result = Feat->fvDistance( F, G, threshold );
 #ifdef DBGTEST
@@ -140,7 +141,7 @@ namespace Timbl{
     for ( size_t i=0; i < _size; ++i ){
       metricTest[i] = 0;
 #ifdef DBGTEST
-      cerr << "set metric[" << i+1 << "]=" << toString(features[i]->getMetricType()) << endl;
+      cerr << "set metric[" << i+1 << "]=" << TiCC::toString(features[i]->getMetricType()) << endl;
 #endif
       if ( features[i]->Ignore() )
 	continue;
@@ -202,19 +203,20 @@ namespace Timbl{
   double innerProduct( FeatureValue *FV,
 		       FeatureValue *G ) {
     double r1, r2, result;
-#ifdef DBGTEST
+#ifdef DBGTEST_DOT
     cerr << "innerproduct " << FV << " x " << G << endl;
 #endif
     if ( FV_to_real( FV, r1 ) &&
 	 FV_to_real( G, r2 ) ){
-#ifdef DBGTEST
+#ifdef DBGTEST_DOT
       cerr << "innerproduct " << r1 << " x " << r2 << endl;
 #endif
       result = r1 * r2;
     }
-    else
+    else {
       result = 0.0;
-#ifdef DBGTEST
+    }
+#ifdef DBGTEST_DOT
     cerr << " resultaat == " << result << endl;
 #endif
     return result;
@@ -230,12 +232,19 @@ namespace Timbl{
     size_t i;
     for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
       double W = permFeatures[TrueF]->Weight();
-      denom1 +=  innerProduct( (*FV)[TrueF], (*FV)[TrueF] ) * W;
+      denom1 += innerProduct( (*FV)[TrueF], (*FV)[TrueF] ) * W;
       denom2 += innerProduct( G[i], G[i] ) * W;
       result += innerProduct( (*FV)[TrueF], G[i] ) * W;
     }
     double denom = sqrt( denom1 * denom2 );
     distances[effSize] = result/ (denom + Common::Epsilon);
+#ifdef DBGTEST
+    cerr << "denom1 " << denom1 << endl;
+    cerr << "denom2 " << denom2 << endl;
+    cerr << "denom  " << denom << endl;
+    cerr << "result " << result << endl;
+    cerr << "distance " <<  distances[effSize] << endl;
+#endif
     return effSize;
   }
 
