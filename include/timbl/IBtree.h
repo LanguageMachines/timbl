@@ -28,6 +28,8 @@
 #ifndef TIMBL_IBTREE_H
 #define TIMBL_IBTREE_H
 
+#include <unordered_map>
+
 #include "ticcutils/XMLtools.h"
 #include "timbl/MsgClass.h"
 
@@ -95,7 +97,7 @@ namespace Timbl {
     IBtree& operator=( const IBtree& );
   };
 
-  typedef std::map<size_t, const IBtree*> FI_map;
+  typedef std::unordered_map<size_t, const IBtree*> FI_map;
 
   class InstanceBase_base: public MsgClass {
     friend class IG_InstanceBase;
