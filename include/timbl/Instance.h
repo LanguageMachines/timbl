@@ -32,6 +32,7 @@
 #include <list>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include "timbl/MsgClass.h"
 
 template<typename T>
@@ -207,7 +208,7 @@ namespace Timbl {
     FeatureValue& operator=( const FeatureValue& ); // inhibit copies
   };
 
-  typedef std::map< size_t, ValueClass *> IVCmaptype;
+  typedef std::unordered_map< size_t, ValueClass *> IVCmaptype;
   typedef std::vector<ValueClass *> VCarrtype;
 
   class BaseFeatTargClass: public MsgClass {
