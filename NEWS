@@ -1,10 +1,17 @@
+6.4.10 2017-11-09
+[Ko van der Sloot]
+Bugfix release:
+- allow for spaces in TABBED input (they are significant)
+- corrected some typos in messages and man page
+- minor code refactorings
+
 6.4.9 2017-05-04
 [Ko van der Sloot]
 Maintenance release:
 - removed unused/non-functional functions from the API
-- code refactoring. Mostlu based on CPPCHECK static analyzer.
+- code refactoring. Mostly based on CPPCHECK static analyzer.
 - small bugs:
-   -e options didn't always what you expected
+   -e options didn't always do what you expected
 - added missing files in docs
 [Maarten van Gompel]
 - updated README.md
