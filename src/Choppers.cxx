@@ -277,12 +277,12 @@ namespace Timbl{
     // get occ
     strippedInput = extractOcc( strippedInput, occS );
     if ( occS.empty() ){
-      throw logic_error( "Missing occurence" );
+      throw logic_error( "Missing occurrence" );
     }
     else {
       int tmp;
       if ( !TiCC::stringTo<int>( occS, tmp ) ){
-	throw runtime_error( "Wrong (non-integer) occurence value: '" + occS + "'" );
+	throw runtime_error( "Wrong (non-integer) occurrence value: '" + occS + "'" );
       }
       else {
 	occ = tmp;

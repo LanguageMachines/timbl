@@ -109,7 +109,7 @@ namespace Timbl {
     { "BINARY", "Sparse Binary" },
     { "SPARSE", "Sparse" } };
 
-  const string VerbosityName[][2] = { { "Unknown", "erronous" },
+  const string VerbosityName[][2] = { { "Unknown", "erroneous" },
 				      { "S", "Silent" },
 				      { "O", "Options" },
 				      { "F", "Feature_Statistics" },
