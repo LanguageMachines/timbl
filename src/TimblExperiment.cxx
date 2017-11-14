@@ -1051,9 +1051,9 @@ namespace Timbl {
       int OldPrec = outfile.precision(DBL_DIG-1);
       outfile.setf(ios::showpoint);
       outfile.width(8);
-      if ( GlobalMetric->isSimilarityMetric() )
-	outfile << " " << maxSimilarity-Distance;
-      else
+      // if ( GlobalMetric->isSimilarityMetric() )
+      // 	outfile << " " << GlobalMetric->get_max_similarity() - Distance;
+      // else
 	outfile << " " << Distance;
       outfile.precision(OldPrec);
     }

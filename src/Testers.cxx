@@ -243,7 +243,7 @@ namespace Timbl{
     cerr << "denom2 " << denom2 << endl;
     cerr << "denom  " << denom << endl;
     cerr << "result " << result << endl;
-    cerr << "distance " <<  distances[effSize] << endl;
+    cerr << "cosine::test() distance " <<  distances[effSize] << endl;
 #endif
     return effSize;
   }
@@ -259,18 +259,26 @@ namespace Timbl{
       distances[i+1] = distances[i] + result;
 #ifdef DBGTEST
       cerr << "gewogen result " << result << endl;
-      cerr << "distance[" << i+1 << "]=" <<  distances[i+1] << endl;
+      cerr << "dot::test() distance[" << i+1 << "]=" <<  distances[i+1] << endl;
 #endif
     }
     return effSize;
   }
 
-  double SimilarityTester::getDistance( size_t pos ) const{
+  double CosineTester::getDistance( size_t pos ) const{
 #ifdef DBGTEST
-    cerr << "getDistance, maxSim = " << maxSimilarity << endl;
+    cerr << "getDistance, maxSim = " << 1.0  << endl;
     cerr << " distances[" << pos << "]= " <<  distances[pos] << endl;
 #endif
-    return maxSimilarity - distances[pos];
+    return 1.0 - distances[pos];
+  }
+
+  double DotProductTester::getDistance( size_t pos ) const{
+#ifdef DBGTEST
+    cerr << "getDistance, maxSim = " << std::numeric_limits<int>::max() << endl;
+    cerr << " distances[" << pos << "]= " <<  distances[pos] << endl;
+#endif
+    return (std::numeric_limits<int>::max() - distances[pos])/std::numeric_limits<int>::max();;
   }
 
 }

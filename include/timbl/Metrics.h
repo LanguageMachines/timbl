@@ -29,13 +29,12 @@
 #ifndef TIMBL_METRICS_H
 #define TIMBL_METRICS_H
 
+#include <exception>
 #include <limits>
 
 namespace Timbl{
 
   class FeatureValue;
-
-  extern const double maxSimilarity;
 
   class metricClass {
   public:
@@ -47,6 +46,10 @@ namespace Timbl{
     virtual bool isStorable() const = 0;
     virtual double distance( FeatureValue *, FeatureValue *,
 			     size_t=1, double = 1.0 ) const = 0;
+    virtual double get_max_similarity() const {
+      throw std::logic_error( "get_max_similarity not implemented for " +
+			      TiCC::toString( _type ) );
+    }
   private:
     MetricType _type;
   };
@@ -141,12 +144,16 @@ namespace Timbl{
   public:
   CosineMetric(): similarityMetricClass( Cosine ){};
     double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
+    double get_max_similarity() const { return 1.0; };
   };
 
   class DotProductMetric: public similarityMetricClass {
   public:
   DotProductMetric(): similarityMetricClass( DotProduct ){};
     double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
+    double get_max_similarity() const {
+      return std::numeric_limits<int>::max();
+    };
   };
 
 }
