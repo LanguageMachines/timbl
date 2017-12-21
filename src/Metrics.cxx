@@ -47,8 +47,6 @@ using Common::Log2;
 
 namespace Timbl{
 
-  const double maxSimilarity = std::numeric_limits<int>::max();
-
   double lv_distance( const string& source, const string& target ){
     // code taken from: http://www.merriampark.com/ldcpp.htm
     //    Levenshtein Distance Algorithm: C++ Implementation

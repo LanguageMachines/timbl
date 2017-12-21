@@ -105,10 +105,10 @@ namespace Timbl{
 		    const std::vector<size_t>& p ):
     TesterClass( pf, p ){};
     ~SimilarityTester() {};
-    double getDistance( size_t ) const;
     virtual size_t test( std::vector<FeatureValue *>&,
 			 size_t,
 			 double ) = 0;
+  protected:
   private:
     SimilarityTester( const SimilarityTester & ); // inhibit copies
     SimilarityTester& operator=( const SimilarityTester & ); // inhibit copies
@@ -119,6 +119,7 @@ namespace Timbl{
   CosineTester( const std::vector<Feature*>& pf,
 		const std::vector<size_t>& p ):
     SimilarityTester( pf, p ){};
+    double getDistance( size_t ) const;
     size_t test( std::vector<FeatureValue *>&,
 		 size_t,
 		 double );
@@ -132,6 +133,7 @@ namespace Timbl{
   DotProductTester( const std::vector<Feature*>& pf,
 		    const std::vector<size_t>& p ):
     SimilarityTester( pf, p ){};
+    double getDistance( size_t ) const;
     size_t test( std::vector<FeatureValue *>&,
 		 size_t,
 		 double );
