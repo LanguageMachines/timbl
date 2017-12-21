@@ -1819,7 +1819,6 @@ namespace Timbl {
 				    num_of_features );
 	  }
 	  bestArray.addResult( Distance, best_distrib, origI );
-
 	}
 	else if ( GlobalMetric->type() == DotProduct ){
 	  Error( "The Dot Product metric fails on your data: intermediate result too big to handle," );

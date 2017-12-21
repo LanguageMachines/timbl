@@ -223,14 +223,14 @@ namespace Timbl{
   }
 
   size_t CosineTester::test( vector<FeatureValue *>& G,
-			     size_t CurPos,
+			     size_t,
 			     double ){
     double denom1 = 0.0;
     double denom2 = 0.0;
     double result = 0.0;
     size_t TrueF;
     size_t i;
-    for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
+    for ( i=0, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
       double W = permFeatures[TrueF]->Weight();
       denom1 += innerProduct( (*FV)[TrueF], (*FV)[TrueF] ) * W;
       denom2 += innerProduct( G[i], G[i] ) * W;
@@ -249,11 +249,11 @@ namespace Timbl{
   }
 
   size_t DotProductTester::test( vector<FeatureValue *>& G,
-				 size_t CurPos,
+				 size_t,
 				 double ) {
     size_t TrueF;
     size_t i;
-    for ( i=CurPos, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
+    for ( i=0, TrueF = i + offSet; i < effSize; ++i,++TrueF ){
       double result = innerProduct( (*FV)[TrueF], G[i] );
       result *= permFeatures[TrueF]->Weight();
       distances[i+1] = distances[i] + result;
