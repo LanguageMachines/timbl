@@ -1804,12 +1804,15 @@ namespace Timbl {
     tester->init( Inst, effective_feats, ib_offset );
     size_t CurPos = 0;
     while ( best_distrib ){
-      double dummy = -1.0;
+      double dummy_t = -1.0;
+      size_t dummy_p = 0;
+      // similarity::test() doesn't need CurPos, nor a Threshold
+      // it recalculates the whole vector
       size_t EndPos = tester->test( CurrentFV,
-				    CurPos,
-				    dummy );
+				    dummy_p,
+				    dummy_t );
       if ( EndPos == EffFeat ){
-	// we finished with a certain amount of succes
+	// this should always be true!
 	double Distance = tester->getDistance(EndPos);
 	if ( Distance >= 0.0 ){
 	  string origI;
@@ -1826,12 +1829,12 @@ namespace Timbl {
 	  FatalError( "timbl terminated" );
 	}
 	else {
-	  Error( "DISTANCE == " + TiCC::toString<double>(Distance) );
+	  Error( "negative similarity DISTANCE: " + TiCC::toString<double>(Distance) );
 	  FatalError( "we are dead" );
 	}
       }
       else {
-	EndPos++; // out of luck, compensate for roll-back
+	throw( logic_error( "Similarity testing: test should consider all features" ) );
       }
       if ( EndPos > 0 ){
 	CurPos = EndPos-1;
