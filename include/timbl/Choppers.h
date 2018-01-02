@@ -1,7 +1,7 @@
 #ifndef TIMBL_CHOPPERS_H
 #define TIMBL_CHOPPERS_H
 /*
-  Copyright (c) 1998 - 2017
+  Copyright (c) 1998 - 2018
   ILK   - Tilburg University
   CLST  - Radboud University
   CLiPS - University of Antwerp
