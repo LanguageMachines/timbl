@@ -50,13 +50,16 @@ AC_CHECK_FUNCS([floor gettimeofday pow rint sqrt ])
 
 PKG_PROG_PKG_CONFIG
 
+if test "x$prefix" = "xNONE"; then
+   prefix="/usr/local"
+fi
+
 if test "x$PKG_CONFIG_PATH" = x; then
     export PKG_CONFIG_PATH="$prefix/lib/pkgconfig"
 else
     export PKG_CONFIG_PATH="$prefix/lib/pkgconfig:$PKG_CONFIG_PATH"
 fi
 
-PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([XML2], [libxml-2.0 >= 2.6.16] )
 CXXFLAGS="$CXXFLAGS $XML2_CFLAGS"
 LIBS="$LIBS $XML2_LIBS"

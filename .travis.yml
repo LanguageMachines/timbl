@@ -27,9 +27,28 @@ matrix:
       env:
         - CXXFLAGS="-fopenmp=libiomp5"
 
+    - os: osx
+      compiler: gcc
+      env: COMPILER=g++
+
+
 before_install:
-    - sudo apt-get update
-    - sudo apt-get install pkg-config autoconf-archive libicu-dev libxml2-dev libbz2-dev zlib1g-dev libboost-dev libboost-regex-dev libtar-dev
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        sudo apt-get update;
+        sudo apt-get install pkg-config autoconf-archive libicu-dev libxml2-dev libbz2-dev zlib1g-dev libboost-dev libboost-regex-dev libtar-dev;
+      fi
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+        brew update;
+        brew install pkg-config;
+        brew install autoconf-archive;
+        brew outdated || brew upgrade icu4c;
+        brew outdated || brew upgrade libxml2;
+        brew outdated || brew install bzip2;
+        brew outdated || brew install zlib;
+        brew install libtar;
+        brew outdated boost || brew upgrade boost;
+      fi
+
     - git clone https://github.com/proycon/ticcutils
     - cd ticcutils
     - bash bootstrap.sh
@@ -37,6 +56,7 @@ before_install:
     - make
     - sudo make install
     - cd ..
+
 install:
   - bash bootstrap.sh
   - ./configure
