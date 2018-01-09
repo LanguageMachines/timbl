@@ -11,20 +11,21 @@
 
 \newcommand{\chisq}{{$ \chi^2 $}}
 
-\author{Walter Daelemans$*$ \and Jakub Zavrel$\dagger$ \and Ko van der Sloot$**$ \and
+\author{Walter Daelemans$*$ \and Jakub Zavrel$\dagger$ \and Ko van der Sloot$\dagger\dagger$\\ \and
 	Antal van den Bosch$\dagger\dagger$\\ \ \\
 	(*) CLiPS - Computational Linguistics Group\\
         Department of Linguistics \\
 	University of Antwerp\\ \\
 	($\dagger$) Textkernel B.V.\\ \\
-	(**) Induction of Linguistic Knowledge Research Group\\
-	Tilburg center for Cognition and Communication \\
-        Tilburg University \\ \\
+%	(**) Induction of Linguistic Knowledge Research Group\\
+%	Tilburg center for Cognition and Communication \\
+%        Tilburg University \\ \\
         ($\dagger\dagger$) Centre for Language Studies \\
         Radboud University Nijmegen \\ \\
         URL: http://ilk.uvt.nl\thanks{This document is available from
 	http://ilk.uvt.nl/downloads/pub/papers/ilk.XXXX.pdf. All rights reserved
-	Induction of Linguistic Knowledge, Tilburg University and 
+	Centre for Language Studies, Nijmegen \
+        Induction of Linguistic Knowledge, Tilburg University and
         CLiPS, University of Antwerp.}}
 
 \title{{\huge TiMBL: Tilburg Memory-Based Learner} \\ \vspace*{0.5cm}
@@ -37,7 +38,7 @@
 
 \begin{document}
 
-\pagenumbering{roman} 
+\pagenumbering{roman}
 
 \maketitle
 
@@ -140,7 +141,7 @@ formats.
 
 \chapter{GNU General Public License}
 \label{license}
-\pagenumbering{arabic} 
+\pagenumbering{arabic}
 
 TiMBL is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -248,7 +249,7 @@ TiMBL should now be ready for use. If you want to run the examples and
 demos from this manual, you should act as follows:
 
 \begin{itemize}
-\item Be sure to add {\tt <location\_to\_install>/bin} to your PATH. 
+\item Be sure to add {\tt <location\_to\_install>/bin} to your PATH.
 In many shells something like
 
  {\tt > export PATH=\$PATH:<location\_to\_install>/bin }
@@ -288,7 +289,7 @@ program.
   sub-linear.
 \item We added Jensen-Shannon divergence as a pairwise similarity metric
   for feature values. With {\sc mvdm} and Jeffrey divergence, TiMBL
-  now offers three class disribution distance functions for value
+  now offers three class distribution distance functions for value
   differences.
 \item Euclidean distance was long overdue as an optional distance
   function ({\tt -mE}) for numeric features.
@@ -390,7 +391,7 @@ switches are added:
 \item Two distance metrics are added: {\tt -mC} sets the Cosine
   metric, and {\tt -mL} sets the Levenshtein metric. The latter metric
   operates at the feature-value level, and thus offers an alternative
-  to the all-or-nothing Overlap metric for string-valued features. 
+  to the all-or-nothing Overlap metric for string-valued features.
 
 \item Class distribution output generated with {\tt +v db} can be
   normalized so that they add to $1.0$, with the additional {\tt -G}
@@ -494,7 +495,7 @@ longer supported.
 \item The command line interface has had the following additions,
   including the ones reflecting the above changes:
 
-\begin{itemize} 
+\begin{itemize}
 \item {\tt -mJ} activates the Jeffrey divergence distance metric.
 \item {\tt -mD} activates the Dot-product distance metric.
 \item {\tt -dED:<a>:<b>} (without whitespace) sets the $\alpha$ and new
@@ -556,7 +557,7 @@ restricted, but can be set to different values.
 \item The command line interface has had several additions reflecting
 the above changes, plus one extra verbosity option:
 
-\begin{itemize} 
+\begin{itemize}
 	\item the {\tt -d metriccode} option sets the distance
           weighting metric. Three metrics are available: inverse
           distance (code ID), inverse linear (IL), and exponential
@@ -571,21 +572,21 @@ the above changes, plus one extra verbosity option:
           values occur fewer than {\tt n} times, Overlap is used
           rather than the {\sc mvdm} metric.  The default value for
           {\tt n} is 1 (no switching).
-	\item the {\tt -a 3} or {\tt -a IB2} switch invokes the 
-              {\sc ib2} algorithm. This algorithm expects to have 
+	\item the {\tt -a 3} or {\tt -a IB2} switch invokes the
+              {\sc ib2} algorithm. This algorithm expects to have
               the {\tt -b} switch set.
 	\item the {\tt -b n} option sets the number ($n$) of lines
               counting from the top of the training set file, which form
-              the bootstrap set of memorized instances to which {\sc ib2} 
+              the bootstrap set of memorized instances to which {\sc ib2}
               will start adding instances incrementally.
-	\item the {\tt -a 4} or {\tt -a TRIBL2} switch invokes the 
+	\item the {\tt -a 4} or {\tt -a TRIBL2} switch invokes the
               {\sc tribl2} algorithm.
         \item the {\tt -C n} switch (default: {\tt n} set to 10) restricts
               the number of concurrent connections to a TiMBL server
               (cf. the {\tt -S} switch).
 	\item the {\tt +v/-v} option has {\tt cm} as a new optional
               argument; it returns the confusion matrix, obtained
-              after testing, between predicted and actual classes in 
+              after testing, between predicted and actual classes in
               the test data.
 \end{itemize}
 
@@ -731,7 +732,7 @@ specify which features are numeric with the {\tt -N} option on the
 command line.
 
 \item The organization of the code is much more object-oriented than
-in version 1.0. 
+in version 1.0.
 %The main benefit of this is that:
 
 \item A Memory-Based Learning API is made available. You can define
@@ -875,7 +876,7 @@ all remaining items. Accuracy of the classifier is then the number of
 data items correctly predicted. With the option {\tt -t
 leave\_one\_out}, this testing methodology is used by TiMBL. We
 will use this option in the tutorial on the file {\tt dimin.data}, the
-union of {\tt dimin.train} and {\tt dimin.test}. 
+union of {\tt dimin.train} and {\tt dimin.test}.
 
 \section{Using TiMBL}
 
@@ -906,7 +907,7 @@ experiment (the default values in this case). We will describe these
 shortly.
 
 Apart from the result file, information about the operation of the
-algorithm is also sent to the standard output. It is therefore 
+algorithm is also sent to the standard output. It is therefore
 advisable to redirect the output to a file in order to make a log of
 the results.
 
@@ -1017,7 +1018,7 @@ Phase 2 is the learning phase: all training items are stored in an
 efficient way in memory for use during testing. Again timing
 information (real time) is provided, as well as information about the
 size of the data structure representing the stored examples and the
-amount of compression achieved. 
+amount of compression achieved.
 
 %\vspace{0.5cm}
 
@@ -1058,7 +1059,7 @@ Tested:    100 @ Fri Dec 24 20:27:07 2010
 Ready:     950 @ Fri Dec 24 20:27:07 2010
 Seconds taken: 0.0678 (14003.54 p/s)
 
-overall accuracy:        0.967368  (919/950), of which 39 exact matches 
+overall accuracy:        0.967368  (919/950), of which 39 exact matches
 There were 5 ties of which 4 (80.00%) were correctly resolved
 \end{verbatim}
 }
@@ -1106,12 +1107,12 @@ at the cost of more memory and slower computation, whereas {\sc
 igtree} is a fast heuristic approximation of {\sc ib1}, but sometimes
 less accurate. The {\sc IGTree} algorithm is used when {\tt -a 1} is
 given on the command line, whereas the {\sc ib1} algorithm used above
-(the default) would have been specified explicitly by {\tt -a 0}. 
+(the default) would have been specified explicitly by {\tt -a 0}.
 
 {\footnotesize
 \begin{verbatim}
 > timbl -a1 -f dimin.train -t dimin.test
-\end{verbatim}} 
+\end{verbatim}}
 
 We see that {\sc IGTree} performs only slightly worse (96.6\%) than
 {\sc ib1} (96.8\%) for this train-test partitioning of the data --- it
@@ -1153,7 +1154,7 @@ Whenever more than one nearest neighbor is taken into account for
 extrapolation, it may be useful to weigh the influence of the
 neighbors on the final decision as a function of their distance from
 the test item. Several possible implementations of this distance
-function are provided. E.g., the following provides inverse distance: 
+function are provided. E.g., the following provides inverse distance:
 
 {\footnotesize
 \begin{verbatim}
@@ -1295,7 +1296,7 @@ to the nearest neighbor:
 -,m,e,=,-,d,A,l,+,j,O,n,E,E         0.182421
 -,sn,u,=,-,p,@,=,+,r,K,=,T,T        0.046229
 =,=,=,=,=,=,=,=,+,sp,A,N,E,E        0.042845
-+,k,a,=,-,k,@,=,-,n,E,st,J,J        0.114685        
++,k,a,=,-,k,@,=,-,n,E,st,J,J        0.114685
 \end{verbatim}
 }
 
@@ -1338,14 +1339,14 @@ the following confusion matrix is computed and printed:
 > timbl +v cm -f dimin.train -t dimin.test
 
 Confusion Matrix:
-             T      E      J      P      K 
+             T      E      J      P      K
         -----------------------------------
-     T |    453      0      2      0      0 
-     E |      0     87      4      1      8 
-     J |      1      5    346      0      0 
-     P |      0      3      0     24      0 
-     K |      0      7      0      0      9 
-   -*- |      0      0      0      0      0 
+     T |    453      0      2      0      0
+     E |      0     87      4      1      8
+     J |      1      5    346      0      0
+     P |      0      3      0     24      0
+     K |      0      7      0      0      9
+   -*- |      0      0      0      0      0
 
 \end{verbatim}
 }
@@ -1390,7 +1391,7 @@ F-Score beta=1, microav: 0.967160
 F-Score beta=1, macroav: 0.861914
 AUC, microav:            0.980138
 AUC, macroav:            0.926060
-overall accuracy:        0.967368  (919/950), of which 39 exact matches 
+overall accuracy:        0.967368  (919/950), of which 39 exact matches
 There were 5 ties of which 4 (80.00%) were correctly resolved
 \end{verbatim}
 }
@@ -1472,7 +1473,7 @@ base); it is sometimes referred to as `lazy' as memory storage is done
 without abstraction or restructuring.  An instance consists of a
 fixed-length vector of $n$ feature-value pairs, and an information
 field containing the classification of that particular feature-value
-vector.  
+vector.
 
 In the performance component of an {\sc mbl} system, the product of
 the learning component is used as a basis for mapping input to output;
@@ -1508,7 +1509,7 @@ $\Delta(X,Y)$ is the distance between instances $X$ and $Y$,
 represented by $n$ features, and $\delta$ is the distance per
 feature. The distance between two patterns is simply the sum of the
 differences between the features. The $k$-{\sc nn} algorithm with this
-metric is called {\sc ib1} \cite{Aha+91}. 
+metric is called {\sc ib1} \cite{Aha+91}.
 
 \begin{equation}
 \Delta(X,Y) = \sum_{i=1}^{n} \delta(x_{i},y_{i})
@@ -1656,7 +1657,7 @@ metric is called {\sc ib1-ig} \cite{Daelemans+92b}.
 \begin{equation}
 \Delta(X,Y) = \sum_{i=1}^{n}\ w_{i} \ \delta(x_{i},y_{i})
 \label{distancew}
-\end{equation} 
+\end{equation}
 
 The possibility of automatically determining the relevance of features
 implies that many different and possibly irrelevant features can be
@@ -1689,11 +1690,11 @@ The \chisq statistic is computed from the same contingency table as
 the Information Gain measure by the following formula
 (Equation~\ref{chisq-eq}).
 
-\begin{equation} 
+\begin{equation}
 \chi^{2} = \sum_{i} \sum_{j} \frac{(E_{ij} - O_{ij})^{2}}
-				  {E_{ij}} 
+				  {E_{ij}}
 \label{chisq-eq}
-\end{equation} 
+\end{equation}
 
 where $O_{ij}$ is the observed number of cases with value $v_{i}$ in
 class $c_{j}$, i.e.~$O_{ij} = n_{ij}$, and $E_{ij}$ is the expected
@@ -1834,7 +1835,7 @@ variant of Kullback-Leibner distance; the $m$ term given in
 Equation~\ref{jdm} is used for this purpose.
 
 \begin{equation}
-\delta(v_{1}, v_{2}) = \sum_{i=1}^{n} 
+\delta(v_{1}, v_{2}) = \sum_{i=1}^{n}
 ( P(C_{i}|v_{1}) log \frac{P(C_{i}|v_{1})}{m} +
   P(C_{i}|v_{2}) log \frac{P(C_{i}|v_{2})}{m} )
 \label{jd}
@@ -1860,11 +1861,11 @@ remedy some negative effects due to data sparseness.
 \subsection{Dot-product and cosine metrics}
 \label{dotproduct}
 
-When features have numeric or binary values, TiMBL can also compute 
-the distance between two instances via the dot product (or inner product) 
-of their feature-value vectors. The dot product (which is higher with better 
-matches) is subsequently inversed to a distance by subtracting it from 
-the maximum dot product attainable, i.e. that on an exact match. In 
+When features have numeric or binary values, TiMBL can also compute
+the distance between two instances via the dot product (or inner product)
+of their feature-value vectors. The dot product (which is higher with better
+matches) is subsequently inversed to a distance by subtracting it from
+the maximum dot product attainable, i.e. that on an exact match. In
 Equation~\ref{doteq} this maximal dot product is referred to as $dot_{max}$.
 
 \begin{equation}
@@ -1877,11 +1878,11 @@ the feature weight $w_{i}$ in the metric. When no weighting is set
 ({\tt -w 0}), all weights are set to $1.0$, and equation~\ref{doteq}
 reduces to the normal unweighted dot product.
 
-The dot-product metric is typically used with binary vectors or sparse 
-vectors in general. When either $x_{i}$ or $y_{i}$ has a zero value, that 
-value pair is not counted in the dot product. Consequently, the significant 
-deviation from the Overlap metric is that matching values that both have a 
-zero value do not count here, whereas they count as much as any other value 
+The dot-product metric is typically used with binary vectors or sparse
+vectors in general. When either $x_{i}$ or $y_{i}$ has a zero value, that
+value pair is not counted in the dot product. Consequently, the significant
+deviation from the Overlap metric is that matching values that both have a
+zero value do not count here, whereas they count as much as any other value
 match in the Overlap metric.
 
 A commonly used variant of the dot product metric, e.g. in information
@@ -1935,7 +1936,7 @@ neighborhood of the query point, but the far neighbors will receive
 equal influence as the close neighbors. This can result in
 classification errors that could easily have been avoided if the
 measure of influence would somehow be correlated with the measure of
-similarity. To remedy this, we have implemented three types of distance 
+similarity. To remedy this, we have implemented three types of distance
 weighted voting functions in TiMBL.
 
 A voting rule in which the votes of different members of the nearest
@@ -1949,12 +1950,12 @@ the interval in between (\namecite{Dudani76}, Equation~\ref{dudani_eq}.).
 
 \begin{equation}
 \label{dudani_eq}
-w_{j}= \left \{ \begin{array}{ll}  
+w_{j}= \left \{ \begin{array}{ll}
                         \frac{d_{k} - d_{j}}{d_{k} - d_{1}} & \mbox{if $d_{k}
-\not= d_{1}$ } \\ 
+\not= d_{1}$ } \\
                         1 & \mbox{if $d_{k} = d_{1}$}\\
-                    \end{array} 
-          \right. 
+                    \end{array}
+          \right.
 \end{equation}
 
 Where $d_{j}$ is the distance to the query of the $j$'th nearest
@@ -1968,10 +1969,10 @@ by zero~\cite{Wettschereck94}.
 
 \begin{equation}
 \label{inverseweight}
-w_{j}= \left \{ \begin{array}{ll}  
-                        \frac{1}{d_{j} + \epsilon} \\ 
-                    \end{array} 
-          \right. 
+w_{j}= \left \{ \begin{array}{ll}
+                        \frac{1}{d_{j} + \epsilon} \\
+                    \end{array}
+          \right.
 \end{equation}
 
 Another weighting function considered here is based on the work of
@@ -1995,7 +1996,7 @@ them depend on their absolute distance to the query. This assumes that
 the relationship between absolute distance and the relevance gradient
 is fixed over different datasets. This assumption is generally false;
 even within the same dataset, different feature weighting metrics can
-cause very different absolute distances. 
+cause very different absolute distances.
 
 Figure~\ref{dist-weight-fig} visualises a part of the curves of ID and
 ED, the latter with a few varied settings of $\alpha$ and
@@ -2059,7 +2060,7 @@ to its user-specified value). If the tie in the class distribution
 persists, then the class label is selected with the highest overall
 occurrence in the training set. If that is also equal, then the first
 class is taken that was encountered when reading the training instance
-file. 
+file.
 
 Optionally, TiMBL can be set to avoid ties by making a {\em random}\/
 choice of a classification from a class distribution in a
@@ -2213,9 +2214,9 @@ The positive effect of Information Gain on performance prompted us to
 develop an alternative approach in which the instance memory is
 restructured in such a way that it contains the same information as
 before, but in a compressed decision tree structure. We call this
-algorithm {\sc IGTree}~\cite{Daelemans+97} 
+algorithm {\sc IGTree}~\cite{Daelemans+97}
 %(see Figure~\ref{example3}
-%for an illustration). 
+%for an illustration).
 In this structure, similar to the
 tree-structured instance base described above, instances are stored as
 paths of connected nodes which contain classification
@@ -2341,7 +2342,7 @@ still ambiguous, tree construction halts and the leaf nodes at that
 point represent case bases containing subsets of the original training
 set. During search, the normal {\sc IGTree} search algorithm is used,
 until the case-base nodes are reached, in which case regular {\sc ib1}
-nearest neighbor search is used on this sub-case-base. 
+nearest neighbor search is used on this sub-case-base.
 
 {\sc tribl2} does not employ a fixed switching point. Rather, during
 the classification of an instance it continues to use {\sc IGTree} as
@@ -2432,13 +2433,13 @@ following performance measures:
 \begin{description}
 \item[Precision]\index{precision} $= \frac{TP}{TP+FP}$, or the
   proportional number of times the classifier has correctly made the
-  decision that some instance has class $C$. 
+  decision that some instance has class $C$.
 
 \item[Recall or True Positive Rate
   (TPR)]\index{TPR}\index{recall}\index{true positive rate} $=
   \frac{TP}{P}$, or the proportional number of times an example with
   class $C$ in the test data has indeed been classified as class $C$
-  by the classifier. 
+  by the classifier.
 
 \item[False Positive Rate (FPR)]\index{FPR}\index{false positive rate} $=
   \frac{FP}{N}$, or the proportional number of times an example with a
@@ -2535,7 +2536,7 @@ versions of {\sc IGTree} can be found in
 \cite{Daelemans+93c,VandenBosch+93} where they are applied to
 grapheme-to-phoneme conversion.  See \cite{Daelemans+97} for a
 description and review of {\sc IGTree} and {\sc ib1-ig}. {\sc tribl}
-is described in \cite{Daelemans+97d}.  
+is described in \cite{Daelemans+97d}.
 
 Experiments with distance-weighted class voting are described in
 \cite{Zavrel97}. Aspects of using binary-valued (unpacked
@@ -2551,7 +2552,7 @@ reported in \cite{VandenBosch99,Daelemans+99}. A hybrid of TiMBL and
 the {\sc ripper} rule-induction algorithm \cite{Cohen95} is described
 in \cite{VandenBosch00,VandenBosch04}. Using TiMBL as a classifier
 combination method is discussed in
-\cite{Halteren+01}. 
+\cite{Halteren+01}.
 
 \namecite{VandenBosch04} presents a search algorithm to
 find optimal combinations of parameter settings automatically, given a
@@ -2565,7 +2566,7 @@ in \cite{VandenBosch+07b}.
 
 The memory-based algorithms implemented in the TiMBL package have been
 targeted to a large range of Natural Language Processing
-tasks. Examples of applications in the {\bf morpho-phonological} 
+tasks. Examples of applications in the {\bf morpho-phonological}
 area are hyphenation and syllabification \cite{Daelemans+92b};
 classifiying phonemes in speech \cite{Kocsor+00}; assignment of word
 stress \cite{Daelemans+94}; grapheme-to-phoneme conversion,
@@ -2594,7 +2595,7 @@ morphology \cite{Eddington00,Eddington03}, and the Dutch plural
 inflection \cite{Keuleers+07}. \namecite{Vandekerckhove+13} use
 TiMBL to develop a language bigram model and use this to explain
 behavior of patients with a specific impairment that prohibits them to
-assess adjective orderings as normal or less felicitous. 
+assess adjective orderings as normal or less felicitous.
 
 A comparison to other analogical methods for linguistics is provided
 in \cite{Daelemans+97f,Daelemans02}. \namecite{VandenBosch+13b} offer
@@ -2613,7 +2614,7 @@ clause identification \cite{Orasan00,Sang01}; detecting the scope of
 negation markers and hedge cues \cite{Morante+08c,Morante+09c};
 sentence-boundary detection \cite{Stevenson+00}; and, beyond the
 sentence level, to co-reference resolution
-\cite{Preiss02,Mitkov+02,Hoste05,Klenner+08,Wunsch+09,Zhekova+11}. 
+\cite{Preiss02,Mitkov+02,Hoste05,Klenner+08,Wunsch+09,Zhekova+11}.
 
 Memory-based learning has been integrated as a classifier engine in
 more complex dependency parsing systems
@@ -2696,7 +2697,7 @@ learning methods for NLP tasks related to English word pronunciation
 alignment, grapheme-to-phoneme conversion). TiMBL is also central in
 the Ph.D. theses of \namecite{Buchholz02}, \namecite{Lendvai04},
 \namecite{Hendrickx05}, \namecite{Hoste05}, \namecite{Keuleers08},
-\namecite{Canisius09}, and \namecite{Vandekerckhove13}. 
+\namecite{Canisius09}, and \namecite{Vandekerckhove13}.
 
 In 1999 a special issue of the {\em Journal for Experimental and
   Theoretical Artificial Intelligence} (Vol.~11(3), edited by Walter
@@ -2721,7 +2722,7 @@ ILK} home page: {\tt http://ilk.uvt.nl} and the {\sc CLiPS} home page: \\
 The user interacts with TiMBL through the use of command line arguments.
 When you have installed TiMBL successfully, and you type {\tt timbl} at the
 command line without any further arguments, it will print an overview
-of the most basic command line options. 
+of the most basic command line options.
 
 {\footnotesize
 \begin{verbatim}
@@ -2746,7 +2747,7 @@ with just these basics:
 training items.
 \item {\tt -t <testfile>} : supplies the name of the file with the
 test items.
-\item {\tt -h} : prints a glossary of all available command line 
+\item {\tt -h} : prints a glossary of all available command line
 options.
 
 \end{description}
@@ -2860,7 +2861,7 @@ The weights are used in the metric of {\sc ib1} and in the ordering of the
 
 \item {\tt -d <val>} : The type of class voting weights that are used for
 extrapolation from the nearest neighbor set. {\tt val} can be one of:
-	\begin{itemize} 
+	\begin{itemize}
 
   	\item {\tt Z} : normal majority voting; all neighbors have
          equal weight (default).
@@ -2887,7 +2888,7 @@ extrapolation from the nearest neighbor set. {\tt val} can be one of:
   both values occur less frequently than {\tt n} times in the learning
   material, TiMBL switches from {\sc mvdm} or Jeffrey Divergence to
   Overlap. Higher values of {\tt n} force TiMBL to use the Overlap
-  metric more. 
+  metric more.
 
  Only applicable in conjunction with the {\sc mvdm}
   ({\tt -mM}) and Jeffrey divergence ({\tt -mJ}) or Jensen-Shannon
@@ -3285,7 +3286,7 @@ last feature on the line) is followed by a period (although this is
 not mandatory: TiMBL is robust to missing periods)\footnote{The
 periods after the category are not reproduced in the output}.  White
 space within the line is taken literally, so the pattern {\tt a,\ b\
-c,d} will be interpreted as {\tt `a',`\ b\ c',`d'}. An exception is the 
+c,d} will be interpreted as {\tt `a',`\ b\ c',`d'}. An exception is the
 class label, which should not contain any whitespace. When using this
 format, especially with linguistic data sets or with data sets
 containing floating point numbers, one should take special care that
@@ -3333,7 +3334,7 @@ from after the {\tt @data} statement until the end of the
 file. Feature-values are supposed to be separated by commas; white
 space is deleted entirely, so the pattern {\tt a, b c,d} will be
 interpreted as {\tt `a',`bc',`d'}. There should be no whitespace in
-class labels. 
+class labels.
 % We hope to include better support for the ARFF format
 %in future releases.
 
@@ -3342,10 +3343,10 @@ class labels.
 % There are 4 attributes.
 % There are 12 instances.
 % Attribute information:                       Ints Reals  Enum  Miss
-%          'size'                                 0     0    12     0   
-%          'shape'                                0     0    12     0   
-%          'n_holes'                              9     0     3     0   
-%          'class.'                               0     0    12     0   
+%          'size'                                 0     0    12     0
+%          'shape'                                0     0    12     0
+%          'n_holes'                              9     0     3     0
+%          'class.'                               0     0    12     0
 @relation 'example.data'
 @attribute 'size' { small, large}
 @attribute 'shape' { compact, long, other}
@@ -3559,16 +3560,16 @@ classes (columns) given that value.
 \begin{verbatim}
 targets A,      B,      C,      D,      E.
 
-feature # 1 Matrix: 
+feature # 1 Matrix:
 small   0.429   0.286   0.286   0.000   0.000
 large   0.000   0.000   0.200   0.400   0.400
- 
-feature # 2 Matrix: 
+
+feature # 2 Matrix:
 compact 0.750   0.250   0.000   0.000   0.000
 long    0.000   0.167   0.333   0.333   0.167
 other   0.000   0.000   0.500   0.000   0.500
- 
-feature # 3 Matrix: 
+
+feature # 3 Matrix:
 1       0.500   0.000   0.333   0.167   0.000
 none    0.000   0.667   0.000   0.333   0.000
 2       0.000   0.000   0.333   0.000   0.667
@@ -3678,7 +3679,7 @@ Features
 \end{verbatim}
 \end{footnotesize}
 
-The corresponding compressed {\sc IGTree} version is considerably smaller. 
+The corresponding compressed {\sc IGTree} version is considerably smaller.
 
 \begin{footnotesize}
 \begin{verbatim}
@@ -3729,6 +3730,6 @@ versions 1.0 to 3.0 is preserved in TiMBL version 4 up to release
 \clearpage
 
 \bibliographystyle{fullname}
-\bibliography{../../ilkbib/ilk}
+\bibliography{ilk}
 
 \end{document}
