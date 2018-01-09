@@ -1,3 +1,8 @@
+6.4.11 2018-01-09
+[Ko van der Sloot]
+Bugfix release:
+- Fixed a major bug in similarity metric calculations. (Cosine and Dot product)
+
 6.4.10 2017-11-09
 [Ko van der Sloot]
 Bugfix release:
