@@ -1802,7 +1802,6 @@ namespace Timbl {
 							       ib_offset,
 							       effective_feats );
     tester->init( Inst, effective_feats, ib_offset );
-    size_t CurPos = 0;
     while ( best_distrib ){
       double dummy_t = -1.0;
       size_t dummy_p = 0;
@@ -1836,11 +1835,8 @@ namespace Timbl {
       else {
 	throw( logic_error( "Similarity testing: test should consider all features" ) );
       }
-      if ( EndPos > 0 ){
-	CurPos = EndPos-1;
-	best_distrib = IB->NextGraphTest( CurrentFV,
-					  CurPos );
-      }
+      --EndPos;
+      best_distrib = IB->NextGraphTest( CurrentFV, EndPos );
     }
   }
 
