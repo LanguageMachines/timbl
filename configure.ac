@@ -27,11 +27,14 @@ LT_INIT
 AC_LANG([C++])
 
 AC_OPENMP
-if test "x$ac_cv_prog_cxx_openmp" != "xunsupported"; then
-   CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
-   AC_DEFINE(HAVE_OPENMP, 1 , Define to 1 if you have OpenMP )
-else
-   AC_MSG_NOTICE(We don't have OpenMP. Multithreaded operation is disabled)
+if test "x$ac_cv_prog_cxx_openmp" != "x"; then
+  if test "x$ac_cv_prog_cxx_openmp" != "xunsupported"; then
+    CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
+    AC_DEFINE([HAVE_OPENMP], [1] , [Define to 1 if you have OpenMP] )
+  else
+    AC_MSG_NOTICE([We don't have OpenMP for Clang. Multithreaded operation is di
+sabled])
+  fi
 fi
 
 #checks for libraries.
