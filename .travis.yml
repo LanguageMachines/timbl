@@ -15,21 +15,15 @@ language: cpp
 matrix:
   include:
     - os: linux
-      compiler: gcc
+      compiler: g++
 
     - os: linux
-      compiler: clang
-      addons:
-        apt:
-          packages:
-            - libiomp-dev
-
+      compiler: clang++
       env:
-        - CXXFLAGS="-fopenmp=libiomp5"
+        - OPENMPFLAG=--disable-openmp
 
     - os: osx
-      compiler: gcc
-      env: COMPILER=g++
+      compiler: clang
 
 
 before_install:
@@ -47,22 +41,26 @@ before_install:
         brew outdated || brew install zlib;
         brew install libtar;
         brew outdated boost || brew upgrade boost;
+        brew install llvm;
+        export PATH="/usr/local/opt/llvm/bin:$PATH";
+        export LDFLAGS="-L/usr/local/opt/llvm/lib";
+        export CXXFLAGS="-I/usr/local/opt/llvm/include";
       fi
-
     - git clone https://github.com/proycon/ticcutils
     - cd ticcutils
     - bash bootstrap.sh
-    - ./configure
+    - ./configure $OPENMPFLAG
     - make
     - sudo make install
     - cd ..
 
 install:
-  - bash bootstrap.sh
-  - ./configure
-  - make
-  - sudo make install
+    - bash bootstrap.sh
+    - ./configure $OPENMPFLAG
+    - make
+    - sudo make install
+
 script:
-  - LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib make check
+   - LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib make check
 after_failure:
-  - cat src/test_suite.log
+   - cat src/test_suite.log
