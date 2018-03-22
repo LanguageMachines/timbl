@@ -15,21 +15,29 @@ language: cpp
 matrix:
   include:
     - os: linux
+      cache: ccache
       compiler: g++
+      env:
+        - SCAN=echo
 
     - os: linux
       compiler: clang++
+      cache: ccache
       env:
+        - SCAN=scan-build
         - OPENMPFLAG=--disable-openmp
 
     - os: osx
+      cache: ccache
       compiler: clang
+      env:
+        - SCAN=echo
 
 
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         sudo apt-get update;
-        sudo apt-get install pkg-config autoconf-archive libicu-dev libxml2-dev libbz2-dev zlib1g-dev libboost-dev libboost-regex-dev libtar-dev;
+        sudo apt-get install pkg-config autoconf-archive ccache cppcheck libicu-dev libxml2-dev libbz2-dev zlib1g-dev libboost-dev libboost-regex-dev libtar-dev;
       fi
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
         brew update;
@@ -40,12 +48,17 @@ before_install:
         brew outdated || brew install bzip2;
         brew outdated || brew install zlib;
         brew install libtar;
+        brew install cppcheck;
+        brew install ccache;
         brew outdated boost || brew upgrade boost;
         brew install llvm;
         export PATH="/usr/local/opt/llvm/bin:$PATH";
         export LDFLAGS="-L/usr/local/opt/llvm/lib";
         export CXXFLAGS="-I/usr/local/opt/llvm/include";
       fi
+
+    - export PATH="/usr/lib/ccache/bin/:$PATH"
+
     - git clone https://github.com/proycon/ticcutils
     - cd ticcutils
     - bash bootstrap.sh
@@ -57,10 +70,13 @@ before_install:
 install:
     - bash bootstrap.sh
     - ./configure $OPENMPFLAG
+    - cppcheck --enable=all --quiet --error-exitcode=0 .
+    - $SCAN --status-bugs make
     - make
     - sudo make install
 
 script:
    - LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib make check
+
 after_failure:
    - cat src/test_suite.log
