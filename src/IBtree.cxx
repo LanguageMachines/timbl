@@ -239,6 +239,10 @@ namespace Timbl {
     if ( !DefaultsValid || !DefAss )
       TopT = 0;
     if ( TopT == 0 ){
+      if ( !TopDistribution ){
+	// added to satisfy scan-build
+	throw logic_error( "TopDistribution=0, might not happen!" );
+      }
       TopT = TopDistribution->BestTarget( tiedTop, Random);
     }
     tie = tiedTop;
@@ -1493,6 +1497,10 @@ namespace Timbl {
 #endif
     pnt = InstBase;
     for ( unsigned int i = 0; i < Depth; ++i ){
+      if ( !pnt ){
+	// added to satisfy scan-build
+	throw logic_error( "pnt may never be 0!" );
+      }
       InstPath[i] = pnt;
       RestartSearch[i] = pnt;
       if ( i == 0 )

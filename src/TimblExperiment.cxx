@@ -243,6 +243,8 @@ namespace Timbl {
     default:
       FatalError( "You may not split experiments for Special cases like " +
 		  TiCC::toString(algorithm) );
+      exit(EXIT_FAILURE); // never reached, (FatalError throws) but satisfies
+      // scan-build
     }
     *result = *this;
     if ( OptParams ){
@@ -1212,8 +1214,6 @@ namespace Timbl {
 
   bool IB2_Experiment::Expand_N( const string& FileName ){
     bool result = true;
-    size_t Added = 0;
-    size_t TotalAdded = 0;
     if ( ExpInvalid() ){
       result = false;
     }
@@ -1268,6 +1268,8 @@ namespace Timbl {
 	    time_stamp( "Start:     ", stats.dataLines() );
 	  }
 	  bool found;
+	  size_t TotalAdded = 0;
+	  size_t Added = 0;
 	  initExperiment();
 	  do {
 	    // The next Instance to store.
