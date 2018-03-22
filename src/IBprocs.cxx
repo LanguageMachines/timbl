@@ -343,6 +343,12 @@ namespace Timbl {
 	  else {
 	    is >> ws >> buf;
 	    double min, max;
+	    // this is rather awfull
+	    // sscanf is not realy what we want. But notice:
+	    // the buffer might contain: [-4--0] !!!! ARGL
+	    // simply using split('-') is wrong.
+	    // we should have used a different separator!
+	    //   But we didn't
 	    int scancount = sscanf( buf.c_str(), "[%lf-%lf]", &min, &max );
 	    if ( scancount == 2 ){
 	      Features[k-1]->Min( min );
