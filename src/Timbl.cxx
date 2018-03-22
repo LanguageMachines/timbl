@@ -619,7 +619,7 @@ void Do_Test( TimblAPI *Run ){
 	cerr << "Warning: Skipped a line from indirect testfile:\n'"
 	     << tmp_line << "'" << endl;
 	if ( TestFile == "" )
-	  cerr << "missing a Testfile name " << endl;
+	  cerr << "missing a Testfile name (-t option)" << endl;
       }
       else if ( Run->SetIndirectOptions( opts ) ){
 	Default_Output_Names( opts );
