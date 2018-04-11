@@ -677,7 +677,7 @@ namespace Timbl {
       line = TiCC::trim( line );
       if ( line.empty() )
 	continue;
-      if ( line.find( "Feature" ) != 0 ){
+      if ( line.compare( 0, 7, "Feature" ) != 0 ){
 	if ( skip )
 	  continue;
 	else
