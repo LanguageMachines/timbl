@@ -1,0 +1,117 @@
+{
+    "@context": [
+        "https://doi.org/10.5063/schema/codemeta-2.0",
+        "http://schema.org"
+    ],
+    "@type": "SoftwareSourceCode",
+    "identifier": "timbl",
+    "name": "TiMBL",
+    "version": "6.4.9",
+    "description": "TiMBL is an open source software package implementing several memory-based learning algorithms, among which IB1-IG, an implementation of k-nearest neighbor classification with feature weighting suitable for symbolic feature spaces, and IGTree, a decision-tree approximation of IB1-IG. All implemented algorithms have in common that they store some representation of the training set explicitly in memory. During testing, new cases are classified by extrapolation from the most similar stored cases.",
+    "license": "https://spdx.org/licenses/GPL-3.0",
+	"url": "https://languagemachines.github.io/timbl",
+    "author": [
+		{
+			"@type": "Person",
+			"givenName": "Ko",
+			"familyName": "van der Sloot",
+			"email": "ko.vandersloot@let.ru.nl",
+			"affiliation": {
+				"@id": "https://www.ru.nl/clst",
+				"@type": "Organization",
+				"name": "Centre for Language and Speech Technology",
+				"url": "https://www.ru.nl/clst",
+				"parentOrganization": {
+					"@id": "https://www.ru.nl/cls",
+					"@type": "Organization",
+					"name": "Centre for Language Studies",
+					"url": "https://www.ru.nl/cls",
+					"parentOrganization": {
+						"@id": "https://www.ru.nl",
+						"name": "Radboud University",
+						"@type": "Organization",
+						"url": "https://www.ru.nl",
+						"location": {
+							"@type": "Place",
+							"name": "Nijmegen"
+						}
+					}
+
+				}
+			}
+		},
+		{
+			"@id": "https://orcid.org/0000-0003-2493-656X",
+			"@type": "Person",
+			"givenName": "Antal",
+			"familyName": "van den Bosch",
+			"email": "antal.vandenbosch@let.ru.nl",
+			"affiliation": { "@id": "https://cls.ru.nl" }
+		},
+		{
+			"@type": "Person",
+			"givenName": "Walter",
+			"familyName": "Daelemans"
+		},
+		{
+			"@id": "https://orcid.org/0000-0002-1046-0006",
+			"@type": "Person",
+			"givenName": "Maarten",
+			"familyName": "van Gompel",
+			"email": "proycon@anaproy.nl",
+			"affiliation": { "@id": "https://www.ru.nl/clst" }
+		},
+		{
+			"@type": "Person",
+			"givenName": "Ton",
+			"familyName": "Weijters"
+		},
+		{
+			"@type": "Person",
+			"givenName": "Jakub",
+			"familyName": "Zavrel"
+		}
+	],
+	"sourceOrganization": { "@id": "https://www.ru.nl/clst" },
+	"programmingLanguage": {
+		"@type": "ComputerLanguage",
+		"identifier": "c++",
+		"name": "C++"
+	},
+	"operatingSystem": "POSIX",
+	"codeRepository": "https://github.com/LanguageMachines/timbl",
+    "softwareRequirements": [
+        {
+			"@type": "SoftwareApplication",
+			"identifier": "libxml2",
+			"name": "libxml2"
+		},
+        {
+			"@type": "SoftwareApplication",
+			"identifier": "ticcutils",
+			"name": "ticcutils"
+		}
+	],
+	"readme": "https://github.com/LanguageMachines/timbl/blob/master/README.md",
+	"issueTracker": "https://github.com/LanguageMachines/timbl/issues",
+	"contIntegration": "https://travis-ci.org/LanguageMachines/timbl",
+	"releaseNotes": "https://github.com/LanguageMachines/timbl/releases",
+	"developmentStatus": "active",
+	"keywords":  [ "nlp", "natural language processing", "memory based learning", "machine learning", "knn", "k-nearest neighbours", "decision tree" ],
+    "referencePublication": [
+		{
+			"@type": "TechArticle",
+			"name": "TiMBL: Tilburg Memory Based Learner, Reference Guide",
+			"author": [ "Walter Daelemans", "Jakub Zavrel", "Ko van der Sloot", "Antal van den Bosch" ],
+			"url": "https://github.com/LanguageMachines/timbl/raw/master/docs/Timbl_6.4_Manual.pdf"
+		},
+		{
+			"@type": "Book",
+			"name": "Memory-Based Language Processing",
+			"author": [ "Walter Daelemans", "Antal van den Bosch" ],
+			"url": "http://ilk.uvt.nl/mblp",
+            "publisher": "Cambridge University Press"
+		}
+	],
+	"dateCreated": "1998"
+}
