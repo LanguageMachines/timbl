@@ -204,7 +204,7 @@ inline void usage_full(void){
        << "                     then normalize between 0 and 1 (default f=1.0)" << endl
        << "             1:<f> : does the same" << endl
        << "    logProbability : Add 1 to the target Weight, take the 10Log and" << endl
-       << "                     then normalize between 0 and 1 (default f=1.0)" << endl
+       << "                     then normalize between 0 and 1." << endl
        << "             2     : does the same" << endl;
   cerr << "-W f      : calculate and save all Weights in file 'f'" << endl;
   cerr << "+% or -%  : do or don't save test result (%) to file" << endl;
