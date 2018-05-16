@@ -1,3 +1,13 @@
+6.4.12 2018-05-16
+[Ko van der Sloot]
+Bugfix release:
+- updated usage(). Info on -G 2 option was wrong.
+- changed an error message to be more clear.
+- fixed building of the TeX documentation
+
+[Maarten van Gompel]
+- Added codemeta.json metadata
+
 6.4.11 2018-01-09
 [Ko van der Sloot]
 Bugfix release:
