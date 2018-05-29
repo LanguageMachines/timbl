@@ -646,11 +646,19 @@ namespace Timbl {
     }
     else
       return false;
-
   }
 
   bool TimblAPI::ShowStatistics( ostream& os ) const{
     return Valid() && pimpl->showStatistics( os );
+  }
+
+  string TimblAPI::extract_limited_m( int lim ) const {
+    if ( Valid() ){
+      return pimpl->extract_limited_m( lim );
+    }
+    else {
+      return "error";
+    }
   }
 
   string TimblAPI::VersionInfo( bool full ){
@@ -658,8 +666,16 @@ namespace Timbl {
     return Common::VersionInfo( full );
   }
 
-  int TimblAPI::Default_Max_Feats() {
+  int TimblAPI::Default_Max_Feats(){
     return Common::DEFAULT_MAX_FEATS;
+  }
+
+  int TimblAPI::NumOfFeatures() const {
+    if ( Valid() ){
+      return pimpl->NumOfFeatures();
+    }
+    else
+      return -1;
   }
 
 }

@@ -135,6 +135,7 @@ namespace Timbl {
     size_t MaxFeats() const { return MaxFeatures; };
     int Progress() const { return progress; };
     void Progress( int p ){ progress =  p; };
+    std::string extract_limited_m( int );
     Target   *Targets;
     std::vector<Feature *> Features;
     std::vector<Feature *> PermFeatures;

@@ -468,6 +468,48 @@ namespace Timbl {
     }
   }
 
+  string MBLClass::extract_limited_m( int lim ){
+    default_order();
+    set_order();
+    string result;
+    MetricType gm = globalMetricOption;
+    result += TiCC::toString( gm );
+    set<size_t> ignore;
+    map<string,set<size_t>> metrics;
+    cerr << "permutation: ";
+    for ( const auto& it : permutation ){
+      cerr << it << "," << endl;
+    }
+    for ( size_t k=0; k < num_of_features; ++k ){
+      if ( Features[permutation[k]]->Ignore() ){
+	ignore.insert(k);
+      }
+      else {
+	MetricType m = Features[permutation[k]]->getMetricType();
+	metrics[TiCC::toString( m )].insert(k);
+      }
+    }
+    for ( size_t i=lim+ignore.size(); i < num_of_features; ++i ){
+      ignore.insert( permutation[i] );
+    }
+    if ( !ignore.empty() ){
+      result += ":I";
+      for ( const auto& it : ignore ){
+	result += it + ",";
+      }
+    }
+    else {
+      result += ":";
+    }
+    for ( const auto& it : metrics ){
+      result += it.first + ":";
+      for ( const auto& ig : it.second ){
+	result += TiCC::toString( ig ) + ",";
+      }
+    }
+    return result;
+  }
+
   void MBLClass::writePermutation( ostream& os ) const {
     os << "Feature Permutation based on "
        << ( Weighting==UserDefined_w?"weightfile":TiCC::toString(TreeOrder, true))

@@ -54,6 +54,8 @@ bool Do_LOO = false;
 bool Do_NS = false;
 bool Do_Indirect = false;
 bool Do_Save_Perc = false;
+bool Do_Limit = false;
+int limit_val = 0;
 
 string I_Path = "";
 string O_Path = "";
@@ -321,6 +323,13 @@ void Preset_Values( TiCC::CL_Options& opts ){
 	cerr << "Invalid Algorithm: Only IB1 possible for LOO and CV " << endl;
 	throw( hardExit() ); // no chance to proceed
       }
+  }
+  if ( opts.extract( "limit", value ) ){
+    Do_Limit = true;
+    if ( !TiCC::stringTo<int>( value, limit_val ) || limit_val < 0 ){
+      cerr << "illegal --limit value: " << value << endl;
+      throw( hardExit() ); // no chance to proceed
+    }
   }
   if ( opts.extract( 'P', value ) ){
     I_Path = value;
@@ -701,6 +710,24 @@ int main(int argc, char *argv[]){
       delete Run;
       usage();
       return 3;
+    }
+    string m_val;
+    Do_Limit = true; limit_val=3;
+    if ( Do_Limit ){
+      if ( !Run->Prepare( dataFile ) ){
+	return -10;
+      }
+      if ( Run->NumOfFeatures() < limit_val ){
+	cerr << "value of --limit is larger then the number of features!"
+	     << endl;
+	return 32;
+      }
+      string m_val = Run->extract_limited_m( limit_val );
+      cerr << endl << endl << "NEW M: " << m_val << endl << endl;
+      opts.extract( 'm' );
+      opts.insert( 'm', m_val, true );
+      delete Run;
+      Run = new TimblAPI( opts );
     }
     Default_Output_Names( opts );
     vector<string> mas = opts.getMassOpts();

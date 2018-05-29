@@ -121,8 +121,10 @@ namespace Timbl{
     bool SetOptions( const std::string& );
     bool SetIndirectOptions( const TiCC::CL_Options&  );
     bool SetThreads( int c );
+    std::string extract_limited_m( int ) const;
     Algorithm Algo() const;
     InputFormatType getInputFormat() const;
+    int NumOfFeatures() const;
     static int Default_Max_Feats();
     bool initExperiment();
   private:
