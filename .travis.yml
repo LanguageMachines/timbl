@@ -3,6 +3,11 @@ dist: trusty
 
 group: edge
 
+# whitelist
+branches:
+  only:
+    - master
+
 notifications:
   irc:
     channels:
