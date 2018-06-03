@@ -666,11 +666,11 @@ namespace Timbl {
     return Common::VersionInfo( full );
   }
 
-  int TimblAPI::Default_Max_Feats(){
+  size_t TimblAPI::Default_Max_Feats(){
     return Common::DEFAULT_MAX_FEATS;
   }
 
-  int TimblAPI::NumOfFeatures() const {
+  size_t TimblAPI::NumOfFeatures() const {
     if ( Valid() ){
       return pimpl->NumOfFeatures();
     }

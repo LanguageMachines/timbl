@@ -124,8 +124,8 @@ namespace Timbl{
     std::string extract_limited_m( int ) const;
     Algorithm Algo() const;
     InputFormatType getInputFormat() const;
-    int NumOfFeatures() const;
-    static int Default_Max_Feats();
+    size_t NumOfFeatures() const;
+    static size_t Default_Max_Feats();
     bool initExperiment();
   private:
     TimblAPI();

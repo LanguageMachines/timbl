@@ -468,7 +468,7 @@ namespace Timbl {
     }
   }
 
-  string MBLClass::extract_limited_m( int lim ){
+  string MBLClass::extract_limited_m( size_t lim ){
     default_order();
     set_order();
     string result;
@@ -476,13 +476,13 @@ namespace Timbl {
     result += TiCC::toString( gm );
     set<size_t> ignore;
     map<string,set<size_t>> metrics;
-    cerr << "permutation: ";
-    for ( const auto& it : permutation ){
-      cerr << it << "," << endl;
-    }
+    // cerr << "permutation: ";
+    // for ( const auto& it : permutation ){
+    //   cerr << it << "," << endl;
+    // }
     for ( size_t k=0; k < num_of_features; ++k ){
       if ( Features[permutation[k]]->Ignore() ){
-	cerr << "Add " << k+1 << " to ignore" << endl;
+	//	cerr << "Add " << k+1 << " to ignore" << endl;
 	ignore.insert(k+1);
       }
       else {
@@ -492,8 +492,11 @@ namespace Timbl {
 	}
       }
     }
+    // cerr << "lim=" << lim << " so start ignoring at: "
+    // 	 << lim + ignore.size()<< endl;
+
     for ( size_t i=lim+ignore.size(); i < num_of_features; ++i ){
-      cerr << "Add " << permutation[i]+1 << " to ignore" << endl;
+      //      cerr << "Add " << permutation[i]+1 << " to ignore" << endl;
       ignore.insert( permutation[i]+1 );
     }
     if ( !ignore.empty() ){
