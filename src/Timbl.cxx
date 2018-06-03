@@ -224,7 +224,7 @@ inline void usage_full(void){
   cerr << "-M n      : size of MaxBests Array" << endl;
   cerr << "-N n      : Number of features (default "
        << TimblAPI::Default_Max_Feats() << ")" << endl;
-  cerr << "--limit l : limit the number features used to the 'l' with the highest weights." << endl;
+  cerr << "--limit l : limit the number of features used to the 'l' with the highest weights." << endl;
   cerr << "            (will restart Timbl with an adapted -m option)" << endl;
   cerr << "--Treeorder=<value>      : ordering of the Tree :" << endl;
   cerr << "       DO: none" << endl;
