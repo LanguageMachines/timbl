@@ -711,8 +711,7 @@ int main(int argc, char *argv[]){
       usage();
       return 3;
     }
-    string m_val;
-    Do_Limit = true; limit_val=3;
+    Do_Limit = true; limit_val=2000000000;
     if ( Do_Limit ){
       if ( !Run->Prepare( dataFile ) ){
 	return -10;

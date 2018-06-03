@@ -482,20 +482,24 @@ namespace Timbl {
     }
     for ( size_t k=0; k < num_of_features; ++k ){
       if ( Features[permutation[k]]->Ignore() ){
-	ignore.insert(k);
+	cerr << "Add " << k+1 << " to ignore" << endl;
+	ignore.insert(k+1);
       }
       else {
 	MetricType m = Features[permutation[k]]->getMetricType();
-	metrics[TiCC::toString( m )].insert(k);
+	if ( m != gm ){
+	  metrics[TiCC::toString( m )].insert(k);
+	}
       }
     }
     for ( size_t i=lim+ignore.size(); i < num_of_features; ++i ){
-      ignore.insert( permutation[i] );
+      cerr << "Add " << permutation[i]+1 << " to ignore" << endl;
+      ignore.insert( permutation[i]+1 );
     }
     if ( !ignore.empty() ){
       result += ":I";
       for ( const auto& it : ignore ){
-	result += it + ",";
+	result += TiCC::toString(it) + ",";
       }
     }
     else {
@@ -506,6 +510,10 @@ namespace Timbl {
       for ( const auto& ig : it.second ){
 	result += TiCC::toString( ig ) + ",";
       }
+    }
+    while ( result.back() == ':'
+	    || result.back() == ',' ){
+      result.pop_back();
     }
     return result;
   }
