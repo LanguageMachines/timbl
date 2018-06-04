@@ -507,7 +507,7 @@ namespace Timbl {
 	//	cerr << "START it=" << *it << " pos = " << pos << endl;
 	size_t steps = 0;
 	for ( ; pos <= *ignore.rbegin(); ++pos ){
-	  cerr << "pos = " << pos << endl;
+	  //	  cerr << "pos = " << pos << endl;
 	  if ( ignore.find(pos) == ignore.end() ){
 	    break;
 	  }
