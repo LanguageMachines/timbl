@@ -503,31 +503,34 @@ namespace Timbl {
       // using TiCC::operator<<;
       // cerr << "IGNORE bevat:" << ignore << endl;
       for ( auto it = ignore.begin(); it != ignore.end(); ++it ){
-	size_t pos = *it;
-	//	cerr << "START it=" << *it << " pos = " << pos << endl;
+	size_t value = *it;
+	//	cerr << "START it=" << *it << " value = " << value << endl;
 	size_t steps = 0;
-	for ( ; pos <= *ignore.rbegin(); ++pos ){
-	  //	  cerr << "pos = " << pos << endl;
-	  if ( ignore.find(pos) == ignore.end() ){
+	for ( ; value <= *ignore.rbegin(); ++value ){
+	  //	  cerr << "value = " << value << endl;
+	  if ( ignore.find(value) == ignore.end() ){
 	    break;
 	  }
 	  ++steps;
 	}
-	// cerr << "END it=" << *it << " pos = " << pos << endl;
+	// cerr << "END it=" << *it << " value = " << value << endl;
 	// cerr << "STEPS =" << steps << endl;
-	if ( pos == *it+1 ){
+	if ( value == *it+1 ){
+	  // so only one value, output it
 	  if ( *it != *ignore.begin() ){
 	    result += ",";
 	  }
 	  result += TiCC::toString(*it) + ",";
 	}
-	else if ( pos == *it+2 ){
+	else if ( value == *it+2 ){
+	  // so only two values, output them , separated
 	  result += TiCC::toString(*it);
 	  ++it;
 	  result += "," + TiCC::toString(*it);
 	}
 	else {
-	  result += TiCC::toString(*it) + "-" + TiCC::toString( pos-1) + ",";
+	  // a range. output with a hyphen
+	  result += TiCC::toString(*it) + "-" + TiCC::toString( value-1) + ",";
 	  //	  cerr << "advance it met " << steps-1 << endl;
 	  for ( size_t j=0; j < steps-1;++j){
 	    ++it;
