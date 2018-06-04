@@ -500,23 +500,61 @@ namespace Timbl {
     }
     if ( !ignore.empty() ){
       result += ":I";
-      for ( const auto& it : ignore ){
-	result += TiCC::toString(it) + ",";
+      // using TiCC::operator<<;
+      // cerr << "IGNORE bevat:" << ignore << endl;
+      for ( auto it = ignore.begin(); it != ignore.end(); ++it ){
+	size_t pos = *it;
+	//	cerr << "START it=" << *it << " pos = " << pos << endl;
+	size_t steps = 0;
+	for ( ; pos <= *ignore.rbegin(); ++pos ){
+	  cerr << "pos = " << pos << endl;
+	  if ( ignore.find(pos) == ignore.end() ){
+	    break;
+	  }
+	  ++steps;
+	}
+	// cerr << "END it=" << *it << " pos = " << pos << endl;
+	// cerr << "STEPS =" << steps << endl;
+	if ( pos == *it+1 ){
+	  if ( *it != *ignore.begin() ){
+	    result += ",";
+	  }
+	  result += TiCC::toString(*it) + ",";
+	}
+	else if ( pos == *it+2 ){
+	  result += TiCC::toString(*it);
+	  ++it;
+	  result += "," + TiCC::toString(*it);
+	}
+	else {
+	  result += TiCC::toString(*it) + "-" + TiCC::toString( pos-1) + ",";
+	  //	  cerr << "advance it met " << steps-1 << endl;
+	  for ( size_t j=0; j < steps-1;++j){
+	    ++it;
+	    if ( it == ignore.end() ){
+	      --it;
+	      break;
+	    }
+	  }
+	}
       }
+      result.pop_back();
     }
-    else {
-      result += ":";
-    }
+    result += ":";
     for ( const auto& it : metrics ){
       bool first = true;
       for ( const auto& ig : it.second ){
 	if ( ignore.find( ig ) == ignore.end() ){
 	  if ( first ){
-	    result += it.first + ":";
+	    result += it.first;
 	    first = false;
 	  }
 	  result += TiCC::toString( ig ) + ",";
 	}
+      }
+      if ( result.back() == ',' ){
+	result.pop_back();
+	result.push_back(':');
       }
     }
     while ( result.back() == ':'

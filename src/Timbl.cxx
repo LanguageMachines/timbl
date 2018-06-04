@@ -767,7 +767,7 @@ int main(int argc, char *argv[]){
 	    //	    cerr << endl << endl << "NEW M: " << m_val << endl << endl;
 	    opts.extract( 'm' );
 	    opts.insert( 'm', m_val, true );
-	    cerr << "A --limit=" << limit_val << " is specified, so we retrain "
+	    cerr << "\t--limit=" << limit_val << " is specified, so we retrain "
 		 << "the data with option: -m" << m_val << endl;
 	    delete Run;
 	    Run = new TimblAPI( opts );
