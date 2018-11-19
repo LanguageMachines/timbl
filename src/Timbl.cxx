@@ -860,14 +860,14 @@ int main(int argc, char *argv[]){
   catch( softExit& e ){
     return EXIT_SUCCESS;
   }
-  catch(std::string& what){
+  catch( const std::string& what ){
     cerr << what << ", sorry" << endl;
   }
-  catch(std::bad_alloc){
+  catch( const std::bad_alloc&){
     cerr << "ran out of memory somewhere" << endl;
     cerr << "timbl terminated, Sorry for that" << endl;
   }
-  catch(std::exception& e){
+  catch( const std::exception& e ){
     cerr << e.what() << ", sorry" << endl;
   }
   return EXIT_FAILURE;

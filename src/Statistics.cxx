@@ -51,7 +51,7 @@ namespace Timbl {
 	mat[i].resize(size,0);
       }
     }
-    catch( bad_alloc ){
+    catch( const bad_alloc& ){
       Error ( "Not enough memory for ConfusionMatrix" );
       throw;
     }
