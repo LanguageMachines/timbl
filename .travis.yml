@@ -30,7 +30,7 @@ matrix:
       cache: ccache
       env:
         - SCAN=scan-build
-        - OPENMPFLAG=--disable-openmp
+#        - OPENMPFLAG=--disable-openmp
 
     - os: osx
       cache: ccache
