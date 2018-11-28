@@ -51,6 +51,15 @@ AC_TYPE_SIZE_T
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([floor gettimeofday pow rint sqrt ])
 
+# for now we demand boost, because on some systems gcc4.8 is installed still
+# and that fails on regex.
+
+AX_BOOST_BASE( [1.50],
+	       [AX_BOOST_REGEX
+	        LIBS="$LIBS $BOOST_REGEX_LIB"
+                AC_DEFINE(HAVE_BOOST_REGEX, 1 , [Define to 1 if you have boost regular expresions] )],
+               [AC_MSG_ERROR([No Regular expression support available. Please install libboost-regex-dev])])
+
 PKG_PROG_PKG_CONFIG
 
 if test "x$prefix" = "xNONE"; then
