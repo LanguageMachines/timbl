@@ -1,3 +1,7 @@
+6.4.13 2018-05-16
+[Ko van der Sloot]
+- added a '--limit' option to use only the most significant features
+
 6.4.12 2018-05-16
 [Ko van der Sloot]
 Bugfix release:
