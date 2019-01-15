@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/LanguageMachines/timbl.svg?branch=master)](https://travis-ci.org/LanguageMachines/timbl) [![Language Machines Badge](http://applejack.science.ru.nl/lamabadge.php/timbl)](http://applejack.science.ru.nl/languagemachines/) 
+[![Build Status](https://travis-ci.org/LanguageMachines/timbl.svg?branch=master)](https://travis-ci.org/LanguageMachines/timbl) [![Language Machines Badge](http://applejack.science.ru.nl/lamabadge.php/timbl)](http://applejack.science.ru.nl/languagemachines/) [![DOI](https://zenodo.org/badge/20526237.svg)](https://zenodo.org/badge/latestdoi/20526237)
 
 ===========================================
 TiMBL: Tilburg Memory Based Learner
