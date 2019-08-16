@@ -1,5 +1,5 @@
 sudo: required
-dist: trusty
+dist: bionic
 
 group: edge
 
@@ -42,7 +42,7 @@ matrix:
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         sudo apt-get update;
-        sudo apt-get install pkg-config autoconf-archive ccache cppcheck libicu-dev libxml2-dev libbz2-dev zlib1g-dev libboost-dev libboost-regex-dev libtar-dev;
+        sudo apt-get install pkg-config autoconf-archive ccache cppcheck libicu-dev libxml2-dev libbz2-dev zlib1g-dev libtar-dev;
       fi
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
         brew update;
@@ -55,7 +55,6 @@ before_install:
         brew install libtar;
         brew install cppcheck;
         brew install ccache;
-        brew outdated boost || brew upgrade boost;
         brew install llvm;
         export PATH="/usr/local/opt/llvm/bin:$PATH";
         export LDFLAGS="-L/usr/local/opt/llvm/lib";
