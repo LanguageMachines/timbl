@@ -1261,10 +1261,10 @@ namespace Timbl {
       LastInstBasePos = InstBase;
     }
     else {
+      if ( *pnt == 0 ){
+	throw logic_error( "unexpected NULL pointer in AddInstance()" );
+      }
       for ( unsigned int i = 0; i < Depth; ++i ){
-	if ( *pnt == 0 ){
-	  throw logic_error( "unexpected NULL pointer in AddInstance()" );
-	}
 #ifdef IBSTATS
 	hlp = (*pnt)->add_feat_val( Inst.FV[i], mismatch[i], pnt, ibCount );
 #else
