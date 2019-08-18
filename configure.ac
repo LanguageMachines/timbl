@@ -71,16 +71,6 @@ PKG_CHECK_MODULES([ticcutils], [ticcutils >= 0.22] )
 CXXFLAGS="$CXXFLAGS $ticcutils_CFLAGS"
 LIBS="$LIBS $ticcutils_LIBS"
 
-# for now we demand boost, because on some systems gcc4.8 is installed still
-# and that fails on regex.
-
-#AX_BOOST_BASE( [1.50],
-#	       [AX_BOOST_REGEX
-#	        LIBS="$LIBS $BOOST_REGEX_LIB"
-#                AC_DEFINE(HAVE_BOOST_REGEX, 1 , [Define to 1 if you have boost regular expresions] )],
-#               [AC_MSG_ERROR([No Regular expression support available. Please install libboost-regex-dev])])
-
-
 AC_CONFIG_FILES([
   Makefile
   timbl.pc
