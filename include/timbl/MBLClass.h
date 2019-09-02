@@ -51,6 +51,7 @@ namespace Timbl {
   public:
     bool SetOption( const std::string& );
     xmlNode *settingsToXml() const;
+    nlohmann::json settings_to_JSON() const;
     bool ShowWeights( std::ostream& ) const;
     bool Verbosity( VerbosityFlags v ) const {
       return verbosity & v; };

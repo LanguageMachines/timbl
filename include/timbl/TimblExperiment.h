@@ -160,9 +160,11 @@ namespace Timbl {
     bool GetWeights( const std::string&, WeightType );
     bool GetCurrentWeights( std::vector<double>& );
     xmlNode *weightsToXML();
+    nlohmann::json weights_to_JSON();
     bool ShowOptions( std::ostream& );
     bool ShowSettings( std::ostream& );
     xmlNode *settingsToXML();
+    nlohmann::json settings_to_JSON();
     bool showBestNeighbors( std::ostream& ) const;
     xmlNode *bestNeighborsToXML() const;
     nlohmann::json best_neighbors_to_JSON() const;

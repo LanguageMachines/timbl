@@ -71,6 +71,7 @@
 #endif
 
 using namespace std;
+using namespace nlohmann;
 
 namespace Timbl {
 
@@ -1037,12 +1038,12 @@ namespace Timbl {
       return 0;
   }
 
-  nlohmann::json TimblExperiment::best_neighbors_to_JSON() const {
+  json TimblExperiment::best_neighbors_to_JSON() const {
     if ( Verbosity( NEAR_N | ALL_K) ){
       return bestArray.to_JSON();
     }
     else {
-      return nlohmann::json();
+      return json();
     }
   }
 
@@ -2072,6 +2073,13 @@ namespace Timbl {
       return 0;
   }
 
+  json TimblExperiment::settings_to_JSON(){
+    if ( ConfirmOptions() )
+      return MBLClass::settings_to_JSON( );
+    else
+      return 0;
+  }
+
   xmlNode *TimblExperiment::weightsToXML(){
     xmlNode *result = TiCC::XmlNewNode( "currentWeights" );
     TiCC::XmlSetAttribute( result,
@@ -2085,6 +2093,22 @@ namespace Timbl {
 					  TiCC::toString(wghts[i]) );
       TiCC::XmlSetAttribute( n, "index", TiCC::toString(i+1) );
     }
+    return result;
+  }
+
+  json TimblExperiment::weights_to_JSON(){
+    json result;
+    result["weighting"] = TiCC::toString( CurrentWeighting() );
+    json arr = json::array();
+    vector<double> wghts;
+    GetCurrentWeights( wghts );
+    for ( unsigned int i=0; i < wghts.size(); ++i ){
+      json element;
+      element["index"] = TiCC::toString(i+1);
+      element["weight"] = TiCC::toString(wghts[i]);
+      arr.push_back( element );
+    }
+    result["weights"] = arr;
     return result;
   }
 

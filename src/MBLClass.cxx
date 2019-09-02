@@ -55,6 +55,7 @@
 #include "timbl/MBLClass.h"
 
 using namespace std;
+using namespace nlohmann;
 
 namespace Timbl {
 
@@ -423,6 +424,26 @@ namespace Timbl {
 	TiCC::XmlNewTextChild( result, tag, val );
       }
     }
+    return result;
+  }
+
+  json MBLClass::settings_to_JSON() const{
+    ostringstream tmp;
+    Options.Show_Settings( tmp );
+    vector<string> lines = TiCC::split_at( tmp.str(), "\n" );
+    json result;
+    json arr = json::array();
+    for ( const auto& line : lines ){
+      vector<string> parts = TiCC::split_at( line, ":" );
+      if ( parts.size() ==2 ){
+	string tag = TiCC::trim( parts[0] );
+	string val = TiCC::trim( parts[1] );
+	json element;
+	element[tag] = val;
+	arr.push_back( element );
+      }
+    }
+    result["settings"] = arr;
     return result;
   }
 
