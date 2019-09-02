@@ -29,6 +29,7 @@
 #define TIMBL_BESTARRAY_H
 
 #include "ticcutils/XMLtools.h"
+#include "ticcutils/json.hpp"
 #include "timbl/neighborSet.h"
 
 namespace Timbl {
@@ -38,7 +39,7 @@ namespace Timbl {
   public:
     BestRec();
     ~BestRec();
-    size_t totalBests() { return aggregateDist.totalSize(); };
+    size_t totalBests() const { return aggregateDist.totalSize(); };
     double bestDistance;
     ValueDistribution aggregateDist;
     std::vector<ValueDistribution*> bestDistributions;
@@ -63,6 +64,8 @@ namespace Timbl {
     void initNeighborSet( neighborSet& ) const;
     void addToNeighborSet( neighborSet& , size_t ) const;
     xmlNode *toXML() const;
+    nlohmann::json to_JSON() const;
+    nlohmann::json record_to_json( const BestRec *, size_t ) const;
   private:
     bool _storeInstances;
     bool _showDi;

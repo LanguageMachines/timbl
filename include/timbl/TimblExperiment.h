@@ -165,6 +165,7 @@ namespace Timbl {
     xmlNode *settingsToXML();
     bool showBestNeighbors( std::ostream& ) const;
     xmlNode *bestNeighborsToXML() const;
+    nlohmann::json best_neighbors_to_JSON() const;
     bool showStatistics( std::ostream& ) const;
     void showInputFormat( std::ostream& ) const;
     const std::string& ExpName() const { return exp_name; };

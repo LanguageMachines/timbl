@@ -35,11 +35,13 @@
 #include "timbl/Instance.h"
 #include "timbl/neighborSet.h"
 #include "ticcutils/XMLtools.h"
+#include "ticcutils/json.hpp"
 #include "timbl/BestArray.h"
 
 namespace Timbl {
   using namespace std;
   using namespace Common;
+  using namespace nlohmann;
 
   BestRec::BestRec():
     bestDistance( 0.0 )
@@ -255,6 +257,83 @@ namespace Timbl {
       }
     }
     return top;
+  }
+
+
+  json neighbor_to_json( const string& nb, const string& db ){
+    json result;
+    result["instance"] = nb;
+    if ( !db.empty() ){
+      result["distribution"] = db;
+    }
+    return result;
+  }
+
+  json BestArray::record_to_json( const BestRec *best, size_t k ) const {
+    json result;
+    if ( _storeInstances ){
+      size_t totalBests = best->totalBests();
+      if ( totalBests > 0 ){
+	// TRIBL algorithms returns 0 this!
+	result["k"] = TiCC::toString(k);
+	result["total"] = TiCC::toString(totalBests);
+	result["distance"] = TiCC::toString( best->bestDistance ) ;
+	if ( maxBests < totalBests ){
+	  result["limited"] = TiCC::toString( maxBests );
+	}
+	if ( best->bestInstances.size() == 0 ){
+	}
+	else if ( best->bestInstances.size() == 1 ){
+	  string db;
+	  if ( _showDb ){
+	    db = best->bestDistributions[0]->DistToString();
+	  }
+	  result["neighbor"] = neighbor_to_json( best->bestInstances[0], db );
+	}
+	else {
+	  json arr = json::array();
+	  for ( unsigned int m=0; m < best->bestInstances.size(); ++m ){
+	    string db;
+	    if ( _showDb ){
+	      db = best->bestDistributions[m]->DistToString();
+	    }
+	    arr.push_back( neighbor_to_json( best->bestInstances[m], db ) );
+	  }
+	  result["neighbor"] = arr;
+	}
+      }
+    }
+    else {
+      if ( !best->aggregateDist.ZeroDist() ){
+	result["k"] = TiCC::toString(k);
+	if ( _showDb ){
+	  result["distribution"] = best->aggregateDist.DistToString();
+	}
+	if ( _showDi ){
+	  result["distance"] = TiCC::toString(best->bestDistance);
+	}
+      }
+    }
+    return result;
+  }
+
+  json BestArray::to_JSON() const {
+    json result;
+    if ( bestArray.size() == 0 ){
+      return result; // empty
+    }
+    else if ( bestArray.size() == 1 ){
+      result = record_to_json( bestArray[0], 1 );
+      return result;
+    }
+    else {
+      result = json::array();
+      size_t k = 0;
+      for ( auto const& best : bestArray ){
+	result.push_back( record_to_json( best, ++k) );
+      }
+    }
+    return result;
   }
 
   ostream& operator<< ( ostream& os, const BestArray& bA ){

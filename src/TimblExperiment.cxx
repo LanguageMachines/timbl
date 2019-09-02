@@ -1037,6 +1037,15 @@ namespace Timbl {
       return 0;
   }
 
+  nlohmann::json TimblExperiment::best_neighbors_to_JSON() const {
+    if ( Verbosity( NEAR_N | ALL_K) ){
+      return bestArray.to_JSON();
+    }
+    else {
+      return nlohmann::json();
+    }
+  }
+
   void TimblExperiment::show_results( ostream& outfile,
 				      const double confidence,
 				      const string& dString,
