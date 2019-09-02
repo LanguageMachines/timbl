@@ -193,9 +193,9 @@ inline void usage_full(void){
   cerr << "      db: add distribution of best matched to output file"
        << endl;
   cerr << "      md: add matching depth to output file." << endl;
-  cerr << "      k:  add a summary for all k neigbors to output file"
+  cerr << "      k:  add a summary for all k neighbors to output file"
        << " (sets -x)" << endl;
-  cerr << "      n:  add nearest neigbors to output file (sets -x)"
+  cerr << "      n:  add nearest neighbors to output file (sets -x)"
        << endl;
   cerr << "  You may combine levels using '+' e.g. +v p+db or -v o+di"
        << endl;
@@ -303,7 +303,7 @@ void Preset_Values( TiCC::CL_Options& opts ){
   opts.insert( 'a', to_string( algorithm ), false );
   if ( opts.extract( 'Z', value ) ){
     // Special case
-    //    spitting neigborSets only
+    //    spitting neighborSets only
     Do_NS = true;
   }
   if ( opts.is_present( 't', value ) ){
