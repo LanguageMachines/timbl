@@ -275,11 +275,11 @@ namespace Timbl {
       size_t totalBests = best->totalBests();
       if ( totalBests > 0 ){
 	// TRIBL algorithms returns 0 this!
-	result["k"] = TiCC::toString(k);
-	result["total"] = TiCC::toString(totalBests);
-	result["distance"] = TiCC::toString( best->bestDistance ) ;
+	result["k"] = k;
+	result["total"] = totalBests;
+	result["distance"] = best->bestDistance;
 	if ( maxBests < totalBests ){
-	  result["limited"] = TiCC::toString( maxBests );
+	  result["limited"] = maxBests;
 	}
 	if ( best->bestInstances.size() == 0 ){
 	}
@@ -305,12 +305,12 @@ namespace Timbl {
     }
     else {
       if ( !best->aggregateDist.ZeroDist() ){
-	result["k"] = TiCC::toString(k);
+	result["k"] = k;
 	if ( _showDb ){
 	  result["distribution"] = best->aggregateDist.DistToString();
 	}
 	if ( _showDi ){
-	  result["distance"] = TiCC::toString(best->bestDistance);
+	  result["distance"] = best->bestDistance;
 	}
       }
     }

@@ -2102,11 +2102,8 @@ namespace Timbl {
     json arr = json::array();
     vector<double> wghts;
     GetCurrentWeights( wghts );
-    for ( unsigned int i=0; i < wghts.size(); ++i ){
-      json element;
-      element["index"] = TiCC::toString(i+1);
-      element["weight"] = TiCC::toString(wghts[i]);
-      arr.push_back( element );
+    for ( const auto& d : wghts ){
+      arr.push_back( d );
     }
     result["weights"] = arr;
     return result;
