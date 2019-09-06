@@ -1775,10 +1775,12 @@ namespace Timbl {
 					 exact );
       exp->normalizeResult();
       distrib = exp->bestResult.getResult();
-      if ( exp->Verbosity(CONFIDENCE) )
-	confidence = exp->bestResult.confidence(resultTarget);
-      else
+      if ( exp->Verbosity(CONFIDENCE) ){
+	confidence = exp->confidence();
+      }
+      else {
 	confidence = 0;
+      }
       return true;
     }
   }
@@ -1925,15 +1927,16 @@ namespace Timbl {
 	  bool exact = false;
 	  string distrib;
 	  double distance;
-	  double confidence = 0;
+	  double confi = 0;
 	  const TargetValue *resultTarget = LocalClassify( CurrInst,
 							   distance,
 							   exact );
 	  normalizeResult();
 	  distrib = bestResult.getResult();
-	  if ( Verbosity(CONFIDENCE) )
-	    confidence = bestResult.confidence( resultTarget );
-	  show_results( outStream, confidence, distrib, resultTarget, distance );
+	  if ( Verbosity(CONFIDENCE) ){
+	    confi = confidence();
+	  }
+	  show_results( outStream, confi, distrib, resultTarget, distance );
 	  if ( exact ){ // remember that a perfect match may be incorrect!
 	    if ( Verbosity(EXACT) ) {
 	      *mylog << "Exacte match:\n" << get_org_input() << endl;

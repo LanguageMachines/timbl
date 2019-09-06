@@ -135,11 +135,12 @@ namespace Timbl {
 							   exact );
 	  normalizeResult();
 	  string dString = bestResult.getResult();
-	  double confidence = 0;
-	  if ( Verbosity(CONFIDENCE) )
-	    confidence = bestResult.confidence( ResultTarget );
+	  double confi = 0;
+	  if ( Verbosity(CONFIDENCE) ){
+	    confi = confidence();
+	  }
 	  // Write it to the output file for later analysis.
-	  show_results( outStream, confidence, dString,
+	  show_results( outStream, confi, dString,
 			ResultTarget, final_distance );
 	  if ( exact ){ // remember that a perfect match may be incorrect!
 	    if ( Verbosity(EXACT) ) {
