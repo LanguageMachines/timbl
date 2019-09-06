@@ -464,6 +464,13 @@ namespace Timbl {
       return -1;
   }
 
+  double TimblAPI::confidence() const {
+    if ( Valid() )
+      return pimpl->confidence();
+    else
+      return -1;
+  }
+
   bool TimblAPI::matchedAtLeaf() const {
     return  Valid() && pimpl->matchedAtLeaf();
   }

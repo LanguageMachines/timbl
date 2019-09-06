@@ -112,7 +112,7 @@ namespace Timbl {
     if ( ExResultDist ){
       Distance = 0.0;
       Res = ExResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
-      bestResult.addConstant( ExResultDist );
+      bestResult.addConstant( ExResultDist, Res );
       exact = Do_Exact();
     }
     else {
@@ -129,9 +129,9 @@ namespace Timbl {
 	Distance = sum_remaining_weights(level);
 	if ( TrResultDist ){
 	  if ( level == 0 )
-	    bestResult.addTop( TrResultDist );
+	    bestResult.addTop( TrResultDist, Res );
 	  else
-	    bestResult.addConstant( TrResultDist );
+	    bestResult.addConstant( TrResultDist, Res );
 	}
       }
       else {
@@ -149,16 +149,16 @@ namespace Timbl {
 	  --num_of_neighbors;
 	  if ( !Tie2 ){
 	    delete ResultDist;
-	    bestResult.addDisposable( ResultDist2 );
+	    bestResult.addDisposable( ResultDist2, Res2 );
 	    Res = Res2;
 	  }
 	  else {
 	    delete ResultDist2;
-	    bestResult.addDisposable( ResultDist );
+	    bestResult.addDisposable( ResultDist, Res );
 	  }
 	}
 	else {
-	  bestResult.addDisposable( ResultDist );
+	  bestResult.addDisposable( ResultDist, Res );
 	}
 	SubTree->CleanPartition( true );
 	Distance = getBestDistance();
@@ -216,7 +216,7 @@ namespace Timbl {
     if ( ExResultDist ){
       Distance = 0.0;
       Res = ExResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
-      bestResult.addConstant( ExResultDist );
+      bestResult.addConstant( ExResultDist, Res );
       exact = Do_Exact();
     }
     else {
@@ -239,16 +239,16 @@ namespace Timbl {
 	  --num_of_neighbors;
 	  if ( !Tie2 ){
 	    delete ResultDist1;
-	    bestResult.addDisposable( ResultDist2 );
+	    bestResult.addDisposable( ResultDist2, Res2 );
 	    Res = Res2;
 	  }
 	  else {
 	    delete ResultDist2;
-	    bestResult.addDisposable( ResultDist1 );
+	    bestResult.addDisposable( ResultDist1, Res );
 	  }
 	}
 	else {
-	  bestResult.addDisposable( ResultDist1 );
+	  bestResult.addDisposable( ResultDist1, Res );
 	}
 	SubTree->CleanPartition( true );
 	match_depth = level;
@@ -258,7 +258,7 @@ namespace Timbl {
 	// an exact match
 	Distance = 0.0;
 	Res = TrResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
-	bestResult.addConstant( TrResultDist );
+	bestResult.addConstant( TrResultDist, Res );
 	bestArray.init( num_of_neighbors, MaxBests,
 			Verbosity(NEAR_N), Verbosity(DISTANCE),
 			Verbosity(DISTRIB) );
@@ -266,19 +266,23 @@ namespace Timbl {
 	bestArray.initNeighborSet( nSet );
       }
     }
-    if ( confusionInfo )
+    if ( confusionInfo ){
       confusionInfo->Increment( Inst.TV, Res );
+    }
     bool correct = Inst.TV && ( Res == Inst.TV );
     if ( correct ){
       stats.addCorrect();
-      if ( Tie )
+      if ( Tie ){
 	stats.addTieCorrect();
+      }
     }
-    else if ( Tie )
+    else if ( Tie ){
       stats.addTieFailure();
+    }
     exact = exact || ( fabs(Distance) < Epsilon );
-    if ( exact )
+    if ( exact ){
       stats.addExact();
+    }
     return Res;
   }
 

@@ -103,8 +103,10 @@ namespace Timbl {
   void resultStore::clear( ) {
     delete dist;
     dist = 0;
-    if ( disposable )
+    if ( disposable ){
       delete rawDist;
+    }
+    best_target = 0;
     rawDist = 0;
     beam = 0;
     isTop = false;
@@ -136,19 +138,25 @@ namespace Timbl {
     return resultCache;
   }
 
-  void resultStore::addConstant( const ValueDistribution *vd ) {
+  void resultStore::addConstant( const ValueDistribution *vd,
+				 const TargetValue *best_result ) {
     rawDist = vd;
+    best_target = best_result;
     disposable = false;
   }
 
-  void resultStore::addTop( const ValueDistribution *vd ) {
+  void resultStore::addTop( const ValueDistribution *vd,
+			    const TargetValue *best_result ) {
     rawDist = vd;
+    best_target = best_result;
     disposable = false;
     isTop = true;
   }
 
-  void resultStore::addDisposable( ValueDistribution *vd ) {
+  void resultStore::addDisposable( ValueDistribution *vd,
+				   const TargetValue *best_result ) {
     rawDist = vd;
+    best_target = best_result;
     disposable = true;
   }
 
@@ -1581,25 +1589,28 @@ namespace Timbl {
 
     exact = fabs(Distance) < Epsilon ;
     if ( ResultDist ){
-      bestResult.addDisposable( ResultDist );
+      bestResult.addDisposable( ResultDist, Res );
     }
     else {
-      bestResult.addConstant( ExResultDist );
+      bestResult.addConstant( ExResultDist, Res );
       exact = exact || Do_Exact();
     }
-    if ( exact )
+    if ( exact ){
       stats.addExact();
+    }
     if ( confusionInfo ){
       confusionInfo->Increment( Inst.TV, Res );
     }
     bool correct = Inst.TV && ( Res == Inst.TV );
     if ( correct ){
       stats.addCorrect();
-      if ( Tie )
+      if ( Tie ){
 	stats.addTieCorrect();
+      }
     }
-    else if ( Tie )
+    else if ( Tie ){
       stats.addTieFailure();
+    }
     return Res;
   }
 

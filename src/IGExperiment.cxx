@@ -388,20 +388,23 @@ namespace Timbl {
     if ( ResultDist &&
 	 InstanceBase && InstanceBase->PersistentD() ){
       if ( match_depth == 0 )
-	bestResult.addTop( ResultDist );
+	bestResult.addTop( ResultDist, TV );
       else
-	bestResult.addConstant( ResultDist );
+	bestResult.addConstant( ResultDist, TV );
     }
-    if ( confusionInfo )
+    if ( confusionInfo ){
       confusionInfo->Increment( Inst.TV, TV );
+    }
     bool correct = Inst.TV && ( TV == Inst.TV );
     if ( correct ){
       stats.addCorrect();
-      if ( Tie )
+      if ( Tie ){
 	stats.addTieCorrect();
+      }
     }
-    else if ( Tie )
+    else if ( Tie ){
       stats.addTieFailure();
+    }
     return TV;
   }
 

@@ -63,18 +63,22 @@ namespace Timbl {
       beam(0),
       norm(unknownNorm),
       factor(0.0),
+      best_target(0),
       targets(0)
 	{};
     ~resultStore();
     bool reset( int, normType, double, const Target * );
     void clear();
-    void addConstant( const ValueDistribution * );
-    void addTop( const ValueDistribution * );
-    void addDisposable( ValueDistribution * );
+    void addConstant( const ValueDistribution *, const TargetValue * );
+    void addTop( const ValueDistribution *, const TargetValue * );
+    void addDisposable( ValueDistribution *, const TargetValue * );
     const WValueDistribution *getResultDist();
     std::string getResult();
     void prepare();
     void normalize();
+    double confidence() const {
+      return dist->Confidence( best_target );
+    };
     double confidence( const TargetValue* tv ) const {
       return dist->Confidence( tv );
     };
@@ -88,6 +92,7 @@ namespace Timbl {
     int beam;
     normType norm;
     double factor;
+    const TargetValue *best_target;
     const Target *targets;
     std::string topCache;
     std::string resultCache;
@@ -176,6 +181,7 @@ namespace Timbl {
     bool Classify( const std::string& , std::string&, double& );
     bool Classify( const std::string& , std::string&, std::string&, double& );
     size_t matchDepth() const { return match_depth; };
+    double confidence() const { return bestResult.confidence(); };
     bool matchedAtLeaf() const { return last_leaf; };
 
     virtual AlgorithmType Algorithm() const = 0;

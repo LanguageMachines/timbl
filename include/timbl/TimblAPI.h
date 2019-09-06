@@ -96,6 +96,7 @@ namespace Timbl{
 		   std::string&, double& );
     bool ShowBestNeighbors( std::ostream& ) const;
     size_t matchDepth() const;
+    double confidence() const;
     bool matchedAtLeaf() const;
     std::string ExpName() const;
     static std::string VersionInfo( bool = false ); //obsolete
