@@ -191,6 +191,7 @@ namespace Timbl {
     is_copy = false;
     is_synced = false;
     sock_os = 0;
+    sock_is_json = false;
     Targets   = NULL;
     err_count = 0;
     MBL_init = false;
@@ -252,6 +253,7 @@ namespace Timbl {
       verbosity          = m.verbosity;
       do_exact_match     = m.do_exact_match;
       sock_os            = 0;
+      sock_is_json       = false;
       globalMetricOption = m.globalMetricOption;
       if ( m.GlobalMetric )
 	GlobalMetric     = getMetricClass( m.GlobalMetric->type() );
@@ -343,8 +345,17 @@ namespace Timbl {
   void MBLClass::Warning( const string& out_line ) const {
 #pragma omp critical
     {
-      if ( sock_os )
-	*sock_os << "ERROR { " << out_line << " }" << endl;
+      if ( sock_os ){
+	if ( sock_is_json ){
+	  json out_json;
+	  out_json["status"] = "error";
+	  out_json["message"] = out_line;
+	  last_error = out_json;
+	}
+	else {
+	  *sock_os << "ERROR { " << out_line << " }" << endl;
+	}
+      }
       else {
 	if ( exp_name != "" )
 	  *myerr << "Warning:-" << exp_name << "-" << out_line << endl;
@@ -355,8 +366,17 @@ namespace Timbl {
   }
 
   void MBLClass::Error( const string& out_line ) const {
-    if ( sock_os )
-      *sock_os << "ERROR { " << out_line << " }"  << endl;
+    if ( sock_os ){
+      if ( sock_is_json ){
+	json out_json;
+	out_json["status"] = "error";
+	out_json["message"] = out_line;
+	last_error = out_json;
+      }
+      else {
+	*sock_os << "ERROR { " << out_line << " }"  << endl;
+      }
+    }
     else {
       if ( exp_name != "" )
 	*myerr << "Error:-" << exp_name << "-" << out_line << endl;
@@ -367,8 +387,17 @@ namespace Timbl {
   }
 
   void MBLClass::FatalError( const string& out_line ) const {
-    if ( sock_os )
-      *sock_os << "ERROR { " << out_line << " }" << endl;
+    if ( sock_os ){
+      if ( sock_is_json ){
+	json out_json;
+	out_json["status"] = "error";
+	out_json["message"] = out_line;
+	last_error = out_json;
+      }
+      else {
+	*sock_os << "ERROR { " << out_line << " }" << endl;
+      }
+    }
     else {
       if ( exp_name != "" )
 	*myerr << "-" << exp_name << "-";
@@ -394,13 +423,14 @@ namespace Timbl {
     return true;
   }
 
-  bool MBLClass::connectToSocket( ostream *ss ){
+  bool MBLClass::connectToSocket( ostream *ss, bool is_json ){
     if ( sock_os ){
       throw( logic_error( "connectToSocket:: already connected!" ) );
     }
     else {
       sock_os = ss;
       if ( sock_os && sock_os->good() ){
+	sock_is_json = is_json;
 	return true;
       }
       else {

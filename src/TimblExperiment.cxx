@@ -1440,8 +1440,8 @@ namespace Timbl {
       size_t i = countFeatures( line, IF );
       if ( i != NumOfFeatures() ){
 	if ( i > 0 )
-	  Warning( "mismatch between number of features in testline " +
-		   line + " and the Instancebase (" + TiCC::toString<size_t>(i)
+	  Warning( "mismatch between number of features in testline '" +
+		   line + "' and the Instancebase (" + TiCC::toString<size_t>(i)
 		   + " vs. " + TiCC::toString<size_t>(NumOfFeatures()) + ")" );
       }
       else {

@@ -70,8 +70,10 @@ namespace Timbl {
     };
     WeightType CurrentWeighting() const { return Weighting; };
     InputFormatType InputFormat() const { return input_format; };
-    bool connectToSocket( std::ostream * );
+    bool connectToSocket( std::ostream *, bool = false );
     std::ostream *sock_os;
+    bool sock_is_json;
+    mutable nlohmann::json last_error;
     int getOcc() const { return doOcc; };
   protected:
     explicit MBLClass( const std::string& = "" );
