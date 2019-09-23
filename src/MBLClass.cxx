@@ -1339,7 +1339,6 @@ namespace Timbl {
   }
 
   bool MBLClass::read_the_vals( istream& is ){
-    bool result = true;
     bool *done = new bool[num_of_features];
     for ( size_t i=0; i < num_of_features; ++i )
       done[i] = false;
@@ -1392,13 +1391,13 @@ namespace Timbl {
 	}
       }
     }
-    if ( result ){
-      for ( size_t j=0; j < num_of_features; ++j )
-	if ( !done[j] ) {
-	  Error( "in weightsfile, Feature index " + TiCC::toString<size_t>(j+1) +
-		 " is not mentioned" );
-	  result = false;
-	}
+    bool result = true;
+    for ( size_t j=0; j < num_of_features; ++j ){
+      if ( !done[j] ) {
+	Error( "in weightsfile, Feature index " + TiCC::toString<size_t>(j+1) +
+	       " is not mentioned" );
+	result = false;
+      }
     }
     delete [] done;
     return result;

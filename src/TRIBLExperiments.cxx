@@ -220,10 +220,10 @@ namespace Timbl {
       exact = Do_Exact();
     }
     else {
-      IB_InstanceBase *SubTree = NULL;
       size_t level = 0;
       const ValueDistribution *TrResultDist = 0;
-      SubTree = InstanceBase->TRIBL2_test( Inst, TrResultDist, level );
+      IB_InstanceBase *SubTree
+	= InstanceBase->TRIBL2_test( Inst, TrResultDist, level );
       if ( SubTree ){
 	testInstance( Inst, SubTree, level );
 	bestArray.initNeighborSet( nSet );
