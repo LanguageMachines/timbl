@@ -1483,6 +1483,59 @@ namespace Timbl {
     return true;
   }
 
+  json TimblExperiment::classify_to_JSON( const std::string& inst ) {
+    json result;
+    double distance = 0.0;
+    const TargetValue *targ = classifyString( inst, distance );
+    if ( targ ){
+      string cat = targ->Name();
+      normalizeResult();
+      result["category"] = cat;
+      if ( Verbosity(NEAR_N) ){
+	json tmp = best_neighbors_to_JSON();
+	if ( !tmp.empty() ){
+	  result["neighbors"] = tmp;
+	}
+      }
+      if ( Verbosity(DISTANCE) ){
+	result["distance"] = distance;
+      }
+      if ( Verbosity(DISTRIB) ){
+	string distribution = bestResult.getResult();
+	result["distribution"] = distribution;
+      }
+      if ( Verbosity(MATCH_DEPTH) ){
+	result["match_depth"] = matchDepth();
+      }
+      if ( Verbosity(NEAR_N) ){
+	json tmp = best_neighbors_to_JSON();
+	if ( !tmp.empty() ){
+	  result["neighbors"] = tmp;
+	}
+      }
+    }
+    else {
+      result = last_error;
+    }
+    return result;
+  }
+
+  json TimblExperiment::classify_to_JSON( const std::vector<std::string>& instances ) {
+    json result = json::array();
+    for ( const auto& i : instances ){
+      json tmp = classify_to_JSON( i );
+      result.push_back( tmp );
+    }
+    if ( result.size() != instances.size() ){
+      json error;
+      error["status"] = "error";
+      error["message"] = "total confusion in Timbl";
+      result = error;
+    }
+    return result;
+  }
+
+
   bool TimblExperiment::Classify( const string& Line,
 				  string& Result,
 				  string& Dist,

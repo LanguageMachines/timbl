@@ -184,6 +184,9 @@ namespace Timbl {
     double confidence() const { return bestResult.confidence(); };
     bool matchedAtLeaf() const { return last_leaf; };
 
+    nlohmann::json classify_to_JSON( const std::string& );
+    nlohmann::json classify_to_JSON( const std::vector<std::string>& );
+
     virtual AlgorithmType Algorithm() const = 0;
     const TargetValue *Classify( const std::string& Line,
 				 const ValueDistribution *& db,
