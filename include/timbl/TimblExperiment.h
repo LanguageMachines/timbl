@@ -77,10 +77,20 @@ namespace Timbl {
     void prepare();
     void normalize();
     double confidence() const {
-      return dist->Confidence( best_target );
+      if ( dist ){
+	return dist->Confidence( best_target );
+      }
+      else {
+	return 0.0;
+      }
     };
     double confidence( const TargetValue* tv ) const {
-      return dist->Confidence( tv );
+      if ( dist ){
+	return dist->Confidence( tv );
+      }
+      else {
+	return 0.0;
+      }
     };
   private:
     resultStore( const resultStore& ); // inhibit copies

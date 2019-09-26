@@ -1500,8 +1500,8 @@ namespace Timbl {
       if ( Verbosity(DISTANCE) ){
 	result["distance"] = distance;
       }
+      string distribution = bestResult.getResult();
       if ( Verbosity(DISTRIB) ){
-	string distribution = bestResult.getResult();
 	result["distribution"] = distribution;
       }
       if ( Verbosity(MATCH_DEPTH) ){
