@@ -1513,6 +1513,9 @@ namespace Timbl {
 	  result["neighbors"] = tmp;
 	}
       }
+      if (Verbosity(CONFIDENCE) ){
+	result["confidence"] = confidence();
+      }
     }
     else {
       result = last_error;
