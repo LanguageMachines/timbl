@@ -468,6 +468,8 @@ namespace Timbl {
       if ( parts.size() ==2 ){
 	string tag = TiCC::trim( parts[0] );
 	string val = TiCC::trim( parts[1] );
+	// a lot of values are integers, some float's
+	// in fact they should be added as such, not as strings....
 	json element;
 	element[tag] = val;
 	arr.push_back( element );
