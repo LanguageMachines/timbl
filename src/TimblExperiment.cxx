@@ -1328,15 +1328,14 @@ namespace Timbl {
 	      }
 	    }
 	  } while( found );
-	  if ( result ){
-	    time_stamp( "Finished:  ", stats.dataLines() );
-	    *mylog << "in total added " << TotalAdded << " new entries" << endl;
-	    if ( !Verbosity(SILENT) ){
-	      IBInfo( *mylog );
-	      LearningInfo( *mylog );
-	    }
-	    MBL_init = false; // force recalculations when testing
+
+	  time_stamp( "Finished:  ", stats.dataLines() );
+	  *mylog << "in total added " << TotalAdded << " new entries" << endl;
+	  if ( !Verbosity(SILENT) ){
+	    IBInfo( *mylog );
+	    LearningInfo( *mylog );
 	  }
+	  MBL_init = false; // force recalculations when testing
 	}
       }
     }
