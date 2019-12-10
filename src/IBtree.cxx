@@ -1262,13 +1262,10 @@ namespace Timbl {
     }
     else {
       for ( unsigned int i = 0; i < Depth; ++i ){
-	if ( *pnt == 0 ){
-	  throw logic_error( "unexpected NULL pointer in AddInstance()" );
-	}
 #ifdef IBSTATS
-	hlp = (*pnt)->add_feat_val( Inst.FV[i], mismatch[i], pnt, ibCount );
+	hlp = IBtree::add_feat_val( Inst.FV[i], mismatch[i], pnt, ibCount );
 #else
-	hlp = (*pnt)->add_feat_val( Inst.FV[i], pnt, ibCount );
+	hlp = IBtree::add_feat_val( Inst.FV[i], pnt, ibCount );
 #endif
 	if ( i==0 && hlp->next == 0 ){
 	  LastInstBasePos = hlp;

@@ -77,9 +77,9 @@ namespace Timbl {
     ~IBtree();
     IBtree *Reduce( const TargetValue *, unsigned long&, long );
 #ifdef IBSTATS
-    inline IBtree *add_feat_val( FeatureValue *, unsigned int&, IBtree **, unsigned long& );
+    static inline IBtree *add_feat_val( FeatureValue *, unsigned int&, IBtree **, unsigned long& );
 #else
-    inline IBtree *add_feat_val( FeatureValue *, IBtree **, unsigned long& );
+    static inline IBtree *add_feat_val( FeatureValue *, IBtree **, unsigned long& );
 #endif
     inline ValueDistribution *sum_distributions( bool );
     inline IBtree *make_unique( const TargetValue *, unsigned long& );
