@@ -31,7 +31,13 @@
 int main(){
   std::string path = std::getenv( "topsrcdir" );
   std::cerr << path << std::endl;
-
+  std::cerr << "version: " << Timbl::VersionName() << std::endl;
+  Timbl::AlgorithmType alg = Timbl::charToAlg( '0'  );
+  assert( alg == Timbl::IB1_a );
+  Timbl::normType nor = Timbl::charToNorm( '0'  );
+  assert( nor == Timbl::probabilityNorm );
+  Timbl::WeightType w = Timbl::charToWeig( '0'  );
+  assert( w == Timbl::No_w );
   Timbl::TimblAPI exp( "+vdi+db", "test1" );
   if ( exp.isValid() ){
     exp.Learn( path + "/demos/dimin.train" );
