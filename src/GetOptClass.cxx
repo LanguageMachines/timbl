@@ -663,15 +663,15 @@ namespace Timbl {
       //      cerr << "process " << curr_opt << endl;
       bool mood = false;
       string long_option;
-      bool longOpt = curr_opt.isLong();
-      string opt_val = curr_opt.Option();
-      char opt_char = curr_opt.OptChar();
+      bool longOpt = curr_opt.is_long();
+      string opt_val = curr_opt.option();
+      char opt_char = curr_opt.opt_char();
 
       if ( longOpt ){
-	long_option = curr_opt.OptWord();
+	long_option = curr_opt.option();
       }
       else {
-	mood = curr_opt.getMood();
+	mood = curr_opt.get_mood();
       }
       //      cerr << "long option:" << long_option << endl;
       //      cerr << "   opt_val:" << opt_val << endl;
