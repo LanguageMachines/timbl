@@ -661,20 +661,11 @@ namespace Timbl {
     //    cerr << "mode: " << mode << endl;
     for( auto const& curr_opt: opts ){
       //      cerr << "process " << curr_opt << endl;
-      bool mood = false;
-      string long_option;
+      bool mood = curr_opt.get_mood();
       bool longOpt = curr_opt.is_long();
-      string opt_val = curr_opt.option();
+      string opt_val = curr_opt.value();
       char opt_char = curr_opt.opt_char();
-
-      if ( longOpt ){
-	long_option = curr_opt.opt_value();
-      }
-      else {
-	mood = curr_opt.get_mood();
-      }
-      //      cerr << "long option:" << long_option << endl;
-      //      cerr << "   opt_val:" << opt_val << endl;
+      string long_option = curr_opt.option();
       try {
 	//	cerr << "try " << opt_char << endl;
 	switch (opt_char) {
