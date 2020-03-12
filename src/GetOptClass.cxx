@@ -668,7 +668,7 @@ namespace Timbl {
       char opt_char = curr_opt.opt_char();
 
       if ( longOpt ){
-	long_option = curr_opt.option();
+	long_option = curr_opt.opt_value();
       }
       else {
 	mood = curr_opt.get_mood();
