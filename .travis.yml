@@ -29,7 +29,7 @@ matrix:
       compiler: clang++
       cache: ccache
       env:
-        - SCAN=echo   #  no scanning due to a false positive
+        - SCAN=scan-build
         - OPENMPFLAG=--disable-openmp
 
     - os: osx
