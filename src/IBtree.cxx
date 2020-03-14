@@ -109,8 +109,9 @@ namespace Timbl {
     while ( pnt ) {
       if ( pnt->link || pnt->FValue ){
 	os << pnt->FValue;
-	if ( pnt->TValue )
+	if ( pnt->TValue ){
 	  os << "(" << pnt->TValue << ")" ;
+	}
 	if ( pnt->TDistribution ){
 	  os << pnt->TDistribution ;
 	}
@@ -149,8 +150,9 @@ namespace Timbl {
   }
 
   ostream &operator<<( ostream &os, const IBtree *grap ){
-    if ( grap )
+    if ( grap ){
       os << *grap;
+    }
     else
       os << "null";
     return os;
@@ -163,10 +165,12 @@ namespace Timbl {
   }
 
   ostream& operator<<( ostream &os, const InstanceBase_base *ib ){
-    if ( ib )
+    if ( ib ){
       os << *ib;
-    else
+    }
+    else {
       os << "empty INSTANCE BASE";
+    }
     return os;
   }
 
@@ -192,8 +196,9 @@ namespace Timbl {
 	  os << pnt->FValue << " ";
 	  write_tree( os, pnt );
 	  pnt = pnt->next;
-	  if ( pnt )
+	  if ( pnt ){
 	    os << ",";
+	  }
 	}
 	os << "]\n";
       }
@@ -221,8 +226,9 @@ namespace Timbl {
 	  os << pnt->FValue->Index();
 	  write_tree_hashed( os, pnt );
 	  pnt = pnt->next;
-	  if ( pnt )
+	  if ( pnt ){
 	    os << ",";
+	  }
 	}
 	os << "]\n";
       }
@@ -237,8 +243,9 @@ namespace Timbl {
   }
 
   const TargetValue *InstanceBase_base::TopTarget( bool &tie ) {
-    if ( !DefaultsValid || !DefAss )
+    if ( !DefaultsValid || !DefAss ){
       TopT = 0;
+    }
     if ( TopT == 0 ){
       if ( !TopDistribution ){
 	// added to satisfy scan-build
@@ -265,8 +272,9 @@ namespace Timbl {
 	os << pnt->FValue;
 	write_tree( os, pnt );
 	pnt = pnt->next;
-	if ( pnt )
+	if ( pnt ){
 	  os << ",";
+	}
       }
       os << "]\n";
     }
@@ -308,18 +316,23 @@ namespace Timbl {
     TiCC::XmlSetAttribute( nodes, "nodecount", TiCC::toString( cnt ) );
     while ( pnt ){
       xmlNode *node = TiCC::XmlNewChild( nodes, "node" );
-      if ( pnt->FValue )
+      if ( pnt->FValue ){
 	xmlAddChild( node, to_node( pnt->FValue ) );
-      if ( pnt->TValue )
-	xmlAddChild( node, to_node( pnt->TValue ) );
-      if ( pnt->link ){
-	if ( pnt->link->FValue )
-	  xmlAddChild( node, to_xml(pnt->link) );
-	else if ( pnt->link->TDistribution )
-	  xmlAddChild( node, to_node( pnt->link->TDistribution ) );
       }
-      else if ( pnt->TDistribution )
+      if ( pnt->TValue ){
+	xmlAddChild( node, to_node( pnt->TValue ) );
+      }
+      if ( pnt->link ){
+	if ( pnt->link->FValue ){
+	  xmlAddChild( node, to_xml(pnt->link) );
+	}
+	else if ( pnt->link->TDistribution ){
+	  xmlAddChild( node, to_node( pnt->link->TDistribution ) );
+	}
+      }
+      else if ( pnt->TDistribution ){
 	xmlAddChild( node, to_node( pnt->TDistribution ) );
+      }
       pnt = pnt->next;
     }
     return nodes;
@@ -333,8 +346,9 @@ namespace Timbl {
 		 TiCC::XmlNewComment( "Version " + TiCC::toString(Version) ) );
     bool dummy;
     xmlAddChild( root, to_node( TopTarget( dummy ) ) );
-    if ( PersistentDistributions )
+    if ( PersistentDistributions ){
       xmlAddChild( root, to_node( TopDistribution ) );
+    }
     IBtree *pnt = InstBase;
     xmlNode *tree = to_xml( pnt );
     xmlAddChild( root, tree );
@@ -374,8 +388,9 @@ namespace Timbl {
 	    while ( pnt ){
 	      os << pnt->FValue;
 	      pnt = pnt->next;
-	      if ( pnt )
+	      if ( pnt ){
 		os << " ";
+	      }
 	    }
 	    os << " >" << endl;
 	  }
@@ -421,8 +436,9 @@ namespace Timbl {
 	os << pnt->FValue->Index();
 	write_tree_hashed( os, pnt );
 	pnt = pnt->next;
-	if ( pnt )
+	if ( pnt ){
 	  os << ",";
+	}
       }
       os << "]\n";
     }
@@ -478,8 +494,9 @@ namespace Timbl {
 					 vector<Feature*>& Feats,
 					 Target *Targ,
 					 int level ){
-    if ( !is )
+    if ( !is ){
       return NULL;
+    }
     IBtree *result = new IBtree();
     ++ibCount;
     string buf;
@@ -508,8 +525,9 @@ namespace Timbl {
       }
       // also we have to update the targetinformation of the featurevalue
       // so we can recalculate the statistics later on.
-      if ( result->FValue->ValFreq() > 0 )
+      if ( result->FValue->ValFreq() > 0 ){
 	result->FValue->ReconstructDistribution( *(result->TDistribution) );
+      }
     }
     if ( look_ahead(is) == '[' ){
       result->link = read_list( is, Feats, Targ, level+1 );
@@ -522,8 +540,9 @@ namespace Timbl {
       result->link = new IBtree();
       ++ibCount;
       result->link->TValue = result->TValue;
-      if ( PersistentDistributions )
+      if ( PersistentDistributions ){
 	result->link->TDistribution = result->TDistribution->to_VD_Copy();
+      }
       else {
 	result->link->TDistribution = result->TDistribution;
 	result->TDistribution = NULL;
@@ -543,8 +562,9 @@ namespace Timbl {
 						vector<Feature*>& Feats,
 						Target *Targ,
 						int level ){
-    if ( !is )
+    if ( !is ){
       return NULL;
+    }
     IBtree *result = new IBtree();
     ++ibCount;
     char delim;
@@ -590,8 +610,9 @@ namespace Timbl {
       result->link = new IBtree();
       ++ibCount;
       result->link->TValue = result->TValue;
-      if ( PersistentDistributions )
+      if ( PersistentDistributions ){
 	result->link->TDistribution = result->TDistribution->to_VD_Copy();
+      }
       else {
 	result->link->TDistribution = result->TDistribution;
 	result->TDistribution = NULL;
@@ -676,16 +697,18 @@ namespace Timbl {
 	  Warning( what );
 	}
       }
-      if ( !TopDistribution )
+      if ( !TopDistribution ){
 	Error( "problems reading Top Distribution from Instance Base file" );
+      }
       else {
 	if ( look_ahead( is ) == '[' ){
 	  InstBase = read_list( is, Feats, Targs, 0 );
 	}
 	if ( InstBase ){
 	  is >> ws >> buf;
-	  if ( buf.empty() || buf[0] != ')' )
+	  if ( buf.empty() || buf[0] != ')' ){
 	    Error( "missing last `)` in Instance base file, found " + buf );
+	  }
 	}
       }
     }
@@ -706,11 +729,13 @@ namespace Timbl {
     vector<string> vals;
     while ( getline( is, line ) ){
       size_t i = TiCC::split( line, vals );
-      if ( i == 2 )
+      if ( i == 2 ){
 	// just ignore index!
 	cats->Hash( vals[1] );
-      else
+      }
+      else {
 	break;
+      }
       is >> ws;
     }
     if ( !compare_nocase( line, "Features" ) ){
@@ -719,11 +744,13 @@ namespace Timbl {
     }
     while ( getline( is, line ) ){
       size_t i = TiCC::split( line, vals );
-      if ( i == 2 )
+      if ( i == 2 ){
 	// just ignore index!
 	feats->Hash( vals[1] );
-      else
+      }
+      else {
 	break;
+      }
     }
     return true;
   }
@@ -794,8 +821,9 @@ namespace Timbl {
 	catch ( const string& what ){
 	  Warning( what );
 	}
-	if ( !TopDistribution )
+	if ( !TopDistribution ){
 	  Error( "problems reading Top Distribution from Instance Base file" );
+	}
       }
       else {
 	Error( "problems reading Top Distribution from Instance Base file" );
@@ -805,19 +833,22 @@ namespace Timbl {
       }
       if ( InstBase ){
 	is >> delim;
-	if ( delim != ')' )
+	if ( delim != ')' ){
 	  Error( string("missing last `)` in Instance base file, found: ")
 		 + delim );
+	}
       }
     }
     return (InstBase != NULL);
   }
 
   bool InstanceBase_base::HasDistributions() const {
-    if ( InstBase && InstBase->link )
+    if ( InstBase && InstBase->link ){
       return InstBase->link->TDistribution != NULL;
-    else
+    }
+    else {
       return false;
+    }
   }
 
   inline ValueDistribution *IBtree::sum_distributions( bool keep ){
@@ -825,19 +856,23 @@ namespace Timbl {
     // distibutions of all branches.
     ValueDistribution *result;
     if ( !keep ){
-      if ( TDistribution )
+      if ( TDistribution ){
 	if ( FValue ){
 	  result = TDistribution;
 	  TDistribution = NULL;
 	}
-	else
+	else {
 	  result = TDistribution->to_VD_Copy();
-      else
+	}
+      }
+      else {
 	result = new ValueDistribution();
+      }
       IBtree *pnt = this->next;
       while ( pnt ){
-	if ( pnt->TDistribution )
+	if ( pnt->TDistribution ){
 	  result->Merge( *(pnt->TDistribution) );
+	}
 	if ( FValue ){
 	  delete pnt->TDistribution;
 	  pnt->TDistribution = NULL;
@@ -846,10 +881,12 @@ namespace Timbl {
       }
     }
     else {
-      if ( TDistribution )
+      if ( TDistribution ){
 	result = TDistribution->to_VD_Copy();
-      else
+      }
+      else {
 	result = new ValueDistribution();
+      }
       IBtree *pnt = this->next;
       while ( pnt ){
 	if ( pnt->TDistribution ){
@@ -908,8 +945,9 @@ namespace Timbl {
 	pnt->link->redo_distributions();
 	delete pnt->TDistribution;
 	pnt->TDistribution = pnt->link->sum_distributions( false );
-	if ( pnt->FValue->ValFreq() > 0 )
+	if ( pnt->FValue->ValFreq() > 0 ){
 	  pnt->FValue->ReconstructDistribution( *(pnt->TDistribution) );
+	}
       }
       pnt = pnt->next;
     }
@@ -943,14 +981,17 @@ namespace Timbl {
     // leaves of the Tree and moving back to the top.
     IBtree *pnt = this;
     while ( pnt ){
-      if ( pnt->link != NULL )
+      if ( pnt->link != NULL ){
 	pnt->link = pnt->link->Reduce( pnt->TValue, cnt, depth-1 );
+      }
       pnt = pnt->next;
     }
-    if ( depth <= 0 )
+    if ( depth <= 0 ){
       return make_unique( Top, cnt );
-    else
+    }
+    else {
       return this;
+    }
   }
 
   const ValueDistribution *IBtree::exact_match( const Instance& Inst ) const {
@@ -960,16 +1001,20 @@ namespace Timbl {
     int pos = 0;
     while ( pnt ){
       if ( pnt->link == NULL ){
-	if ( pnt->TDistribution->ZeroDist() )
+	if ( pnt->TDistribution->ZeroDist() ){
 	  return NULL;
-	else
+	}
+	else {
 	  return pnt->TDistribution;
+	}
       }
-      else if ( Inst.FV[pos]->isUnknown() )
+      else if ( Inst.FV[pos]->isUnknown() ){
 	return NULL;
+      }
       else if ( pnt->FValue == Inst.FV[pos] ){
-	if ( pnt->FValue->ValFreq() == 0 )
+	if ( pnt->FValue->ValFreq() == 0 ){
 	  return NULL;
+	}
 	else {
 	  pnt = pnt->link;
 	  pos++;
@@ -1183,8 +1228,9 @@ namespace Timbl {
 
   void InstanceBase_base::CleanPartition( bool distToo ){
     InstBase = 0; // prevent deletion of InstBase in next step!
-    if ( !distToo )
+    if ( !distToo ){
       TopDistribution = 0; // save TopDistribution for deletion
+    }
     delete this;
   }
 
@@ -1236,8 +1282,9 @@ namespace Timbl {
     // is build incremental
     ValueDistribution dist;
     while ( pnt ){
-      if ( pnt->TDistribution )
+      if ( pnt->TDistribution ){
 	dist.Merge( *pnt->TDistribution );
+      }
       pnt = pnt->next;
     }
     bool dummy;
@@ -1279,10 +1326,12 @@ namespace Timbl {
     if ( *pnt == NULL ){
       *pnt = new IBtree();
       ++ibCount;
-      if ( abs( Inst.ExemplarWeight() ) > Epsilon )
+      if ( abs( Inst.ExemplarWeight() ) > Epsilon ){
 	(*pnt)->TDistribution = new WValueDistribution();
-      else
+      }
+      else {
 	(*pnt)->TDistribution = new ValueDistribution;
+      }
       NumOfTails++;
     }
     int occ = Inst.Occurrences();
@@ -1325,8 +1374,9 @@ namespace Timbl {
     TopDistribution->Merge( *ib->TopDistribution );
 #ifdef IBSTATS
     if ( ib->mismatch.size() > 0 ){
-      if ( mismatch.size() == 0 )
+      if ( mismatch.size() == 0 ){
 	mismatch.resize( ib->mismatch.size(), 0 );
+      }
       for ( unsigned int i = 0; i < mismatch.size(); ++i ){
 	mismatch[i] += ib->mismatch[i];
       }
@@ -1343,8 +1393,9 @@ namespace Timbl {
     while ( pnt ){
       delete pnt->TDistribution;
       pnt->TDistribution = 0;
-      if ( pnt->link )
+      if ( pnt->link ){
 	pnt->link->cleanDistributions();
+      }
       pnt = pnt->next;
     }
   }
@@ -1378,10 +1429,12 @@ namespace Timbl {
 	    --ib->ibCount;
 	    delete ibPnt;
 	    while ( snip ){
-	      if ( PersistentDistributions )
+	      if ( PersistentDistributions ){
 		(*pnt)->TDistribution->Merge( *snip->TDistribution );
-	      else
+	      }
+	      else {
 		delete snip->TDistribution;
+	      }
 	      IBtree **tmp = &(*pnt)->link;
 	      while ( *tmp && (*tmp)->FValue->Index() < snip->FValue->Index() ){
 		tmp = &(*tmp)->next;
@@ -1410,8 +1463,9 @@ namespace Timbl {
     TopDistribution->Merge( *ib->TopDistribution );
 #ifdef IBSTATS
     if ( ib->mismatch.size() > 0 ){
-      if ( mismatch.size() == 0 )
+      if ( mismatch.size() == 0 ){
 	mismatch.resize( ib->mismatch.size(), 0 );
+      }
       for ( unsigned int i = 0; i < mismatch.size(); ++i ){
 	mismatch[i] += ib->mismatch[i];
       }
@@ -1459,12 +1513,14 @@ namespace Timbl {
   const IBtree *IBtree::search_node( FeatureValue *fv ) const {
     const IBtree *pnt = 0;
     if ( fv ){
-      if ( fv->isUnknown() )
+      if ( fv->isUnknown() ){
 	return 0;
+      }
       pnt = this;
       while ( pnt ){
-	if ( pnt->FValue == fv )
+	if ( pnt->FValue == fv ){
 	  break;
+	}
 	pnt = pnt->next;
       }
     }
@@ -1473,14 +1529,17 @@ namespace Timbl {
 
   const IBtree *InstanceBase_base::fast_search_node( FeatureValue *fv ) {
     const IBtree *result = 0;
-    if ( fast_index.empty() )
+    if ( fast_index.empty() ){
       fill_index();
+    }
     if ( fv ){
-      if ( fv->isUnknown() )
+      if ( fv->isUnknown() ){
 	return 0;
+      }
       FI_map::const_iterator It = fast_index.find( fv->Index() );
-      if ( It != fast_index.end() )
+      if ( It != fast_index.end() ){
 	result = It->second;
+      }
     }
     return result;
   }
@@ -1507,13 +1566,16 @@ namespace Timbl {
       }
       InstPath[i] = pnt;
       RestartSearch[i] = pnt;
-      if ( i == 0 )
+      if ( i == 0 ){
 	pnt = fast_search_node( (*testInst)[offSet+i] );
-      else
+      }
+      else {
 	pnt = pnt->search_node( (*testInst)[offSet+i] );
+      }
       if ( pnt ){ // found an exact match, so mark restart position
-	if ( RestartSearch[i] == pnt )
+	if ( RestartSearch[i] == pnt ){
 	  RestartSearch[i] = pnt->next;
+	}
 	SkipSearch[i] = pnt;
 	InstPath[i] = pnt;
       }
@@ -1572,8 +1634,9 @@ namespace Timbl {
 	pnt = pnt->next;
       }
       if ( !pnt ) {
-	if ( pos == 0 )
+	if ( pos == 0 ){
 	  goon = false;
+	}
 	else {
 	  pos--;
 	  //	  cerr << "decremented pos to " << pos << endl;
@@ -1590,10 +1653,12 @@ namespace Timbl {
       for (  size_t j=pos+1; j < Depth; ++j ){
 	const IBtree *tmp = pnt->search_node( (*testInst)[offSet+j] );
 	if ( tmp ){ // we found an exact match, so mark Restart position
-	  if ( pnt == tmp )
+	  if ( pnt == tmp ){
 	    RestartSearch[j] = pnt->next;
-	  else
+	  }
+	  else {
 	    RestartSearch[j] = pnt;
+	  }
 	  SkipSearch[j] = tmp;
 	  InstPath[j] = tmp;
 	  Path[j] = tmp->FValue;
@@ -1610,8 +1675,9 @@ namespace Timbl {
 	cerr << "set Path[" << j<< "] to " << Path[j] << endl;
 #endif
       }
-      if ( pnt )
+      if ( pnt ){
 	result = pnt->TDistribution;
+      }
     }
     if ( result && result->ZeroDist() ){
       // This might happen when doing LOO or CV tests
@@ -1649,20 +1715,24 @@ namespace Timbl {
     const IBtree *pnt = fast_search_node( Inst.FV[pos] );
     while ( pnt ){
       result = pnt->TValue;
-      if ( PersistentDistributions )
+      if ( PersistentDistributions ){
 	Dist = pnt->TDistribution;
+      }
       pnt = pnt->link;
-      if ( pnt && !pnt->FValue )
+      if ( pnt && !pnt->FValue ){
 	pnt = NULL;
+      }
       leaf = (pnt == NULL);
       ++pos;
-      if ( pnt )
+      if ( pnt ){
 	pnt = pnt->search_node( Inst.FV[pos] );
+      }
     }
     end_level = pos;
     if ( end_level == 0 ){
-      if ( !WTop && TopDistribution )
+      if ( !WTop && TopDistribution ){
 	WTop = TopDistribution->to_WVD_Copy();
+      }
       Dist = WTop;
     }
     return Dist;
@@ -1724,8 +1794,9 @@ namespace Timbl {
     }
     else {
       if ( pos == 0 && dist == NULL ){
-	if ( !WTop && TopDistribution )
+	if ( !WTop && TopDistribution ){
 	  WTop = TopDistribution->to_WVD_Copy();
+	}
 	dist = WTop;
 	bool dummy;
 	TV = TopTarget( dummy );

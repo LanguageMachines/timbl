@@ -53,8 +53,9 @@ namespace Timbl {
 	result = false;
       }
     }
-    if ( result )
+    if ( result ){
       Targets->decrement_value( Inst.TV );
+    }
     return result;
   }
 
@@ -70,18 +71,22 @@ namespace Timbl {
 	result = false;
       }
     }
-    if ( result )
+    if ( result ){
       Targets->increment_value( Inst.TV );
+    }
     return result;
   }
 
   MBLClass::IB_Stat MBLClass::IBStatus() const {
-    if (!InstanceBase )
+    if ( !InstanceBase ){
       return Invalid;
-    else if (InstanceBase->IsPruned() )
+    }
+    else if (InstanceBase->IsPruned() ){
       return Pruned;
-    else
+    }
+    else {
       return Normal;
+    }
   }
 
   void MBLClass::IBInfo( ostream& os ) const {
@@ -117,8 +122,9 @@ namespace Timbl {
 	}
 	else {
 	  nodes = *(nIt-1) + *(tIt-1);
-	  if ( nodes == 0 )
+	  if ( nodes == 0 ){
 	    break;
+	  }
 	  os << setw(8) << i << " |"<< setw(8) << permutation[i-1] + 1 << " |"
 	     << setw(10) << nodes << " |"
 	     << setw(10) << *(nIt-1) << " |" << setw(10) << *(tIt-1) << " |"
@@ -144,10 +150,12 @@ namespace Timbl {
     string::size_type b_pos = s.find_first_not_of( seps, pos );
     if ( b_pos != string::npos ){
       pos = s.find_first_of( seps, b_pos );
-      if ( pos == string::npos )
+      if ( pos == string::npos ){
 	return string( s, b_pos );
-      else
+      }
+      else {
 	return string( s, b_pos, pos - b_pos );
+      }
     }
     else {
       pos = string::npos;
@@ -184,10 +192,12 @@ namespace Timbl {
       if ( num > 2 ){
 	if ( compare_nocase_n( "Status:", splits[1] ) ){
 	  version = 2;
-	  if ( splits[2] == "pruned" )
+	  if ( splits[2] == "pruned" ){
 	    Pruned = true;
-	  else if ( splits[2] == "complete" )
+	  }
+	  else if ( splits[2] == "complete" ){
 	    Pruned = false;
+	  }
 	  else {
 	    Error( "Unknown Status Information in Instance-Base file." );
 	    info_ok = false;
@@ -195,10 +205,12 @@ namespace Timbl {
 	}
 	else if ( compare_nocase_n( "Algorithm:", splits[1] ) ) {
 	  version = 1;
-	  if ( compare_nocase( splits[2], "IG-tree" ) )
+	  if ( compare_nocase( splits[2], "IG-tree" ) ){
 	    Pruned = true;
-	  else if ( compare_nocase( splits[2], "MBL" ) )
+	  }
+	  else if ( compare_nocase( splits[2], "MBL" ) ){
 	    Pruned = false;
+	  }
 	  else {
 	    Error( "Unknown Algorithm Information in Instance-Base file." );
 	    info_ok = false;
@@ -225,8 +237,9 @@ namespace Timbl {
 	    while ( info_ok && pos != string::npos &&
 		    i < MaxFeatures ){
 	      i++;
-	      if ( !excl )
+	      if ( !excl ){
 		effective_feats++;
+	      }
 	      string tmp = string_tok( perms, pos, ", !" );
 	      size_t index = TiCC::stringTo<size_t>( tmp );
 	      permutation.push_back( --index );
@@ -237,8 +250,9 @@ namespace Timbl {
 		info_ok = false;
 		break;
 	      }
-	      if ( excl )
+	      if ( excl ){
 		UserOptions[index+1] = Ignore;
+	      }
 	      if ( pos == string::npos ){
 		break;
 	      }
@@ -256,8 +270,9 @@ namespace Timbl {
 		info_ok = false;
 	      }
 	    }
-	    if ( info_ok )
+	    if ( info_ok ){
 	      depth = i;
+	    }
 	  }
 	}
 	else if ( compare_nocase_n( "Numeric:", splits[1] ) ){
@@ -285,8 +300,9 @@ namespace Timbl {
 	else if ( compare_nocase_n( "Version", splits[1] ) ){
 	  version = TiCC::stringTo<int>( splits[2] );
 	  if ( version >= 3  && num > 3 ){
-	    if ( compare_nocase_n( "(Hashed)", splits[3] ) )
+	    if ( compare_nocase_n( "(Hashed)", splits[3] ) ){
 	      Hashed = true;
+	    }
 	  }
 	}
       }
@@ -316,16 +332,18 @@ namespace Timbl {
   }
 
   bool MBLClass::get_ranges( const string& rangeline ){
-    if ( NumNumFeatures() == 0 )
+    if ( NumNumFeatures() == 0 ){
       return true;
+    }
     istringstream is( rangeline );
     string buf;
     char kar;
     bool result = false;
     is >> kar; // skip #
     is >> ws >> buf;
-    if ( !compare_nocase_n( "Ranges:", buf ) )
+    if ( !compare_nocase_n( "Ranges:", buf ) ){
       Error( "missing Ranges line in Instance-Base file" );
+    }
     else {
       is >> ws;
       if ( look_ahead(is) == '.' ){
@@ -355,10 +373,12 @@ namespace Timbl {
 	      Features[k-1]->Max( max );
 	      if ( is ){
 		is >> ws >> buf;
-		if ( !buf.empty() && (buf[0] == '.' || buf[0] == ',' ) )
+		if ( !buf.empty() && (buf[0] == '.' || buf[0] == ',' ) ){
 		  result = true;
-		else
+		}
+		else {
 		  result = false;
+		}
 	      }
 	      else {
 		buf = ".";

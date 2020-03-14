@@ -818,8 +818,9 @@ namespace Timbl {
 
 	case 'D':
 	  if ( longOpt ){
-	    if ( option == "Diversify" )
+	    if ( option == "Diversify" ){
 	      do_diversify = true;
+	    }
 	    else {
 	      Error( "invalid option: Did you mean '--Diversify' ?" );
 	      return false;
@@ -913,8 +914,9 @@ namespace Timbl {
 	  break;
 	}
 	case 'm':
-	  if ( !parse_metrics( value, local_metric ) )
+	  if ( !parse_metrics( value, local_metric ) ){
 	    return false;
+	  }
 	  break;
 
 	case 'M':
@@ -936,12 +938,15 @@ namespace Timbl {
 	case 'o':
 	  if ( longOpt ){
 	    if ( option == "occurrences" ){
-	      if ( value == "train" )
+	      if ( value == "train" ){
 		occIn = 1;
-	      else if ( value == "test" )
+	      }
+	      else if ( value == "test" ){
 		occIn = 2;
-	      else if ( value == "both" )
+	      }
+	      else if ( value == "both" ){
 		occIn = 3;
+	      }
 	      else {
 		Error( "invalid --ocurrences value. (expected train,test or both)" );
 		return false;
@@ -1018,10 +1023,12 @@ namespace Timbl {
 	case 't':
 	  {
 	    AlgorithmType tmp_a = IB1_a;
-	    if ( compare_nocase( value, "leave_one_out" ) )
+	    if ( compare_nocase( value, "leave_one_out" ) ){
 	      tmp_a = LOO_a;
-	    else if ( compare_nocase( value, "cross_validate" ) )
+	    }
+	    else if ( compare_nocase( value, "cross_validate" ) ){
 	      tmp_a = CV_a;
+	    }
 	    if ( local_algo != IB1_a && tmp_a != IB1_a ){
 	      Error( "only IB1 algorithm is allowed for: " + TiCC::toString(tmp_a)  );
 	      return false;
@@ -1071,15 +1078,17 @@ namespace Timbl {
 		     " is not allowed at this stage." );
 	      return false;
 	    }
-	    else if ( Flag > 0 )
+	    else if ( Flag > 0 ){
 	      if ( mood ){
 		myVerbosity |= Flag;
 	      }
 	      else {
 		myVerbosity &= ~Flag;
 	      }
-	    else
+	    }
+	    else {
 	      myVerbosity = NO_VERB;
+	    }
 	  }
 	}
 	  break;
