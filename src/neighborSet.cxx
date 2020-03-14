@@ -125,8 +125,9 @@ namespace Timbl {
 	  ++dis2;
 	}
       }
-      else
+      else {
 	break;
+      }
     }
     while ( dit2 != s.distances.end() ){
       distances.push_back( *dit2 );

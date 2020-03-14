@@ -408,8 +408,9 @@ namespace Timbl {
     if ( it != distribution.end() ){
       it->second->IncFreq( occ );
     }
-    else
+    else {
       distribution[id] = new Vfield( val, occ, 1.0 );
+    }
     total_items += occ;
     return true;
   }
@@ -449,11 +450,12 @@ namespace Timbl {
       if ( distribution.find(key) != distribution.end() ){
 	distribution[key]->AddFreq( vd->Freq() );
       }
-      else
+      else {
 	// VD might be weighted. But we don't need/want that info here
 	// Weight == Freq is more convenient
 	distribution[key] = new Vfield( vd->Value(), vd->Freq(),
 					vd->Freq() );
+      }
     }
     total_items += VD.total_items;
   }
@@ -495,9 +497,11 @@ namespace Timbl {
 	    Max = pnt->Freq();
 	    nof_best = 1;
 	  }
-	  else
-	    if ( pnt->Freq() == Max )
+	  else {
+	    if ( pnt->Freq() == Max ){
 	      nof_best++;
+	    }
+	  }
 	  ++It;
 	}
 	tie = ( nof_best > 1 );
@@ -524,13 +528,14 @@ namespace Timbl {
 	    best = pnt->Value();
 	    Max = pnt->Freq();
 	  }
-	  else
+	  else {
 	    if ( pnt->Freq() == Max ) {
 	      tie = true;
 	      if ( pnt->Value()->ValFreq() > best->ValFreq() ){
 		best = pnt->Value();
 	      }
 	    }
+	  }
 	  ++It;
 	}
 	return best;
@@ -558,9 +563,11 @@ namespace Timbl {
 	    Max = It->second->Weight();
 	    nof_best = 1;
 	  }
-	  else
-	    if ( abs(It->second->Weight()- Max) < Epsilon )
+	  else {
+	    if ( abs(It->second->Weight()- Max) < Epsilon ){
 	      nof_best++;
+	    }
+	  }
 	  ++It;
 	}
 	tie = ( nof_best > 1 );
@@ -585,13 +592,14 @@ namespace Timbl {
 	    best = It->second->Value();
 	    Max = It->second->Weight();
 	  }
-	  else
+	  else {
 	    if ( abs(It->second->Weight() - Max) < Epsilon ) {
 	      tie = true;
 	      if ( It->second->Value()->ValFreq() > best->ValFreq() ){
 		best = It->second->Value();
 	      }
 	    }
+	  }
 	  ++It;
 	}
 	return best;
@@ -773,8 +781,9 @@ namespace Timbl {
       info_gain  = 0.0;
       entropy = DBentropy;
     }
-    else
+    else {
       gain_ratio = info_gain / split_info;
+    }
   }
 
   void Feature::Statistics( double DBentropy, Target *Targets, bool full ){
@@ -853,10 +862,12 @@ namespace Timbl {
     split_info = -split_info;
     // Gain ratio.
     //
-    if ( fabs(split_info) < Epsilon )
+    if ( fabs(split_info) < Epsilon ){
       gain_ratio = 0.0;
-    else
+    }
+    else {
       gain_ratio = info_gain / split_info;
+    }
   }
 
   void Feature::ChiSquareStatistics( vector<FeatureValue *>& FVA,
@@ -918,8 +929,9 @@ namespace Timbl {
 	    }
 	    ++It;
 	  }
-	  else
+	  else {
 	    break;
+	  }
 	}
 	while ( n < Size ){
 	  double tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
@@ -996,8 +1008,9 @@ namespace Timbl {
 	    }
 	    ++It;
 	  }
-	  else
+	  else {
 	    break;
+	  }
 	}
 	while ( n < Size ){
 	  double tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
@@ -1141,8 +1154,9 @@ namespace Timbl {
 	if ( do_fr ){
 	  target = Targ->add_value( index, freq );
 	}
-	else
+	else {
 	  target = Targ->ReverseLookup( index );
+	}
 	if ( !target ){
 	  delete result;
 	  result = 0;
@@ -1157,8 +1171,9 @@ namespace Timbl {
 	  next = look_ahead(is);
 	}
 	else if ( next == '}' ){
-	  if ( !result )
+	  if ( !result ){
 	    result = new ValueDistribution();
+	  }
 	  result->SetFreq( target, freq );
 	}
 	else if ( isdigit(next) ){
@@ -1189,8 +1204,9 @@ namespace Timbl {
     if ( vc ){
       os << vc->Name();
     }
-    else
+    else {
       os << "*FV-NF*";
+    }
     return os;
   }
 
@@ -1317,15 +1333,18 @@ namespace Timbl {
   bool Feature::isNumerical() const {
     if ( metric && metric->isNumerical() )
       return true;
-    else
+    else {
       return false;
+    }
   }
 
   bool Feature::isStorableMetric() const {
-    if ( metric && metric->isStorable() )
+    if ( metric && metric->isStorable() ){
       return true;
-    else
+    }
+    else {
       return false;
+    }
   }
 
   BaseFeatTargClass::BaseFeatTargClass( Hash::StringHash *T ):
@@ -1393,10 +1412,12 @@ namespace Timbl {
   }
 
   size_t Feature::matrix_byte_size() const {
-    if ( metric_matrix )
+    if ( metric_matrix ){
       return metric_matrix->NumBytes();
-    else
+    }
+    else {
       return 0;
+    }
   }
 
   FeatVal_Stat Feature::prepare_numeric_stats(){
@@ -1418,17 +1439,21 @@ namespace Timbl {
 	  n_min = tmp;
 	  n_max = tmp;
 	}
-	else if ( tmp < n_min )
+	else if ( tmp < n_min ){
 	  n_min = tmp;
-	else if ( tmp > n_max )
+	}
+	else if ( tmp > n_max ){
 	  n_max = tmp;
+	}
       }
       ++it;
     }
-    if ( fabs(n_max - n_min) < Epsilon )
+    if ( fabs(n_max - n_min) < Epsilon ){
       return SingletonNumeric;
-    else
+    }
+    else {
       return NumericValue;
+    }
   }
 
   inline int min( int i1, int i2 ) { return (i1>i2?i2:i1); }
@@ -1438,10 +1463,12 @@ namespace Timbl {
     size_t NumInst = Targ->TotalValues();
     int NumCats = Targ->EffectiveValues();
     int k = min( NumCats, eff_cnt ) - 1;
-    if ( k == 0 || NumInst == 0 )
+    if ( k == 0 || NumInst == 0 ){
       shared_variance = 0;
-    else
+    }
+    else {
       shared_variance = chi_square / (double)( NumInst * k );
+    }
   }
 
   void Feature::StandardDeviationStatistics( ){
@@ -1462,10 +1489,12 @@ namespace Timbl {
   }
 
   void Feature::clear_matrix(){
-    if ( PrestoreStatus == ps_read )
+    if ( PrestoreStatus == ps_read ){
       return;
-    else
+    }
+    else {
       delete_matrix();
+    }
   }
 
   void Feature::delete_matrix(){
@@ -1541,13 +1570,15 @@ namespace Timbl {
 	  os << "\t" << it->second;
 	  ++it;
 	}
-	else
+	else {
 	  os << "\t" << 0.0;
+	}
       }
       os << setprecision( old_prec );
     }
-    else
+    else {
       os << "(Null SA)";
+    }
     return os;
   }
 
@@ -1644,10 +1675,12 @@ namespace Timbl {
   }
 
   bool Feature::fill_matrix( istream &is ) {
-    if ( !metric_matrix )
+    if ( !metric_matrix ){
       metric_matrix = new SparseSymetricMatrix<ValueClass*>();
-    else
+    }
+    else {
       metric_matrix->Clear();
+    }
     string line;
     while ( getline(is,line) ){
       if ( line.empty() ) break;
@@ -1810,8 +1843,9 @@ namespace Timbl {
     if ( I ){
       os << *I;
     }
-    else
+    else {
       os << " Empty Instance";
+    }
     return os;
   }
 

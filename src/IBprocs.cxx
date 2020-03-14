@@ -294,8 +294,9 @@ namespace Timbl {
 	    Error( "invalid Bin_Size found: " + splits[2] );
 	    info_ok = false;
 	  }
-	  else
+	  else {
 	    Bin_Size = siz;
+	  }
 	}
 	else if ( compare_nocase_n( "Version", splits[1] ) ){
 	  version = TiCC::stringTo<int>( splits[2] );
@@ -385,8 +386,9 @@ namespace Timbl {
 		result = true;
 	      }
 	    }
-	    else
+	    else {
 	      result = false;
+	    }
 	  }
 	} while ( result && buf[0] != '.' );
       }
@@ -405,8 +407,9 @@ namespace Timbl {
 	excl = true;
 	os << permutation[j]+1 << "! ";
       }
-      else
+      else {
 	os << permutation[j]+1 << ", ";
+      }
     }
     os << permutation[num_of_features-1]+1 << " >" << endl;
   }
@@ -463,8 +466,9 @@ namespace Timbl {
 			    TargetStrings, FeatureStrings,
 			    keep_distributions );
       }
-      else
+      else {
 	InstanceBase->Save( os, keep_distributions );
+      }
     }
     return result;
   }

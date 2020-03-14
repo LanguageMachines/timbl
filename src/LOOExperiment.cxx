@@ -83,10 +83,12 @@ namespace Timbl {
       if ( Verbosity(OPTIONS ) )
 	ShowSettings( os );
       os << endl << "Starting to test using Leave One Out";
-      if ( Do_Sloppy_LOO() )
+      if ( Do_Sloppy_LOO() ) {
 	os << " using SLOPPY metric calculations" << endl;
-      else
+      }
+      else {
 	os << endl;
+      }
       os   << "Writing output in:          " << outStreamName << endl
 	   << "Algorithm     : LOO" << endl;
       show_metric_info( os );

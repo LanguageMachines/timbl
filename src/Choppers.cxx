@@ -178,8 +178,9 @@ namespace Timbl{
       string dummy;
       buffer = extractWeight( inBuffer, dummy );
     }
-    else
+    else {
       buffer = inBuffer;
+    }
     size_t len = buffer.length();
     switch ( IF ){
     case ARFF:
@@ -196,8 +197,9 @@ namespace Timbl{
 			     " (-l option)" );
 	return result;
       }
-      else
+      else {
 	result = (len / F_length) - 1;
+      }
       break;
     case Columns:
       {
@@ -229,8 +231,9 @@ namespace Timbl{
       string dummy;
       buffer = extractWeight( inBuffer, dummy );
     }
-    else
+    else {
       buffer = inBuffer;
+    }
     size_t len = buffer.length();
     int c45Cnt = 0;
     int columnCnt = 0;
@@ -375,8 +378,9 @@ namespace Timbl{
       if ( !TiCC::stringTo<size_t>( p, k, 1, vSize ) ){
 	return false;
       }
-      else
+      else {
 	choppedInput[k-1] = "1";
+      }
     }
     return true;
   }

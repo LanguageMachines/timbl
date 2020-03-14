@@ -641,8 +641,9 @@ namespace Timbl {
 	    Error( "missing ':' in metric description" );
 	    return false;
 	  }
-	  else
+	  else {
 	    ++p;
+	  }
 	}
 	if ( p != line.end() ){
 	  Error( "illegal value in metric description: -m " + Mline );
@@ -661,8 +662,9 @@ namespace Timbl {
       }
       return true;
     }
-    else
+    else {
       return false;
+    }
   }
 
   inline bool isBoolOrEmpty( const string& in, bool& val ){

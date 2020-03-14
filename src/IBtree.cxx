@@ -121,8 +121,9 @@ namespace Timbl {
 	  os << pnt->link;
 	  IBtree_Indent--;
 	}
-	else
+	else {
 	  os << endl;
+	}
       }
       else {
 	if ( pnt->TValue ){
@@ -153,8 +154,9 @@ namespace Timbl {
     if ( grap ){
       os << *grap;
     }
-    else
+    else {
       os << "null";
+    }
     return os;
   }
 
@@ -639,8 +641,9 @@ namespace Timbl {
       // but we need to cleanup behind us also
       return true;
     }
-    else
+    else {
       return false;
+    }
   }
 
   void InstanceBase_base::fill_index(){
@@ -663,8 +666,9 @@ namespace Timbl {
       }
       return true;
     }
-    else
+    else {
       return false;
+    }
   }
 
   bool InstanceBase_base::read_IB( istream &is,
@@ -768,8 +772,9 @@ namespace Timbl {
       // but we need to cleanup behind us also
       return true;
     }
-    else
+    else {
       return false;
+    }
   }
 
   bool IG_InstanceBase::ReadIB( istream &is,
@@ -785,8 +790,9 @@ namespace Timbl {
       }
       return true;
     }
-    else
+    else {
       return false;
+    }
   }
 
   bool InstanceBase_base::read_IB( istream &is,
@@ -968,8 +974,9 @@ namespace Timbl {
 	--cnt;
 	delete dead;
       }
-      else
+      else {
 	tmp = &((*tmp)->next);
+      }
     }
     return result;
   }
@@ -1020,8 +1027,9 @@ namespace Timbl {
 	  pos++;
 	}
       }
-      else
+      else {
 	pnt = pnt->next;
+      }
     }
     return NULL;
   }
@@ -1494,8 +1502,9 @@ namespace Timbl {
 	    pnt = pnt->link;
 	    pos++;
 	  }
-	  else
+	  else {
 	    pnt = pnt->next;
+	  }
 	}
       }
     }
@@ -1780,8 +1789,9 @@ namespace Timbl {
 	}
 	pos++;
       }
-      else
+      else {
 	pnt = pnt->next;
+      }
     }
     if ( pos == threshold ){
       if ( pnt ){
@@ -1833,8 +1843,9 @@ namespace Timbl {
 	  break;
 	}
       }
-      else
+      else {
 	pnt = pnt->next;
+      }
     }
     if ( last_match ){
       subtree = IBPartition( last_match );

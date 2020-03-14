@@ -72,10 +72,12 @@ namespace Timbl {
   }
 
   bool IG_Experiment::checkTestFile(){
-    if ( TimblExperiment::checkTestFile() )
+    if ( TimblExperiment::checkTestFile() ){
       return sanityCheck();
-    else
+    }
+    else {
       return false;
+    }
   }
 
   ostream& operator<< ( ostream& os,
@@ -337,10 +339,12 @@ namespace Timbl {
 
 
   bool IG_Experiment::checkLine( const string& line ){
-    if ( TimblExperiment::checkLine( line ) )
+    if ( TimblExperiment::checkLine( line ) ){
       return sanityCheck();
-    else
+    }
+    else {
       return false;
+    }
   }
 
   bool IG_Experiment::sanityCheck() const {
@@ -387,10 +391,12 @@ namespace Timbl {
     Distance = sum_remaining_weights( match_depth );
     if ( ResultDist &&
 	 InstanceBase && InstanceBase->PersistentD() ){
-      if ( match_depth == 0 )
+      if ( match_depth == 0 ) {
 	bestResult.addTop( ResultDist, TV );
-      else
+      }
+      else {
 	bestResult.addConstant( ResultDist, TV );
+      }
     }
     if ( confusionInfo ){
       confusionInfo->Increment( Inst.TV, TV );
@@ -480,25 +486,30 @@ namespace Timbl {
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	  Features[i]->SetWeight( 1.0 );
-	  if ( Features[permutation[i]]->Ignore() )
+	  if ( Features[permutation[i]]->Ignore() ){
 	    PermFeatures[i] = NULL;
-	  else
+	  }
+	  else {
 	    PermFeatures[pos++] = Features[permutation[i]];
+	  }
 	}
-	if ( Hashed )
+	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is, PermFeatures,
 					 Targets,
 					 TargetStrings, FeatureStrings,
 					 Version );
-	else
+	}
+	else {
 	  result = InstanceBase->ReadIB( is, PermFeatures,
 					 Targets,
 					 Version );
+	}
 	if ( result ){
 	  if ( !InstanceBase->HasDistributions() ){
-	    if ( KeepDistributions() )
+	    if ( KeepDistributions() ){
 	      Error( "Instance base doesn't contain Distributions, "
 		     "+D option impossible" );
+	    }
 	    else if ( Verbosity(DISTRIB) ){
 	      Info( "Instance base doesn't contain Distributions, "
 		    "+vDB option disabled ...."  );
@@ -519,8 +530,9 @@ namespace Timbl {
 	Error( "can't open: " + FileName );
       }
       else {
-	if ( !Verbosity(SILENT) )
+	if ( !Verbosity(SILENT) ){
 	  Info( "Reading Instance-Base from: " + FileName );
+	}
 	if ( GetInstanceBase( infile ) ){
 	  if ( !Verbosity(SILENT) ){
 	    writePermutation( cout );

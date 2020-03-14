@@ -67,13 +67,16 @@ namespace Timbl {
   void ConfusionMatrix::Increment( const TargetValue *t1,
 				   const TargetValue *t2 ){
     if ( t2 ){
-      if ( t1 )
+      if ( t1 ){
 	++mat[t1->Index()-1][t2->Index()-1];
-      else
+      }
+      else {
 	++mat[size][t2->Index()-1];
+      }
     }
-    else
+    else {
       throw std::out_of_range( "ConfusionMatrix, index out of range" );
+    }
   }
 
   void ConfusionMatrix::Print( ostream& os, const Target *tg ) const {
@@ -120,8 +123,9 @@ namespace Timbl {
   }
 
   void pf( ostream& os, double d ){
-    if ( d < 0 )
+    if ( d < 0 ){
       os << " \t (nan)\t";
+    }
     else {
       os.setf(ios::showpoint);
       os << " \t" << d;
@@ -156,36 +160,45 @@ namespace Timbl {
 	if ( i == j ){
 	  TP = mat[i][j];
 	}
-	else
+	else {
 	  FN += mat[i][j];
+	}
       }
       testF += testCount;
       for ( unsigned int j=0; j <= size; ++j ){
-	if ( j != i )
+	if ( j != i ){
 	  FP += mat[j][i];
+	}
       }
       for ( unsigned int j=0; j <= size; ++j ){
-	if ( j != i )
+	if ( j != i ){
 	  for ( unsigned int k=0; k < size; ++k ){
 	    if ( k != i )
 	      TN += mat[j][k];
 	  }
+	}
       }
       double precision;
-      if ( TP + FP == 0 )
+      if ( TP + FP == 0 ){
 	precision = -1;
-      else
+      }
+      else {
 	precision = TP / double(TP + FP);
+      }
       double TPR;
-      if ( TP + FN == 0 )
+      if ( TP + FN == 0 ){
 	TPR = -1;
-      else
+      }
+      else {
 	TPR = TP / double(TP + FN);
+      }
       double FPR;
-      if ( FP + TN == 0 )
+      if ( FP + TN == 0 ){
 	FPR = -1;
-      else
+      }
+      else {
 	FPR = FP / double(FP + TN);
+      }
       double FScore;
       if ( precision < 0 || TPR < 0 ||
 	   fabs(precision + TPR) < Epsilon ){
