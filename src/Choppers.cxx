@@ -44,60 +44,81 @@ namespace Timbl{
     Chopper *result = 0;
     switch ( IF ){
     case C4_5:
-      if ( doOcc )
+      if ( doOcc ){
 	result = new C45_OccChopper();
-      else if ( doEx )
+      }
+      else if ( doEx ){
 	result = new C45_ExChopper();
-      else
+      }
+      else {
 	result = new C45_Chopper();
+      }
       break;
     case ARFF:
-      if ( doOcc )
+      if ( doOcc ){
 	result = new ARFF_OccChopper();
-      else if ( doEx )
+      }
+      else if ( doEx ){
 	result = new ARFF_ExChopper();
-      else
+      }
+      else {
 	result = new ARFF_Chopper();
+      }
       break;
     case SparseBin:
-      if ( doOcc )
+      if ( doOcc ){
 	result = new Bin_OccChopper();
-      else if ( doEx )
+      }
+      else if ( doEx ){
 	result = new Bin_ExChopper();
-      else
+      }
+      else {
 	result = new Bin_Chopper();
+      }
       break;
     case Sparse:
-      if ( doOcc )
+      if ( doOcc ){
 	result = new Sparse_OccChopper();
-      else if ( doEx )
+      }
+      else if ( doEx ){
 	result = new Sparse_ExChopper();
-      else
+      }
+      else {
 	result = new Sparse_Chopper();
+      }
       break;
     case Columns:
-      if ( doOcc )
+      if ( doOcc ){
 	result = new Columns_OccChopper();
-      else if ( doEx )
+      }
+      else if ( doEx ){
 	result = new Columns_ExChopper();
-      else
+      }
+      else {
 	result = new Columns_Chopper();
+      }
       break;
     case Tabbed:
-      if ( doOcc )
+      if ( doOcc ){
 	result = new Tabbed_OccChopper();
-      else if ( doEx )
+      }
+      else if ( doEx ){
 	result = new Tabbed_ExChopper();
-      else
+      }
+      else {
 	result = new Tabbed_Chopper();
+      }
       break;
     case Compact:
-      if ( doOcc )
+      if ( doOcc ){
 	result = new Compact_OccChopper( fLen );
-      else if ( doEx )
+      }
+      else if ( doEx ) {
 	result = new Compact_ExChopper( fLen );
-      else
+      }
+      else {
 	result = new Compact_Chopper( fLen );
+      }
       break;
     default:
       break;
@@ -164,8 +185,9 @@ namespace Timbl{
     case ARFF:
     case C4_5:
       for ( auto const& c : buffer ){
-	if ( c == ',')
+	if ( c == ','){
 	  ++result;
+	}
       };
       break;
     case Compact:
@@ -224,12 +246,15 @@ namespace Timbl{
 	}
       }
     }
-    if ( columnCnt == 0 && c45Cnt == 0 )
+    if ( columnCnt == 0 && c45Cnt == 0 ){
       IF = Compact;
-    else if ( c45Cnt >= columnCnt )
+    }
+    else if ( c45Cnt >= columnCnt ){
       IF = C4_5;
-    else
+    }
+    else {
       IF = Columns;
+    }
     return IF;
   }
 
@@ -306,8 +331,9 @@ namespace Timbl{
     init( InBuf, len, true );
     vector<string> splits;
     size_t res = TiCC::split_at( strippedInput, splits, "," );
-    if ( res != vSize )
+    if ( res != vSize ){
       return false;
+    }
     for ( size_t i=0; i < res ; ++i ){
       choppedInput[i] = StrToCode( splits[i] );
     }
@@ -335,8 +361,9 @@ namespace Timbl{
     // 12, 25, 333, bla.
     // the termination dot is optional
     init( InBuf, len, true );
-    for ( size_t m = 0; m < vSize-1; ++m )
+    for ( size_t m = 0; m < vSize-1; ++m ){
       choppedInput[m] = "0";
+    }
     vector<string> parts;
     TiCC::split_at( strippedInput, parts, ",", true );
     for ( auto const& p : parts ){
@@ -409,8 +436,9 @@ namespace Timbl{
     init( InBuf, len, false );
     vector<string> splits;
     size_t res = TiCC::split( strippedInput, splits );
-    if ( res != vSize )
+    if ( res != vSize ){
       return false;
+    }
     for ( size_t i=0; i < res ; ++i ){
       choppedInput[i] = StrToCode( splits[i] );
     }
@@ -419,7 +447,7 @@ namespace Timbl{
 
   string Columns_Chopper::getString() const {
     string res;
-    for ( const auto& chop : choppedInput ) {
+    for ( const auto& chop : choppedInput ){
       res += chop + " ";
     }
     return res;
@@ -433,8 +461,9 @@ namespace Timbl{
     init( InBuf, len, false );
     vector<string> splits;
     size_t res = TiCC::split_at( strippedInput, splits, "\t" );
-    if ( res != vSize )
+    if ( res != vSize ){
       return false;
+    }
     for ( size_t i=0; i < res ; ++i ){
       choppedInput[i] = StrToCode( splits[i], false );
     }
@@ -454,13 +483,15 @@ namespace Timbl{
     // (12,value1) (25,value2) (333,value3) bla.
     // the termination dot is optional
     init( InBuf, len, true );
-    for ( size_t m = 0; m < vSize-1; ++m )
+    for ( size_t m = 0; m < vSize-1; ++m ){
       choppedInput[m] = DefaultSparseString;
+    }
     choppedInput[vSize-1] = "";
     vector<string> entries;
     size_t num_ent = TiCC::split_at_first_of( strippedInput, entries, "()" );
-    if ( num_ent < 1 )
+    if ( num_ent < 1 ){
       return false;
+    }
     for ( const auto& ent : entries ){
       --num_ent;
       vector<string> parts;

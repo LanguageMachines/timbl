@@ -311,7 +311,7 @@ namespace Timbl {
     ostringstream oss;
     oss << "{ ";
     bool first = true;
-    for( const auto& it : distribution ){
+    for ( const auto& it : distribution ){
       Vfield *f = it.second;
       if ( f->frequency > 0 ){
 	if ( !first )
@@ -328,7 +328,7 @@ namespace Timbl {
     ostringstream oss;
     bool first = true;
     oss << "{ ";
-    for( const auto& it : distribution ){
+    for ( const auto& it : distribution ){
       Vfield *f = it.second;
       if ( f->frequency > 0 ){
 	if ( !first )
@@ -350,7 +350,7 @@ namespace Timbl {
     ostringstream oss;
     oss << "{ ";
     bool first = true;
-    for( const auto& it : distribution ){
+    for ( const auto& it : distribution ){
       Vfield *f = it.second;
       if ( f->frequency > 0 ){
 	if ( !first )
@@ -367,7 +367,7 @@ namespace Timbl {
     ostringstream oss;
     oss << "{ ";
     bool first = true;
-    for( const auto& it : distribution ){
+    for ( const auto& it : distribution ){
       Vfield *f = it.second;
       if ( f->frequency > 0 ){
 	if ( !first )
@@ -797,13 +797,14 @@ namespace Timbl {
     if ( full ){
       ChiSquareStatistics( FVBin, BinSize, Targets );
       int cnt = 0;   // count effective values in Bin
-      for( int i=0; i < BinSize; ++i ){
-	if ( FVBin[i]->ValFreq() > 0 )
-	  cnt++;
+      for ( int i=0; i < BinSize; ++i ){
+	if ( FVBin[i]->ValFreq() > 0 ){
+	  ++cnt;
+	}
       }
       SharedVarianceStatistics( Targets, cnt );
     }
-    for( int i=0; i < BinSize; ++i ){
+    for ( int i=0; i < BinSize; ++i ){
       delete FVBin[i];
     }
   }
@@ -1038,8 +1039,9 @@ namespace Timbl {
 
   ostream& operator<<(ostream& os, const ValueDistribution *vd ) {
     string tmp = "{null}";
-    if( vd )
+    if ( vd ){
       vd->DistToString( tmp );
+    }
     os << tmp;
     return os;
   }
@@ -1254,7 +1256,7 @@ namespace Timbl {
 				    TargetValue *tv,
 				    int freq ){
     IVCmaptype::const_iterator it = ValuesMap.find( index );
-    if(  it == ValuesMap.end() ){
+    if (  it == ValuesMap.end() ){
       const string& value = TokenTree->ReverseLookup( index );
       // we want to store the singleton value for this index
       // so we MUST reverse lookup the index
@@ -1731,7 +1733,7 @@ namespace Timbl {
 
   TargetValue *Target::add_value( size_t index, int freq ){
     IVCmaptype::const_iterator it = ValuesMap.find( index );
-    if(  it == ValuesMap.end() ){
+    if (  it == ValuesMap.end() ){
       const string& name = TokenTree->ReverseLookup( index );
       // we want to store the singleton value for this index
       // so we MUST reverse lookup the index
@@ -1814,8 +1816,9 @@ namespace Timbl {
   }
 
   ostream& operator<<(ostream& os, const Instance& I ){
-    for ( unsigned int i=0; i < I.FV.size(); ++i )
+    for ( unsigned int i=0; i < I.FV.size(); ++i ){
       os << I.FV[i] << ", ";
+    }
     os << I.TV << " " << I.sample_weight;
     return os;
   }

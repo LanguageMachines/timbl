@@ -63,8 +63,9 @@ namespace Timbl {
   }
 
   bool CV_Experiment::checkTestFile(){
-    if ( !IB1_Experiment::checkTestFile() )
+    if ( !IB1_Experiment::checkTestFile() ){
       return false;
+    }
     else if ( doSamples() ){
       FatalError( "Cannot Cross validate on a file with Examplar Weighting" );
       return false;
@@ -95,14 +96,16 @@ namespace Timbl {
 	    showInputFormat( *mylog );
 	  }
 	  FileNames.push_back(name);
-	  if ( size == 0 )
+	  if ( size == 0 ){
 	    size = tmp;
-	  else
+	  }
+	  else {
 	    if ( tmp != size ) {
 	      Error( "mismatching number of features in file " +
 		     name + "of CV filelist " + FileName );
 	      return false;
 	    }
+	  }
 	}
 	else {
 	  Error( "unable to determine number of features in file " +
@@ -122,8 +125,9 @@ namespace Timbl {
 
   bool CV_Experiment::Test( const string& FileName,
 			    const string& OutFile ){
-    if ( !ConfirmOptions() )
+    if ( !ConfirmOptions() ){
       return false;
+    }
     (void)OutFile;
     bool result = false;
     VerbosityFlags keep = get_verbosity();
@@ -136,8 +140,9 @@ namespace Timbl {
       size_t NumOfFiles = FileNames.size();
       TimblExperiment::Prepare( FileNames[1], false );
       TimblExperiment::Learn( FileNames[1], false );
-      for ( size_t filenum = 2; filenum < NumOfFiles; ++filenum )
+      for ( size_t filenum = 2; filenum < NumOfFiles; ++filenum ){
 	Expand( FileNames[filenum] );
+      }
       string outName;
       string percName;
       for ( size_t SkipFile = 0; SkipFile < NumOfFiles-1; ++SkipFile ) {
@@ -146,15 +151,19 @@ namespace Timbl {
 	percName = outName;
 	percName += ".%";
 	set_verbosity( keep );
-	if ( CV_WfileName != "" )
+	if ( CV_WfileName != "" ){
 	  GetWeights( CV_WfileName, CV_fileW );
-	if ( !CV_PfileName.empty() )
+	}
+	if ( !CV_PfileName.empty() ){
 	  GetArrays( CV_PfileName );
+	}
 	result = TimblExperiment::Test( FileNames[SkipFile], outName );
-	if ( result )
+	if ( result ){
 	  result = createPercFile( percName );
-	if ( !result )
+	}
+	if ( !result ){
 	  return false;
+	}
 	set_verbosity( SILENT );
 	Expand( FileNames[SkipFile] );
 	Remove( FileNames[SkipFile+1] );
@@ -164,13 +173,16 @@ namespace Timbl {
       percName = outName;
       percName += ".%";
       set_verbosity( keep );
-      if ( CV_WfileName != "" )
+      if ( CV_WfileName != "" ){
 	GetWeights( CV_WfileName, CV_fileW );
-      if ( !CV_PfileName.empty() )
+      }
+      if ( !CV_PfileName.empty() ){
 	GetArrays( CV_PfileName );
+      }
       result = TimblExperiment::Test( FileNames[NumOfFiles-1], outName );
-      if ( result )
+      if ( result ){
 	result = createPercFile( percName );
+      }
     }
     return result;
   }

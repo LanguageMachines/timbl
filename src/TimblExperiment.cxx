@@ -1719,8 +1719,9 @@ namespace Timbl {
     os << "Deviant Feature Metrics:";
     int cnt = 0;
     size_t *InvPerm = new size_t[NumOfFeatures()];
-    for ( size_t i = 0; i < NumOfFeatures(); ++i )
+    for ( size_t i = 0; i < NumOfFeatures(); ++i ){
       InvPerm[permutation[i]] = i;
+    }
     for ( size_t i = 0; i < NumOfFeatures(); ++i ){
       if ( !Features[i]->Ignore() &&
 	   InvPerm[i]+1 > TRIBL_offset() ){

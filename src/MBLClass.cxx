@@ -1342,8 +1342,9 @@ namespace Timbl {
 
   bool MBLClass::read_the_vals( istream& is ){
     bool *done = new bool[num_of_features];
-    for ( size_t i=0; i < num_of_features; ++i )
+    for ( size_t i=0; i < num_of_features; ++i ){
       done[i] = false;
+    }
     string Buffer;
     while ( getline( is, Buffer) ){
       if ( !Buffer.empty() ){
@@ -1614,23 +1615,26 @@ namespace Timbl {
 	Warning( ostr1.str() );
       }
       first = true;
-      for ( size_t ff = 0; ff < num_of_features; ++ff )
+      for ( size_t ff = 0; ff < num_of_features; ++ff ){
 	if ( feat_status[ff] == NotNumeric ){
 	  if ( first ){
 	    ostr2 << "The following feature(s) contained non-numeric values and\nwill be treated as NON-Numeric: ";
 	    first = false;
 	  }
-	  else
+	  else {
 	    ostr2 << ", ";
+	  }
 	  size_t n = ff;
 	  while ( ff < num_of_features-1 &&
 		  feat_status[ff+1] == NotNumeric ) ff++;
 	  if ( n != ff ){
 	    ostr2 << n+1 << "-" << ff+1;
 	  }
-	  else
+	  else {
 	    ostr2 << ff+1;
+	  }
 	}
+      }
       if ( !first  ){
 	Warning( ostr2.str() );
       }
@@ -1740,49 +1744,62 @@ namespace Timbl {
 				   size_t Size ) const {
     string result;
     Instance inst( Size );
-    for ( size_t i=0; i< OffSet; ++i )
+    for ( size_t i=0; i< OffSet; ++i ){
       inst.FV[i] = OrgFV[i];
-    for ( size_t j=OffSet; j< Size; ++j )
+    }
+    for ( size_t j=OffSet; j< Size; ++j ){
       inst.FV[j] = RedFV[j-OffSet];
+    }
     size_t *InvPerm = new size_t[num_of_features];
-    for ( size_t i=0; i< num_of_features; ++i )
+    for ( size_t i=0; i< num_of_features; ++i ){
       InvPerm[permutation[i]] = i;
+    }
     for ( size_t j=0; j< num_of_features; ++j ){
       switch ( input_format ) {
       case C4_5:
 	// fall through
       case ARFF:
-	if ( Features[j]->Ignore() )
+	if ( Features[j]->Ignore() ){
 	  result += "-*-,";
-	else
+	}
+	else {
 	  result += inst.FV[InvPerm[j]]->Name() + ",";
+	}
 	break;
       case Sparse:
-	if ( inst.FV[InvPerm[j]]->Name() != DefaultSparseString )
+	if ( inst.FV[InvPerm[j]]->Name() != DefaultSparseString ){
 	  result += string("(")  + TiCC::toString<size_t>(j+1) + ","
 	    + CodeToStr( inst.FV[InvPerm[j]]->Name() ) + ")";
+	}
 	break;
       case SparseBin:
-	if ( inst.FV[InvPerm[j]]->Name()[0] == '1' )
+	if ( inst.FV[InvPerm[j]]->Name()[0] == '1' ){
 	  result += TiCC::toString<size_t>( j+1 ) + ",";
+	}
 	break;
       case Columns:
-	if ( Features[j]->Ignore() )
+	if ( Features[j]->Ignore() ){
 	  result += "-*- ";
-	else
+	}
+	else {
 	  result += inst.FV[InvPerm[j]]->Name() + " ";
+	}
 	break;
       case Tabbed:
-	if ( Features[j]->Ignore() )
+	if ( Features[j]->Ignore() ){
 	  result += "-*- ";
-	else
+	}
+	else {
 	  result += inst.FV[InvPerm[j]]->Name() + "\t";
+	}
 	break;
       default:
-	if ( Features[j]->Ignore() )
+	if ( Features[j]->Ignore() ){
 	  result += string( F_length, '*' );
-	else
+	}
+	else {
 	  result += inst.FV[InvPerm[j]]->Name();
+	}
 	break;
       }
     }
@@ -2142,15 +2159,18 @@ namespace Timbl {
   }
 
   void MBLClass::Initialize( size_t n ){
-    if ( n > 0 )
+    if ( n > 0 ) {
       num_of_features = n;
+    }
     // Allocate memory. Will be reused again and again ....
     //
-    if ( target_pos == std::numeric_limits<size_t>::max() )
+    if ( target_pos == std::numeric_limits<size_t>::max() ){
       target_pos = num_of_features; // the default
-    else if ( target_pos > num_of_features )
+    }
+    else if ( target_pos > num_of_features ){
       FatalError( "Initialize: TARGET_POS cannot exceed NUM_OF_FEATURES+1 " +
 		  TiCC::toString<size_t>( num_of_features+1 ) );
+    }
     Features.resize(num_of_features,NULL);
     PermFeatures.resize(num_of_features,NULL);
     FeatureStrings = new Hash::StringHash(); // all features share the same hash

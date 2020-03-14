@@ -58,8 +58,9 @@ namespace Timbl {
   }
 
   ConfusionMatrix::~ConfusionMatrix(){
-    for ( unsigned int i=0; i <= size; ++i )
+    for ( unsigned int i=0; i <= size; ++i ){
       mat[i].clear();
+    }
     mat.clear();
   }
 
@@ -237,10 +238,11 @@ namespace Timbl {
 
   void ConfusionMatrix::merge( const ConfusionMatrix *cm ){
     if ( cm ){
-      for ( size_t i=0; i <= size; ++i )
+      for ( size_t i=0; i <= size; ++i ){
 	for ( size_t j=0; j < size; ++j ){
 	  mat[i][j] += cm->mat[i][j];
 	}
+      }
     }
   }
 

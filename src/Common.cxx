@@ -35,10 +35,12 @@ namespace Common {
 
   string VersionInfo( bool full ){
     // obsolete
-    if ( full )
+    if ( full ){
       return BuildInfo();
-    else
+    }
+    else {
       return Version();
+    }
   }
   string Version() { return VERSION; }
   string VersionName() { return PACKAGE_STRING; }

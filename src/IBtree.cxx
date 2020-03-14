@@ -139,8 +139,9 @@ namespace Timbl {
 	os << endl;
       }
       if (pnt->next){
-	for ( int j=0; j<IBtree_Indent; ++j )
+	for ( int j=0; j<IBtree_Indent; ++j ){
 	  os << "\t";
+	}
       }
       pnt = pnt->next;
     }
@@ -390,12 +391,14 @@ namespace Timbl {
 		  Hash::StringHash *feats ){
     int Size = cats->NumOfEntries();
     os << "Classes" << endl;
-    for ( int i=1; i <= Size; ++i )
+    for ( int i=1; i <= Size; ++i ){
       os << i << "\t" << cats->ReverseLookup( i ) << endl;
+    }
     Size = feats->NumOfEntries();
     os << "Features" << endl;
-    for ( int i=1; i <= Size; ++i )
+    for ( int i=1; i <= Size; ++i ){
       os << i << "\t" << feats->ReverseLookup( i ) << endl;
+    }
     os << endl;
   }
 
@@ -1386,7 +1389,7 @@ namespace Timbl {
 	      IBtree *nxt = snip->next;
 	      snip->next = 0;
 	      if ( *tmp ){
-		if( (*tmp)->FValue->Index() == snip->FValue->Index() ){
+		if ( (*tmp)->FValue->Index() == snip->FValue->Index() ){
 		  return false;
 		}
 		snip->next = *tmp;

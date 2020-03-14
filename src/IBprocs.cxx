@@ -406,29 +406,35 @@ namespace Timbl {
       writePermSpecial( os );
       os << "# Numeric: ";
       bool first = true;
-      for ( size_t i=0; i < num_of_features; ++i )
+      for ( size_t i=0; i < num_of_features; ++i ){
 	if ( !Features[i]->Ignore() &&
 	     Features[i]->isNumerical() ){
-	  if ( !first )
+	  if ( !first ){
 	    os << ", ";
-	  else
+	  }
+	  else {
 	    first = false;
+	  }
 	  os << i+1;
 	}
+      }
       os << '.' << endl;
       if ( NumNumFeatures() > 0 ){
 	os << "# Ranges: ";
 	first = true;
-	for ( size_t j=0; j < num_of_features; ++j )
+	for ( size_t j=0; j < num_of_features; ++j ){
 	  if ( !Features[j]->Ignore() &&
 	       Features[j]->isNumerical() ){
-	    if ( !first )
+	    if ( !first ){
 	      os << " , ";
-	    else
+	    }
+	    else {
 	      first = false;
+	    }
 	    os << j+1 << " [" << Features[j]->Min()
-		    << "-" << Features[j]->Max() << "]";
+	       << "-" << Features[j]->Max() << "]";
 	  }
+	}
 	os << " ." << endl;
       }
       os << "# Bin_Size: " << Bin_Size << endl;

@@ -126,10 +126,10 @@ namespace Timbl{
       set<char> string1_unigrams;
       set<char> string2_unigrams;
 
-      for( const auto& c : string1 ){
+      for ( const auto& c : string1 ){
 	string1_unigrams.insert(c);
       }
-      for( const auto& c : string2 ){
+      for ( const auto& c : string2 ){
 	string2_unigrams.insert(c);
       }
 
@@ -143,11 +143,11 @@ namespace Timbl{
       set<string> string1_bigrams;
       set<string> string2_bigrams;
 
-      for( unsigned int i = 0; i < (ls1 - 1); ++i ) {
+      for ( unsigned int i = 0; i < (ls1 - 1); ++i ) {
 	// extract character bigrams from string1
 	string1_bigrams.insert(string1.substr(i, 2));
       }
-      for( unsigned int i = 0; i < (ls2 - 1); ++i ) {
+      for ( unsigned int i = 0; i < (ls2 - 1); ++i ) {
 	// extract character bigrams from string2
 	string2_bigrams.insert(string2.substr(i, 2));
       }

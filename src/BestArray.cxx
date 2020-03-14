@@ -212,8 +212,9 @@ namespace Timbl {
       ++k;
       if ( _storeInstances ){
 	size_t totalBests = best->totalBests();
-	if ( totalBests == 0 )
+	if ( totalBests == 0 ){
 	  break; // TRIBL algorithms do this!
+	}
 	xmlNode *nbs = TiCC::XmlNewChild( top, "neighbors" );
 	TiCC::XmlSetAttribute( nbs,
 			       "k",
@@ -224,24 +225,27 @@ namespace Timbl {
 	TiCC::XmlSetAttribute( nbs,
 			       "distance",
 			       TiCC::toString( best->bestDistance ) );
-	if ( maxBests < totalBests )
+	if ( maxBests < totalBests ){
 	  TiCC::XmlSetAttribute( nbs,
 				 "limited",
 				 TiCC::toString( maxBests ) );
+	}
 	for ( unsigned int m=0; m < best->bestInstances.size(); ++m ){
 	  xmlNode *nb = TiCC::XmlNewChild( nbs, "neighbor" );
 	  TiCC::XmlNewTextChild( nb,
 				 "instance",
 				 best->bestInstances[m] );
-	  if ( _showDb )
+	  if ( _showDb ){
 	    TiCC::XmlNewTextChild( nb,
 				   "distribution",
 				   best->bestDistributions[m]->DistToString() );
+	  }
 	}
       }
       else {
-	if ( best->aggregateDist.ZeroDist() )
+	if ( best->aggregateDist.ZeroDist() ){
 	  break;
+	}
 	xmlNode *nbs = TiCC::XmlNewChild( top, "neighbors" );
 	TiCC::XmlSetAttribute( nbs, "k", TiCC::toString(k) );
 	if ( _showDb ){
@@ -342,28 +346,33 @@ namespace Timbl {
       ++k;
       if ( bA._storeInstances ){
 	size_t totalBests = best->totalBests();
-	if ( totalBests == 0 )
+	if ( totalBests == 0 ){
 	  break; // TRIBL algorithms do this!
+	}
 	os << "# k=" << k << ", " << totalBests
 	   <<  " Neighbor(s) at distance: ";
 	int OldPrec = os.precision(DBL_DIG-1);
 	os.setf(ios::showpoint);
 	os << "\t" << best->bestDistance;
 	os.precision(OldPrec);
-	if ( bA.maxBests <= best->bestInstances.size() )
+	if ( bA.maxBests <= best->bestInstances.size() ){
 	  os << " (only " << bA.maxBests << " shown)";
+	}
 	os << endl;
 	for ( unsigned int m=0; m < best->bestInstances.size(); ++m ){
 	  os << "#\t" << best->bestInstances[m];
-	  if ( bA._showDb )
+	  if ( bA._showDb ){
 	    os << best->bestDistributions[m]->DistToString() << endl;
-	  else
+	  }
+	  else {
 	    os << " -*-" << endl;
+	  }
 	}
       }
       else {
-	if ( best->aggregateDist.ZeroDist() )
+	if ( best->aggregateDist.ZeroDist() ){
 	  break;
+	}
 	os << "# k=" << k << "\t";
 	if ( bA._showDb ){
 	  os << best->aggregateDist.DistToString();

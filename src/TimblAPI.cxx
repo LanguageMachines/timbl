@@ -248,8 +248,9 @@ namespace Timbl {
     WeightType tmp;
     if ( TiCC::stringTo<WeightType>( s, tmp ) ){
       w = WT_to_W( tmp );
-      if( w == UNKNOWN_W )
+      if ( w == UNKNOWN_W ){
 	return false;
+      }
       return true;
     }
     return false;
