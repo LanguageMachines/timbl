@@ -290,17 +290,21 @@ namespace Timbl {
   }
 
   bool TimblAPI::Learn( const string& s ){
-    if ( Valid() )
+    if ( Valid() ){
       return pimpl->Learn( s );
-    else
+    }
+    else {
       return false;
+    }
   }
 
   bool TimblAPI::Prepare( const string& s ){
-    if ( Valid() )
+    if ( Valid() ){
       return pimpl->Prepare( s );
-    else
+    }
+    else {
       return false;
+    }
   }
 
   bool TimblAPI::CVprepare( const string& wf, Weighting w, const string& pf ){
@@ -326,8 +330,9 @@ namespace Timbl {
       }
       return pimpl->CVprepare( wf, tmp, pf );
     }
-    else
+    else {
       return false;
+    }
   }
 
 
@@ -350,28 +355,35 @@ namespace Timbl {
   bool TimblAPI::Test( const string& in,
 		       const string& out,
 		       const string& p ){
-    if ( !Valid() )
+    if ( !Valid() ){
       return false;
+    }
     else {
-      if ( in.empty() )
+      if ( in.empty() ){
 	return false;
-      if ( out.empty() && Algo() != CV )
+      }
+      if ( out.empty() && Algo() != CV ){
 	return false;
-      if ( !pimpl->Test( in, out ) )
+      }
+      if ( !pimpl->Test( in, out ) ){
 	return false;
+      }
       return pimpl->createPercFile( p );
     }
   }
 
   bool TimblAPI::NS_Test( const string& in,
 			  const string& out ){
-    if ( !Valid() )
+    if ( !Valid() ){
       return false;
+    }
     else {
-      if ( in.empty() )
+      if ( in.empty() ){
 	return false;
-      if ( out.empty() && Algo() != CV )
+      }
+      if ( out.empty() && Algo() != CV ){
 	return false;
+      }
       return pimpl->NS_Test( in, out );
     }
   }
@@ -401,8 +413,9 @@ namespace Timbl {
     if ( Valid() ){
       return pimpl->Classify( s, db  );
     }
-    else
+    else {
       db = NULL;
+    }
     return NULL;
   }
 
@@ -411,8 +424,9 @@ namespace Timbl {
     if ( Valid() ){
       return pimpl->Classify( s, di );
     }
-    else
+    else {
       di = DBL_MAX;
+    }
     return NULL;
   }
 
@@ -434,14 +448,16 @@ namespace Timbl {
   }
 
   const Instance *TimblAPI::lastHandledInstance() const {
-    if ( Valid() )
+    if ( Valid() ){
       return &pimpl->CurrInst;
+    }
     return 0;
   }
 
   const Target *TimblAPI::myTargets() const{
-    if ( Valid() )
+    if ( Valid() ){
       return pimpl->Targets;
+    }
     return 0;
   }
 
@@ -459,17 +475,21 @@ namespace Timbl {
   }
 
   size_t TimblAPI::matchDepth() const {
-    if ( Valid() )
+    if ( Valid() ){
       return pimpl->matchDepth();
-    else
+    }
+    else {
       return -1;
+    }
   }
 
   double TimblAPI::confidence() const {
-    if ( Valid() )
+    if ( Valid() ){
       return pimpl->confidence();
-    else
+    }
+    else {
       return -1;
+    }
   }
 
   bool TimblAPI::matchedAtLeaf() const {
@@ -481,22 +501,27 @@ namespace Timbl {
       pimpl->initExperiment( true );
       return true;
     }
-    else
+    else {
       return false;
+    }
   }
 
   InputFormatType TimblAPI::getInputFormat() const {
-    if ( Valid() )
+    if ( Valid() ){
       return pimpl->InputFormat();
-    else
+    }
+    else {
       return UnknownInputFormat;
+    }
   }
 
   bool TimblAPI::SaveWeights( const string& f ){
-    if ( Valid() )
+    if ( Valid() ){
       return pimpl->SaveWeights( f );
-    else
+    }
+    else {
       return false;
+    }
   }
 
   bool TimblAPI::GetWeights( const string& f, Weighting w ){
@@ -522,30 +547,34 @@ namespace Timbl {
       }
       return pimpl->GetWeights( f, tmp );
     }
-  else
-    return false;
+    else {
+      return false;
+    }
   }
 
   double TimblAPI::GetAccuracy() {
     if (Valid()) {
         return pimpl->stats.testedCorrect()/(double) pimpl->stats.dataLines();
-    } else {
-        return -1;
+    }
+    else {
+      return -1;
     }
   }
 
   Weighting TimblAPI::CurrentWeighting() const{
-    if ( Valid() )
+    if ( Valid() ){
       return WT_to_W( pimpl->CurrentWeighting() );
-    else
+    }
+    else {
       return UNKNOWN_W;
+    }
   }
 
   Weighting TimblAPI::GetCurrentWeights( std::vector<double>& res ) const {
     res.clear();
-    if ( Valid() ){
-      if ( pimpl->GetCurrentWeights( res ) )
-	return CurrentWeighting();
+    if ( Valid() &&
+	 pimpl->GetCurrentWeights( res ) ){
+      return CurrentWeighting();
     }
     return UNKNOWN_W;
   }
@@ -559,68 +588,79 @@ namespace Timbl {
   }
 
   string TimblAPI::ExpName() const {
-    if ( pimpl ) // return the name, even when !Valid()
+    if ( pimpl ) {
+      // return the name, even when !Valid()
       return pimpl->ExpName();
-    else
+    }
+    else {
       return "ERROR";
+    }
   }
 
   bool TimblAPI::WriteNamesFile( const string& f ){
     if ( Valid() ) {
       return pimpl->WriteNamesFile( f );
     }
-    else
+    else {
       return false;
+    }
   }
 
   bool TimblAPI::WriteInstanceBase( const string& f ){
     if ( Valid() ){
       return pimpl->WriteInstanceBase( f );
     }
-    else
+    else {
       return false;
+    }
   }
 
   bool TimblAPI::WriteInstanceBaseXml( const string& f ){
     if ( Valid() ){
       return pimpl->WriteInstanceBaseXml( f );
     }
-    else
+    else {
       return false;
+    }
   }
 
   bool TimblAPI::WriteInstanceBaseLevels( const string& f, unsigned int l ){
     if ( Valid() ){
       return pimpl->WriteInstanceBaseLevels( f, l );
     }
-    else
+    else {
       return false;
+    }
   }
 
   bool TimblAPI::GetInstanceBase( const string& f ){
     if ( Valid() ){
-      if ( !pimpl->ReadInstanceBase( f ) )
+      if ( !pimpl->ReadInstanceBase( f ) ){
 	i_am_fine = false;
+      }
       return Valid();
     }
-    else
+    else {
       return false;
+    }
   }
 
   bool TimblAPI::WriteArrays( const string& f ){
     if ( Valid() ){
       return pimpl->WriteArrays( f );
     }
-    else
+    else {
       return false;
+    }
   }
 
   bool TimblAPI::GetArrays( const string& f ){
     if ( Valid() ){
       return pimpl->GetArrays( f );
     }
-    else
+    else {
       return false;
+    }
   }
 
   bool TimblAPI::WriteMatrices( const string& f ){
@@ -652,8 +692,9 @@ namespace Timbl {
       pimpl->IBInfo( os );
       return true;
     }
-    else
+    else {
       return false;
+    }
   }
 
   bool TimblAPI::ShowStatistics( ostream& os ) const{
@@ -682,8 +723,9 @@ namespace Timbl {
     if ( Valid() ){
       return pimpl->NumOfFeatures();
     }
-    else
+    else {
       return -1;
+    }
   }
 
 }

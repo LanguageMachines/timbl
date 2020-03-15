@@ -60,10 +60,12 @@ using namespace nlohmann;
 namespace Timbl {
 
   void MBLClass::fill_table(){
-    if ( tableFilled )
+    if ( tableFilled ){
       return;
-    else
+    }
+    else {
       tableFilled = true;
+    }
     //cerr << "fill table() for " << (void*)this << endl;
     bool stat =
       Options.Add( new IntegerOption( "FLENGTH",
@@ -152,12 +154,14 @@ namespace Timbl {
   }
 
   void MBLClass::InvalidMessage(void) const{
-    if ( err_count++ == 1 )
+    if ( err_count++ == 1 ){
       Warning( "A preceding error prevents any operation on this "
 	       "Timbl Object\n"
 	       "other experiments might not be influenced" );
-    else
+    }
+    else {
       Warning( "This Experiment is invalid due to errors" );
+    }
   }
 
   bool MBLClass::SetOption( const string& line ){
@@ -255,8 +259,9 @@ namespace Timbl {
       sock_os            = 0;
       sock_is_json       = false;
       globalMetricOption = m.globalMetricOption;
-      if ( m.GlobalMetric )
+      if ( m.GlobalMetric ){
 	GlobalMetric     = getMetricClass( m.GlobalMetric->type() );
+      }
       UserOptions        = m.UserOptions;
       mvd_threshold      = m.mvd_threshold;
       num_of_neighbors   = m.num_of_neighbors;
@@ -280,10 +285,12 @@ namespace Timbl {
       PermFeatures = m.PermFeatures;
       for ( unsigned int i=0; i < Features.size(); ++i ){
 	Features[i] = new Feature( *m.Features[i] );
-	if ( m.PermFeatures[i] )
+	if ( m.PermFeatures[i] ) {
 	  PermFeatures[i] = Features[permutation[i]];
-	else
+	}
+	else {
 	  PermFeatures[i] = 0;
+	}
       }
       Targets   = m.Targets;
       err_count = 0;
@@ -335,10 +342,12 @@ namespace Timbl {
 #pragma omp critical
     {
       // Info NEVER to socket !
-      if ( exp_name != "" )
+      if ( exp_name != "" ){
 	*mylog << "-" << exp_name << "-" << out_line << endl;
-      else
+      }
+      else {
 	*mylog << out_line << endl;
+      }
     }
   }
 
@@ -357,10 +366,12 @@ namespace Timbl {
 	}
       }
       else {
-	if ( exp_name != "" )
+	if ( exp_name != "" ){
 	  *myerr << "Warning:-" << exp_name << "-" << out_line << endl;
-	else
-	*myerr << "Warning: " << out_line << endl;
+	}
+	else {
+	  *myerr << "Warning: " << out_line << endl;
+	}
       }
     }
   }
@@ -378,10 +389,12 @@ namespace Timbl {
       }
     }
     else {
-      if ( exp_name != "" )
+      if ( exp_name != "" ){
 	*myerr << "Error:-" << exp_name << "-" << out_line << endl;
-      else
+      }
+      else {
 	*myerr << "Error: " << out_line << endl;
+      }
     }
     err_count++;
   }
@@ -399,12 +412,12 @@ namespace Timbl {
       }
     }
     else {
-      if ( exp_name != "" )
-	*myerr << "-" << exp_name << "-";
-      if ( exp_name != "" )
+      if ( exp_name != "" ){
 	*myerr << "FatalError:-" << exp_name << "-" << out_line << endl;
-      else
+      }
+      else {
 	*myerr << "FatalError: " << out_line << endl;
+      }
       throw( runtime_error("Stopped") );
     }
   }
@@ -480,8 +493,9 @@ namespace Timbl {
   }
 
   bool MBLClass::ShowWeights( ostream &os ) const {
-    if ( ExpInvalid() )
+    if ( ExpInvalid() ){
       return false;
+    }
     else {
       int OldPrec = os.precision(DBL_DIG);
       size_t pos = 0;
@@ -513,8 +527,9 @@ namespace Timbl {
       for ( size_t k=0; k < num_of_features; ++k ){
 	size_t Max = 0;
 	for ( size_t m=1; m < num_of_features; ++m ){
-	  if ( WR[m] > WR[Max] )
+	  if ( WR[m] > WR[Max] ){
 	    Max = m;
+	  }
 	}
 	WR[Max] = -1;
 	permutation[k] = Max;
@@ -639,8 +654,9 @@ namespace Timbl {
 	ostr.setf(ios::right, ios::adjustfield);
 	ostr << number << " @ ";
       }
-      else
+      else {
 	ostr << "        ";
+      }
       ostr << TiCC::Timer::now();
       Info( ostr.str() );
     }
@@ -648,9 +664,10 @@ namespace Timbl {
 
   void MBLClass::InitWeights(void){
     for ( auto const& feat : Features ){
-      if ( feat->Ignore() )
+      if ( feat->Ignore() ){
 	feat->SetWeight( 0.0 );
-      else
+      }
+      else {
 	switch ( Weighting ){
 	case IG_w:
 	  feat->SetWeight( feat->InfoGain() );
@@ -678,27 +695,30 @@ namespace Timbl {
 		      TiCC::toString( Weighting ) );
 	  break;
 	}
+      }
     }
   }
 
   void MBLClass::diverseWeights(void){
     double minW = DBL_MAX;
     for ( auto const& feat : Features ){
-      if ( feat->Ignore() )
+      if ( feat->Ignore() ){
 	continue;
+      }
       if ( feat->Weight() < minW ){
 	minW =  feat->Weight();
       }
     }
     for ( auto const& feat : Features ){
-      if ( feat->Ignore() )
+      if ( feat->Ignore() ){
 	continue;
+      }
       feat->SetWeight( (feat->Weight() - minW ) + Epsilon );
     }
   }
 
   void MBLClass::default_order(){
-    if ( TreeOrder == UnknownOrdening )
+    if ( TreeOrder == UnknownOrdening ){
       switch ( Weighting ){
       case GR_w:
 	TreeOrder = GROrder;
@@ -726,6 +746,7 @@ namespace Timbl {
 		    TiCC::toString( Weighting ) );
 	break;
       }
+    }
   }
 
   void MBLClass::set_order(){
@@ -791,13 +812,16 @@ namespace Timbl {
       ++i;
     }
     calculatePermutation( Order );
-    if ( !Verbosity(SILENT) )
+    if ( !Verbosity(SILENT) ){
       writePermutation( *mylog );
+    }
     for ( size_t j=0; j < num_of_features; ++j ){
-      if ( j < effective_feats )
+      if ( j < effective_feats ){
 	PermFeatures[j] = Features[permutation[j]];
-      else
+      }
+      else {
 	PermFeatures[j] = NULL;
+      }
     }
   }
 
@@ -816,9 +840,10 @@ namespace Timbl {
       }
       ++m;
     }
-    if ( TotalCount )
+    if ( TotalCount ){
       os << "Total Size of value-matrices " << TotalCount << " Bytes "
 	 << endl << endl;
+    }
   }
 
   bool MBLClass::readMatrices( istream& is ){
@@ -827,13 +852,16 @@ namespace Timbl {
     bool anything = false;
     while ( getline( is, line ) ){
       line = TiCC::trim( line );
-      if ( line.empty() )
+      if ( line.empty() ){
 	continue;
+      }
       if ( line.compare( 0, 7, "Feature" ) != 0 ){
-	if ( skip )
+	if ( skip ){
 	  continue;
-	else
+	}
+	else {
 	  return false;
+	}
       }
       else {
 	skip = false;
@@ -845,8 +873,9 @@ namespace Timbl {
 	  FatalError( "no feature index found in the inputfile" );
 	}
 	else {
-	  if ( pos == string::npos )
+	  if ( pos == string::npos ){
 	    line = "";
+	  }
 	  else {
 	    line = TiCC::trim( line.substr( pos ) );
 	  }
@@ -857,8 +886,9 @@ namespace Timbl {
 		       + " use -m commandline option to set metrics" );
 	      skip = true;
 	    }
-	    else if ( !Features[num-1]->fill_matrix( is ) )
+	    else if ( !Features[num-1]->fill_matrix( is ) ){
 	      return false;
+	    }
 	    else {
 	      Info( "read ValueMatrix for feature " + nums );
 	      anything = true;
@@ -969,8 +999,9 @@ namespace Timbl {
 
 
   bool MBLClass::writeArrays( ostream& os ) {
-    if ( ExpInvalid() )
+    if ( ExpInvalid() ){
       return false;
+    }
     else if ( !initProbabilityArrays( false ) ){
       Warning( "couldn't Calculate probability Arrays's" );
       return false;
@@ -983,8 +1014,9 @@ namespace Timbl {
       while ( it != Targets->ValuesArray.end() ){
 	os << (TargetValue *)*it;
 	++it;
-	if ( it != Targets->ValuesArray.end() )
+	if ( it != Targets->ValuesArray.end() ){
 	  os << ",";
+	}
       }
       os << "." << endl << endl;
       size_t pos = 0;
@@ -1011,8 +1043,9 @@ namespace Timbl {
     for ( const auto& feat : Features ){
       if ( !feat->Ignore() &&
 	   !feat->isNumerical() ) {
-	if ( !feat->AllocSparseArrays( Dim ) )
+	if ( !feat->AllocSparseArrays( Dim ) ){
 	  return false;
+	}
       }
     }
     return true;
@@ -1089,8 +1122,10 @@ namespace Timbl {
       // Now add the Feature values.
       for ( size_t i = 0; i < num_of_features; ++i ){
 	// when learning, no need to bother about Permutation
-	if ( Features[i]->Ignore() ) // but this might happen, take care!
+	if ( Features[i]->Ignore() ) {
+	  // but this might happen, take care!
 	  CurrInst.FV[i] = NULL;
+	}
 	else {
 	  // Add it to the Instance.
 	  CurrInst.FV[i] = Features[i]->add_value( ChopInput->getField(i),
@@ -1143,8 +1178,9 @@ namespace Timbl {
     }
     if ( ( phase != TestWords ) && doSamples() ){
       double exW = ChopInput->getExW();
-      if ( exW < 0 )
+      if ( exW < 0 ){
 	exW = 1.0;
+      }
       CurrInst.ExemplarWeight( exW );
     }
     return &CurrInst;
@@ -1185,8 +1221,9 @@ namespace Timbl {
 	      os.setf(ios::right, ios::adjustfield);
 	      os << setw(7) << feat->EffectiveValues()
 		 << "\t" << feat->StandardDeviation();
-	      if ( feat->isNumerical() )
+	      if ( feat->isNumerical() ){
 		os << " NUMERIC";
+	      }
 	      os << endl;
 	    }
 	  }
@@ -1209,8 +1246,9 @@ namespace Timbl {
 		 << "\t" << feat->SharedVariance()
 		 << "\t" << feat->InfoGain()
 		 << "\t" << feat->GainRatio();
-	      if ( feat->isNumerical() )
+	      if ( feat->isNumerical() ){
 		os << " NUMERIC";
+	      }
 	      os << endl;
 	    }
 	  }
@@ -1231,8 +1269,9 @@ namespace Timbl {
 	      os << setw(7) << feat->EffectiveValues()
 		 << "\t" << feat->InfoGain()
 		 << "\t" << feat->GainRatio();
-	      if ( feat->isNumerical() )
+	      if ( feat->isNumerical() ){
 		os << " NUMERIC";
+	      }
 	      os << endl;
 	    }
 	  }
@@ -1262,10 +1301,12 @@ namespace Timbl {
 	  for ( const auto& feat : Features ){
 	    os.precision(DBL_DIG);
 	    os << ++pos << "\t";
-	    if ( feat->Ignore() )
+	    if ( feat->Ignore() ){
 	      os << "Ignore" << endl;
-	    else
+	    }
+	    else {
 	      os << feat->StandardDeviation() << endl;
+	    }
 	  }
 	  os << "#" << endl;
 	}
@@ -1276,10 +1317,12 @@ namespace Timbl {
 	  for (  const auto& feat : Features ){
 	    os.precision(DBL_DIG);
 	    os << ++pos << "\t";
-	    if ( feat->Ignore() )
+	    if ( feat->Ignore() ){
 	      os << "Ignore" << endl;
-	    else
+	    }
+	    else {
 	      os << 1.0 << endl;
+	    }
 	  }
 	  os << "#" << endl;
 	  os << "# " << TiCC::toString( GR_w ) << endl;
@@ -1288,10 +1331,12 @@ namespace Timbl {
 	  for (  const auto& feat : Features ){
 	    os.precision(DBL_DIG);
 	    os << ++pos << "\t";
-	    if ( feat->Ignore() )
+	    if ( feat->Ignore() ){
 	      os << "Ignore" << endl;
-	    else
+	    }
+	    else {
 	      os << feat->GainRatio() << endl;
+	    }
 	  }
 	  os << "#" << endl;
 	  os << "# " << TiCC::toString( IG_w ) << endl;
@@ -1300,10 +1345,12 @@ namespace Timbl {
 	  for (  const auto& feat : Features ){
 	    os.precision(DBL_DIG);
 	    os << ++pos << "\t";
-	    if ( feat->Ignore() )
+	    if ( feat->Ignore() ){
 	      os << "Ignore" << endl;
-	    else
+	    }
+	    else {
 	      os << feat->InfoGain() << endl;
+	    }
 	  }
 	  if ( need_all_weights ){
 	    os << "#" << endl;
@@ -1313,10 +1360,12 @@ namespace Timbl {
 	    for (  const auto& feat : Features ){
 	      os.precision(DBL_DIG);
 	      os << ++pos << "\t";
-	      if ( feat->Ignore() )
+	      if ( feat->Ignore() ){
 		os << "Ignore" << endl;
-	      else
+	      }
+	      else {
 		os << feat->SharedVariance() << endl;
+	      }
 	    }
 	    os << "#" << endl;
 	    os << "# " << TiCC::toString( X2_w ) << endl;
@@ -1325,10 +1374,12 @@ namespace Timbl {
 	    for (  const auto& feat : Features ){
 	      os.precision(DBL_DIG);
 	      os << ++pos << "\t";
-	      if ( feat->Ignore() )
+	      if ( feat->Ignore() ){
 		os << "Ignore" << endl;
-	      else
+	      }
+	      else {
 		os << feat->ChiSquare() << endl;
+	      }
 	    }
 	    os << "#" << endl;
 	  }
@@ -1377,18 +1428,20 @@ namespace Timbl {
 	      }
 	      else {
 		Features[i_f-1]->SetWeight( w );
-		if ( Features[i_f-1]->Ignore() )
+		if ( Features[i_f-1]->Ignore() ){
 		  Warning( "in weightsfile, "
 			   "Feature " + vals[0] + " has value: " +
 			   TiCC::toString<double>( w ) +
 			   " assigned, but will be ignored" );
+		}
 	      }
 	    }
 	    else {
 	      Features[i_f-1]->SetWeight( 0.0 );
-	      if ( !Features[i_f-1]->Ignore() )
+	      if ( !Features[i_f-1]->Ignore() ){
 		Warning( "in weightsfile, Feature " + vals[0] +
 			 " has value: 'Ignore', we will use: 0.0 " );
+	      }
 	    }
 	  }
 	}
@@ -1414,15 +1467,17 @@ namespace Timbl {
       while( getline( is, Buffer ) ) {
 	// A comment starts with '#'
 	//
-	if ( Buffer.empty() )
+	if ( Buffer.empty() ){
 	  continue;
+	}
 	else {
 	  if ( Buffer[0] == '#'){
 	    vector<string> vals;
 	    if ( TiCC::split_at( Buffer, vals, " " ) == 2  ){
 	      WeightType tmp_w = Unknown_w;
-	      if ( !TiCC::stringTo<WeightType>( vals[1], tmp_w ) )
+	      if ( !TiCC::stringTo<WeightType>( vals[1], tmp_w ) ){
 		continue;
+	      }
 	      else {
 		old_style = false;
 		if ( tmp_w == wanted ){
@@ -1494,8 +1549,9 @@ namespace Timbl {
       while ( it != Targets->ValuesArray.end() ){
 	double Ratio = (*it)->ValFreq() /
 	  (double)totval;
-	if ( Ratio > 0 )
+	if ( Ratio > 0 ){
 	  Entropy += Ratio * Log2(Ratio);
+	}
 	++it;
       }
       DBEntropy = fabs(-Entropy);
@@ -1507,8 +1563,9 @@ namespace Timbl {
     bool nothing_changed = true;
     for ( size_t g = 0; g < num_of_features; ++g ) {
       feat_status[g] = Unknown;
-      if ( Features[g]->Ignore() )
+      if ( Features[g]->Ignore() ){
 	continue;
+      }
       bool metricChanged = false;
       MetricType TmpMetricType = UserOptions[g+1];
       metricClass *tmpMetric = getMetricClass( TmpMetricType );
@@ -1528,8 +1585,9 @@ namespace Timbl {
 	  }
 	}
       }
-      else if ( Features[g]->ValuesArray.size() == 1 )
+      else if ( Features[g]->ValuesArray.size() == 1 ){
 	feat_status[g] = Singleton;
+      }
       delete tmpMetric;
       if ( always || realy_first ){
 	bool isRead;
@@ -1545,8 +1603,9 @@ namespace Timbl {
 	}
 	metricChanged = !Features[g]->setMetricType(TmpMetricType);
       }
-      if ( metricChanged )
+      if ( metricChanged ){
 	nothing_changed = false;
+      }
     } // end g
     if ( ( CurrentWeighting() == SD_w ||
 	   GlobalMetric->isSimilarityMetric() )
@@ -1562,25 +1621,30 @@ namespace Timbl {
 	    ostr1 << "The following feature(s) have non numeric value: ";
 	    first = false;
 	  }
-	  else
+	  else {
 	    ostr1 << ", ";
+	  }
 	  size_t n = ff;
 	  while ( ff < num_of_features-1 &&
-		  feat_status[ff+1] == NotNumeric )
-	    ff++;
+		  feat_status[ff+1] == NotNumeric ){
+	    ++ff;
+	  }
 	  if ( n != ff ){
 	    ostr1 << n+1 << "-" << ff+1;
 	  }
-	  else
+	  else {
 	    ostr1 << ff+1;
+	  }
 	}
       }
       if ( !first  ){
 	Error( ostr1.str() );
-	if ( GlobalMetric->isSimilarityMetric() )
+	if ( GlobalMetric->isSimilarityMetric() ){
 	  Error( "Therefore InnerProduct/Cosine operations are impossible" );
-	else
+	}
+	else {
 	  Error( "Therefore " + TiCC::toString(CurrentWeighting()) + " weighting is impossible" );
+	}
 	return;
       }
     }
@@ -1597,18 +1661,21 @@ namespace Timbl {
 	    ostr1 << "The following feature(s) have only 1 value: ";
 	    first = false;
 	  }
-	  else
+	  else {
 	    ostr1 << ", ";
+	  }
 	  size_t n = ff;
 	  while ( ff < num_of_features-1 &&
 		  ( feat_status[ff+1] == Singleton ||
-		    feat_status[ff+1] == SingletonNumeric ) )
-	    ff++;
+		    feat_status[ff+1] == SingletonNumeric ) ){
+	    ++ff;
+	  }
 	  if ( n != ff ){
 	    ostr1 << n+1 << "-" << ff+1;
 	  }
-	  else
+	  else {
 	    ostr1 << ff+1;
+	  }
 	}
       }
       if ( !first && !is_copy ){
@@ -1642,8 +1709,9 @@ namespace Timbl {
     if ( always || realy_first ){
       for ( const auto& feat : Features ){
 	if ( Weighting != UserDefined_w ){
-	  if ( CurrentWeighting() == SD_w )
+	  if ( CurrentWeighting() == SD_w ){
 	    feat->StandardDeviationStatistics( );
+	  }
 	  else if ( feat->isNumerical() ){
 	    feat->NumStatistics( DBEntropy, Targets, Bin_Size,
 				 need_all_weights );
@@ -1668,17 +1736,20 @@ namespace Timbl {
       while ( it != Targets->ValuesArray.end() ){
 	os << (TargetValue *)*it;
 	++it;
-	if ( it != Targets->ValuesArray.end() )
+	if ( it != Targets->ValuesArray.end() ){
 	  os << ",";
+	}
       }
       os << "." << endl << endl;
       size_t pos = 0;
       for ( auto const& feat : Features ){
 	os << "a" << ++pos << ": ";
-	if ( feat->Ignore() )
+	if ( feat->Ignore() ){
 	  os << "Ignore" << endl;
-	else if ( feat->isNumerical() )
+	}
+	else if ( feat->isNumerical() ){
 	  os << "Numeric" << endl;
+	}
 	else {
 	  // Loop over the values.
 	  //
@@ -1686,8 +1757,9 @@ namespace Timbl {
 	  while( it2 != feat->ValuesArray.end() ){
 	    os << (FeatureValue *)*it2;
 	    ++it2;
-	    if ( it2 != feat->ValuesArray.end() )
+	    if ( it2 != feat->ValuesArray.end() ){
 	      os << ",";
+	    }
 	  }
 	  os << "." << endl;
 	}
@@ -1826,8 +1898,9 @@ namespace Timbl {
     Vfield *Bpnt = NULL;
     if ( best_distrib ){
       lastpos = best_distrib->begin();
-      if ( lastpos != best_distrib->end() )
+      if ( lastpos != best_distrib->end() ){
 	Bpnt = lastpos->second;
+      }
     }
     size_t CurPos = 0;
     while ( Bpnt ) {
@@ -1929,8 +2002,9 @@ namespace Timbl {
 	  //	  cerr << "Ok add " << best_distrib << "at distance " << Distance << endl;
 	  Threshold = bestArray.addResult( Distance, best_distrib, origI );
 	  //	  cerr << "BA = " << bestArray << endl;
-	  if ( do_silly_testing )
+	  if ( do_silly_testing ){
 	    Threshold = DBL_MAX;
+	  }
 	}
 	else {
 	  Error( "DISTANCE == " + TiCC::toString<double>(Distance) );
@@ -1952,8 +2026,9 @@ namespace Timbl {
 	  //	  cerr << "na next test, curpos=" << CurPos << "-" << TiCC::toString(CurrentFV) << endl;
 	  break;
 	}
-	if ( pos == 0 )
+	if ( pos == 0 ){
 	  break;
+	}
 	--pos;
       }
     }
@@ -2016,18 +2091,21 @@ namespace Timbl {
       test_instance_ex( Inst, SubTree, level );
     }
     else {
-      if ( GlobalMetric->isSimilarityMetric( ) )
+      if ( GlobalMetric->isSimilarityMetric( ) ){
 	test_instance_sim( Inst, SubTree, level );
-      else
+      }
+      else {
 	test_instance( Inst, SubTree, level );
+      }
     }
   }
 
   size_t MBLClass::countFeatures( const string& inBuffer,
 				  const InputFormatType IF ) const {
     size_t result = 0;
-    if ( IF == Sparse  || IF == SparseBin )
+    if ( IF == Sparse  || IF == SparseBin ){
       return num_of_features;
+    }
     else {
       try {
 	result = Chopper::countFeatures( inBuffer, IF, F_length,
@@ -2068,8 +2146,9 @@ namespace Timbl {
       }
       else if ( input_format != UnknownInputFormat ){
 	// The format is somehow already known, so use that
-	if ( input_format == SparseBin || input_format == Sparse )
+	if ( input_format == SparseBin || input_format == Sparse ){
 	  NumF = MaxFeatures;
+	}
 	else {
 	  if ( !getline( datafile, Buffer ) ) {
 	    Warning( "empty data file" );

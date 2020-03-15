@@ -114,26 +114,31 @@ namespace Timbl {
   }
 
   const WValueDistribution *resultStore::getResultDist() {
-    if ( rawDist && !dist )
+    if ( rawDist && !dist ){
       prepare();
+    }
     return dist;
   }
 
   string resultStore::getResult() {
     if ( isTop ){
       if ( topCache.empty() ){
-	if ( dist )
+	if ( dist ) {
 	  topCache = dist->DistToStringW( beam );
-	else
+	}
+	else {
 	  topCache = "{}";
+	}
       }
       resultCache = topCache;
     }
     else if ( resultCache.empty() ){
-      if ( dist )
+      if ( dist ) {
 	resultCache = dist->DistToStringW( beam );
-      else
+      }
+      else {
 	resultCache = "{}";
+      }
     }
     return resultCache;
   }
@@ -161,9 +166,10 @@ namespace Timbl {
   }
 
   void resultStore::prepare() {
-    if ( isTop && !topCache.empty() )
+    if ( isTop && !topCache.empty() ){
       return;
-    if ( !dist && rawDist ) {
+    }
+    if ( !dist && rawDist ){
       if ( !disposable ){
 	dist = rawDist->to_WVD_Copy();
       }
@@ -293,8 +299,9 @@ namespace Timbl {
 	      }
 	    }
 	  }
-	  if ( initProbabilityArrays( all_vd ) )
+	  if ( initProbabilityArrays( all_vd ) ){
 	    calculatePrestored();
+	  }
 	  else {
 	    Error( string("not enough memory for Probability Arrays")
 		   + "' in ("
@@ -303,8 +310,9 @@ namespace Timbl {
 	    throw std::bad_alloc();
 	  }
 	  InitWeights();
-	  if ( do_diversify )
+	  if ( do_diversify ){
 	    diverseWeights();
+	  }
 	}
 	srand( random_seed );
 	initTesters();
@@ -338,8 +346,9 @@ namespace Timbl {
 	stats.addSkipped();
 	continue;
       }
-      else
+      else {
 	found = true;
+      }
     }
     return found;
   }
@@ -398,8 +407,9 @@ namespace Timbl {
 	    ifstream datafile( FileName, ios::in);
 	    stats.clear();
 	    string Buffer;
-	    if ( InputFormat() == ARFF )
+	    if ( InputFormat() == ARFF ){
 	      skipARFFHeader( datafile );
+	    }
 	    if ( !nextLine( datafile, Buffer ) ){
 	      Error( "no useful data in: " + FileName );
 	      result = false;
@@ -421,8 +431,9 @@ namespace Timbl {
 		// Progress update.
 		//
 		if ( !Verbosity(SILENT) ){
-		  if (( stats.dataLines() % Progress() ) == 0)
+		  if ( ( stats.dataLines() % Progress() ) == 0 ){
 		    time_stamp( "Examining: ", stats.dataLines() );
+		  }
 		}
 		bool found = false;
 		while ( !found &&
@@ -446,17 +457,20 @@ namespace Timbl {
 		  if ( Verbosity(FEAT_W) ){
 		    *mylog << "Lines of data     : "
 			   << stats.dataLines() << endl;
-		    if ( stats.skippedLines() != 0 )
+		    if ( stats.skippedLines() != 0 ) {
 		      *mylog << "SkippedLines      : "
 			     << stats.skippedLines() << endl;
+		    }
 		    LearningInfo( *mylog );
 		  }
 		}
-		else
+		else {
 		  calculate_fv_entropy( false );
+		}
 		prepT.stop();
-		if ( !Verbosity(SILENT) )
+		if ( !Verbosity(SILENT) ){
 		  Info( "Preparation took " + prepT.toString() );
+		}
 		if ( warnOnSingleTarget && Targets->EffectiveValues() <=1 ){
 		  Warning( "Training file contains only 1 class." );
 		}
@@ -503,11 +517,13 @@ namespace Timbl {
 	chopLine( Buffer );
 	// Progress update.
 	//
-	if (( stats.dataLines() % Progress() ) == 0)
+	if ( ( stats.dataLines() % Progress() ) == 0 ){
 	  time_stamp( "Learning:  ", stats.dataLines() );
+	}
 	chopped_to_instance( TrainWords );
-	if ( !outInstanceBase )
+	if ( !outInstanceBase ){
 	  outInstanceBase = InstanceBase->clone();
+	}
 	//		  cerr << "add instance " << &CurrInst << endl;
 	if ( !outInstanceBase->AddInstance( CurrInst ) ){
 	  Warning( "deviating exemplar weight in:\n" +
@@ -535,16 +551,15 @@ namespace Timbl {
     if ( is_synced ){
       CurrentDataFile = FileName; // assume magic!
     }
-    if ( CurrentDataFile == "" )
+    if ( CurrentDataFile == "" ) {
       if ( FileName == "" ){
 	Warning( "unable to build an InstanceBase: No datafile defined yet" );
 	result = false;
       }
-      else {
-	if ( !Prepare( FileName, warnOnSingleTarget ) || ExpInvalid() ){
-	  result = false;
-	}
+      else if ( !Prepare( FileName, warnOnSingleTarget ) || ExpInvalid() ){
+	result = false;
       }
+    }
     else if ( FileName != "" &&
 	      CurrentDataFile != FileName ){
       Error( "Unable to Learn from file '" + FileName + "'\n"
@@ -556,8 +571,9 @@ namespace Timbl {
       TiCC::Timer learnT;
       learnT.start();
       InitInstanceBase();
-      if ( ExpInvalid() )
+      if ( ExpInvalid() ){
 	return false;
+      }
       if ( EffectiveFeatures() < 2 ) {
 	fileIndex fmIndex;
 	//      TiCC::Timer t;
@@ -635,7 +651,9 @@ namespace Timbl {
 				  const string& s,
 				  const bool init ):
     TimblExperiment( IB1_a, s ){
-    if ( init ) InitClass( N );
+    if ( init ) {
+      InitClass( N );
+    }
     TreeOrder = GRoverFeature;
   }
 
@@ -660,9 +678,10 @@ namespace Timbl {
 	chopped_to_instance( TrainLearnWords );
 	MBL_init = false;
 	bool happy = InstanceBase->AddInstance( CurrInst );
-	if ( !happy )
+	if ( !happy ){
 	  Warning( "deviating exemplar weight in:\n" +
 		   InstanceString + "\nIgnoring the new weight" );
+	}
       }
     }
     return result;
@@ -722,8 +741,9 @@ namespace Timbl {
       // Open the file.
       //
       ifstream datafile( FileName, ios::in);
-      if ( InputFormat() == ARFF )
+      if ( InputFormat() == ARFF ){
 	skipARFFHeader( datafile );
+      }
       if ( !nextLine( datafile, Buffer ) ){
 	Error( "no useful data in: " + FileName );
 	result = false;    // No more input
@@ -750,8 +770,9 @@ namespace Timbl {
 	  }
 	  // Progress update.
 	  //
-	  if ((stats.dataLines() % Progress() ) == 0)
+	  if ( (stats.dataLines() % Progress() ) == 0 ){
 	    time_stamp(  "Learning:  ", stats.dataLines() );
+	  }
 	  found = false;
 	  while ( !found && nextLine( datafile, Buffer ) ){
 	    found = chopLine( Buffer );
@@ -763,8 +784,9 @@ namespace Timbl {
 	  }
 	} while( found );
 	time_stamp( "Finished:  ", stats.dataLines() );
-	if ( !Verbosity(SILENT) )
+	if ( !Verbosity(SILENT) ){
 	  IBInfo( *mylog );
+	}
       }
     }
     return result;
@@ -792,8 +814,9 @@ namespace Timbl {
       // Open the file.
       //
       ifstream datafile( FileName, ios::in);
-      if ( InputFormat() == ARFF )
+      if ( InputFormat() == ARFF ){
 	skipARFFHeader( datafile );
+      }
       if ( !nextLine( datafile, Buffer ) ){
 	Error( "no useful data in: " + FileName );
 	result = false;    // No more input
@@ -814,8 +837,9 @@ namespace Timbl {
 	  HideInstance( CurrInst );
 	  // Progress update.
 	  //
-	  if ((stats.dataLines() % Progress() ) == 0)
+	  if ( (stats.dataLines() % Progress() ) == 0 ){
 	    time_stamp( "Removing:  ", stats.dataLines() );
+	  }
 	  found = false;
 	  while ( !found &&
 		  nextLine( datafile, Buffer ) ){
@@ -828,8 +852,9 @@ namespace Timbl {
 	  }
 	} while( found );
 	time_stamp( "Finished:  ", stats.dataLines() );
-	if ( !Verbosity(SILENT) )
+	if ( !Verbosity(SILENT) ){
 	  IBInfo( *mylog );
+	}
       }
     }
     return result;
@@ -874,17 +899,22 @@ namespace Timbl {
       time(&Time);
       if ( line == 1000 ){
 	// check if we are slow, if so, change progress value
-	if ( Time - start > 120 ) // more then two minutes
+	if ( Time - start > 120 ) {
+	  // more then two minutes for 1,000
 	  // very slow !
 	  Progress( 1000 );
+	}
       }
       else if ( line == 10000 ){
-	if ( Time - start > 600 ) // more then ten minutes
-	  // quit slow !
+	if ( Time - start > 600 ) {
+	  // more then ten minutes for 10,000
+	  // quite slow !
 	  Progress( 10000 );
+	}
       }
-      if ( exp_name != "" )
+      if ( exp_name != "" ){
 	os  << "-" << exp_name << "-";
+      }
       os << "Tested: ";
       os.width(6);
       os.setf(ios::right, ios::adjustfield);
@@ -918,23 +948,27 @@ namespace Timbl {
       time(&Time);
       if ( line == 100 ){
 	// check if we are slow, if so, change progress value
-	if ( Time - start > 120 && local_progress > 100 )
+	if ( Time - start > 120 && local_progress > 100 ){
 	  // very slow !
 	  Progress( 100 );
+	}
       }
       else if ( line == 1000 ){
 	// check if we are slow, if so, change progress value
-	if ( Time - start > 120 && local_progress > 1000 )
+	if ( Time - start > 120 && local_progress > 1000 ){
 	  // very slow !
 	  Progress( 1000 );
+	}
       }
       else if ( line == 10000 ){
-	if ( Time - start > 120 && local_progress > 10000)
-	  // quit slow !
+	if ( Time - start > 120 && local_progress > 10000 ){
+	  // quite slow !
 	  Progress( 10000 );
+	}
       }
-      if ( exp_name != "" )
+      if ( exp_name != "" ){
 	os  << "-" << exp_name << "-";
+      }
       os << "Learning:  ";
       os.width(6);
       os.setf(ios::right, ios::adjustfield);
@@ -956,8 +990,9 @@ namespace Timbl {
       os << endl;
       return true;
     }
-    else
+    else {
       return false;
+    }
   }
 
   void TimblExperiment::show_speed_summary( ostream& os,
@@ -978,29 +1013,35 @@ namespace Timbl {
 
   bool TimblExperiment::showStatistics( ostream& os ) const {
     os << endl;
-    if ( confusionInfo )
+    if ( confusionInfo ){
       confusionInfo->FScore( os, Targets, Verbosity(CLASS_STATS) );
+    }
     os << "overall accuracy:        "
        << stats.testedCorrect()/(double) stats.dataLines()
        << "  (" << stats.testedCorrect() << "/" << stats.dataLines()  << ")" ;
-    if ( stats.exactMatches() != 0 )
+    if ( stats.exactMatches() != 0 ){
       os << ", of which " << stats.exactMatches() << " exact matches " ;
+    }
     os << endl;
     int totalTies =  stats.tiedCorrect() + stats.tiedFailure();
     if ( totalTies > 0 ){
-      if ( totalTies == 1 )
+      if ( totalTies == 1 ) {
 	os << "There was 1 tie";
-      else
+      }
+      else {
 	os << "There were " << totalTies << " ties";
+      }
       double tie_perc = 100 * ( stats.tiedCorrect() / (double)totalTies);
       int oldPrec = os.precision(2);
       os << " of which " << stats.tiedCorrect()
 	 << " (" << setprecision(2)
 	 << tie_perc << setprecision(6) << "%)";
-      if ( totalTies == 1 )
+      if ( totalTies == 1 ){
 	os << " was correctly resolved" << endl;
-      else
+      }
+      else {
 	os << " were correctly resolved" << endl;
+      }
       os.precision(oldPrec);
     }
     if ( confusionInfo && Verbosity(CONF_MATRIX) ){
@@ -1034,16 +1075,18 @@ namespace Timbl {
       outfile << bestArray;
       return true;
     }
-    else
+    else {
       return false;
+    }
   }
 
   xmlNode *TimblExperiment::bestNeighborsToXML() const {
     if ( Verbosity( NEAR_N | ALL_K) ){
       return bestArray.toXML();
     }
-    else
+    else {
       return 0;
+    }
   }
 
   json TimblExperiment::best_neighbors_to_JSON() const {
@@ -1071,10 +1114,7 @@ namespace Timbl {
       int OldPrec = outfile.precision(DBL_DIG-1);
       outfile.setf(ios::showpoint);
       outfile.width(8);
-      // if ( GlobalMetric->isSimilarityMetric() )
-      // 	outfile << " " << GlobalMetric->get_max_similarity() - Distance;
-      // else
-	outfile << " " << Distance;
+      outfile << " " << Distance;
       outfile.precision(OldPrec);
     }
     if ( Verbosity(MATCH_DEPTH) ){
@@ -1092,8 +1132,9 @@ namespace Timbl {
       Error( "IB2 learning failed, invalid bootstrap option?" );
       return false;
     }
-    else
+    else {
       return TimblExperiment::Prepare( FileName, false, expand );
+    }
   }
 
   bool IB2_Experiment::Learn( const string& FileName, bool ){
@@ -1112,16 +1153,15 @@ namespace Timbl {
 	if ( is_synced ){
 	  CurrentDataFile = FileName; // assume magic!
 	}
-	if ( CurrentDataFile == "" )
+	if ( CurrentDataFile == "" ){
 	  if ( FileName == "" ){
 	    Warning( "unable to build an InstanceBase: No datafile defined yet" );
 	    result = false;
 	  }
-	  else {
-	    if ( !Prepare( FileName, false ) || ExpInvalid() ){
-	      result = false;
-	    }
+	  else if ( !Prepare( FileName, false ) || ExpInvalid() ){
+	    result = false;
 	  }
+	}
 	else if ( FileName != "" &&
 		  CurrentDataFile != FileName ){
 	  Error( "Unable to Learn from file '" + FileName + "'\n"
@@ -1136,8 +1176,9 @@ namespace Timbl {
 	// Open the file.
 	//
 	ifstream datafile( CurrentDataFile, ios::in);
-	if ( InputFormat() == ARFF )
+	if ( InputFormat() == ARFF ){
 	  skipARFFHeader( datafile );
+	}
 	if ( !nextLine( datafile, Buffer ) ){
 	  Error( "cannot start learning from in: " + CurrentDataFile );
 	  result = false;    // No more input
@@ -1149,8 +1190,9 @@ namespace Timbl {
 	else {
 	  learnT.start();
 	  InitInstanceBase( );
-	  if ( ExpInvalid() )
+	  if ( ExpInvalid() ){
 	    return false;
+	  }
 	  MBL_init = false;
 	  if ( !Verbosity(SILENT) ) {
 	    Info( "Phase 2: Learning from Datafile: " + CurrentDataFile );
@@ -1169,10 +1211,12 @@ namespace Timbl {
 	    }
 	    // Progress update.
 	    //
-	    if ((stats.dataLines() % Progress() ) == 0)
+	    if ( (stats.dataLines() % Progress() ) == 0 ){
 	      time_stamp( "Learning:  ", stats.dataLines() );
-	    if ( stats.dataLines() >= IB2_offset() )
+	    }
+	    if ( stats.dataLines() >= IB2_offset() ){
 	      go_on = false;
+	    }
 	    else {
 	      found = false;
 	      while ( !found &&
@@ -1188,7 +1232,7 @@ namespace Timbl {
 	    }
 	  }
 	  if ( !Verbosity(SILENT) ){
-	  time_stamp( "Finished:  ", stats.dataLines() );
+	    time_stamp( "Finished:  ", stats.dataLines() );
 	  }
 	  learnT.stop();
 	  if ( !Verbosity(SILENT) ){
@@ -1199,8 +1243,9 @@ namespace Timbl {
 	  cerr << "IB2 mismatches: " << InstanceBase->mismatch << endl;
 #endif
 	}
-	if ( result )
+	if ( result ){
 	  result = Expand_N( FileName );
+	}
       }
       return result;
     }
@@ -1245,17 +1290,20 @@ namespace Timbl {
     }
     else {
       string file_name;
-      if ( FileName == "" )
+      if ( FileName == "" ){
 	file_name = CurrentDataFile;
-      else
+      }
+      else {
 	file_name = FileName;
+      }
       string Buffer;
       stats.clear();
       // Open the file.
       //
       ifstream datafile( file_name, ios::in);
-      if ( InputFormat() == ARFF )
+      if ( InputFormat() == ARFF ){
 	skipARFFHeader( datafile );
+      }
       if ( !nextLine( datafile, Buffer ) ){
 	Error( "no useful data in: " + file_name );
 	result = false;    // No more input
@@ -1378,9 +1426,10 @@ namespace Timbl {
   }
 
   bool TimblExperiment::checkTestFile(){
-    if ( IBStatus() == Invalid )
+    if ( IBStatus() == Invalid ){
       Warning( "you tried to apply the " + TiCC::toString( algorithm ) +
 	       " algorithm, but no Instance Base is available yet" );
+    }
     else {
       runningPhase = TestWords;
       size_t numF =0;
@@ -1389,11 +1438,12 @@ namespace Timbl {
 	  Error( "unable to use the data from '" + testStreamName +
 		 "', wrong Format?" );
 	}
-	else
+	else {
 	  Error( "mismatch between number of features in Testfile " +
 		 testStreamName + " and the Instancebase (" +
 		 TiCC::toString<size_t>(numF) + " vs. " +
 		 TiCC::toString<size_t>(NumOfFeatures()) + ")" );
+	}
 	return false;
       }
       if ( !Verbosity(SILENT) ){
@@ -1408,8 +1458,9 @@ namespace Timbl {
   }
 
   bool IB1_Experiment::checkTestFile(){
-    if ( !TimblExperiment::checkTestFile() )
+    if ( !TimblExperiment::checkTestFile() ){
       return false;
+    }
     else if ( IBStatus() == Pruned ){
       Warning( "you tried to apply the " + TiCC::toString( algorithm) +
 	       " algorithm on a pruned Instance Base" );
@@ -1419,8 +1470,9 @@ namespace Timbl {
   }
 
   bool IB2_Experiment::checkTestFile(){
-    if ( !IB1_Experiment::checkTestFile() )
+    if ( !IB1_Experiment::checkTestFile() ){
       return false;
+    }
     else if ( IB2_offset() == 0 && InstanceBase == 0 ){
       Error( "missing bootstrap information for IB2 algorithm." );
       return false;
@@ -1434,21 +1486,24 @@ namespace Timbl {
 	 ConfirmOptions() ) {
       runningPhase = TestWords;
       InputFormatType IF = InputFormat();
-      if ( IF == UnknownInputFormat )
+      if ( IF == UnknownInputFormat ){
 	IF = getInputFormat( line );
+      }
       size_t i = countFeatures( line, IF );
       if ( i != NumOfFeatures() ){
-	if ( i > 0 )
+	if ( i > 0 ){
 	  Warning( "mismatch between number of features in testline '" +
 		   line + "' and the Instancebase (" + TiCC::toString<size_t>(i)
 		   + " vs. " + TiCC::toString<size_t>(NumOfFeatures()) + ")" );
+	}
       }
       else {
 	if ( Initialized ){
 	  result = true;
 	}
-	else if ( IBStatus() == Invalid )
+	else if ( IBStatus() == Invalid ){
 	  Warning( "no Instance Base is available yet" );
+	}
 	else if ( !setInputFormat( IF ) ){
 	  Error( "Couldn't set input format to " + TiCC::toString( IF ) );
 	}
@@ -1467,8 +1522,9 @@ namespace Timbl {
 
 
   bool IB1_Experiment::checkLine( const string& line ){
-    if ( !TimblExperiment::checkLine( line ) )
+    if ( !TimblExperiment::checkLine( line ) ){
       return false;
+    }
     else if ( IBStatus() == Pruned ){
       Warning( "you tried to apply the IB1 algorithm on a pruned"
 	       " Instance Base" );
@@ -1713,8 +1769,9 @@ namespace Timbl {
     if ( GlobalMetric->isStorable() ){
       os << ", Prestored matrix";
     }
-    if ( Do_Exact() )
+    if ( Do_Exact() ){
       os << ", prefering exact matches";
+    }
     os << endl;
     os << "Deviant Feature Metrics:";
     int cnt = 0;
@@ -1731,22 +1788,28 @@ namespace Timbl {
 	  os << endl << "   Feature[" << i+1 << "] : " << TiCC::toString( mt, true );
 	  if ( Features[i]->isStorableMetric() ){
 	    bool readM = false;
-	    if ( Features[i]->matrixPresent( readM ) )
-	      if ( readM )
+	    if ( Features[i]->matrixPresent( readM ) ){
+	      if ( readM ){
 		os << " (User Defined)";
-	      else
+	      }
+	      else {
 		os << " (Prestored)";
-	    else
+	      }
+	    }
+	    else {
 	      os << " (Not Prestored)";
+	    }
 	  }
 	}
       }
     }
     delete [] InvPerm;
-    if ( cnt )
+    if ( cnt ){
       os << endl;
-    else
+    }
+    else {
       os << "(none)" << endl;
+    }
     MatrixInfo( os );
     show_ignore_info( os );
   }
@@ -1754,14 +1817,17 @@ namespace Timbl {
   void TimblExperiment::show_weight_info( ostream& os ) const {
     os << "Weighting     : " << TiCC::toString(CurrentWeighting(), true);
     if ( CurrentWeighting() == UserDefined_w ){
-      if ( WFileName != "" )
+      if ( WFileName != "" ){
 	os << "  (" << WFileName << ")";
-      else
+      }
+      else {
 	os << " (no weights loaded, using No Weighting)" ;
+      }
     }
     os << endl;
-    if ( Verbosity( FEAT_W ) && CurrentWeighting() != No_w )
+    if ( Verbosity( FEAT_W ) && CurrentWeighting() != No_w ){
       ShowWeights( os );
+    }
   }
 
   void TimblExperiment::show_ignore_info( ostream& os ) const{
@@ -1772,19 +1838,22 @@ namespace Timbl {
 	  first = false;
 	  os << "Ignored features : { ";
 	}
-	else
+	else {
 	  os << ", ";
+	}
 	os << i+1;
       }
     }
-    if ( !first )
+    if ( !first ){
       os << " } " << endl;
+    }
   }
 
   void TimblExperiment::showTestingInfo( ostream& os ) {
     if ( !Verbosity(SILENT) ){
-      if ( Verbosity(OPTIONS ) )
+      if ( Verbosity(OPTIONS ) ){
 	ShowSettings( os );
+      }
       os << endl << "Starting to test, Testfile: " << testStreamName << endl
 	 << "Writing output in:          " << outStreamName << endl
 	 << "Algorithm     : " << TiCC::toString( Algorithm() ) << endl;
@@ -1863,8 +1932,9 @@ namespace Timbl {
   };
 
   threadBlock::threadBlock( TimblExperiment *parent, int num ){
-    if ( num <= 0 )
+    if ( num <= 0 ){
       throw range_error( "threadBlock size cannot be <=0" );
+    }
     size = num;
     exps.resize( size );
     exps[0].exp = parent;
@@ -1882,8 +1952,9 @@ namespace Timbl {
       int cnt;
       bool goon = exps[0].exp->nextLine( is, exps[i].Buffer, cnt );
       exps[i].lineNo += cnt;
-      if ( !goon && i == 0 )
+      if ( !goon && i == 0 ){
 	result = false;
+      }
     }
     return result;
   }
@@ -1916,8 +1987,9 @@ namespace Timbl {
       time(&lStartTime);
       timeval startTime;
       gettimeofday( &startTime, 0 );
-      if ( InputFormat() == ARFF )
+      if ( InputFormat() == ARFF ){
 	skipARFFHeader( testStream );
+      }
       unsigned int dataCount = stats.dataLines();
       while ( experiments.readLines( testStream ) ){
 	if ( numOfThreads > 1 ){
@@ -1969,8 +2041,9 @@ namespace Timbl {
       time(&lStartTime);
       timeval startTime;
       gettimeofday( &startTime, 0 );
-      if ( InputFormat() == ARFF )
+      if ( InputFormat() == ARFF ){
 	skipARFFHeader( testStream );
+      }
       string Buffer;
       while ( nextLine( testStream, Buffer ) ){
 	if ( !chopLine( Buffer ) ) {
@@ -1998,9 +2071,10 @@ namespace Timbl {
 	      *mylog << "Exacte match:\n" << get_org_input() << endl;
 	    }
 	  }
-	  if ( !Verbosity(SILENT) )
+	  if ( !Verbosity(SILENT) ){
 	    // Display progress counter.
 	    show_progress( *mylog, lStartTime, stats.dataLines() );
+	  }
 	}
       }
       if ( !Verbosity(SILENT) ){
@@ -2033,8 +2107,9 @@ namespace Timbl {
       time(&lStartTime);
       timeval startTime;
       gettimeofday( &startTime, 0 );
-      if ( InputFormat() == ARFF )
+      if ( InputFormat() == ARFF ){
 	skipARFFHeader( testStream );
+      }
       string Buffer;
       while ( nextLine( testStream, Buffer ) ){
 	if ( !chopLine( Buffer ) ) {
@@ -2046,9 +2121,10 @@ namespace Timbl {
 	  chopped_to_instance( TestWords );
 	  const neighborSet *res = LocalClassify( CurrInst );
 	  outStream << get_org_input() << endl << *res;
-	  if ( !Verbosity(SILENT) )
+	  if ( !Verbosity(SILENT) ){
 	    // Display progress counter.
 	    show_progress( *mylog, lStartTime, stats.dataLines() );
+	  }
 	}
       }// end while.
       if ( !Verbosity(SILENT) ){
@@ -2110,10 +2186,12 @@ namespace Timbl {
 
   bool TimblExperiment::SetOptions( const TiCC::CL_Options& Opts ){
     bool result;
-    if ( IsClone() )
+    if ( IsClone() ){
       result = OptParams->parse_options( Opts, 2 );
-    else
+    }
+    else {
       result = OptParams->parse_options( Opts, 0 );
+    }
     return result;
   }
 
@@ -2137,17 +2215,21 @@ namespace Timbl {
   }
 
   xmlNode *TimblExperiment::settingsToXML(){
-    if ( ConfirmOptions() )
+    if ( ConfirmOptions() ){
       return MBLClass::settingsToXml( );
-    else
+    }
+    else {
       return 0;
+    }
   }
 
   json TimblExperiment::settings_to_JSON(){
-    if ( ConfirmOptions() )
+    if ( ConfirmOptions() ){
       return MBLClass::settings_to_JSON( );
-    else
+    }
+    else {
       return 0;
+    }
   }
 
   xmlNode *TimblExperiment::weightsToXML(){
@@ -2187,8 +2269,9 @@ namespace Timbl {
       return false;
     }
     else {
-      if ( !Verbosity(SILENT) )
+      if ( !Verbosity(SILENT) ){
 	Info( "Saving Probability Arrays in " + FileName );
+      }
       return MBLClass::writeArrays( out );
     }
   }
@@ -2200,14 +2283,16 @@ namespace Timbl {
       return false;
     }
     else {
-      if ( !Verbosity(SILENT) )
+      if ( !Verbosity(SILENT) ){
 	Info( "Reading Probability Arrays from " + FileName );
+      }
       if ( !readArrays( inf ) ){
 	Error( "Errors found in file " + FileName );
 	return false;
       }
-      else
+      else {
 	return true;
+      }
     }
   }
 
@@ -2219,8 +2304,9 @@ namespace Timbl {
       return false;
     }
     else {
-      if ( !Verbosity(SILENT) )
+      if ( !Verbosity(SILENT) ){
 	Info( "Saving Matrices in " + FileName );
+      }
       initExperiment( );
       return writeMatrices( out );
     }
@@ -2233,14 +2319,16 @@ namespace Timbl {
       return false;
     }
     else {
-      if ( !Verbosity(SILENT) )
+      if ( !Verbosity(SILENT) ){
 	Info( "Reading matrices from " + FileName );
+      }
       if ( !readMatrices( inf ) ){
 	Error( "Errors found in file " + FileName );
 	return false;
       }
-      else
+      else {
 	return true;
+      }
     }
   }
 
@@ -2254,18 +2342,21 @@ namespace Timbl {
 	return false;
       }
       else {
-	if ( !Verbosity(SILENT) )
+	if ( !Verbosity(SILENT) ){
 	  Info( "Saving Weights in " + FileName );
-	if ( writeWeights( outfile ) )
+	}
+	if ( writeWeights( outfile ) ){
 	  return true;
+	}
 	else {
 	  Error( "failed to store weights in file " + FileName );
 	  return false;
 	}
       }
     }
-    else
+    else {
       return false;
+    }
   }
 
   bool TimblExperiment::GetWeights( const std::string& FileName, WeightType w ){
@@ -2280,12 +2371,10 @@ namespace Timbl {
       else {
 	if ( w == Unknown_w ){
 	  w = GR_w;
-	  // 	Warning( "Unspecified weighting, using default: "
-	  // 		 + TiCC::toString(w) );
 	}
-	if ( !Verbosity(SILENT) )
-	  //	  Info( "Reading " + TiCC::toString(w) + " weights from " + FileName );
+	if ( !Verbosity(SILENT) ){
 	  Info( "Reading weights from " + FileName );
+	}
 	if ( readWeights( weightsfile, w ) ){
 	  WFileName = FileName;
 	  return true;
@@ -2296,8 +2385,9 @@ namespace Timbl {
 	}
       }
     }
-    else
+    else {
       return false;
+    }
   }
 
   bool TimblExperiment::WriteInstanceBase( const std::string& FileName ){
@@ -2308,10 +2398,10 @@ namespace Timbl {
 	Warning( "can't open outputfile: " + FileName );
       }
       else {
-	if ( !Verbosity(SILENT) )
+	if ( !Verbosity(SILENT) ){
 	  Info( "Writing Instance-Base in: " + FileName );
-	if ( PutInstanceBase( outfile ) )
-	  result = true;
+	}
+	result = PutInstanceBase( outfile );
       }
     }
     return result;
@@ -2325,8 +2415,9 @@ namespace Timbl {
 	Warning( "can't open outputfile: " + FileName );
       }
       else {
-	if ( !Verbosity(SILENT) )
+	if ( !Verbosity(SILENT) ){
 	  Info( "Writing Instance-Base in: " + FileName );
+	}
 	if ( ExpInvalid() ){
 	  result = false;
 	}
@@ -2350,8 +2441,9 @@ namespace Timbl {
 	Warning( "can't open outputfile: " + FileName );
       }
       else {
-	if ( !Verbosity(SILENT) )
+	if ( !Verbosity(SILENT) ){
 	  Info( "Writing Instance-Base in: " + FileName );
+	}
 	if ( ExpInvalid() ){
 	  result = false;
 	}
@@ -2390,23 +2482,27 @@ namespace Timbl {
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	  Features[i]->SetWeight( 1.0 );
-	  if ( Features[permutation[i]]->Ignore() )
+	  if ( Features[permutation[i]]->Ignore() ){
 	    PermFeatures[i] = NULL;
-	  else
+	  }
+	  else {
 	    PermFeatures[pos++] = Features[permutation[i]];
+	  }
 	}
 	InstanceBase = new IB_InstanceBase( EffectiveFeatures(),
 					    ibCount,
 					    (RandomSeed()>=0) );
-	if ( Hashed )
+	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is, PermFeatures,
 					 Targets,
 					 TargetStrings, FeatureStrings,
 					 Version );
-	else
+	}
+	else {
 	  result = InstanceBase->ReadIB( is, PermFeatures,
 					 Targets,
 					 Version );
+	}
       }
     }
     return result;
@@ -2420,8 +2516,9 @@ namespace Timbl {
 	Error( "can't open: " + FileName );
       }
       else {
-	if ( !Verbosity(SILENT) )
+	if ( !Verbosity(SILENT) ){
 	  Info( "Reading Instance-Base from: " + FileName );
+	}
 	if ( GetInstanceBase( infile ) ){
 	  if ( !Verbosity(SILENT) ){
 	    IBInfo( cout );
@@ -2444,8 +2541,9 @@ namespace Timbl {
       return false;
     }
     else {
-      if ( !Verbosity(SILENT) )
+      if ( !Verbosity(SILENT) ){
 	Info( "Saving names in " + FileName );
+      }
       MBLClass::writeNamesFile( namesfile );
       return true;
     }
@@ -2462,10 +2560,11 @@ namespace Timbl {
 
   bool TimblExperiment::GetCurrentWeights( vector<double>& res ) {
     res.clear();
-    if ( ExpInvalid() )
+    if ( ExpInvalid() ){
       return false;
+    }
     else {
-      initExperiment( );
+      initExperiment();
       for ( size_t i=0; i< NumOfFeatures(); ++i ){
 	res.push_back( Features[i]->Weight() );
       }
@@ -2482,8 +2581,9 @@ namespace Timbl {
     // Open the file.
     //
     ifstream datafile( file_name, ios::in);
-    if ( InputFormat() == ARFF )
+    if ( InputFormat() == ARFF ){
       skipARFFHeader( datafile );
+    }
     cur_pos = datafile.tellg();
     if ( !nextLine( datafile, Buffer ) ){
       Error( "cannot start learning from in: " + file_name );
@@ -2514,8 +2614,9 @@ namespace Timbl {
 	else {
 	  it->second.insert( cur_pos );
 	}
-	if ((stats.dataLines() % Progress() ) == 0)
+	if ( (stats.dataLines() % Progress() ) == 0 ){
 	  time_stamp( "Indexing:  ", stats.dataLines() );
+	}
 	bool found = false;
 	while ( !found &&
 		( cur_pos = datafile.tellg(),
@@ -2543,8 +2644,9 @@ namespace Timbl {
     // Open the file.
     //
     ifstream datafile( file_name, ios::in);
-    if ( InputFormat() == ARFF )
+    if ( InputFormat() == ARFF ){
       skipARFFHeader( datafile );
+    }
     cur_pos = datafile.tellg();
     if ( !nextLine( datafile, Buffer ) ){
       Error( "cannot start learning from in: " + file_name );
@@ -2555,7 +2657,7 @@ namespace Timbl {
       result = false;    // No more input
     }
     else {
-      if ( !Verbosity(SILENT) ) {
+      if ( !Verbosity(SILENT) ){
 	Info( "Phase 2: Building multi index on Datafile: " + file_name );
 	time_stamp( "Start:     ", 0 );
       }
@@ -2568,8 +2670,9 @@ namespace Timbl {
 	FeatureValue *fv0 = CurrInst.FV[0];
 	FeatureValue *fv1 = CurrInst.FV[1];
 	fileDoubleIndex::iterator it = fmIndex.find( fv0 );
-	if ( it != fmIndex.end() )
+	if ( it != fmIndex.end() ){
 	  it->second[fv1].insert( cur_pos );
+	}
 	else {
 	  fileIndex mi;
 	  mi[fv1].insert( cur_pos );

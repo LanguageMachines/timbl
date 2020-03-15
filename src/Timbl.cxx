@@ -265,8 +265,9 @@ void get_command_lines( const string& value, list<string>& result ){
   }
   string Buf;
   while ( getline( ind, Buf ) ){
-    if ( Buf.empty() )
+    if ( Buf.empty() ){
       continue;
+    }
     result.push_back( Buf );
   }
 }
@@ -298,8 +299,9 @@ void Preset_Values( TiCC::CL_Options& opts ){
       throw( hardExit() ); // no chance to proceed
     }
   }
-  else
+  else {
     algorithm = IB1; // general default
+  }
   opts.insert( 'a', to_string( algorithm ), false );
   if ( opts.extract( 'Z', value ) ){
     // Special case
@@ -307,24 +309,27 @@ void Preset_Values( TiCC::CL_Options& opts ){
     Do_NS = true;
   }
   if ( opts.is_present( 't', value ) ){
-    if ( value == "cross_validate" )
+    if ( value == "cross_validate" ){
       // Special case
       //    running Cross Validation
       Do_CV = true;
-    else if ( value == "leave_one_out" )
+    }
+    else if ( value == "leave_one_out" ){
       // Special case
       //    running Leave_one_out
       Do_LOO = true;
+    }
     else if ( value != "" && value[0] == '@' ){
       Do_Indirect = true;
       opts.remove( 't' );
       get_command_lines( value, ind_lines );
     }
-    if ( Do_LOO || Do_CV )
+    if ( Do_LOO || Do_CV ){
       if ( algorithm != IB1 ){
 	cerr << "Invalid Algorithm: Only IB1 possible for LOO and CV " << endl;
 	throw( hardExit() ); // no chance to proceed
       }
+    }
   }
   if ( opts.extract( "limit", value ) ){
     Do_Limit = true;
@@ -354,12 +359,14 @@ void Preset_Values( TiCC::CL_Options& opts ){
   // default Weighting = GainRatio
   if ( opts.is_present( 'w', value ) ){
     // user specified weighting
-    if ( !string_to( value, W ) )
+    if ( !string_to( value, W ) ){
       // no valid weight, hopefully a filename
       return;
-    else
+    }
+    else {
       // valid Weight, but maybe a number, so replace
       opts.remove( 'w' );
+    }
   }
   opts.insert( 'w', to_string(W), false );
 }
@@ -447,8 +454,9 @@ bool get_file_names( TiCC::CL_Options& opts ){
       levelTreeOutFile = correct_path( vec[0], O_Path );
       levelTreeLevel = TiCC::stringTo<int>( vec[1] );
     }
-    else
+    else {
       levelTreeOutFile = correct_path( value, O_Path );
+    }
   }
   if ( opts.extract( 'I', value ) ){
     TreeOutFile = correct_path( value, O_Path );
@@ -508,12 +516,15 @@ bool Default_Output_Names( TiCC::CL_Options& opts ){
     temp += ".";
     switch ( algorithm ){
     case IB1:
-      if ( Do_LOO )
+      if ( Do_LOO ){
 	temp += "LOO";
-      else if ( Do_CV )
+      }
+      else if ( Do_CV ){
 	temp += "CV";
-      else
+      }
+      else {
 	temp += "IB1";
+      }
       break;
     case IB2:
       temp +="IB2";
@@ -527,8 +538,9 @@ bool Default_Output_Names( TiCC::CL_Options& opts ){
 	temp += "-";
 	temp += Q_value;
       }
-      else
+      else {
 	temp +=  "-0";
+      }
       break;
     case TRIBL2:
       temp +=  "TRIBL2";
@@ -544,10 +556,12 @@ bool Default_Output_Names( TiCC::CL_Options& opts ){
     }
     if ( algorithm != IGTREE ){
       temp +=  ".";
-      if ( opts.is_present( 'm', value ) )
+      if ( opts.is_present( 'm', value ) ){
 	temp += value;
-      else
+      }
+      else {
 	temp +=  "ErRoR";
+      }
       if ( opts.is_present( 'L', value ) ){
 	temp += ".L";
 	temp += value;
@@ -557,18 +571,20 @@ bool Default_Output_Names( TiCC::CL_Options& opts ){
     if ( opts.is_present( 'w', value ) ){
       temp += value;
     }
-    else
-      if ( !WgtInFile.empty() )
-	temp += "ud";
-      else
-	temp += "gr";
+    else if ( !WgtInFile.empty() ){
+      temp += "ud";
+    }
+    else {
+      temp += "gr";
+    }
     if ( algorithm != IGTREE ){
       if ( opts.is_present( 'k', value ) ){
 	temp +=  ".k";
 	temp +=  value;
       }
-      else
+      else {
 	temp +=  ".k1";
+      }
       if ( opts.is_present( 'd', value ) ){
 	temp +=  ".";
 	temp +=  value;
@@ -589,8 +605,9 @@ bool Default_Output_Names( TiCC::CL_Options& opts ){
     if ( Do_Save_Perc ){
       PercFile = OutputFile;
       string::size_type pos = PercFile.rfind( '.' );
-      if ( pos != string::npos )
+      if ( pos != string::npos ){
 	PercFile = PercFile.substr( 0, pos );
+      }
       PercFile += ".%";
     }
   }
@@ -603,17 +620,20 @@ void Do_Test( TimblAPI *Run ){
   }
   if ( ind_lines.empty() ){
     // just one test...
-    if ( ProbInFile != "" )
+    if ( ProbInFile != "" ){
       Run->GetArrays( ProbInFile );
+    }
     if ( MatrixInFile != "" ) {
       Run->GetMatrices( MatrixInFile );
     }
-    if ( Do_NS )
+    if ( Do_NS ) {
       Run->NS_Test( TestFile, OutputFile );
-    else
+    }
+    else {
       Run->Test( TestFile,
 		 OutputFile,
 		 PercFile );
+    }
   }
   else {
     // multiple tests from indirect file
@@ -633,30 +653,36 @@ void Do_Test( TimblAPI *Run ){
       if ( !get_file_names( opts ) || TestFile == "" ){
 	cerr << "Warning: Skipped a line from indirect testfile:\n'"
 	     << tmp_line << "'" << endl;
-	if ( TestFile == "" )
+	if ( TestFile == "" ){
 	  cerr << "missing a Testfile name (-t option)" << endl;
+	}
       }
       else if ( Run->SetIndirectOptions( opts ) ){
 	Default_Output_Names( opts );
 	if ( WgtInFile != "" ) {
-	  if ( !Run->GetWeights( WgtInFile, WgtType ) )
+	  if ( !Run->GetWeights( WgtInFile, WgtType ) ){
 	    continue;
+	  }
 	}
-	if ( ProbInFile != "" )
+	if ( ProbInFile != "" ){
 	  Run->GetArrays( ProbInFile );
+	}
 	if ( MatrixInFile != "" ) {
 	  Run->GetMatrices( MatrixInFile );
 	}
-	if ( Do_NS )
+	if ( Do_NS ){
 	  Run->NS_Test( TestFile, OutputFile );
-	else
+	}
+	else {
 	  Run->Test( TestFile,
 		     OutputFile,
 		     PercFile );
+	}
       }
-      else
+      else {
 	cerr << "Warning: Skipped a line from indirect testfile:\n'"
 	     << tmp_line << "'" << endl;
+      }
     }
   }
 }
@@ -709,8 +735,9 @@ int main(int argc, char *argv[]){
     }
     Preset_Values( opts );
     Adjust_Default_Values( opts );
-    if ( !get_file_names( opts ) )
+    if ( !get_file_names( opts ) ){
       return 2;
+    }
     TimblAPI *Run = new TimblAPI( opts );
     if ( !Run->isValid() ){
       delete Run;
@@ -754,8 +781,9 @@ int main(int argc, char *argv[]){
       if ( TreeInFile == "" ){
 	// normal case
 	//   learning and maybe a testing phase
-	if ( WgtOutFile != "" )
+	if ( WgtOutFile != "" ) {
 	  Run->SetOptions( "ALL_WEIGHTS: true" );
+	}
 	if ( Run->Prepare( dataFile ) ){
 	  if ( Do_Limit ){
 	    if ( Run->NumOfFeatures() < limit_val ){
@@ -780,9 +808,9 @@ int main(int argc, char *argv[]){
 	  if ( NamesFile != "" ) {
 	    Run->WriteNamesFile( NamesFile );
 	  }
-	  if ( ProbOutFile != "" )
+	  if ( ProbOutFile != "" ){
 	    Run->WriteArrays( ProbOutFile );
-
+	  }
 	  do_test = TestFile != "" || Do_Indirect;
 	  if ( do_test ||     // something to test ?
 	       MatrixOutFile != "" || // or at least to produce
@@ -801,14 +829,17 @@ int main(int argc, char *argv[]){
 	      }
 	    }
 	    if ( ok && Run->Learn( dataFile ) ){
-	      if ( TreeOutFile != "" )
+	      if ( TreeOutFile != "" ){
 		Run->WriteInstanceBase( TreeOutFile );
-	      if ( levelTreeOutFile != "" )
+	      }
+	      if ( levelTreeOutFile != "" ){
 		Run->WriteInstanceBaseLevels( levelTreeOutFile,
 					      levelTreeLevel );
+	      }
 	    }
-	    else
+	    else {
 	      do_test = false; // no testing because of problems
+	    }
 	  }
 	}
       }
@@ -818,11 +849,13 @@ int main(int argc, char *argv[]){
 	do_test = false;
 	if ( Run->GetInstanceBase( TreeInFile ) ) {
 	  if ( Run->Expand( dataFile ) ){
-	    if ( !TreeOutFile.empty() )
+	    if ( !TreeOutFile.empty() ){
 	      Run->WriteInstanceBase( TreeOutFile );
-	    if ( levelTreeOutFile != "" )
+	    }
+	    if ( levelTreeOutFile != "" ){
 	      Run->WriteInstanceBaseLevels( levelTreeOutFile,
 					    levelTreeLevel );
+	    }
 	    do_test = !TestFile.empty();
 	  }
 	}
@@ -834,17 +867,20 @@ int main(int argc, char *argv[]){
 	  cerr << "reading an instancebase(-i option) without a testfile (-t option) is useless" << endl;
 	  do_test = false;
 	}
-	else
+	else {
 	  do_test = true;
-	if ( do_test )
+	}
+	if ( do_test ){
 	  do_test = Run->GetInstanceBase( TreeInFile );
+	}
       }
       if ( do_test ){
 	Do_Test( Run );
       }
       if ( Run->isValid() ) {
-	if ( XOutFile != "" )
+	if ( XOutFile != "" ){
 	  Run->WriteInstanceBaseXml( XOutFile );
+	}
 	if ( MatrixOutFile != "" ) {
 	  Run->WriteMatrices( MatrixOutFile );
 	}
