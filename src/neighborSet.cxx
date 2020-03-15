@@ -140,8 +140,9 @@ namespace Timbl {
   double neighborSet::relativeWeight( const decayStruct *d,
 				      size_t k ) const{
     double result = 1.0;
-    if ( !d )
+    if ( !d ){
       return result;
+    }
     switch ( d->type() ){
     case Zero:
       break;
@@ -203,8 +204,9 @@ namespace Timbl {
   ostream& operator<<( ostream& os, const neighborSet& set ){
     for ( unsigned int i=0; i < set.size(); ++i ){
       os << "# k=" << i+1;
-      if ( set.showDistribution )
+      if ( set.showDistribution ){
 	os << "\t"  << set.distributions[i]->DistToStringW(0);
+      }
       if ( set.showDistance ){
 	int OldPrec = os.precision(DBL_DIG-1);
 	os.setf(ios::showpoint);
@@ -246,8 +248,9 @@ namespace Timbl {
   }
 
   ostream& operator<<( ostream& os, const decayStruct *dc ){
-    if ( dc )
+    if ( dc ){
       os << *dc;
+    }
     return os;
   }
 

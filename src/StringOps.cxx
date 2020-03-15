@@ -97,8 +97,9 @@ namespace Timbl {
 	  ++it;
 	}
       }
-      else
+      else {
 	out += *it++;
+      }
     }
     return out;
   }
@@ -109,18 +110,22 @@ namespace Timbl {
 
   bool compare_nocase( const string& s1, const string& s2 ){
     if ( s1.size() == s2.size() &&
-	 equal( s1.begin(), s1.end(), s2.begin(), nocase_cmp ) )
+	 equal( s1.begin(), s1.end(), s2.begin(), nocase_cmp ) ){
       return true;
-    else
+    }
+    else {
       return false;
+    }
   }
 
   bool compare_nocase_n( const string& s1, const string& s2 ){
     if ( s1.size() <= s2.size() &&
-	 equal( s1.begin(), s1.end(), s2.begin(), nocase_cmp ) )
+	 equal( s1.begin(), s1.end(), s2.begin(), nocase_cmp ) ){
       return true;
-    else
+    }
+    else {
       return false;
+    }
   }
 
   string correct_path( const string& filename,
@@ -145,14 +150,15 @@ namespace Timbl {
 	if ( keep_origpath ){
 	  result += filename;
 	}
-	else{
+	else {
 	  result += filename.substr( pos+1 );
 	}
       }
       return result;
     }
-    else
+    else {
       return filename;
+    }
   }
 
 } // namespace Timbl

@@ -173,8 +173,9 @@ namespace Timbl {
       for ( unsigned int j=0; j <= size; ++j ){
 	if ( j != i ){
 	  for ( unsigned int k=0; k < size; ++k ){
-	    if ( k != i )
+	    if ( k != i ){
 	      TN += mat[j][k];
+	    }
 	  }
 	}
       }

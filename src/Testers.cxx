@@ -86,12 +86,15 @@ namespace Timbl{
 			  const std::vector<Feature*>& features,
 			  const std::vector<size_t>& permutation,
 			  int mvdThreshold ){
-    if ( m == Cosine )
+    if ( m == Cosine ){
       return new CosineTester( features, permutation );
-    else if ( m == DotProduct )
+    }
+    else if ( m == DotProduct ){
       return new DotProductTester( features, permutation );
-    else
+    }
+    else {
       return new DistanceTester( features, permutation, mvdThreshold );
+    }
   }
 
   TesterClass::TesterClass( const vector<Feature*>& feat,
@@ -194,8 +197,9 @@ namespace Timbl{
 
   inline bool FV_to_real( FeatureValue *FV, double &result ){
     if ( FV ){
-      if ( TiCC::stringTo<double>( FV->Name(), result ) )
+      if ( TiCC::stringTo<double>( FV->Name(), result ) ){
 	return true;
+      }
     }
     return false;
   }

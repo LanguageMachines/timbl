@@ -72,8 +72,9 @@ namespace Timbl {
   }
 
   bool TRIBL_Experiment::checkTestFile(){
-    if ( !TimblExperiment::checkTestFile() )
+    if ( !TimblExperiment::checkTestFile() ){
       return false;
+    }
     else if ( IBStatus() == Pruned ){
       Warning( "you tried to apply the " + TiCC::toString( algorithm) +
 	       " algorithm on a pruned Instance Base" );
@@ -87,8 +88,9 @@ namespace Timbl {
   }
 
   bool TRIBL2_Experiment::checkTestFile(){
-    if ( !TimblExperiment::checkTestFile() )
+    if ( !TimblExperiment::checkTestFile() ){
       return false;
+    }
     else if ( IBStatus() == Pruned ){
       Warning( "you tried to apply the " + TiCC::toString( algorithm) +
 	       " algorithm on a pruned Instance Base" );
@@ -128,10 +130,12 @@ namespace Timbl {
 	last_leaf = false;
 	Distance = sum_remaining_weights(level);
 	if ( TrResultDist ){
-	  if ( level == 0 )
+	  if ( level == 0 ){
 	    bestResult.addTop( TrResultDist, Res );
-	  else
+	  }
+	  else {
 	    bestResult.addConstant( TrResultDist, Res );
+	  }
 	}
       }
       else {
@@ -164,25 +168,30 @@ namespace Timbl {
 	Distance = getBestDistance();
       }
     }
-    if ( confusionInfo )
+    if ( confusionInfo ){
       confusionInfo->Increment( Inst.TV, Res );
+    }
     bool correct = Inst.TV && ( Res == Inst.TV );
     if ( correct ){
       stats.addCorrect();
-      if ( Tie )
+      if ( Tie ){
 	stats.addTieCorrect();
+      }
     }
-    else if ( Tie )
+    else if ( Tie ){
       stats.addTieFailure();
+    }
     exact = exact || (fabs(Distance) < Epsilon );
-    if ( exact )
+    if ( exact ){
       stats.addExact();
+    }
     return Res;
   }
 
   bool TRIBL_Experiment::checkLine( const string& line ){
-    if ( !TimblExperiment::checkLine( line ) )
+    if ( !TimblExperiment::checkLine( line ) ){
       return false;
+    }
     else if ( IBStatus() == Pruned ){
       Warning( "you tried to apply the TRIBL algorithm on a pruned "
 	       " Instance Base" );
@@ -192,8 +201,9 @@ namespace Timbl {
   }
 
   bool TRIBL2_Experiment::checkLine( const string& line ){
-    if ( !TimblExperiment::checkLine( line ) )
+    if ( !TimblExperiment::checkLine( line ) ){
       return false;
+    }
     else if ( IBStatus() == Pruned ){
       Warning( "you tried to apply the TRIBL2 algorithm on a pruned "
 	       " Instance Base" );
@@ -288,8 +298,9 @@ namespace Timbl {
 
   void TRIBL_Experiment::showTestingInfo( ostream& os ){
     if ( !Verbosity(SILENT) ){
-      if ( Verbosity(OPTIONS) )
+      if ( Verbosity(OPTIONS) ){
 	ShowSettings( os );
+      }
       os << endl << "Starting to test, Testfile: " << testStreamName << endl
 	 <<	"Writing output in:          " << outStreamName << endl
 	 << "Algorithm     : TRIBL, q = " << TRIBL_offset() << endl;
@@ -327,20 +338,24 @@ namespace Timbl {
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	  Features[i]->SetWeight( 1.0 );
-	  if ( Features[permutation[i]]->Ignore() )
+	  if ( Features[permutation[i]]->Ignore() ){
 	    PermFeatures[i] = NULL;
-	  else
+	  }
+	  else {
 	    PermFeatures[pos++] = Features[permutation[i]];
+	  }
 	}
-	if ( Hashed )
+	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is, PermFeatures,
 					 Targets,
 					 TargetStrings, FeatureStrings,
 					 Version );
-	else
+	}
+	else {
 	  result = InstanceBase->ReadIB( is, PermFeatures,
 					 Targets,
 					 Version );
+	}
       }
     }
     return result;
@@ -374,20 +389,24 @@ namespace Timbl {
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	  Features[i]->SetWeight( 1.0 );
-	  if ( Features[permutation[i]]->Ignore() )
+	  if ( Features[permutation[i]]->Ignore() ){
 	    PermFeatures[i] = NULL;
-	  else
+	  }
+	  else {
 	    PermFeatures[pos++] = Features[permutation[i]];
+	  }
 	}
-	if ( Hashed )
+	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is, PermFeatures,
 					 Targets,
 					 TargetStrings, FeatureStrings,
 					 Version );
-	else
+	}
+	else {
 	  result = InstanceBase->ReadIB( is, PermFeatures,
 					 Targets,
 					 Version );
+	}
       }
     }
     return result;

@@ -65,8 +65,9 @@ namespace Timbl {
 
   inline int random_number( int Min, int Max ){
     // calculate a random integer within the interval [min,max]
-    if ( Min == Max )
+    if ( Min == Max ){
       return Min;
+    }
     double randnum = (double)rand()/(double)RAND_MAX;
     randnum *= (Max-Min);
     randnum += Min;
@@ -84,8 +85,9 @@ namespace Timbl {
   double ValueDistribution::Confidence( const TargetValue *tv ) const {
     VDlist::const_iterator it = distribution.begin();
     while ( it != distribution.end() ){
-      if ( it->second->Value() == tv )
+      if ( it->second->Value() == tv ){
 	return it->second->Weight();
+      }
       ++it;
     }
     return 0.0;
@@ -100,8 +102,9 @@ namespace Timbl {
     while ( it != distribution.end() ){
       Vfield *f = it->second;
       if ( f->frequency >= minf ){
-	if ( !first )
+	if ( !first ){
 	  oss << ", ";
+	}
 	oss << f->value << " " << double(f->frequency);
 	first = false;
       }
@@ -127,8 +130,9 @@ namespace Timbl {
 	++it;
 	continue;
       }
-      if ( !first )
+      if ( !first ){
 	oss << ", ";
+      }
       oss << f->value << " " << f->weight;
       first = false;
       ++it;
@@ -158,11 +162,13 @@ namespace Timbl {
       std::set<double, dblCmp>::iterator rit = freqs.begin();
       while ( rit != freqs.end() && cnt < beam ) {
 	++cnt;
-	if ( cnt < beam )
+	if ( cnt < beam ){
 	  ++rit;
+	}
       }
-      if ( cnt == beam )
+      if ( cnt == beam ){
 	minw = *rit;
+      }
     }
     DistToString( DistStr, minw );
   }
@@ -182,11 +188,13 @@ namespace Timbl {
       std::set<double, dblCmp>::iterator rit = wgths.begin();
       while ( rit != wgths.end() && cnt < beam ) {
 	++cnt;
-	if ( cnt < beam )
+	if ( cnt < beam ){
 	  ++rit;
+	}
       }
-      if ( cnt == beam )
+      if ( cnt == beam ){
 	minw = *rit;
+      }
     }
     DistToString( DistStr, minw );
   }
@@ -314,8 +322,9 @@ namespace Timbl {
     for ( const auto& it : distribution ){
       Vfield *f = it.second;
       if ( f->frequency > 0 ){
-	if ( !first )
+	if ( !first ){
 	  oss << ", ";
+	}
 	oss << f->value->Index() << " " << f->frequency;
 	first = false;
       }
@@ -331,8 +340,9 @@ namespace Timbl {
     for ( const auto& it : distribution ){
       Vfield *f = it.second;
       if ( f->frequency > 0 ){
-	if ( !first )
+	if ( !first ){
 	  oss << ", ";
+	}
 	oss << f->Value()->Index() << " "
 	    << f->frequency << " " << f->weight;
 	first = false;
@@ -353,8 +363,9 @@ namespace Timbl {
     for ( const auto& it : distribution ){
       Vfield *f = it.second;
       if ( f->frequency > 0 ){
-	if ( !first )
+	if ( !first ){
 	  oss << ", ";
+	}
 	oss << f->value << " " << f->frequency;
 	first = false;
       }
@@ -370,8 +381,9 @@ namespace Timbl {
     for ( const auto& it : distribution ){
       Vfield *f = it.second;
       if ( f->frequency > 0 ){
-	if ( !first )
+	if ( !first ){
 	  oss << ", ";
+	}
 	oss.setf(ios::showpoint);
 	oss << f->value << " " << f->frequency << " " << f->weight;
 	first = false;
@@ -510,10 +522,11 @@ namespace Timbl {
 	nof_best = 0;
 	while ( It != distribution.end() ){
 	  pnt = It->second;
-	  if ( pnt->Freq() == Max )
+	  if ( pnt->Freq() == Max ){
 	    if ( ++nof_best == pick ){
 	      return pnt->Value();
 	    }
+	  }
 	  ++It;
 	}
 	return NULL;
@@ -575,10 +588,11 @@ namespace Timbl {
 	It = distribution.begin();
 	nof_best = 0;
 	while ( It != distribution.end() ){
-	  if ( abs(It->second->Weight() - Max) < Epsilon )
+	  if ( abs(It->second->Weight() - Max) < Epsilon ){
 	    if ( ++nof_best == pick ){
 	      return It->second->Value();
 	    }
+	  }
 	  ++It;
 	}
 	return NULL;
@@ -693,8 +707,9 @@ namespace Timbl {
   struct D_D {
     D_D(): dist(0), value(0.0) {};
     explicit D_D( FeatureValue *fv ): value(0.0) {
-      if ( !TiCC::stringTo<double>( fv->Name(), value ) )
+      if ( !TiCC::stringTo<double>( fv->Name(), value ) ){
 	throw( logic_error("called DD with an non-numeric value" ) );
+      }
       dist = &fv->TargetDist;
     }
     ValueDistribution *dist;
@@ -725,16 +740,18 @@ namespace Timbl {
     size_t dd_len = ddv.size();
     int num_per_bin = (int)floor( (double)dd_len / BinSize);
     size_t rest = dd_len - num_per_bin * BinSize;
-    if ( rest )
+    if ( rest ){
       num_per_bin++;
+    }
     int jj = 0;
     int cnt = 0;
     for ( size_t m = 0; m < dd_len; ++m ){
       FVBin[jj]->TargetDist.Merge( *ddv[m]->dist );
       if ( ++cnt >= num_per_bin ){
 	++jj;
-	if ( --rest == 0 )
+	if ( --rest == 0 ){
 	  --num_per_bin;
+	}
 	cnt = 0;
       }
     }
@@ -845,8 +862,9 @@ namespace Timbl {
     // Info. gain.
     //
     info_gain = DBentropy - entropy;
-    if ( info_gain < 0.0 )
+    if ( info_gain < 0.0 ){
       info_gain = 0.0;
+    }
     // And the split. info.
     //
     split_info = 0.0;
@@ -1028,7 +1046,7 @@ namespace Timbl {
     double result = 0.0;
     if ( F != G ){
       bool dummy;
-      if ( metric->isStorable() && matrixPresent( dummy )&&
+      if ( metric->isStorable() && matrixPresent( dummy ) &&
 	   F->ValFreq() >= matrix_clip_freq &&
 	   G->ValFreq() >= matrix_clip_freq ){
 	result = metric_matrix->Extract( F, G );
@@ -1101,13 +1119,15 @@ namespace Timbl {
 	  next = look_ahead(is);
 	}
 	else if ( next == '}' ){
-	  if ( !result )
+	  if ( !result ){
 	    result = new ValueDistribution();
+	  }
 	  result->SetFreq( target, freq );
 	}
 	else if ( isdigit(next) ){
-	  if ( !result )
+	  if ( !result ){
 	    result = new WValueDistribution();
+	  }
 	  double sw;
 	  is >> sw;
 	  result->SetFreq( target, freq, sw );
@@ -1118,8 +1138,9 @@ namespace Timbl {
 	  }
 	}
       } while ( is && next != '}' );
-      if ( is )
+      if ( is ){
 	is >> nextCh;   // skip }
+      }
       else {
 	delete result;
 	throw string( "missing '}' " );
@@ -1164,8 +1185,9 @@ namespace Timbl {
 	}
 	next = look_ahead(is);
 	if ( next == ',' ){
-	  if ( !result )
+	  if ( !result ){
 	    result = new ValueDistribution();
+	  }
 	  result->SetFreq( target, freq );
 	  is >> nextCh;
 	  next = look_ahead(is);
@@ -1179,8 +1201,9 @@ namespace Timbl {
 	else if ( isdigit(next) ){
 	  double sw;
 	  is >> sw;
-	  if ( !result )
+	  if ( !result ){
 	    result = new WValueDistribution();
+	  }
 	  result->SetFreq( target, freq, sw );
 	  next = look_ahead(is);
 	  if ( next == ',' ){
@@ -1189,8 +1212,9 @@ namespace Timbl {
 	  }
 	}
       } while ( is && next != '}' );
-      if ( is )
+      if ( is ){
 	is >> nextCh;   // skip }
+      }
       else {
 	delete result;
 	throw string( "missing '}' " );
@@ -1233,8 +1257,9 @@ namespace Timbl {
     size_t result = 0;
     VCarrtype::const_iterator it = ValuesArray.begin();
     while( it != ValuesArray.end() ){
-      if ( (*it)->ValFreq() > 0 )
+      if ( (*it)->ValFreq() > 0 ){
 	++result;
+      }
       ++it;
     }
     return result;
@@ -1255,8 +1280,9 @@ namespace Timbl {
     unsigned int index = TokenTree->Lookup( str );
     if ( index ) {
       IVCmaptype::const_iterator it = ValuesMap.find( index );
-      if ( it != ValuesMap.end() )
-	result =  reinterpret_cast<FeatureValue*>(it->second);
+      if ( it != ValuesMap.end() ){
+	result = reinterpret_cast<FeatureValue*>(it->second);
+      }
     }
     return result;
   }
@@ -1285,8 +1311,9 @@ namespace Timbl {
       it->second->IncValFreq( freq );
     }
     FeatureValue *result =  reinterpret_cast<FeatureValue*>(ValuesMap[index]);
-    if ( tv )
+    if ( tv ){
       result->TargetDist.IncFreq(tv, freq );
+    }
     return result;
   }
 
@@ -1295,8 +1322,9 @@ namespace Timbl {
     bool result = false;
     if ( FV ){
       FV->incr_val_freq();
-      if ( tv )
+      if ( tv ){
 	FV->TargetDist.IncFreq(tv,1);
+      }
       result = true;
     }
     return result;
@@ -1306,8 +1334,9 @@ namespace Timbl {
     bool result = false;
     if ( FV ){
       FV->decr_val_freq();
-      if ( tv )
+      if ( tv ){
 	FV->TargetDist.DecFreq(tv);
+      }
       result = true;
     }
     return result;
@@ -1331,8 +1360,9 @@ namespace Timbl {
   }
 
   bool Feature::isNumerical() const {
-    if ( metric && metric->isNumerical() )
+    if ( metric && metric->isNumerical() ){
       return true;
+    }
     else {
       return false;
     }
@@ -1401,8 +1431,9 @@ namespace Timbl {
   bool Feature::matrixPresent( bool& isRead ) const {
     isRead = false;
     if ( metric_matrix != 0 ){
-      if ( PrestoreStatus == ps_ok )
+      if ( PrestoreStatus == ps_ok ){
 	return true;
+      }
       else if ( PrestoreStatus == ps_read ){
 	isRead = true;
 	return true;
@@ -1523,10 +1554,12 @@ namespace Timbl {
     //
     // Store a complete distance matrix.
     //
-    if ( PrestoreStatus == ps_read )
+    if ( PrestoreStatus == ps_read ){
       return true;
-    if ( !metric_matrix )
+    }
+    if ( !metric_matrix ){
       metric_matrix = new SparseSymetricMatrix<ValueClass*>();
+    }
     if ( PrestoreStatus != ps_failed && metric->isStorable( ) ) {
       try {
 	for ( const auto& FV_i : ValuesArray ){
@@ -1683,7 +1716,9 @@ namespace Timbl {
     }
     string line;
     while ( getline(is,line) ){
-      if ( line.empty() ) break;
+      if ( line.empty() ){
+	break;
+      }
       vector<string> arr;
       double d;
       if ( TiCC::split_at( line, arr, " " ) != 2 ){

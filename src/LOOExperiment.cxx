@@ -48,8 +48,9 @@ namespace Timbl {
 	initDecay();
 	if ( !is_copy ){
 	  calculate_fv_entropy( true );
-	  if ( initProbabilityArrays( all_vd ) )
+	  if ( initProbabilityArrays( all_vd ) ){
 	    calculatePrestored();
+	  }
 	  else {
 	    Error( string("not enough memory for Probability Arrays")
 		   + "' in ("
@@ -58,8 +59,9 @@ namespace Timbl {
 	    throw std::bad_alloc();
 	  }
 	  InitWeights();
-	  if ( do_diversify )
+	  if ( do_diversify ){
 	    diverseWeights();
+	  }
 	  srand( random_seed );
 	}
 	initTesters();
@@ -80,8 +82,9 @@ namespace Timbl {
 
   void LOO_Experiment::showTestingInfo( ostream& os ){
     if ( !Verbosity(SILENT) ){
-      if ( Verbosity(OPTIONS ) )
+      if ( Verbosity(OPTIONS ) ){
 	ShowSettings( os );
+      }
       os << endl << "Starting to test using Leave One Out";
       if ( Do_Sloppy_LOO() ) {
 	os << " using SLOPPY metric calculations" << endl;
@@ -109,8 +112,9 @@ namespace Timbl {
       stats.clear();
       delete confusionInfo;
       confusionInfo = 0;
-      if ( Verbosity(ADVANCED_STATS) )
+      if ( Verbosity(ADVANCED_STATS) ){
 	confusionInfo = new ConfusionMatrix( Targets->ValuesArray.size() );
+      }
       showTestingInfo( *mylog );
       // Start time.
       //
@@ -118,11 +122,12 @@ namespace Timbl {
       time(&lStartTime);
       timeval startTime;
       gettimeofday( &startTime, 0 );
-      if ( InputFormat() == ARFF )
+      if ( InputFormat() == ARFF ){
 	skipARFFHeader( testStream );
+      }
       string Buffer;
       while ( nextLine( testStream, Buffer ) ){
-	if ( !chopLine( Buffer ) ) {
+	if ( !chopLine( Buffer ) ){
 	  Warning( "testfile, skipped line #" +
 		   TiCC::toString<int>( stats.totalLines() ) +
 		   "\n" + Buffer );
@@ -145,7 +150,7 @@ namespace Timbl {
 	  show_results( outStream, confi, dString,
 			ResultTarget, final_distance );
 	  if ( exact ){ // remember that a perfect match may be incorrect!
-	    if ( Verbosity(EXACT) ) {
+	    if ( Verbosity(EXACT) ){
 	      *mylog << "Exacte match:\n" << get_org_input() << endl;
 	    }
 	  }

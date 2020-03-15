@@ -103,9 +103,9 @@ namespace Timbl{
 	// (http://www.acm.org/~hlb/publications/asm/asm.html)
 	if (i>2 && j>2) {
 	  size_t trans=matrix[i-2][j-2]+1;
-	  if (source[i-2]!=t_j) trans++;
-	  if (s_i!=target[j-2]) trans++;
-	  if (cell>trans) cell=trans;
+	  if (source[i-2]!=t_j) { trans++; };
+	  if (s_i!=target[j-2]) { trans++; };
+	  if (cell>trans) { cell=trans; };
 	}
 	matrix[i][j]=cell;
       }
@@ -134,8 +134,9 @@ namespace Timbl{
       }
 
       for ( const auto& ug : string2_unigrams ){
-	if ( string1_unigrams.find( ug ) != string1_unigrams.end() )
+	if ( string1_unigrams.find( ug ) != string1_unigrams.end() ){
 	  ++overlap;
+	}
       }
       total = string1_unigrams.size() + string2_unigrams.size();
     }
@@ -153,8 +154,9 @@ namespace Timbl{
       }
 
       for ( const auto& bg : string2_bigrams ){
-	if ( string1_bigrams.find( bg ) != string1_bigrams.end() )
+	if ( string1_bigrams.find( bg ) != string1_bigrams.end() ){
 	  ++overlap;
+	}
       }
       total = string1_bigrams.size() + string2_bigrams.size();
     }
@@ -165,8 +167,9 @@ namespace Timbl{
 
   double vd_distance( SparseValueProbClass *r, SparseValueProbClass *s ){
     double result = 0.0;
-    if ( ! ( r && s ) )
+    if ( ! ( r && s ) ){
       return 1.0;
+    }
     SparseValueProbClass::IDiterator p1 = r->begin();
     SparseValueProbClass::IDiterator p2 = s->begin();
     while( p1 != r->end() &&
@@ -198,8 +201,9 @@ namespace Timbl{
   }
 
   double p_log_p_div_q( double p, double q ) {
-    if ( abs(q) < Epsilon )
+    if ( abs(q) < Epsilon ){
       return 0;
+    }
     return p * Log2( p/q );
   }
 
@@ -239,8 +243,9 @@ namespace Timbl{
   }
 
   double k_log_k_div_m( double k, double l ) {
-    if ( abs(k+l) < Epsilon )
+    if ( abs(k+l) < Epsilon ){
       return 0;
+    }
     return k * Log2( (2.0 * k)/( k + l ) );
   }
 
@@ -324,17 +329,20 @@ namespace Timbl{
 				  FeatureValue *G,
 				  size_t,
 				  double ) const {
-    if ( F == G )
+    if ( F == G ){
       return 0.0;
-    else
+    }
+    else {
       return 1.0;
+    }
   }
 
 
   inline bool FV_to_real( FeatureValue *FV, double &result ){
     if ( FV ){
-      if ( TiCC::stringTo<double>( FV->Name(), result ) )
+      if ( TiCC::stringTo<double>( FV->Name(), result ) ){
 	return true;
+      }
     }
     return false;
   }
@@ -413,8 +421,9 @@ namespace Timbl{
 #endif
 	result = 1.0;
       }
-      else
+      else {
 	result = vd_distance( F->valueClassProb(), G->valueClassProb() );
+      }
     }
     return result;
   }
@@ -424,10 +433,12 @@ namespace Timbl{
 				  double scale ) const {
     double r1, r2, result;
     if ( FV_to_real( F, r1 ) &&
-	 FV_to_real( G, r2 ) )
+	 FV_to_real( G, r2 ) ){
       result = fabs( (r1-r2)/ ( scale ) );
-    else
+    }
+    else {
       result = 1.0;
+    }
     return result;
   }
 
@@ -436,10 +447,12 @@ namespace Timbl{
 				    double scale ) const {
     double r1, r2, result;
     if ( FV_to_real( F, r1 ) &&
-	 FV_to_real( G, r2 ) )
+	 FV_to_real( G, r2 ) ){
       result = sqrt(fabs(r1*r1-r2*r2))/ ( scale );
-    else
+    }
+    else {
       result = 1.0;
+    }
     return result;
   }
 

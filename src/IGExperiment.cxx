@@ -58,12 +58,14 @@ namespace Timbl {
 	stats.clear();
 	delete confusionInfo;
 	confusionInfo = 0;
-	if ( Verbosity(ADVANCED_STATS) )
+	if ( Verbosity(ADVANCED_STATS) ){
 	  confusionInfo = new ConfusionMatrix( Targets->ValuesArray.size() );
+	}
 	if ( !is_copy ){
 	  InitWeights();
-	  if ( do_diversify )
+	  if ( do_diversify ){
 	    diverseWeights();
+	  }
 	  srand( random_seed );
 	}
 	MBL_init = true;
@@ -120,8 +122,9 @@ namespace Timbl {
       TiCC::Timer learnT;
       learnT.start();
       InitInstanceBase();
-      if ( ExpInvalid() )
+      if ( ExpInvalid() ){
 	return false;
+      }
       if ( EffectiveFeatures() < 2 ){
 	fileIndex fmIndex;
 	result = build_file_index( CurrentDataFile, fmIndex );
@@ -149,8 +152,9 @@ namespace Timbl {
 	      chopLine( Buffer );
 	      // Progress update.
 	      //
-	      if (( stats.dataLines() % Progress() ) == 0)
+	      if ( ( stats.dataLines() % Progress() ) == 0 ){
 		time_stamp( "Learning:  ", stats.dataLines() );
+	      }
 	      chopped_to_instance( TrainWords );
 	      if ( !outInstanceBase ){
 		outInstanceBase = new IG_InstanceBase( EffectiveFeatures(),
@@ -159,7 +163,6 @@ namespace Timbl {
 						       false,
 						       true );
 	      }
-	      //		cerr << "add instance " << &CurrInst << endl;
 	      outInstanceBase->AddInstance( CurrInst );
 	      ++sit;
 	    }
@@ -227,8 +230,9 @@ namespace Timbl {
 		  chopLine( Buffer );
 		  // Progress update.
 		  //
-		  if (( stats.dataLines() % Progress() ) == 0)
+		  if ( ( stats.dataLines() % Progress() ) == 0 ){
 		    time_stamp( "Learning:  ", stats.dataLines() );
+		  }
 		  chopped_to_instance( TrainWords );
 		  if ( !PartInstanceBase ){
 		    PartInstanceBase = new IG_InstanceBase( EffectiveFeatures(),
@@ -286,15 +290,17 @@ namespace Timbl {
 		  chopLine( Buffer );
 		  // Progress update.
 		  //
-		  if (( stats.dataLines() % Progress() ) == 0)
+		  if ( ( stats.dataLines() % Progress() ) == 0 ){
 		    time_stamp( "Learning:  ", stats.dataLines() );
+		  }
 		  chopped_to_instance( TrainWords );
-		  if ( !outInstanceBase )
+		  if ( !outInstanceBase ){
 		    outInstanceBase = new IG_InstanceBase( EffectiveFeatures(),
 							   ibCount,
 							   (RandomSeed()>=0),
 							   false,
 							   true );
+		  }
 		  //	      cerr << "add instance " << &CurrInst << endl;
 		  outInstanceBase->AddInstance( CurrInst );
 		  ++sit;
@@ -415,9 +421,10 @@ namespace Timbl {
   }
 
   void IG_Experiment::showTestingInfo( ostream& os ){
-    if ( !Verbosity(SILENT)) {
-      if ( Verbosity(OPTIONS) )
+    if ( !Verbosity(SILENT) ) {
+      if ( Verbosity(OPTIONS) ){
 	ShowSettings( os );
+      }
       os << endl << "Starting to test, Testfile: " << testStreamName << endl
 	 << "Writing output in:          " << outStreamName << endl
 	 << "Algorithm     : IGTree" << endl;
@@ -436,8 +443,9 @@ namespace Timbl {
 	Warning( "can't open outputfile: " + FileName );
       }
       else {
-	if ( !Verbosity(SILENT) )
+	if ( !Verbosity(SILENT) ){
 	  Info( "Writing Instance-Base in: " + FileName );
+	}
 	if ( PutInstanceBase( outfile ) ){
 	  string tmp = FileName;
 	  tmp += ".wgt";

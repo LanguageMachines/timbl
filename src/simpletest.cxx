@@ -43,8 +43,9 @@ int main(){
     exp.Learn( path + "/demos/dimin.train" );
     if ( exp.isValid() ){
       exp.Test( path + "/demos/dimin.test", "dimin.out" );
-      if ( exp.isValid() )
+      if ( exp.isValid() ){
 	return EXIT_SUCCESS;
+      }
     }
   }
   return EXIT_FAILURE;
