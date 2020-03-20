@@ -146,13 +146,11 @@ namespace Timbl {
       if ( pos == string::npos ){
 	result += filename;
       }
+      else if ( keep_origpath ){
+	result += filename;
+      }
       else {
-	if ( keep_origpath ){
-	  result += filename;
-	}
-	else {
-	  result += filename.substr( pos+1 );
-	}
+	result += filename.substr( pos+1 );
       }
       return result;
     }
