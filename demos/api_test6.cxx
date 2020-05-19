@@ -32,7 +32,7 @@ using std::endl;
 using namespace Timbl;
 
 int main(){
-  TimblAPI My_Experiment( "-a IB1 +vDI+DB -G0 -k3", "test6" );
+  TimblAPI My_Experiment( "-a IB1 +vDI+DB -G 0 -k3", "test6" );
   My_Experiment.Learn( "dimin.train" );
   const ValueDistribution *vd;
   const TargetValue *tv
@@ -48,7 +48,8 @@ int main(){
 
   cout << "the same with neighborSets" << endl;
   const neighborSet *nb = My_Experiment.classifyNS( "-,=,O,m,+,h,K,=,-,n,I,N,K" );
-  ValueDistribution *vd2 = nb->bestDistribution();
+  WValueDistribution *vd2 = nb->bestDistribution();
+  vd2->Normalize();
   cout << "default answer " << vd2 << endl;
   decayStruct *dc = new  expDecay(0.3);
   delete vd2;
