@@ -1010,11 +1010,9 @@ namespace Timbl {
       // Print the possible classes.
       //
       os << "Targets : ";
-      VCarrtype::const_iterator it = Targets->ValuesArray.begin();
-      while ( it != Targets->ValuesArray.end() ){
-	os << (TargetValue *)*it;
-	++it;
-	if ( it != Targets->ValuesArray.end() ){
+      for ( const auto& it : Targets->ValuesArray ){
+	os << it;
+	if ( &it != &Targets->ValuesArray.back() ){
 	  os << ",";
 	}
       }
@@ -1545,14 +1543,11 @@ namespace Timbl {
       double Entropy = 0.0;
       // first get the Database Entropy
       size_t totval = Targets->TotalValues();
-      VCarrtype::const_iterator it = Targets->ValuesArray.begin();
-      while ( it != Targets->ValuesArray.end() ){
-	double Ratio = (*it)->ValFreq() /
-	  (double)totval;
+      for ( const auto& it : Targets->ValuesArray ){
+	double Ratio = it->ValFreq() / (double)totval;
 	if ( Ratio > 0 ){
 	  Entropy += Ratio * Log2(Ratio);
 	}
-	++it;
       }
       DBEntropy = fabs(-Entropy);
       allocate_arrays(); // create ValueClassProb arrays..
@@ -1732,11 +1727,9 @@ namespace Timbl {
     else {
       // Print the possible classes.
       //
-      VCarrtype::const_iterator it = Targets->ValuesArray.begin();
-      while ( it != Targets->ValuesArray.end() ){
-	os << (TargetValue *)*it;
-	++it;
-	if ( it != Targets->ValuesArray.end() ){
+      for ( const auto& it : Targets->ValuesArray ){
+	os << it;
+	if ( &it != &Targets->ValuesArray.back() ){
 	  os << ",";
 	}
       }
@@ -1753,11 +1746,9 @@ namespace Timbl {
 	else {
 	  // Loop over the values.
 	  //
-	  auto it2 = feat->ValuesArray.begin();
-	  while( it2 != feat->ValuesArray.end() ){
-	    os << (FeatureValue *)*it2;
-	    ++it2;
-	    if ( it2 != feat->ValuesArray.end() ){
+	  for ( const auto& val : feat->ValuesArray ){
+	    os << val;
+	    if ( &val != &feat->ValuesArray.back() ){
 	      os << ",";
 	    }
 	  }
