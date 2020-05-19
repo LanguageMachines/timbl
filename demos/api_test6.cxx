@@ -32,7 +32,7 @@ using std::endl;
 using namespace Timbl;
 
 int main(){
-  TimblAPI My_Experiment( "-a IB1 +vDI+DB -k3", "test6" );
+  TimblAPI My_Experiment( "-a IB1 +vDI+DB -G0 -k3", "test6" );
   My_Experiment.Learn( "dimin.train" );
   const ValueDistribution *vd;
   const TargetValue *tv
