@@ -1420,9 +1420,8 @@ namespace Timbl {
   FeatVal_Stat Feature::prepare_numeric_stats(){
     double tmp;
     bool first = true;
-    VCarrtype::const_iterator it = ValuesArray.begin();
-    while ( it != ValuesArray.end() ){
-      FeatureValue *fv = (FeatureValue*)*it;
+    for ( const auto& it : ValuesArray ){
+      FeatureValue *fv = (FeatureValue*)it;
       size_t freq = fv->ValFreq();
       if ( freq > 0 ){
 	if ( !TiCC::stringTo<double>( fv->Name(), tmp ) ){
@@ -1443,7 +1442,6 @@ namespace Timbl {
 	  n_max = tmp;
 	}
       }
-      ++it;
     }
     if ( fabs(n_max - n_min) < Epsilon ){
       return SingletonNumeric;
@@ -1582,13 +1580,11 @@ namespace Timbl {
   }
 
   void Feature::print_vc_pb_array( ostream &os ) const {
-    VCarrtype::const_iterator it = ValuesArray.begin();
-    while ( it != ValuesArray.end() ){
-      FeatureValue *FV = (FeatureValue*)*it;
+    for ( const auto& it : ValuesArray ){
+      FeatureValue *FV = (FeatureValue*)it;
       if ( FV->ValueClassProb ){
 	os << FV << FV->ValueClassProb << endl;
       }
-      ++it;
     }
   }
 
@@ -1598,14 +1594,12 @@ namespace Timbl {
     FeatureValue *FV;
     bool first = true;
     // clear all existing arrays
-    VCarrtype::const_iterator it = ValuesArray.begin();
-    while ( it != ValuesArray.end() ){
-      FV = (FeatureValue*)*it;
+    for ( const auto& it : ValuesArray ){
+      FV = (FeatureValue*)it;
       if ( FV->ValueClassProb ){
 	delete FV->ValueClassProb;
 	FV->ValueClassProb = NULL;
       }
-      ++it;
     }
     string name;
     string buf;
@@ -1661,13 +1655,11 @@ namespace Timbl {
       }
     }
     // check if we've got all the values, assign a default if not so
-    it = ValuesArray.begin();
-    while ( it != ValuesArray.end() ){
-      FV = (FeatureValue *)*it;
+    for ( const auto& it : ValuesArray ){
+      FV = (FeatureValue *)it;
       if ( FV->ValueClassProb == NULL ){
 	FV->ValueClassProb = new SparseValueProbClass( Num );
       }
-      ++it;
     }
     vcpb_read = true;
     return true;
@@ -1725,18 +1717,16 @@ namespace Timbl {
     ios::fmtflags old_flags = os.flags();
     os.unsetf(std::ios_base::floatfield);
     if ( full ){
-      VCarrtype::const_iterator it1 = ValuesArray.begin();
-      while ( it1 != ValuesArray.end() ){
-	FeatureValue *FV_i = (FeatureValue *)(*it1);
+      for ( const auto& it1 : ValuesArray ){
+	FeatureValue *FV_i = (FeatureValue *)it1;
 	os.width(6);
 	os.setf(ios::left, ios::adjustfield);
 	os << FV_i << ":";
 	os.width(12);
 	os.precision(3);
 	os.setf(ios::right, ios::adjustfield);
-	VCarrtype::const_iterator it2 = ValuesArray.begin();
-	while ( it2 !=  ValuesArray.end() ){
-	  FeatureValue *FV_j = (FeatureValue *)(*it2);
+	for ( const auto& it2 : ValuesArray ){
+	  FeatureValue *FV_j = (FeatureValue *)it2;
 	  os.width(12);
 	  os.precision(3);
 	  os.setf(ios::right,ios::adjustfield );
@@ -1747,10 +1737,8 @@ namespace Timbl {
 	  else {
 	    os << metric_matrix->Extract(FV_i,FV_j);
 	  }
-	  ++it2;
 	}
 	os << endl;
-	++it1;
       }
     }
     else {
@@ -1785,13 +1773,11 @@ namespace Timbl {
   TargetValue *Target::MajorityClass() const {
     ValueClass *result = 0;
     size_t freq = 0;
-    VCarrtype::const_iterator it = ValuesArray.begin();
-    while ( it != ValuesArray.end() ){
-      if ( (*it)->ValFreq() > freq ){
-	result = *it;
+    for ( const auto& it : ValuesArray ){
+      if ( it->ValFreq() > freq ){
+	result = it;
 	freq = result->ValFreq();
       }
-      ++it;
     }
     return reinterpret_cast<TargetValue*>(result);
   }
