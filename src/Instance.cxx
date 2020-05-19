@@ -93,12 +93,11 @@ namespace Timbl {
 
   void ValueDistribution::DistToString( string& DistStr, double minf ) const {
     ostringstream oss;
-    VDlist::const_iterator it = distribution.begin();
     oss.setf(ios::showpoint);
     bool first = true;
     oss << "{ ";
-    while ( it != distribution.end() ){
-      Vfield *f = it->second;
+    for ( const auto& it : distribution ){
+      Vfield *f = it.second;
       if ( f->frequency >= minf ){
 	if ( !first ){
 	  oss << ", ";
@@ -106,7 +105,6 @@ namespace Timbl {
 	oss << f->value << " " << double(f->frequency);
 	first = false;
       }
-      ++it;
     }
     oss << " }";
     DistStr = oss.str();
@@ -114,18 +112,15 @@ namespace Timbl {
 
   void WValueDistribution::DistToString( string& DistStr, double minw ) const {
     ostringstream oss;
-    VDlist::const_iterator it = distribution.begin();
     oss.setf(ios::showpoint);
     bool first = true;
     oss << "{ ";
-    while ( it != distribution.end() ){
-      Vfield *f = it->second;
+    for( const auto& it : distribution ){
+      Vfield *f = it.second;
       if ( abs(f->weight) < minw ){
-	++it;
 	continue;
       }
       if ( abs(f->weight) < Epsilon ){
-	++it;
 	continue;
       }
       if ( !first ){
@@ -133,7 +128,6 @@ namespace Timbl {
       }
       oss << f->value << " " << f->weight;
       first = false;
-      ++it;
     }
     oss << " }";
     DistStr = oss.str();
@@ -889,22 +883,19 @@ namespace Timbl {
     for ( size_t j = 0; j < Size; ++j ){
       n_dot_j[j] = 0;
     }
-    ValueDistribution::dist_iterator It;
     for ( size_t i = 0; i < Num_Vals; ++i ){
       n_i_dot[i] = 0;
       FeatureValue *fv = FVA[i];
-      It = fv->TargetDist.begin();
-      while ( It != fv->TargetDist.end()  ){
-	n_dot_j[It->second->Index()-1] += It->second->Freq();
-	n_i_dot[i] += It->second->Freq();
-	++It;
+      for ( const auto& tit : fv->TargetDist ){
+	n_dot_j[tit.second->Index()-1] += tit.second->Freq();
+	n_i_dot[i] += tit.second->Freq();
       }
       n_dot_dot += n_i_dot[i];
     }
     if ( n_dot_dot != 0 ){
       for ( size_t m = 0; m < Num_Vals; ++m ){
 	FeatureValue *fv = FVA[m];
-	It = fv->TargetDist.begin();
+	ValueDistribution::dist_iterator It = fv->TargetDist.begin();
 	size_t n = 0;
 	while ( It != fv->TargetDist.end() && n < Size ){
 	  while ( n < It->second->Index()-1 ){
@@ -960,29 +951,23 @@ namespace Timbl {
     for ( size_t j = 0; j < Size; ++j ){
       n_dot_j[j] = 0;
     }
-    ValueDistribution::dist_iterator It;
-    VCarrtype::const_iterator it = ValuesArray.begin();
     int i = 0;
-    while ( it != ValuesArray.end() ){
+    for ( const auto& it : ValuesArray ){
       n_i_dot[i] = 0;
-      FeatureValue *fv = (FeatureValue *)*it;
-      It = fv->TargetDist.begin();
-      while ( It != fv->TargetDist.end()  ){
-	long int fr = It->second->Freq();
-	n_dot_j[It->second->Index()-1] += fr;
+      FeatureValue *fv = (FeatureValue *)it;
+      for ( const auto& tit : fv->TargetDist ){
+	long int fr = tit.second->Freq();
+	n_dot_j[tit.second->Index()-1] += fr;
 	n_i_dot[i] += fr;
-	++It;
       }
       n_dot_dot += n_i_dot[i];
-      ++it;
       ++i;
     }
     if ( n_dot_dot != 0 ){
-      it = ValuesArray.begin();
       int m = 0;
-      while ( it != ValuesArray.end() ){
-	FeatureValue *fv = (FeatureValue *)*it;
-	It = fv->TargetDist.begin();
+      for ( const auto& it : ValuesArray ){
+	FeatureValue *fv = (FeatureValue *)it;
+	ValueDistribution::dist_iterator It = fv->TargetDist.begin();
 	size_t n = 0;
 	while ( It != fv->TargetDist.end() && n < Size ){
 	  size_t id = It->second->Index()-1;
@@ -1009,7 +994,6 @@ namespace Timbl {
 	    (double)n_dot_dot;
 	  chi_square += tmp;
 	}
-	++it;
 	++m;
       }
     }
