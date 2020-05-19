@@ -83,12 +83,10 @@ namespace Timbl {
   }
 
   double ValueDistribution::Confidence( const TargetValue *tv ) const {
-    VDlist::const_iterator it = distribution.begin();
-    while ( it != distribution.end() ){
-      if ( it->second->Value() == tv ){
-	return it->second->Weight();
+    for ( const auto& it : distribution ){
+      if ( it.second->Value() == tv ){
+	return it.second->Weight();
       }
-      ++it;
     }
     return 0.0;
   }
@@ -152,11 +150,9 @@ namespace Timbl {
     double minw = 0.0;
     if ( beam > 0 ){
       std::set<double, dblCmp> freqs;
-      VDlist::const_iterator it = distribution.begin();
-      while ( it != distribution.end() ){
-	Vfield *f = it->second;
+      for ( const auto& it : distribution ){
+	Vfield *f = it.second;
 	freqs.insert( f->frequency );
-	++it;
       }
       int cnt=0;
       std::set<double, dblCmp>::iterator rit = freqs.begin();
@@ -178,11 +174,9 @@ namespace Timbl {
     double minw = 0.0;
     if ( beam > 0 ){
       std::set<double, dblCmp> wgths;
-      VDlist::const_iterator it = distribution.begin();
-      while ( it != distribution.end() ){
-	Vfield *f = it->second;
+      for ( const auto& it : distribution ){
+	Vfield *f = it.second;
 	wgths.insert( f->weight );
-	++it;
       }
       int cnt=0;
       std::set<double, dblCmp>::iterator rit = wgths.begin();
@@ -215,15 +209,13 @@ namespace Timbl {
     double entropy = 0.0;
     size_t TotalVals = total_items;
     if ( TotalVals > 0 ){
-      VDlist::const_iterator it = distribution.begin();
       // Loop over the classes in the distibution
-      while ( it != distribution.end() ){
-	size_t Freq = it->second->Freq();
+      for ( const auto& it : distribution ){
+	size_t Freq = it.second->Freq();
 	if ( Freq > 0 ){
 	  double Prob = Freq / (double)TotalVals;
 	  entropy += Prob * Log2(Prob);
 	}
-	++it;
       }
     }
     return fabs(entropy);
@@ -231,15 +223,11 @@ namespace Timbl {
 
   void WValueDistribution::Normalize() {
     double sum = 0.0;
-    VDlist::iterator it = distribution.begin();
-    while ( it != distribution.end() ){
-      sum += it->second->Weight();
-      ++it;
+    for ( const auto& it : distribution ){
+      sum += it.second->Weight();
     }
-    it = distribution.begin();
-    while ( it != distribution.end() ){
-      it->second->SetWeight( it->second->Weight() / sum );
-      ++it;
+    for ( auto& it : distribution ){
+      it.second->SetWeight( it.second->Weight() / sum );
     }
   }
 
@@ -684,22 +672,18 @@ namespace Timbl {
     if ( !is_copy ){
       // Loop over all values.
       //
-      VCarrtype::const_iterator it = ValuesArray.begin();
-      while ( it != ValuesArray.end() ){
-	FeatureValue *FV = (FeatureValue*)*it;
+      for ( const auto& it : ValuesArray ){
+	FeatureValue *FV = (FeatureValue*)it;
 	size_t freq = FV->ValFreq();
 	FV->ValueClassProb->Clear();
 	if ( freq > 0 ){
 	  // Loop over all present classes.
 	  //
-	  ValueDistribution::dist_iterator It = FV->TargetDist.begin();
-	  while ( It != FV->TargetDist.end() ){
-	    FV->ValueClassProb->Assign( It->second->Index(),
-					It->second->Freq()/(double)freq );
-	    ++It;
+	  for ( const auto& tit : FV->TargetDist ){
+	    FV->ValueClassProb->Assign( tit.second->Index(),
+					tit.second->Freq()/(double)freq );
 	  }
 	}
-	++it;
       }
     }
   }
@@ -727,14 +711,12 @@ namespace Timbl {
     size_t TotalVals = TotalValues();
     entropy = 0.0;
     vector<D_D*> ddv;
-    VCarrtype::const_iterator it = ValuesArray.begin();
     ddv.reserve( ValuesArray.size() );
-    while ( it != ValuesArray.end() ){
-      FeatureValue *FV = (FeatureValue*)*it;
+    for ( const auto& it : ValuesArray ){
+      FeatureValue *FV = (FeatureValue*)it;
       if ( FV->ValFreq() > 0 ){
 	ddv.push_back( new D_D( FV ) );
       }
-      ++it;
     }
     sort( ddv.begin(), ddv.end(), dd_less );
     size_t dd_len = ddv.size();
@@ -766,11 +748,9 @@ namespace Timbl {
 	// Entropy for this FV pair.
 	//
 	FVEntropy = 0.0;
-	ValueDistribution::dist_iterator It = pnt->TargetDist.begin();
-	while ( It !=  pnt->TargetDist.end() ){
-	  Prob = It->second->Freq()/(double)Freq;
+	for ( const auto& it : pnt->TargetDist ){
+	  Prob = it.second->Freq()/(double)Freq;
 	  FVEntropy += Prob * Log2(Prob);
-	  ++It;
 	}
 	entropy += -FVEntropy * Freq / (double)TotalVals;
       }
@@ -840,22 +820,18 @@ namespace Timbl {
     size_t TotalVals = TotalValues();
     entropy = 0.0;
     // Loop over the values.
-    VCarrtype::const_iterator it = ValuesArray.begin();
-    while ( it != ValuesArray.end() ){
-      FeatureValue *fv = (FeatureValue*)*it;
+    for ( const auto& it : ValuesArray ){
+      FeatureValue *fv = (FeatureValue*)it;
       // Entropy for this FV pair.
       size_t Freq = fv->ValFreq();
       if ( Freq > 0 ){
 	double FVEntropy = 0.0;
-	ValueDistribution::dist_iterator It = fv->TargetDist.begin();
-	while ( It != fv->TargetDist.end() ){
-	  Prob = It->second->Freq() / (double)Freq;
+	for ( const auto& tit : fv->TargetDist ){
+	  Prob = tit.second->Freq() / (double)Freq;
 	  FVEntropy += Prob * Log2(Prob);
-	  ++It;
 	}
 	entropy += -FVEntropy * Freq / (double)TotalVals;
       }
-      ++it;
     }
 
     entropy = fabs( entropy );
@@ -868,14 +844,12 @@ namespace Timbl {
     // And the split. info.
     //
     split_info = 0.0;
-    it = ValuesArray.begin();
-    while( it != ValuesArray.end() ){
-      FeatureValue *fv = (FeatureValue*)*it;
+    for ( const auto& it : ValuesArray ){
+      FeatureValue *fv = (FeatureValue*)it;
       Prob = fv->ValFreq() / (double)TotalVals;
       if ( Prob > 0 ) {
 	split_info += Prob * Log2(Prob);
       }
-      ++it;
     }
     split_info = -split_info;
     // Gain ratio.
@@ -1255,22 +1229,18 @@ namespace Timbl {
 
   size_t BaseFeatTargClass::EffectiveValues() const {
     size_t result = 0;
-    VCarrtype::const_iterator it = ValuesArray.begin();
-    while( it != ValuesArray.end() ){
-      if ( (*it)->ValFreq() > 0 ){
+    for( const auto& it : ValuesArray ){
+      if ( it->ValFreq() > 0 ){
 	++result;
       }
-      ++it;
     }
     return result;
   }
 
   size_t BaseFeatTargClass::TotalValues() const {
     size_t result = 0;
-    VCarrtype::const_iterator it = ValuesArray.begin();
-    while( it != ValuesArray.end() ){
-      result += (*it)->ValFreq();
-      ++it;
+    for ( const auto& it : ValuesArray ){
+      result += it->ValFreq();
     }
     return result;
   }
@@ -1345,16 +1315,14 @@ namespace Timbl {
   bool Feature::AllocSparseArrays( size_t Dim ){
     // Loop over all values.
     //
-    VCarrtype::const_iterator it = ValuesArray.begin();
-    while ( it != ValuesArray.end() ){
-      FeatureValue *FV = (FeatureValue*)*it;
+    for ( const auto& it : ValuesArray ){
+      FeatureValue *FV = (FeatureValue*)it;
       // Loop over all classes.
       if ( FV->ValueClassProb == NULL ){
 	if ( !(FV->ValueClassProb = new SparseValueProbClass( Dim )) ){
 	  return false;
 	}
       }
-      ++it;
     }
     return true;
   }
@@ -1393,10 +1361,8 @@ namespace Timbl {
 
   BaseFeatTargClass::~BaseFeatTargClass(){
     if ( !is_copy ){
-      VCarrtype::iterator it = ValuesArray.begin();
-      while ( it != ValuesArray.end() ){
-	delete *it;
-	++it;
+      for ( const auto& it : ValuesArray ){
+	delete it;
       }
     }
     ValuesMap.clear();
