@@ -493,12 +493,10 @@ namespace Timbl {
 
   ostream& operator<< ( ostream& os, const fileIndex& fi ){
     using TiCC::operator<<;
-    fileIndex::const_iterator it = fi.begin();
-    while ( it != fi.end() ){
+    for ( const auto& it : fi ){
       os << "<";
-      os << it->first << "," << it->second;
+      os << it.first << "," << it.second;
       os << ">";
-      ++it;
     }
     return os;
   }
@@ -506,12 +504,10 @@ namespace Timbl {
   bool TimblExperiment::learnFromFileIndex( const fileIndex& fi,
 					    istream& datafile ){
     InstanceBase_base *outInstanceBase = 0;
-    fileIndex::const_iterator fit = fi.begin();
-    while ( fit != fi.end() ){
-      set<streamsize>::const_iterator sit = fit->second.begin();
-      while ( sit != fit->second.end() ){
+    for ( const auto& fit : fi ){
+      for ( const auto& sit : fit.second ){
 	datafile.clear();
-	datafile.seekg( *sit );
+	datafile.seekg( sit );
 	string Buffer;
 	nextLine( datafile, Buffer );
 	chopLine( Buffer );
@@ -529,9 +525,7 @@ namespace Timbl {
 	  Warning( "deviating exemplar weight in:\n" +
 		   Buffer + "\nIgnoring the new weight" );
 	}
-	++sit;
       }
-      ++fit;
     }
     if ( outInstanceBase ){
       if ( !InstanceBase->MergeSub( outInstanceBase ) ){
@@ -615,10 +609,8 @@ namespace Timbl {
 	  //
 	  ifstream datafile( CurrentDataFile, ios::in);
 	  //
-	  fileDoubleIndex::const_iterator mit = fIndex.begin();
-	  while ( mit != fIndex.end() ){
-	    learnFromFileIndex( mit->second, datafile );
-	    ++mit;
+	  for ( const auto& mit : fIndex ){
+	    learnFromFileIndex( mit.second, datafile );
 	  }
 	}
       }

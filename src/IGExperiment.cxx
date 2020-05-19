@@ -85,10 +85,8 @@ namespace Timbl {
   ostream& operator<< ( ostream& os,
 			const fileDoubleIndex& fmi ){
     os << "[";
-    fileDoubleIndex::const_iterator fmIt = fmi.begin();
-    while ( fmIt != fmi.end() ){
-      os << fmIt->first << " " << fmIt->second << endl;
-      ++fmIt;
+    for ( const auto& it : fmi ){
+      os << it.first << " " << it.second << endl;
     }
     os << "]";
     return os;
@@ -142,12 +140,10 @@ namespace Timbl {
 	  //
 	  ifstream datafile( CurrentDataFile, ios::in);
 	  //
-	  fileIndex::const_iterator fit = fmIndex.begin();
-	  while ( fit != fmIndex.end() ){
-	    set<streamsize>::const_iterator sit = fit->second.begin();
-	    while ( sit != fit->second.end() ){
+	  for ( const auto& fit : fmIndex ){
+	    for ( const auto& sit : fit.second ){
 	      datafile.clear();
-	      datafile.seekg( *sit );
+	      datafile.seekg( sit );
 	      nextLine( datafile, Buffer );
 	      chopLine( Buffer );
 	      // Progress update.
@@ -164,9 +160,7 @@ namespace Timbl {
 						       true );
 	      }
 	      outInstanceBase->AddInstance( CurrInst );
-	      ++sit;
 	    }
-	    ++fit;
 	  }
 	  if ( outInstanceBase ){
 	    //	      cerr << "Out Instance Base" << endl;
@@ -205,14 +199,13 @@ namespace Timbl {
 	  //
 	  ifstream datafile( CurrentDataFile, ios::in);
 	  //
-	  fileDoubleIndex::const_iterator dit = fmIndex.begin();
-	  while ( dit != fmIndex.end() ){
-	    //	    FeatureValue *the_fv = (FeatureValue*)(dit->first);
+	  for ( const auto& dit : fmIndex ){
+	    //	    FeatureValue *the_fv = (FeatureValue*)(dit.first);
 	    //	  cerr << "handle feature '" << the_fv << "' met index " << the_fv->Index() << endl;
-	    if ( dit->second.size() < 1 ){
+	    if ( dit.second.size() < 1 ){
 	      FatalError( "panic" );
 	    }
-	    if ( igOffset() > 0 && dit->second.size() > igOffset() ){
+	    if ( igOffset() > 0 && dit.second.size() > igOffset() ){
 	      //	    cerr << "within offset!" << endl;
 	      IG_InstanceBase *TmpInstanceBase = 0;
 	      TmpInstanceBase = new IG_InstanceBase( EffectiveFeatures(),
@@ -220,12 +213,10 @@ namespace Timbl {
 						     (RandomSeed()>=0),
 						     false,
 						     true );
-	      fileIndex::const_iterator fit = dit->second.begin();
-	      while ( fit !=  dit->second.end() ) {
-		set<streamsize>::const_iterator sit = fit->second.begin();
-		while ( sit != fit->second.end() ){
+	      for ( const auto& fit : dit.second ) {
+		for ( const auto& sit : fit.second ){
 		  datafile.clear();
-		  datafile.seekg( *sit );
+		  datafile.seekg( sit );
 		  nextLine( datafile, Buffer );
 		  chopLine( Buffer );
 		  // Progress update.
@@ -243,7 +234,6 @@ namespace Timbl {
 		  }
 		  //		cerr << "add instance " << &CurrInst << endl;
 		  PartInstanceBase->AddInstance( CurrInst );
-		  ++sit;
 		}
 		if ( PartInstanceBase ){
 		  //		time_stamp( "Start Pruning:    " );
@@ -263,7 +253,6 @@ namespace Timbl {
 		else {
 		  //		cerr << "Partial IB is empty" << endl;
 		}
-		++fit;
 	      }
 	      //	    time_stamp( "Start Final Pruning: " );
 	      //	    cerr << TmpInstanceBase << endl;
@@ -280,12 +269,10 @@ namespace Timbl {
 	    }
 	    else {
 	      //	    cerr << "other case!" << endl;
-	      fileIndex::const_iterator fit = dit->second.begin();
-	      while ( fit != dit->second.end() ){
-		set<streamsize>::const_iterator sit = fit->second.begin();
-		while ( sit != fit->second.end() ){
+	      for ( const auto& fit : dit.second ){
+		for ( const auto& sit : fit.second ){
 		  datafile.clear();
-		  datafile.seekg( *sit );
+		  datafile.seekg( sit );
 		  nextLine( datafile, Buffer );
 		  chopLine( Buffer );
 		  // Progress update.
@@ -303,9 +290,7 @@ namespace Timbl {
 		  }
 		  //	      cerr << "add instance " << &CurrInst << endl;
 		  outInstanceBase->AddInstance( CurrInst );
-		  ++sit;
 		}
-		++fit;
 	      }
 	      if ( outInstanceBase ){
 		//	      cerr << "Out Instance Base" << endl;
@@ -324,7 +309,6 @@ namespace Timbl {
 		outInstanceBase = 0;
 	      }
 	    }
-	    ++dit;
 	  }
 	}
       }

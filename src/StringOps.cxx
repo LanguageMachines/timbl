@@ -46,9 +46,8 @@ namespace Timbl {
       In = par;
     }
     string Out;
-    string::const_iterator it = In.begin();
-    while ( it != In.end() ){
-      switch ( *it ){
+    for ( const auto& it : In ){
+      switch ( it ){
       case ' ':
 	Out += '\\';
 	Out += '_';
@@ -62,9 +61,8 @@ namespace Timbl {
 	Out += '\\';
 	break;
       default:
-	Out += *it;
+	Out += it;
       }
-      ++it;
     }
     return Out;
   }
