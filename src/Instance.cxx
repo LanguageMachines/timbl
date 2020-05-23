@@ -149,15 +149,11 @@ namespace Timbl {
 	freqs.insert( f->frequency );
       }
       int cnt=0;
-      std::set<double, dblCmp>::iterator rit = freqs.begin();
-      while ( rit != freqs.end() && cnt < beam ) {
-	++cnt;
-	if ( cnt < beam ){
-	  ++rit;
+      for ( const auto& rit : freqs ){
+	if ( ++cnt == beam ) {
+	  minw = rit;
+	  break;
 	}
-      }
-      if ( cnt == beam ){
-	minw = *rit;
       }
     }
     DistToString( DistStr, minw );
@@ -173,15 +169,11 @@ namespace Timbl {
 	wgths.insert( f->weight );
       }
       int cnt=0;
-      std::set<double, dblCmp>::iterator rit = wgths.begin();
-      while ( rit != wgths.end() && cnt < beam ) {
-	++cnt;
-	if ( cnt < beam ){
-	  ++rit;
+      for ( const auto& rit : wgths ){
+	if ( ++cnt == beam ) {
+	  minw = rit;
+	  break;
 	}
-      }
-      if ( cnt == beam ){
-	minw = *rit;
       }
     }
     DistToString( DistStr, minw );
@@ -895,22 +887,23 @@ namespace Timbl {
     if ( n_dot_dot != 0 ){
       for ( size_t m = 0; m < Num_Vals; ++m ){
 	FeatureValue *fv = FVA[m];
-	ValueDistribution::dist_iterator It = fv->TargetDist.begin();
 	size_t n = 0;
-	while ( It != fv->TargetDist.end() && n < Size ){
-	  while ( n < It->second->Index()-1 ){
+	for ( const auto& it : fv->TargetDist ){
+	  if ( n >= Size ){
+	    break;
+	  }
+	  while ( n < it.second->Index()-1 ){
 	    double tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
 	      (double)n_dot_dot;
 	    chi_square += tmp;
 	  }
-	  if ( n == It->second->Index()-1 ){
+	  if ( n == it.second->Index()-1 ){
 	    double tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
 	      (double)n_dot_dot;
 	    if ( fabs(tmp) > Epsilon){
-	      chi_square += ( (tmp - It->second->Freq()) *
-			      (tmp - It->second->Freq()) ) / tmp;
+	      chi_square += ( (tmp - it.second->Freq()) *
+			      (tmp - it.second->Freq()) ) / tmp;
 	    }
-	    ++It;
 	  }
 	  else {
 	    break;
@@ -967,11 +960,13 @@ namespace Timbl {
       int m = 0;
       for ( const auto& it : ValuesArray ){
 	FeatureValue *fv = (FeatureValue *)it;
-	ValueDistribution::dist_iterator It = fv->TargetDist.begin();
 	size_t n = 0;
-	while ( It != fv->TargetDist.end() && n < Size ){
-	  size_t id = It->second->Index()-1;
-	  long int fr = It->second->Freq();
+	for ( const auto& it : fv->TargetDist ){
+	  if ( n >= Size ){
+	    break;
+	  }
+	  size_t id = it.second->Index()-1;
+	  long int fr = it.second->Freq();
 	  while ( n < id ){
 	    double tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
 	      (double)n_dot_dot;
@@ -983,7 +978,6 @@ namespace Timbl {
 	    if ( fabs(tmp) > Epsilon ){
 	      chi_square += ( (tmp - fr ) * (tmp - fr ) ) / tmp;
 	    }
-	    ++It;
 	  }
 	  else {
 	    break;
