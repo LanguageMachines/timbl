@@ -1,0 +1,101 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'src/**'
+      - 'include/**'
+
+  pull_request:
+    branches: [master]
+
+jobs:
+  notification:
+    runs-on: ubuntu-latest
+    name: Notifications
+    steps:
+      - name: IRC notification
+        uses: Gottox/irc-message-action@v1
+        with:
+          server: irc.uvt.nl
+          channel: '#gitlama'
+          nickname: GitHub
+          message: |-
+            ${{ github.actor }} pushed to ${{ github.event.repository.name }}
+
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: webiny/action-post-run@1.0.0
+        id: post-run-command
+        with:
+          command: echo "this thing works!"
+      - name: Install Build Environment
+        run: |
+             if [ "$RUNNER_OS" == "Linux" ]; then
+                sudo apt-get install pkg-config autoconf-archive
+             else
+                brew upgrade;
+                brew install pkg-config;
+                brew install autoconf-archive;
+                brew install autoconf;
+                brew install automake;
+             fi
+      - name: Install Dependencies
+        run: |
+             if [ "$RUNNER_OS" == "Linux" ]; then
+                sudo apt-get install libicu-dev libxml2-dev libbz2-dev;
+                sudo apt-get install zlib1g-dev libtar-dev
+             else
+                brew install libxml2;
+                brew install bzip2;
+                brew install zlib;
+                brew install libtar
+             fi
+      - name install TiccUtils
+        run: |
+          git clone https://github.com/LanguageMachines/ticcutils
+          cd ticcutils
+          bash bootstrap.sh
+          ./configure
+          make
+          sudo make install
+          cd ..
+
+      - name: bootstrap
+        run: sh bootstrap.sh
+      - name: configure
+        run: ./configure
+      - name: make
+        run: make
+      - name: install
+        run: sudo make install
+      - name: make check
+        run: LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib make check
+        continue-on-error: true
+      - name: show log
+        run: cat src/test-suite.log
+      - name: Notify IRC of failure
+        if: ${{ failure() }}
+        uses: Gottox/irc-message-action@v1
+        with:
+          server: irc.uvt.nl
+          channel: '#gitlama'
+          nickname: GitHub
+          message: |-
+            ${{ github.event.repository.name }} build by ${{ github.actor }} on ${{ matrix.os }}: FAIL
+      - name: Notify IRC of succes
+        if: ${{ success() }}
+        uses: Gottox/irc-message-action@v1
+        with:
+          server: irc.uvt.nl
+          channel: '#gitlama'
+          nickname: GitHub
+          message: |-
+            ${{ github.event.repository.name }} build by ${{ github.actor }} on ${{ matrix.os }}: SUCCESS
