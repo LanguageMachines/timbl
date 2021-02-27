@@ -60,13 +60,13 @@ jobs:
              fi
       - name install TiccUtils
         run: |
-          git clone https://github.com/LanguageMachines/ticcutils
-          cd ticcutils
-          bash bootstrap.sh
-          ./configure
-          make
-          sudo make install
-          cd ..
+          git clone https://github.com/LanguageMachines/ticcutils;
+          cd ticcutils;
+          bash bootstrap.sh;
+          ./configure;
+          make;
+          sudo make install;
+          cd ..;
 
       - name: bootstrap
         run: sh bootstrap.sh
