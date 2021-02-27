@@ -3,9 +3,9 @@ name: C/C++ CI
 on:
   push:
     branches: [master]
-    paths:
-      - 'src/**'
-      - 'include/**'
+#    paths:
+#      - 'src/**'
+#      - 'include/**'
 
   pull_request:
     branches: [master]
