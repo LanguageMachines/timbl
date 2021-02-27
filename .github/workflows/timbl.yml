@@ -58,7 +58,7 @@ jobs:
                 brew install zlib;
                 brew install libtar
              fi
-      - name install TiccUtils
+      - name: install TiccUtils
         run: |
           git clone https://github.com/LanguageMachines/ticcutils;
           cd ticcutils;
