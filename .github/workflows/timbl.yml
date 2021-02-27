@@ -3,9 +3,9 @@ name: C/C++ CI
 on:
   push:
     branches: [master]
-#    paths:
-#      - 'src/**'
-#      - 'include/**'
+    paths:
+      - 'src/**'
+      - 'include/**'
 
   pull_request:
     branches: [master]
@@ -32,10 +32,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: webiny/action-post-run@1.0.0
-        id: post-run-command
-        with:
-          command: echo "this thing works!"
       - name: Install Build Environment
         run: |
              if [ "$RUNNER_OS" == "Linux" ]; then
