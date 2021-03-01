@@ -1,4 +1,4 @@
-[![GitHub build](https://github.com/LanguageMachines/ticcutils/actions/workflows/timbl.yml/badge.svg?branch=master)](https://github.com/LanguageMachines/timbl/actions/)
+[![GitHub build](https://github.com/LanguageMachines/timbl/actions/workflows/timbl.yml/badge.svg?branch=master)](https://github.com/LanguageMachines/timbl/actions/)
 [![Language Machines Badge](http://applejack.science.ru.nl/lamabadge.php/timbl)](http://applejack.science.ru.nl/languagemachines/)
 [![DOI](https://zenodo.org/badge/20526237.svg)](https://zenodo.org/badge/latestdoi/20526237)
 
