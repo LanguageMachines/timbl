@@ -69,6 +69,8 @@ jobs:
       - name: bootstrap
         run: sh bootstrap.sh
       - name: configure
+        env:
+          CXX: clang
         run: ./configure
       - name: make
         run: make
