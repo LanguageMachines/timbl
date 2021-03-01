@@ -1,4 +1,6 @@
-[![Build Status](https://travis-ci.org/LanguageMachines/timbl.svg?branch=master)](https://travis-ci.org/LanguageMachines/timbl) [![Language Machines Badge](http://applejack.science.ru.nl/lamabadge.php/timbl)](http://applejack.science.ru.nl/languagemachines/) [![DOI](https://zenodo.org/badge/20526237.svg)](https://zenodo.org/badge/latestdoi/20526237)
+[![GitHub build](https://github.com/LanguageMachines/ticcutils/actions/workflows/timbl.yml/badge.svg?branch=master)](https://github.com/LanguageMachines/timbl/actions/)
+[![Language Machines Badge](http://applejack.science.ru.nl/lamabadge.php/timbl)](http://applejack.science.ru.nl/languagemachines/)
+[![DOI](https://zenodo.org/badge/20526237.svg)](https://zenodo.org/badge/latestdoi/20526237)
 
 ===========================================
 TiMBL: Tilburg Memory Based Learner
@@ -52,7 +54,7 @@ This software has been tested on:
 Alternatively, with some effort, you may get it to work on a Windows platform using Cygwin.
 
 Compilers:
- - GCC (use 4.8 or later)
+ - GCC (use 7.0 or later)
  - Clang
 
 Contents of this distribution:
@@ -80,4 +82,3 @@ To compile and install manually from source instead, provided you have all the d
     $ ./configure
     $ make
     $ make install
-
