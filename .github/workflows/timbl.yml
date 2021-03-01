@@ -13,7 +13,7 @@ on:
 jobs:
   notification:
     runs-on: ubuntu-latest
-    name: Notifications
+    name: Notify start to #gitlama
     steps:
       - name: IRC notification
         uses: Gottox/irc-message-action@v1
@@ -22,13 +22,17 @@ jobs:
           channel: '#gitlama'
           nickname: GitHub
           message: |-
-            ${{ github.actor }} pushed to ${{ github.event.repository.name }}
+            ${{ github.actor }} started a test of ${{ github.event.repository.name }}
 
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
+        compiler: [g++, clang++]
+        include:
+          - compiler: home/linuxbrew/.linuxbrew/Cellar/llvm/11.1.0/bin/clang
+            os: macos-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -56,7 +60,7 @@ jobs:
              fi
       - name: install TiccUtils
         env:
-          CXX: clang++
+          CXX: ${{ matrix.compiler }}
         run: |
           git clone https://github.com/LanguageMachines/ticcutils;
           cd ticcutils;
@@ -70,13 +74,15 @@ jobs:
         run: sh bootstrap.sh
       - name: configure
         env:
-          CXX: clang++
+          CXX:  ${{ matrix.compiler }}
         run: ./configure
       - name: make
         run: make
       - name: install
         run: sudo make install
       - name: make check
+        env:
+          CXX:  ${{ matrix.compiler }}
         run: LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib make check
         continue-on-error: true
       - name: show log
