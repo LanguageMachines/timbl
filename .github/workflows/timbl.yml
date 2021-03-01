@@ -30,9 +30,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         compiler: [g++, clang++]
-        include:
-          - compiler: home/linuxbrew/.linuxbrew/Cellar/llvm/11.1.0/bin/clang
-            os: macos-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -95,7 +92,7 @@ jobs:
           channel: '#gitlama'
           nickname: GitHub
           message: |-
-            ${{ github.event.repository.name }} build by ${{ github.actor }} on ${{ matrix.os }}: FAIL
+            ${{ github.event.repository.name }} with ${{ matrix.compiler }} build by ${{ github.actor }} on ${{ matrix.os }}: FAILED
       - name: Notify IRC of succes
         if: ${{ success() }}
         uses: Gottox/irc-message-action@v1
@@ -104,4 +101,4 @@ jobs:
           channel: '#gitlama'
           nickname: GitHub
           message: |-
-            ${{ github.event.repository.name }} build by ${{ github.actor }} on ${{ matrix.os }}: SUCCESS
+            ${{ github.event.repository.name }} with ${{ matrix.compiler }} build build by ${{ github.actor }} on ${{ matrix.os }}: SUCCESS
