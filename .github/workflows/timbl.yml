@@ -4,8 +4,8 @@ on:
   push:
     branches: [master]
     paths:
-      - 'src/**'
-      - 'include/**'
+#      - 'src/**'
+#      - 'include/**'
 
   pull_request:
     branches: [master]
@@ -55,6 +55,8 @@ jobs:
                 brew install libtar
              fi
       - name: install TiccUtils
+        env:
+          CXX: clang
         run: |
           git clone https://github.com/LanguageMachines/ticcutils;
           cd ticcutils;
