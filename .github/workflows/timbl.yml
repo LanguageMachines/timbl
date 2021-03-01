@@ -101,4 +101,4 @@ jobs:
           channel: '#gitlama'
           nickname: GitHub
           message: |-
-            ${{ github.event.repository.name }} with ${{ matrix.compiler }} build build by ${{ github.actor }} on ${{ matrix.os }}: SUCCESS
+            ${{ github.event.repository.name }} with ${{ matrix.compiler }} build by ${{ github.actor }} on ${{ matrix.os }}: SUCCESS
