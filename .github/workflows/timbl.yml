@@ -22,7 +22,7 @@ jobs:
           channel: '#gitlama'
           nickname: GitHub
           message: |-
-            ${{ github.actor }} started a \0033test\003 of ${{ github.event.repository.name }}
+            ${{ github.actor }} started a build of ${{ github.event.repository.name }}
 
   build:
     runs-on: ${{ matrix.os }}
