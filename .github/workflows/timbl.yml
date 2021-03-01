@@ -56,7 +56,7 @@ jobs:
              fi
       - name: install TiccUtils
         env:
-          CXX: clang
+          CXX: clang++
         run: |
           git clone https://github.com/LanguageMachines/ticcutils;
           cd ticcutils;
@@ -70,7 +70,7 @@ jobs:
         run: sh bootstrap.sh
       - name: configure
         env:
-          CXX: clang
+          CXX: clang++
         run: ./configure
       - name: make
         run: make
