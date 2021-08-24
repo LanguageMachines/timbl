@@ -48,7 +48,6 @@ AC_C_INLINE
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
-AC_FUNC_MALLOC
 AC_CHECK_FUNCS([floor gettimeofday pow rint sqrt ])
 
 PKG_PROG_PKG_CONFIG
