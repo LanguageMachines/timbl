@@ -863,7 +863,9 @@ int main(int argc, char *argv[]){
       else {
 	// normal case
 	//   running a testing phase from recovered tree
-	if ( TestFile.empty() && !Do_Indirect ){
+	if ( TestFile.empty()
+	     && XOutFile == ""
+	     && !Do_Indirect ){
 	  cerr << "reading an instancebase(-i option) without a testfile (-t option) is useless" << endl;
 	  do_test = false;
 	}
