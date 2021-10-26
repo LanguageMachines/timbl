@@ -39,7 +39,7 @@
 #include "ticcutils/StringOps.h"
 #include "ticcutils/PrettyPrint.h"
 #include "ticcutils/Timer.h"
-#include "ticcutils/TreeHash.h"
+#include "ticcutils/UniHash.h"
 
 #include "timbl/MsgClass.h"
 #include "timbl/Common.h"
@@ -1112,6 +1112,7 @@ namespace Timbl {
     if ( occ > 1 ){
       CurrInst.Occurrences( occ );
     }
+    //    cerr << "to instance: Chopped input=" << ChopInput->getString() << endl;
     switch ( phase  ){
     case LearnWords:
       // Add the target.
@@ -1126,10 +1127,12 @@ namespace Timbl {
 	}
 	else {
 	  // Add it to the Instance.
+	  //	  cerr << "Feature add: " << ChopInput->getField(i) << endl;
 	  CurrInst.FV[i] = Features[i]->add_value( ChopInput->getField(i),
 						   CurrInst.TV, occ );
 	}
       } // i
+      //      cerr << "new instance: " << CurrInst << endl;
       break;
     case TrainWords:
       // Lookup for TreeBuilding
@@ -1159,7 +1162,7 @@ namespace Timbl {
       // This might fail for unknown values, then we create a dummy value
       for ( size_t m = 0; m < effective_feats; ++m ){
 	size_t j = permutation[m];
-	const string& fld =  ChopInput->getField(j);
+	const UnicodeString& fld =  ChopInput->getField(j);
 	CurrInst.FV[m] = Features[j]->Lookup( fld );
 	if ( !CurrInst.FV[m] ){
 	  // for "unknown" values have to add a dummy value
@@ -1194,7 +1197,7 @@ namespace Timbl {
   }
 
   string MBLClass::get_org_input( ) const {
-    return ChopInput->getString();
+    return TiCC::UnicodeToUTF8(ChopInput->getString());
   }
 
   void MBLClass::LearningInfo( ostream& os ) {
@@ -1805,7 +1808,7 @@ namespace Timbl {
 				   vector<FeatureValue *>& RedFV,
 				   size_t OffSet,
 				   size_t Size ) const {
-    string result;
+    UnicodeString result;
     Instance inst( Size );
     for ( size_t i=0; i< OffSet; ++i ){
       inst.FV[i] = OrgFV[i];
@@ -1830,14 +1833,15 @@ namespace Timbl {
 	}
 	break;
       case Sparse:
-	if ( inst.FV[InvPerm[j]]->Name() != DefaultSparseString ){
-	  result += string("(")  + TiCC::toString<size_t>(j+1) + ","
-	    + CodeToStr( inst.FV[InvPerm[j]]->Name() ) + ")";
+	if ( inst.FV[InvPerm[j]]->utf8_name() != DefaultSparseString ){
+	  result += "(" + TiCC::toUnicodeString<size_t>(j+1) + ","
+	    + CodeToStr( inst.FV[InvPerm[j]]->Name() )
+	    + ")";
 	}
 	break;
       case SparseBin:
 	if ( inst.FV[InvPerm[j]]->Name()[0] == '1' ){
-	  result += TiCC::toString<size_t>( j+1 ) + ",";
+	  result += TiCC::toUnicodeString<size_t>( j+1 ) + ",";
 	}
 	break;
       case Columns:
@@ -1858,7 +1862,7 @@ namespace Timbl {
 	break;
       default:
 	if ( Features[j]->Ignore() ){
-	  result += string( F_length, '*' );
+	  result += UnicodeString( F_length, '*', F_length );
 	}
 	else {
 	  result += inst.FV[InvPerm[j]]->Name();
@@ -1867,7 +1871,7 @@ namespace Timbl {
       }
     }
     delete [] InvPerm;
-    return result;
+    return TiCC::UnicodeToUTF8(result);
   }
 
   inline double WeightFun( double D, double W ){
@@ -2243,8 +2247,8 @@ namespace Timbl {
     }
     Features.resize(num_of_features,NULL);
     PermFeatures.resize(num_of_features,NULL);
-    FeatureStrings = new Hash::StringHash(); // all features share the same hash
-    TargetStrings = new Hash::StringHash(); // targets has it's own hash
+    FeatureStrings = new Hash::UnicodeHash(); // all features share the same hash
+    TargetStrings = new Hash::UnicodeHash(); // targets has it's own hash
     Targets = new Target( TargetStrings );
     for ( size_t i=0; i< num_of_features; ++i ){
       Features[i] = new Feature( FeatureStrings );

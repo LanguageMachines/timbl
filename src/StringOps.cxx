@@ -33,21 +33,23 @@
 #include <cfloat>
 #include "ticcutils/StringOps.h"
 #include "timbl/StringOps.h"
+#include "unicode/ustream.h"
 
 using namespace std;
 namespace Timbl {
 
-  string StrToCode( const string &par, bool trim ){
-    string In;
-    if ( trim){
-      In = TiCC::trim(par);
+  UnicodeString StrToCode( const UnicodeString &par, bool trim ){
+    UnicodeString In = par;
+    //    cerr << "string to code  IN: '" << In << "'" << endl;
+    if ( trim ){
+      In.trim();
     }
     else {
       In = par;
     }
-    string Out;
-    for ( const auto& it : In ){
-      switch ( it ){
+    UnicodeString Out;
+    for ( int i=0; i < In.length(); ++i ){
+      switch ( In[i] ){
       case ' ':
 	Out += '\\';
 	Out += '_';
@@ -61,24 +63,24 @@ namespace Timbl {
 	Out += '\\';
 	break;
       default:
-	Out += it;
+	Out += In[i];
       }
     }
+    //    cerr << "string to code Out: '" << Out << "'" << endl;
     return Out;
   }
 
-  string CodeToStr( const string& in ){
-    string out;
-    string::const_iterator it = in.begin();
-    while ( it != in.end() ){
-      if ( *it == '\\' ){
-	++it;
-	if ( it == in.end() ){
+  UnicodeString CodeToStr( const UnicodeString& in ){
+    UnicodeString out;
+    for( int i=0; i < in.length(); ++i ){
+      if ( in[i] == '\\' ){
+	++i;
+	if ( i == in.length() ){
 	  out += '\\';
 	  break;
 	}
 	else {
-	  switch ( *it ){
+	  switch ( in[i] ){
 	  case  '_':
 	    out += ' ';
 	    break;
@@ -90,13 +92,12 @@ namespace Timbl {
 	    break;
 	  default:
 	    out += '\\';
-	    out += *it;
+	    out += in[i];
 	  }
-	  ++it;
 	}
       }
       else {
-	out += *it++;
+	out += in[i];
       }
     }
     return out;

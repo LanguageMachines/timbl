@@ -197,7 +197,7 @@ namespace Timbl{
 
   inline bool FV_to_real( FeatureValue *FV, double &result ){
     if ( FV ){
-      if ( TiCC::stringTo<double>( FV->Name(), result ) ){
+      if ( TiCC::stringTo<double>( FV->utf8_name(), result ) ){
 	return true;
       }
     }
@@ -206,7 +206,7 @@ namespace Timbl{
 
   double innerProduct( FeatureValue *FV,
 		       FeatureValue *G ) {
-    double r1, r2, result;
+    double r1=0, r2=0, result;
 #ifdef DBGTEST_DOT
     cerr << "innerproduct " << FV << " x " << G << endl;
 #endif

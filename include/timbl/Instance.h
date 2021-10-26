@@ -33,13 +33,15 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
+#include "unicode/unistr.h"
 #include "timbl/MsgClass.h"
+#include "ticcutils/Unicode.h"
 
 template<typename T>
 class SparseSymetricMatrix;
 
 namespace Hash {
-  class StringHash;
+  class UnicodeHash;
 }
 
 namespace Timbl {
@@ -149,7 +151,7 @@ namespace Timbl {
 
   class ValueClass {
   public:
-    ValueClass( const std::string& n, size_t i ):
+    ValueClass( const icu::UnicodeString& n, size_t i ):
       name( n ), index( i ), Frequency( 1 ) {};
     virtual ~ValueClass() {};
     void ValFreq( size_t f ){ Frequency = f; };
@@ -158,10 +160,11 @@ namespace Timbl {
     void incr_val_freq(){ Frequency++; };
     void decr_val_freq(){ Frequency--; };
     size_t Index() const { return index; };
-    const std::string& Name() const { return name; };
+    const icu::UnicodeString& Name() const { return name; };
+    const std::string utf8_name() const { return TiCC::UnicodeToUTF8(name); };
     friend std::ostream& operator<<( std::ostream& os, ValueClass const *vc );
   protected:
-    const std::string& name;
+    const icu::UnicodeString& name;
     size_t index;
     size_t Frequency;
     ValueClass( const ValueClass& );
@@ -170,7 +173,7 @@ namespace Timbl {
 
   class TargetValue: public ValueClass {
   public:
-    TargetValue( const std::string&, size_t );
+    TargetValue( const icu::UnicodeString&, size_t );
   };
 
   class SparseValueProbClass {
@@ -192,8 +195,8 @@ namespace Timbl {
     friend class Feature;
     friend struct D_D;
   public:
-    explicit FeatureValue( const std::string& );
-    FeatureValue( const std::string&, size_t );
+    explicit FeatureValue( const icu::UnicodeString& );
+    FeatureValue( const icu::UnicodeString&, size_t );
     ~FeatureValue();
     void ReconstructDistribution( const ValueDistribution& vd ) {
       TargetDist.Merge( vd );
@@ -213,15 +216,15 @@ namespace Timbl {
 
   class BaseFeatTargClass: public MsgClass {
   public:
-    explicit BaseFeatTargClass( Hash::StringHash * );
+    explicit BaseFeatTargClass( Hash::UnicodeHash * );
     virtual ~BaseFeatTargClass();
     size_t EffectiveValues() const;
     size_t TotalValues() const;
     VCarrtype ValuesArray;
     IVCmaptype ValuesMap;
-    virtual ValueClass *Lookup( const std::string& ) const = 0;
+    virtual ValueClass *Lookup( const icu::UnicodeString& ) const = 0;
   protected:
-    Hash::StringHash *TokenTree;
+    Hash::UnicodeHash *TokenTree;
     bool is_copy;
     BaseFeatTargClass( const BaseFeatTargClass& );
   private:
@@ -231,10 +234,10 @@ namespace Timbl {
 
   class Target: public BaseFeatTargClass {
   public:
-    explicit Target( Hash::StringHash *T ): BaseFeatTargClass(T) {};
-    TargetValue *add_value( const std::string&, int freq = 1 );
+    explicit Target( Hash::UnicodeHash *T ): BaseFeatTargClass(T) {};
+    TargetValue *add_value( const icu::UnicodeString&, int freq = 1 );
     TargetValue *add_value( size_t, int freq = 1 );
-    TargetValue *Lookup( const std::string& ) const;
+    TargetValue *Lookup( const icu::UnicodeString& ) const;
     TargetValue *ReverseLookup( size_t ) const;
     bool decrement_value( TargetValue * );
     bool increment_value( TargetValue * );
@@ -246,7 +249,7 @@ namespace Timbl {
   class Feature: public BaseFeatTargClass {
     friend class MBLClass;
   public:
-    explicit Feature( Hash::StringHash *T );
+    explicit Feature( Hash::UnicodeHash *T );
     ~Feature();
     bool Ignore() const { return ignore; };
     void Ignore( const bool val ){ ignore = val; };
@@ -271,9 +274,9 @@ namespace Timbl {
     double Max() const { return n_max; };
     void Max( const double val ){ n_max = val; };
     double fvDistance( FeatureValue *, FeatureValue *, size_t=1 ) const;
-    FeatureValue *add_value( const std::string&, TargetValue *, int=1 );
+    FeatureValue *add_value( const icu::UnicodeString&, TargetValue *, int=1 );
     FeatureValue *add_value( size_t, TargetValue *, int=1 );
-    FeatureValue *Lookup( const std::string& ) const ;
+    FeatureValue *Lookup( const icu::UnicodeString& ) const ;
     bool decrement_value( FeatureValue *, TargetValue * );
     bool increment_value( FeatureValue *, TargetValue * );
     bool isNumerical() const;

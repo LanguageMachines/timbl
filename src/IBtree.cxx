@@ -34,7 +34,7 @@
 #include <cstdio>
 
 #include "ticcutils/StringOps.h"
-#include "ticcutils/TreeHash.h"
+#include "ticcutils/UniHash.h"
 #include "ticcutils/XMLtools.h"
 #include "timbl/Common.h"
 #include "timbl/MsgClass.h"
@@ -286,13 +286,13 @@ namespace Timbl {
 
   xmlNode *to_node( const FeatureValue *fv ){
     xmlNode *result = TiCC::XmlNewNode( "feature" );
-    TiCC::XmlAddContent( result, fv->Name() );
+    TiCC::XmlAddContent( result, TiCC::UnicodeToUTF8(fv->Name()) );
     return result;
   }
 
   xmlNode *to_node( const TargetValue *tv ){
     xmlNode *result = TiCC::XmlNewNode( "target" );
-    TiCC::XmlAddContent( result, tv->Name() );
+    TiCC::XmlAddContent( result, TiCC::UnicodeToUTF8(tv->Name()) );
     return result;
   }
 
@@ -360,7 +360,7 @@ namespace Timbl {
   string toString( const vector<FeatureValue*>& vec ){
     string result;
     for ( auto const& fv : vec ){
-      result += " " + fv->Name();
+      result += " " +  TiCC::UnicodeToUTF8(fv->Name());
     }
     return result;
   }
@@ -404,24 +404,24 @@ namespace Timbl {
   }
 
   void save_hash( ostream &os,
-		  Hash::StringHash *cats,
-		  Hash::StringHash *feats ){
-    int Size = cats->NumOfEntries();
+		  Hash::UnicodeHash *cats,
+		  Hash::UnicodeHash *feats ){
+    int Size = cats->num_of_entries();
     os << "Classes" << endl;
     for ( int i=1; i <= Size; ++i ){
-      os << i << "\t" << cats->ReverseLookup( i ) << endl;
+      os << i << "\t" << cats->reverse_lookup( i ) << endl;
     }
-    Size = feats->NumOfEntries();
+    Size = feats->num_of_entries();
     os << "Features" << endl;
     for ( int i=1; i <= Size; ++i ){
-      os << i << "\t" << feats->ReverseLookup( i ) << endl;
+      os << i << "\t" << feats->reverse_lookup( i ) << endl;
     }
     os << endl;
   }
 
   void InstanceBase_base::Save( ostream &os,
-				Hash::StringHash *cats,
-				Hash::StringHash *feats,
+				Hash::UnicodeHash *cats,
+				Hash::UnicodeHash *feats,
 				bool persist ) {
     // save an IBtree for later use.
     bool temp_persist =  PersistentDistributions;
@@ -501,7 +501,7 @@ namespace Timbl {
     }
     IBtree *result = new IBtree();
     ++ibCount;
-    string buf;
+    UnicodeString buf;
     char delim;
     is >> ws >> buf;
     result->FValue = Feats[level]->add_value( buf, NULL, 1 );
@@ -720,8 +720,8 @@ namespace Timbl {
   }
 
   bool InstanceBase_base::read_hash( istream &is,
-				     Hash::StringHash *cats,
-				     Hash::StringHash *feats ) const {
+				     Hash::UnicodeHash *cats,
+				     Hash::UnicodeHash *feats ) const {
     string line;
     is >> ws;
     is >> line;
@@ -735,7 +735,7 @@ namespace Timbl {
       size_t i = TiCC::split( line, vals );
       if ( i == 2 ){
 	// just ignore index!
-	cats->Hash( vals[1] );
+	cats->hash_utf8( vals[1] );
       }
       else {
 	break;
@@ -750,7 +750,7 @@ namespace Timbl {
       size_t i = TiCC::split( line, vals );
       if ( i == 2 ){
 	// just ignore index!
-	feats->Hash( vals[1] );
+	feats->hash_utf8( vals[1] );
       }
       else {
 	break;
@@ -760,9 +760,10 @@ namespace Timbl {
   }
 
   bool InstanceBase_base::ReadIB( istream &is,
-				  vector<Feature *>& Feats, Target *Targs,
-				  Hash::StringHash *cats,
-				  Hash::StringHash *feats,
+				  vector<Feature *>& Feats,
+				  Target *Targs,
+				  Hash::UnicodeHash *cats,
+				  Hash::UnicodeHash *feats,
 				  int expected_version ){
     if ( read_IB( is, Feats, Targs, cats, feats, expected_version ) ){
       InstBase->redo_distributions();
@@ -778,8 +779,10 @@ namespace Timbl {
   }
 
   bool IG_InstanceBase::ReadIB( istream &is,
-				vector<Feature *>& Feats, Target *Targs,
-				Hash::StringHash *cats, Hash::StringHash *feats,
+				vector<Feature *>& Feats,
+				Target *Targs,
+				Hash::UnicodeHash *cats,
+				Hash::UnicodeHash *feats,
 				int expected_version ){
     if ( read_IB( is, Feats, Targs, cats, feats, expected_version ) ){
       if ( PersistentDistributions ){
@@ -797,8 +800,8 @@ namespace Timbl {
 
   bool InstanceBase_base::read_IB( istream &is,
 				   vector<Feature *>& Feats, Target *Targs,
-				   Hash::StringHash *cats,
-				   Hash::StringHash *feats,
+				   Hash::UnicodeHash *cats,
+				   Hash::UnicodeHash *feats,
 				   int expected_version ){
     char delim;
     NumOfTails = 0;

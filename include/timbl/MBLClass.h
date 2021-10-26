@@ -36,7 +36,7 @@
 typedef struct _xmlNode xmlNode;
 
 namespace Hash {
-  class StringHash;
+  class UnicodeHash;
 }
 
 namespace Timbl {
@@ -173,8 +173,8 @@ namespace Timbl {
     size_t num_of_neighbors;
     bool dynamic_neighbors;
     DecayType decay_flag;
-    Hash::StringHash *TargetStrings;
-    Hash::StringHash *FeatureStrings;
+    Hash::UnicodeHash *TargetStrings;
+    Hash::UnicodeHash *FeatureStrings;
     std::string exp_name;
     Instance CurrInst;
     BestArray bestArray;

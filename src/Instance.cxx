@@ -34,7 +34,7 @@
 #include <cassert>
 
 #include "ticcutils/StringOps.h"
-#include "ticcutils/TreeHash.h"
+#include "ticcutils/UniHash.h"
 
 #include "timbl/Common.h"
 #include "timbl/MsgClass.h"
@@ -596,7 +596,7 @@ namespace Timbl {
     return best;
   }
 
-  Feature::Feature( Hash::StringHash *T ):
+  Feature::Feature( Hash::UnicodeHash *T ):
     BaseFeatTargClass(T),
     metric_matrix( 0 ),
     metric( 0 ),
@@ -674,10 +674,18 @@ namespace Timbl {
     }
   }
 
+  bool uniToDouble( const UnicodeString& us , double& d ){
+    return TiCC::stringTo<double>( TiCC::UnicodeToUTF8(us), d );
+  }
+
+  double uniToDouble( const UnicodeString& us ){
+    return TiCC::stringTo<double>( TiCC::UnicodeToUTF8(us) );
+  }
+
   struct D_D {
     D_D(): dist(0), value(0.0) {};
     explicit D_D( FeatureValue *fv ): value(0.0) {
-      if ( !TiCC::stringTo<double>( fv->Name(), value ) ){
+      if ( !uniToDouble( fv->Name(), value ) ){
 	throw( logic_error("called DD with an non-numeric value" ) );
       }
       dist = &fv->TargetDist;
@@ -1037,7 +1045,6 @@ namespace Timbl {
     // otherwise 1. Special case when reading the TopDistribution.
     //
     ValueDistribution *result = 0;
-    string buf;
     char nextCh;
     is >> nextCh;   // skip {
     if ( nextCh != '{' ){
@@ -1047,6 +1054,7 @@ namespace Timbl {
       int next;
       do {
 	size_t freq;
+	UnicodeString buf;
 	is >> ws >> buf;
 	is >> freq;
 	TargetValue *target;
@@ -1186,12 +1194,12 @@ namespace Timbl {
     return os;
   }
 
-  FeatureValue::FeatureValue( const std::string& value,
+  FeatureValue::FeatureValue( const UnicodeString& value,
 			      size_t hash_val ):
     ValueClass( value, hash_val ), ValueClassProb( 0 ) {
   }
 
-  FeatureValue::FeatureValue( const string& s ):
+  FeatureValue::FeatureValue( const UnicodeString& s ):
     ValueClass( s, 0 ),
     ValueClassProb(0){
     Frequency = 0;
@@ -1201,7 +1209,7 @@ namespace Timbl {
     delete ValueClassProb;
   }
 
-  TargetValue::TargetValue( const std::string& value,
+  TargetValue::TargetValue( const UnicodeString& value,
 			    size_t value_hash ):
     ValueClass( value, value_hash ){}
 
@@ -1223,9 +1231,9 @@ namespace Timbl {
     return result;
   }
 
-  FeatureValue *Feature::Lookup( const string& str ) const {
+  FeatureValue *Feature::Lookup( const UnicodeString& str ) const {
     FeatureValue *result = NULL;
-    unsigned int index = TokenTree->Lookup( str );
+    unsigned int index = TokenTree->lookup( str );
     if ( index ) {
       IVCmaptype::const_iterator it = ValuesMap.find( index );
       if ( it != ValuesMap.end() ){
@@ -1235,10 +1243,11 @@ namespace Timbl {
     return result;
   }
 
-  FeatureValue *Feature::add_value( const string& valstr,
+  FeatureValue *Feature::add_value( const UnicodeString& valstr,
 				    TargetValue *tv,
 				    int freq ){
-    unsigned int hash_val = TokenTree->Hash( valstr );
+    unsigned int hash_val = TokenTree->hash( valstr );
+    //    cerr << "hash(" << valstr << ") geeft: " << hash_val << endl;
     return add_value( hash_val, tv, freq );
   }
 
@@ -1247,7 +1256,8 @@ namespace Timbl {
 				    int freq ){
     IVCmaptype::const_iterator it = ValuesMap.find( index );
     if (  it == ValuesMap.end() ){
-      const string& value = TokenTree->ReverseLookup( index );
+      const UnicodeString& value = TokenTree->reverse_lookup( index );
+      //      cerr << "lookup(" << index << ") geeft: " << value << endl;
       // we want to store the singleton value for this index
       // so we MUST reverse lookup the index
       FeatureValue *fv = new FeatureValue( value, index );
@@ -1323,7 +1333,7 @@ namespace Timbl {
     }
   }
 
-  BaseFeatTargClass::BaseFeatTargClass( Hash::StringHash *T ):
+  BaseFeatTargClass::BaseFeatTargClass( Hash::UnicodeHash *T ):
     TokenTree( T ),
     is_copy(false){
   }
@@ -1346,9 +1356,9 @@ namespace Timbl {
     ValuesMap.clear();
   }
 
-  TargetValue *Target::Lookup( const string& str ) const {
+  TargetValue *Target::Lookup( const UnicodeString& str ) const {
     TargetValue *result = 0;
-    size_t index = TokenTree->Lookup( str );
+    size_t index = TokenTree->lookup( str );
     if ( index ) {
       IVCmaptype::const_iterator it = ValuesMap.find( index );
       result = reinterpret_cast<TargetValue*>(it->second);
@@ -1402,9 +1412,9 @@ namespace Timbl {
       FeatureValue *fv = (FeatureValue*)it;
       size_t freq = fv->ValFreq();
       if ( freq > 0 ){
-	if ( !TiCC::stringTo<double>( fv->Name(), tmp ) ){
+	if ( !uniToDouble( fv->Name(), tmp ) ){
 	  Warning( "a Non Numeric value '" +
-		   string(fv->Name()) +
+		   TiCC::UnicodeToUTF8(fv->Name()) +
 		   "' in Numeric Feature!" );
 	  return NotNumeric;
 	}
@@ -1449,7 +1459,7 @@ namespace Timbl {
     vector<double> store( ValuesArray.size() );
     for ( unsigned int i=0; i < ValuesArray.size(); ++i ){
       FeatureValue *FV =  reinterpret_cast<FeatureValue*>(ValuesArray[i]);
-      double val = TiCC::stringTo<double>( FV->Name() );
+      double val = uniToDouble( FV->Name() );
       store[i] = val;
       sum += val;
     }
@@ -1599,9 +1609,10 @@ namespace Timbl {
       p = buf.c_str();  // restart
       name = "";
       while ( *p && isspace(*p) ) ++p; // skip whitespace
-      while ( *p && !isspace(*p) )
+      while ( *p && !isspace(*p) ){
 	name += *p++;
-      FV = Lookup( name );
+      }
+      FV = Lookup( TiCC::UnicodeFromUTF8(name) );
       if ( !FV ){
 	Warning( "Unknown FeatureValue '" + name + "' in file, (skipped) " );
 	continue;
@@ -1677,8 +1688,8 @@ namespace Timbl {
 	  return false;
 	}
 	else {
-	  FeatureValue *F1 = Lookup(parts[0]);
-	  FeatureValue *F2 = Lookup(parts[1]);
+	  FeatureValue *F1 = Lookup(TiCC::UnicodeFromUTF8(parts[0]));
+	  FeatureValue *F2 = Lookup(TiCC::UnicodeFromUTF8(parts[1]));
 	  metric_matrix->Assign( F1, F2, d );
 	}
       }
@@ -1726,15 +1737,17 @@ namespace Timbl {
     os.flags( old_flags );
   }
 
-  TargetValue *Target::add_value( const string& valstr, int freq ){
-    unsigned int hash_val = TokenTree->Hash( valstr );
+  TargetValue *Target::add_value( const UnicodeString& valstr, int freq ){
+    unsigned int hash_val = TokenTree->hash( valstr );
+    //    cerr << "target hash(" << valstr << ") geeft: " << hash_val << endl;
     return add_value( hash_val, freq );
   }
 
   TargetValue *Target::add_value( size_t index, int freq ){
     IVCmaptype::const_iterator it = ValuesMap.find( index );
     if (  it == ValuesMap.end() ){
-      const string& name = TokenTree->ReverseLookup( index );
+      const UnicodeString& name = TokenTree->reverse_lookup( index );
+      //      cerr << "target lookup(" << index << ") geeft: " << name << endl;
       // we want to store the singleton value for this index
       // so we MUST reverse lookup the index
       TargetValue *tv = new TargetValue( name, index );

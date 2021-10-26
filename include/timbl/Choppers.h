@@ -31,22 +31,26 @@
 namespace Timbl{
 
   static const std::string DefaultSparseString = "0.0000E-17";
+  static const icu::UnicodeString DefaultUnicodeSparseString = "0.0000E-17";
 
   class Chopper {
   public:
     virtual ~Chopper() {};
     virtual bool chop( const std::string&, size_t ) = 0;
-    const std::string& getField( size_t i ) const { return choppedInput[i]; };
+    const icu::UnicodeString& getField( size_t i ) const {
+      return choppedInput[i];
+    };
     virtual double getExW() const { return -1; };
     virtual int getOcc() const { return 1; };
-    virtual std::string getString() const = 0;
+    virtual icu::UnicodeString getString() const = 0;
     void print( std::ostream& os ){
       os << getString();
     };
     void swapTarget( size_t target_pos ){
-      std::string tmp = choppedInput[target_pos];
-      for ( size_t i = target_pos+1; i < vSize; ++i )
+      icu::UnicodeString tmp = choppedInput[target_pos];
+      for ( size_t i = target_pos+1; i < vSize; ++i ){
 	choppedInput[i-1] = choppedInput[i];
+      }
       choppedInput[vSize-1] = tmp;
     }
     static Chopper *create( InputFormatType , bool, int, bool );
@@ -59,8 +63,8 @@ namespace Timbl{
   protected:
     virtual void init( const std::string&, size_t, bool );
     size_t vSize;
-    std::string strippedInput;
-    std::vector<std::string> choppedInput;
+    icu::UnicodeString strippedInput;
+    std::vector<icu::UnicodeString> choppedInput;
   };
 
   class ExChopper: public virtual Chopper {
@@ -82,7 +86,7 @@ namespace Timbl{
   class C45_Chopper : public virtual Chopper {
   public:
     bool chop( const std::string&, size_t );
-    std::string getString() const;
+    icu::UnicodeString getString() const;
   };
 
   class C45_ExChopper : public C45_Chopper, public ExChopper {
@@ -105,7 +109,7 @@ namespace Timbl{
   class Bin_Chopper : public virtual Chopper {
   public:
     bool chop( const std::string&, size_t );
-    std::string getString() const;
+    icu::UnicodeString getString() const;
   };
 
   class Bin_ExChopper : public Bin_Chopper, public ExChopper {
@@ -118,7 +122,7 @@ namespace Timbl{
   public:
     explicit Compact_Chopper( int L ): fLen(L){};
     bool chop( const std::string&, size_t );
-    std::string getString() const;
+    icu::UnicodeString getString() const;
   private:
     int fLen;
     Compact_Chopper();
@@ -141,7 +145,7 @@ namespace Timbl{
   class Columns_Chopper : public virtual Chopper {
   public:
     bool chop( const std::string&, size_t );
-    std::string getString() const;
+    icu::UnicodeString getString() const;
   };
 
   class Columns_ExChopper : public Columns_Chopper, public ExChopper {
@@ -153,7 +157,7 @@ namespace Timbl{
   class Tabbed_Chopper : public virtual Chopper {
   public:
     bool chop( const std::string&, size_t );
-    std::string getString() const;
+    icu::UnicodeString getString() const;
   };
 
   class Tabbed_ExChopper : public Tabbed_Chopper, public ExChopper {
@@ -166,7 +170,7 @@ namespace Timbl{
   class Sparse_Chopper : public virtual Chopper {
   public:
     bool chop( const std::string&, size_t );
-    std::string getString() const;
+    icu::UnicodeString getString() const;
   };
 
   class Sparse_ExChopper : public Sparse_Chopper, public ExChopper {

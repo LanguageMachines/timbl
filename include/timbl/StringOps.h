@@ -34,14 +34,15 @@
 #include <sstream>
 #include <exception>
 #include <stdexcept>
+#include "unicode/unistr.h"
 
 namespace Timbl {
 
   bool compare_nocase( const std::string&, const std::string& );
   bool compare_nocase_n( const std::string&, const std::string& );
 
-  std::string StrToCode( const std::string&, bool=true );
-  std::string CodeToStr( const std::string& );
+  icu::UnicodeString StrToCode( const icu::UnicodeString&, bool=true );
+  icu::UnicodeString CodeToStr( const icu::UnicodeString& );
 
   std::string correct_path( const std::string&,
 			    const std::string&,

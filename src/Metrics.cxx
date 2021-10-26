@@ -340,7 +340,7 @@ namespace Timbl{
 
   inline bool FV_to_real( FeatureValue *FV, double &result ){
     if ( FV ){
-      if ( TiCC::stringTo<double>( FV->Name(), result ) ){
+      if ( TiCC::stringTo<double>( FV->utf8_name(), result ) ){
 	return true;
       }
     }
@@ -393,7 +393,7 @@ namespace Timbl{
 				      size_t, double) const {
     double result = 0.0;
     if ( G != F ){
-      result = lv_distance( F->Name(), G->Name() );
+      result = lv_distance( F->utf8_name(), G->utf8_name() );
     }
     return result;
   }
@@ -402,7 +402,7 @@ namespace Timbl{
 			       size_t, double ) const {
     double result = 0.0;
     if ( G != F ){
-      result = dc_distance( F->Name(), G->Name() );
+      result = dc_distance( F->utf8_name(), G->utf8_name() );
     }
     return result;
   }
@@ -431,7 +431,7 @@ namespace Timbl{
   double NumericMetric::distance( FeatureValue *F, FeatureValue *G,
 				  size_t,
 				  double scale ) const {
-    double r1, r2, result;
+    double r1=0, r2=0, result;
     if ( FV_to_real( F, r1 ) &&
 	 FV_to_real( G, r2 ) ){
       result = fabs( (r1-r2)/ ( scale ) );
@@ -445,7 +445,7 @@ namespace Timbl{
   double EuclideanMetric::distance( FeatureValue *F, FeatureValue *G,
 				    size_t,
 				    double scale ) const {
-    double r1, r2, result;
+    double r1=0, r2=0, result;
     if ( FV_to_real( F, r1 ) &&
 	 FV_to_real( G, r2 ) ){
       result = sqrt(fabs(r1*r1-r2*r2))/ ( scale );

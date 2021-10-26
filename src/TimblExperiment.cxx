@@ -1535,7 +1535,7 @@ namespace Timbl {
     double distance = 0.0;
     const TargetValue *targ = classifyString( inst, distance );
     if ( targ ){
-      string cat = targ->Name();
+      string cat = targ->utf8_name();
       normalizeResult();
       result["category"] = cat;
       if ( Verbosity(NEAR_N) ){
@@ -1594,7 +1594,7 @@ namespace Timbl {
     Dist.clear();
     const TargetValue *targ = classifyString( Line, Distance );
     if ( targ ){
-      Result = targ->Name();
+      Result = targ->utf8_name();
       normalizeResult();
       Dist = bestResult.getResult();
       return true;
@@ -1608,7 +1608,7 @@ namespace Timbl {
     Result.clear();
     const TargetValue *targ = classifyString( Line, Distance );
     if ( targ ){
-      Result = targ->Name();
+      Result = targ->utf8_name();
       return true;
     }
     return false;
@@ -1620,7 +1620,7 @@ namespace Timbl {
     double dummy;
     const TargetValue *targ = classifyString( Line, dummy );
     if ( targ ){
-      Result = targ->Name();
+      Result = targ->utf8_name();
       return true;
     }
     return false;
