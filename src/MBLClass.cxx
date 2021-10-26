@@ -1196,8 +1196,8 @@ namespace Timbl {
     return result;
   }
 
-  string MBLClass::get_org_input( ) const {
-    return TiCC::UnicodeToUTF8(ChopInput->getString());
+  UnicodeString MBLClass::get_org_input( ) const {
+    return ChopInput->getString();
   }
 
   void MBLClass::LearningInfo( ostream& os ) {
@@ -1762,7 +1762,7 @@ namespace Timbl {
     return result;
   }
 
-  bool MBLClass::Chop( const string& line ) {
+  bool MBLClass::Chop( const UnicodeString& line ) {
     try {
       return ChopInput->chop( line, num_of_features );
     }
@@ -1804,10 +1804,10 @@ namespace Timbl {
     return nSet.bestDistribution( decay, k );
   }
 
-  string MBLClass::formatInstance( const vector<FeatureValue *>& OrgFV,
-				   vector<FeatureValue *>& RedFV,
-				   size_t OffSet,
-				   size_t Size ) const {
+  UnicodeString MBLClass::formatInstance( const vector<FeatureValue *>& OrgFV,
+					  vector<FeatureValue *>& RedFV,
+					  size_t OffSet,
+					  size_t Size ) const {
     UnicodeString result;
     Instance inst( Size );
     for ( size_t i=0; i< OffSet; ++i ){
@@ -1871,7 +1871,7 @@ namespace Timbl {
       }
     }
     delete [] InvPerm;
-    return TiCC::UnicodeToUTF8(result);
+    return result;
   }
 
   inline double WeightFun( double D, double W ){
@@ -1908,7 +1908,7 @@ namespace Timbl {
       }
       ValueDistribution ResultDist;
       ResultDist.SetFreq( Bpnt->Value(), Bpnt->Freq() );
-      string origI;
+      UnicodeString origI;
       if ( Verbosity(NEAR_N) ){
 	origI = formatInstance( Inst.FV, CurrentFV,
 				ib_offset,
@@ -1988,7 +1988,7 @@ namespace Timbl {
 	// we finished with a certain amount of succes
 	double Distance = tester->getDistance(EndPos);
 	if ( Distance >= 0.0 ){
-	  string origI;
+	  UnicodeString origI;
 	  if ( Verbosity(NEAR_N) ){
 	    origI = formatInstance( Inst.FV, CurrentFV,
 				    ib_offset,
@@ -2052,7 +2052,7 @@ namespace Timbl {
 	// this should always be true!
 	double Distance = tester->getDistance(EndPos);
 	if ( Distance >= 0.0 ){
-	  string origI;
+	  UnicodeString origI;
 	  if ( Verbosity(NEAR_N) ){
 	    origI = formatInstance( Inst.FV, CurrentFV,
 				    ib_offset,

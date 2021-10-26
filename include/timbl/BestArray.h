@@ -43,7 +43,7 @@ namespace Timbl {
     double bestDistance;
     ValueDistribution aggregateDist;
     std::vector<ValueDistribution*> bestDistributions;
-    std::vector<std::string> bestInstances;
+    std::vector<icu::UnicodeString> bestInstances;
   private:
     BestRec( const BestRec& );
     BestRec& operator=( const BestRec& );
@@ -60,7 +60,9 @@ namespace Timbl {
 	{};
     ~BestArray();
     void init( unsigned int, unsigned int, bool, bool, bool );
-    double addResult( double, const ValueDistribution *, const std::string& );
+    double addResult( double,
+		      const ValueDistribution *,
+		      const icu::UnicodeString& );
     void initNeighborSet( neighborSet& ) const;
     void addToNeighborSet( neighborSet& , size_t ) const;
     xmlNode *toXML() const;

@@ -127,47 +127,53 @@ namespace Timbl{
     return result;
   }
 
-  void Chopper::init( const string& s, size_t len, bool stripDot ) {
+  void Chopper::init( const UnicodeString& s, size_t len, bool stripDot ) {
     vSize = len+1;
     choppedInput.resize(vSize);
-    string spit = s;
+    UnicodeString split = s;
+    //    cerr << "    strip input:" << split << endl;
     // trim spaces at end
-    spit = TiCC::trim_back( spit );
+    split = TiCC::rtrim( split );
     if ( stripDot ){
       // now trim at most 1 trailing dot
-      auto it = spit.end();
-      --it;
-      if ( *it == '.' ){
-	spit.erase(it);
+      if ( split[split.length()-1] == '.' ){
+	split.remove( split.length()-1 );
       }
     }
     // trim more spaces at end
-    strippedInput = TiCC::UnicodeFromUTF8(TiCC::trim_back( spit ));
+    strippedInput = TiCC::rtrim( split );
     //    cerr << "stripped input:" << strippedInput << endl;
   }
 
-  static string extractWeight( const string& Buffer,
-			       string& wght ) {
-    string::size_type t_pos, e_pos = Buffer.length();
-    // first remove trailing whitespace and dot
-    e_pos = Buffer.find_last_not_of( ". \t", e_pos );
-    // now some non-space
-    t_pos = Buffer.find_last_of( " \t", e_pos );
-    if ( t_pos != string::npos ){
-      // found white space
-      wght = string( Buffer, t_pos+1, e_pos - t_pos );
+  static UnicodeString extractWeight( const UnicodeString& buffer,
+				      UnicodeString& wght ) {
+    //    cerr << "extract weight from '" << buffer << "'" << endl;
+    UnicodeString tmp = buffer;
+    // first remove trailing whitespace and dots
+    tmp = TiCC::rtrim( tmp, " ." );
+    //    cerr << "step 1: '" << tmp << "'" << endl;
+    int e_pos = tmp.length()-1;
+    for ( ; e_pos >= 0; --e_pos ){
+      if ( tmp[e_pos] == ' '
+	   || tmp[e_pos] == '\t' ){
+	break;
+      }
     }
-    else {
+    if ( e_pos == 0 ){
       wght = "";
     }
-    // and some more space...
-    e_pos = Buffer.find_last_not_of( " \t", t_pos );
-    return string( Buffer, 0, e_pos+1 );
+    else {
+      wght = UnicodeString( tmp, e_pos+1 );
+      tmp = UnicodeString( tmp, 0, e_pos );
+    }
+    tmp = TiCC::rtrim( tmp, "\t ." );
+    //    cerr << "result='" << tmp << "' with weight: '" << wght << "'" << endl;
+    return tmp;
   }
 
-  static string extractOcc( const string& Buffer,
-			  string& wght ) {
-    return extractWeight( Buffer, wght );
+  static UnicodeString extractOcc( const UnicodeString& Buffer,
+				   UnicodeString& occ ) {
+    return extractWeight( Buffer, occ );
   }
 
   size_t Chopper::countFeatures( const string& inBuffer,
@@ -175,20 +181,17 @@ namespace Timbl{
 				 int F_length,
 				 bool chopTail ) {
     size_t result = 0;
-    string buffer;
+    UnicodeString buffer = TiCC::UnicodeFromUTF8( inBuffer );
     if ( chopTail ){
-      string dummy;
-      buffer = extractWeight( inBuffer, dummy );
-    }
-    else {
-      buffer = inBuffer;
+      UnicodeString dummy;
+      buffer = extractWeight( buffer, dummy );
     }
     size_t len = buffer.length();
     switch ( IF ){
     case ARFF:
     case C4_5:
-      for ( auto const& c : buffer ){
-	if ( c == ','){
+      for ( int i=0; i < buffer.length(); ++i ){
+	if ( buffer[i] == ','){
 	  ++result;
 	}
       };
@@ -205,16 +208,14 @@ namespace Timbl{
       break;
     case Columns:
       {
-	vector<string> parts;
-	size_t num = TiCC::split( buffer, parts );
-	result = num - 1;
+	vector<UnicodeString> parts = TiCC::split( buffer );
+	result = parts.size() - 1;
       };
       break;
     case Tabbed:
       {
-	vector<string> parts;
-	size_t num = TiCC::split_at( buffer, parts, "\t" );
-	result = num - 1;
+	vector<UnicodeString> parts = TiCC::split_at( buffer, "\t" );
+	result = parts.size() - 1;
       };
       break;
     default:
@@ -228,13 +229,10 @@ namespace Timbl{
   InputFormatType Chopper::getInputFormat( const string& inBuffer,
 					   bool stripTail ) {
     InputFormatType IF = UnknownInputFormat;
-    string buffer;
+    UnicodeString buffer = TiCC::UnicodeFromUTF8( inBuffer );
     if ( stripTail ){
-      string dummy;
-      buffer = extractWeight( inBuffer, dummy );
-    }
-    else {
-      buffer = inBuffer;
+      UnicodeString dummy;
+      buffer = extractWeight( buffer, dummy );
     }
     size_t len = buffer.length();
     int c45Cnt = 0;
@@ -263,22 +261,23 @@ namespace Timbl{
     return IF;
   }
 
-  void ExChopper::init( const string& s, size_t len, bool stripDot ) {
+  void ExChopper::init( const UnicodeString& s, size_t len, bool stripDot ) {
     exW = -1.0;
-    string spit = s;
+    UnicodeString split = s;
     vSize = len+1;
     choppedInput.resize(vSize);
     // trim trailing spaces
-    spit = TiCC::trim_back( spit );
-    string wght;
-    spit = extractWeight( spit, wght );
-    if ( wght.empty() ){
+    split = TiCC::rtrim( split );
+    UnicodeString wght;
+    split = extractWeight( split, wght );
+    if ( wght.isEmpty() ){
       throw logic_error( "Missing sample weight" );
     }
     else {
       double tmp;
       if ( !TiCC::stringTo<double>( wght, tmp ) ){
-	throw runtime_error( "Wrong sample weight: '" + wght + "'" );
+	throw runtime_error( "Wrong sample weight: '"
+			     + TiCC::UnicodeToUTF8(wght) + "'" );
       }
       else {
 	exW = tmp;
@@ -286,33 +285,32 @@ namespace Timbl{
     }
     if ( stripDot ){
       // now trim at most 1 trailing dot
-      auto it = spit.end();
-      --it;
-      if ( *it == '.' ){
-	spit.erase(it);
+      if ( split[split.length()-1] == '.' ){
+	split.remove( split.length()-1 );
       }
     }
     // trim more trailing spaces
-    strippedInput = TiCC::UnicodeFromUTF8(TiCC::trim_back( spit ) );
+    strippedInput = TiCC::rtrim( split );
   }
 
-  void OccChopper::init( const string& s, size_t len, bool stripDot ) {
-    string spit = s;
+  void OccChopper::init( const UnicodeString& s, size_t len, bool stripDot ) {
+    UnicodeString split = s;
     occ = 1;
     vSize = len+1;
     choppedInput.resize(vSize);
     // first trim trailing spaces
-    spit = TiCC::trim_back( spit );
-    string occS;
+    split = TiCC::rtrim( split );
+    UnicodeString occS;
     // get occ
-    spit = extractOcc( spit, occS );
-    if ( occS.empty() ){
+    split = extractOcc( split, occS );
+    if ( occS.isEmpty() ){
       throw logic_error( "Missing occurrence" );
     }
     else {
       int tmp;
       if ( !TiCC::stringTo<int>( occS, tmp ) ){
-	throw runtime_error( "Wrong (non-integer) occurrence value: '" + occS + "'" );
+	throw runtime_error( "Wrong (non-integer) occurrence value: '"
+			     + TiCC::UnicodeToUTF8(occS) + "'" );
       }
       else {
 	occ = tmp;
@@ -320,18 +318,16 @@ namespace Timbl{
     }
     if ( stripDot ){
       // now trim at most 1 trailing dot
-      auto it = spit.end();
-      --it;
-      if ( *it == '.' ){
-	spit.erase(it);
+      if ( split[split.length()-1] == '.' ){
+	split.remove( split.length()-1 );
       }
     }
     // strip remaining trailing spaces
-    strippedInput = TiCC::UnicodeFromUTF8(TiCC::trim_back( spit ) );
+    strippedInput = TiCC::rtrim( split );
   }
 
   using TiCC::operator<<;
-  bool C45_Chopper::chop( const string& InBuf, size_t len ){
+  bool C45_Chopper::chop( const UnicodeString& InBuf, size_t len ){
     // Function that takes a line, and chops it up into substrings,
     // which represent the feature-values and the target-value.
     init( InBuf, len, true );
@@ -355,7 +351,7 @@ namespace Timbl{
     return res;
   }
 
-  bool ARFF_Chopper::chop( const string& InBuf, size_t len ){
+  bool ARFF_Chopper::chop( const UnicodeString& InBuf, size_t len ){
     // Lines look like this:
     // one, two,   three , bla.
     // the termination dot is optional
@@ -363,7 +359,7 @@ namespace Timbl{
     return C45_Chopper::chop( InBuf, len );
   }
 
-  bool Bin_Chopper::chop( const string& InBuf, size_t len ) {
+  bool Bin_Chopper::chop( const UnicodeString& InBuf, size_t len ) {
     // Lines look like this:
     // 12, 25, 333, bla.
     // the termination dot is optional
@@ -405,7 +401,7 @@ namespace Timbl{
     return res;
   }
 
-  bool Compact_Chopper::chop( const string& InBuf, size_t leng ){
+  bool Compact_Chopper::chop( const UnicodeString& InBuf, size_t leng ){
     init( InBuf, leng, false );
     // Lines look like this:
     // ====AKBVAK
@@ -438,7 +434,7 @@ namespace Timbl{
     return res;
   }
 
-  bool Columns_Chopper::chop( const string& InBuf, size_t len ){
+  bool Columns_Chopper::chop( const UnicodeString& InBuf, size_t len ){
     // Lines look like this:
     // one  two three bla
     init( InBuf, len, false );
@@ -463,7 +459,7 @@ namespace Timbl{
 
 
 
-  bool Tabbed_Chopper::chop( const string& InBuf, size_t len ){
+  bool Tabbed_Chopper::chop( const UnicodeString& InBuf, size_t len ){
     // Lines look like this:
     // oneTABtwoTAB TABthreeTABbla
     init( InBuf, len, false );
@@ -486,7 +482,7 @@ namespace Timbl{
     return res;
   }
 
-  bool Sparse_Chopper::chop( const string& InBuf, size_t len ){
+  bool Sparse_Chopper::chop( const UnicodeString& InBuf, size_t len ){
     // Lines look like this:
     // (12,value1) (25,value2) (333,value3) bla.
     // the termination dot is optional
@@ -519,7 +515,7 @@ namespace Timbl{
 	return false;
       }
       size_t index;
-      if ( !TiCC::stringTo( TiCC::UnicodeToUTF8(parts[0]), index ) ){
+      if ( !TiCC::stringTo( parts[0], index ) ){
 	return false;
       }
       if ( index < 1 || index >= vSize ){

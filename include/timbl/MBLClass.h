@@ -100,12 +100,12 @@ namespace Timbl {
     VerbosityFlags get_verbosity() const { return verbosity; };
     void set_verbosity( VerbosityFlags v ) { verbosity = v; };
     const Instance *chopped_to_instance( PhaseValue );
-    bool Chop( const std::string& );
+    bool Chop( const icu::UnicodeString& );
     bool HideInstance( const Instance& );
     bool UnHideInstance( const Instance&  );
-    std::string formatInstance( const std::vector<FeatureValue *>&,
-				std::vector<FeatureValue *>&,
-				size_t,	size_t ) const;
+    icu::UnicodeString formatInstance( const std::vector<FeatureValue *>&,
+				       std::vector<FeatureValue *>&,
+				       size_t,	size_t ) const;
     bool setInputFormat( const InputFormatType );
     size_t countFeatures( const std::string&,
 			  const InputFormatType ) const;
@@ -115,7 +115,7 @@ namespace Timbl {
     void TestInstance( const Instance& ,
 		       InstanceBase_base * = NULL,
 		       size_t = 0 );
-    std::string get_org_input( ) const;
+    icu::UnicodeString get_org_input( ) const;
     const ValueDistribution *ExactMatch( const Instance& ) const;
     void fillNeighborSet( neighborSet& ) const;
     void addToNeighborSet( neighborSet& ns, size_t n ) const;

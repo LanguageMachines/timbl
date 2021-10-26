@@ -357,10 +357,10 @@ namespace Timbl {
     os << doc << endl;
   }
 
-  string toString( const vector<FeatureValue*>& vec ){
-    string result;
+  UnicodeString VectoString( const vector<FeatureValue*>& vec ){
+    UnicodeString result;
     for ( auto const& fv : vec ){
-      result += " " +  TiCC::UnicodeToUTF8(fv->Name());
+      result += " " + fv->Name();
     }
     return result;
   }
@@ -384,7 +384,7 @@ namespace Timbl {
 	    pnt = pnt->link;
 	  }
 	  if ( pnt ){
-	    os << level << " [" << toString(pad) << " " << pnt->FValue << " ] "
+	    os << level << " [" << VectoString(pad) << " " << pnt->FValue << " ] "
 	       << pnt->TDistribution << " < ";
 	    pnt = pnt->link;
 	    while ( pnt ){
@@ -722,35 +722,34 @@ namespace Timbl {
   bool InstanceBase_base::read_hash( istream &is,
 				     Hash::UnicodeHash *cats,
 				     Hash::UnicodeHash *feats ) const {
-    string line;
+    UnicodeString line;
     is >> ws;
     is >> line;
-    if ( !compare_nocase( line, "Classes" ) ){
+    if ( line.caseCompare( "Classes", 0 ) ){
       Error( "missing 'Classes' keyword in Hashinfo" );
       return false;
     }
     is >> ws;
-    vector<string> vals;
-    while ( getline( is, line ) ){
-      size_t i = TiCC::split( line, vals );
-      if ( i == 2 ){
+    while ( TiCC::getline( is, line ) ){
+      vector<UnicodeString> vals = TiCC::split( line );
+      if ( vals.size() == 2 ){
 	// just ignore index!
-	cats->hash_utf8( vals[1] );
+	cats->hash( vals[1] );
       }
       else {
 	break;
       }
       is >> ws;
     }
-    if ( !compare_nocase( line, "Features" ) ){
+    if ( line.caseCompare( "Features", 0 ) ){
       Error( "missing 'Features' keyword in Hashinfo" );
       return false;
     }
-    while ( getline( is, line ) ){
-      size_t i = TiCC::split( line, vals );
-      if ( i == 2 ){
+    while ( TiCC::getline( is, line ) ){
+      vector<UnicodeString> vals = TiCC::split( line );
+      if ( vals.size() == 2 ){
 	// just ignore index!
-	feats->hash_utf8( vals[1] );
+	feats->hash( vals[1] );
       }
       else {
 	break;

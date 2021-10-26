@@ -114,7 +114,7 @@ namespace Timbl {
 
   double BestArray::addResult( double Distance,
 			       const ValueDistribution *Distr,
-			       const string& neighbor ){
+			       const UnicodeString& neighbor ){
     // We have the similarity in Distance, and a num_of_neighbors
     // dimensional array with best similarities.
     // Check, and add/replace/move/whatever.
@@ -234,7 +234,7 @@ namespace Timbl {
 	  xmlNode *nb = TiCC::XmlNewChild( nbs, "neighbor" );
 	  TiCC::XmlNewTextChild( nb,
 				 "instance",
-				 best->bestInstances[m] );
+				 TiCC::UnicodeToUTF8(best->bestInstances[m]) );
 	  if ( _showDb ){
 	    TiCC::XmlNewTextChild( nb,
 				   "distribution",
@@ -264,9 +264,9 @@ namespace Timbl {
   }
 
 
-  json neighbor_to_json( const string& nb, const string& db ){
+  json neighbor_to_json( const UnicodeString& nb, const string& db ){
     json result;
-    result["instance"] = nb;
+    result["instance"] = TiCC::UnicodeToUTF8(nb);
     if ( !db.empty() ){
       result["distribution"] = db;
     }

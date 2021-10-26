@@ -674,18 +674,10 @@ namespace Timbl {
     }
   }
 
-  bool uniToDouble( const UnicodeString& us , double& d ){
-    return TiCC::stringTo<double>( TiCC::UnicodeToUTF8(us), d );
-  }
-
-  double uniToDouble( const UnicodeString& us ){
-    return TiCC::stringTo<double>( TiCC::UnicodeToUTF8(us) );
-  }
-
   struct D_D {
     D_D(): dist(0), value(0.0) {};
     explicit D_D( FeatureValue *fv ): value(0.0) {
-      if ( !uniToDouble( fv->Name(), value ) ){
+      if ( !TiCC::stringTo( fv->Name(), value ) ){
 	throw( logic_error("called DD with an non-numeric value" ) );
       }
       dist = &fv->TargetDist;
@@ -1412,7 +1404,7 @@ namespace Timbl {
       FeatureValue *fv = (FeatureValue*)it;
       size_t freq = fv->ValFreq();
       if ( freq > 0 ){
-	if ( !uniToDouble( fv->Name(), tmp ) ){
+	if ( !TiCC::stringTo( fv->Name(), tmp ) ){
 	  Warning( "a Non Numeric value '" +
 		   TiCC::UnicodeToUTF8(fv->Name()) +
 		   "' in Numeric Feature!" );
@@ -1459,7 +1451,7 @@ namespace Timbl {
     vector<double> store( ValuesArray.size() );
     for ( unsigned int i=0; i < ValuesArray.size(); ++i ){
       FeatureValue *FV =  reinterpret_cast<FeatureValue*>(ValuesArray[i]);
-      double val = uniToDouble( FV->Name() );
+      double val = TiCC::stringTo<double>( FV->Name() );
       store[i] = val;
       sum += val;
     }

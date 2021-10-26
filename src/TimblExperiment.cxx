@@ -354,7 +354,8 @@ namespace Timbl {
   }
 
   bool TimblExperiment::chopLine( const string& Line ){
-    if ( !Chop( Line ) ){
+    UnicodeString line = TiCC::UnicodeFromUTF8( Line );
+    if ( !Chop( line ) ){
       stats.addSkipped();
       return false;
     }
@@ -652,7 +653,8 @@ namespace Timbl {
   /*
     Increment the Instancebase with one instance (IB1 Class only)
   */
-  bool IB1_Experiment::Increment( const string& InstanceString ){
+  bool IB1_Experiment::Increment( const string& _inst ){
+    UnicodeString InstanceString = TiCC::UnicodeFromUTF8( _inst );
     bool result = true;
     if ( ExpInvalid() ){
       result = false;
@@ -663,7 +665,7 @@ namespace Timbl {
     }
     else {
       if ( !Chop( InstanceString ) ){
-	Error( "Couldn't convert to Instance: " + InstanceString );
+	Error( "Couldn't convert to Instance: " + _inst );
 	result = false;    // No more input
       }
       else {
@@ -672,7 +674,7 @@ namespace Timbl {
 	bool happy = InstanceBase->AddInstance( CurrInst );
 	if ( !happy ){
 	  Warning( "deviating exemplar weight in:\n" +
-		   InstanceString + "\nIgnoring the new weight" );
+		   _inst + "\nIgnoring the new weight" );
 	}
       }
     }
@@ -682,7 +684,8 @@ namespace Timbl {
   /*
     Decrement the Instancebase with one instance (IB1 Class only)
   */
-  bool IB1_Experiment::Decrement( const string& InstanceString ){
+  bool IB1_Experiment::Decrement( const string& _inst ){
+    UnicodeString InstanceString = TiCC::UnicodeFromUTF8( _inst );
     bool result = true;
     if ( ExpInvalid() ){
       result = false;
@@ -693,7 +696,7 @@ namespace Timbl {
     }
     else {
       if ( !Chop( InstanceString ) ){
-	Error( "Couldn't convert to Instance: " + InstanceString );
+	Error( "Couldn't convert to Instance: " + _inst );
 	result = false;    // No more input
       }
       else {

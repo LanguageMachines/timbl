@@ -36,7 +36,7 @@ namespace Timbl{
   class Chopper {
   public:
     virtual ~Chopper() {};
-    virtual bool chop( const std::string&, size_t ) = 0;
+    virtual bool chop( const icu::UnicodeString&, size_t ) = 0;
     const icu::UnicodeString& getField( size_t i ) const {
       return choppedInput[i];
     };
@@ -61,7 +61,7 @@ namespace Timbl{
 				 int,
 				 bool=false );
   protected:
-    virtual void init( const std::string&, size_t, bool );
+    virtual void init( const icu::UnicodeString&, size_t, bool );
     size_t vSize;
     icu::UnicodeString strippedInput;
     std::vector<icu::UnicodeString> choppedInput;
@@ -71,7 +71,7 @@ namespace Timbl{
   public:
     double getExW() const { return exW; };
   protected:
-    void init( const std::string&, size_t, bool );
+    void init( const icu::UnicodeString&, size_t, bool );
     double exW;
   };
 
@@ -79,13 +79,13 @@ namespace Timbl{
   public:
     int getOcc() const { return occ; };
   protected:
-    void init( const std::string&, size_t, bool );
+    void init( const icu::UnicodeString&, size_t, bool );
     int occ;
   };
 
   class C45_Chopper : public virtual Chopper {
   public:
-    bool chop( const std::string&, size_t );
+    bool chop( const icu::UnicodeString&, size_t );
     icu::UnicodeString getString() const;
   };
 
@@ -97,7 +97,7 @@ namespace Timbl{
 
   class ARFF_Chopper : public C45_Chopper {
   public:
-    bool chop( const std::string&, size_t );
+    bool chop( const icu::UnicodeString&, size_t );
   };
 
   class ARFF_ExChopper : public C45_ExChopper {
@@ -108,7 +108,7 @@ namespace Timbl{
 
   class Bin_Chopper : public virtual Chopper {
   public:
-    bool chop( const std::string&, size_t );
+    bool chop( const icu::UnicodeString&, size_t );
     icu::UnicodeString getString() const;
   };
 
@@ -121,7 +121,7 @@ namespace Timbl{
   class Compact_Chopper : public virtual Chopper {
   public:
     explicit Compact_Chopper( int L ): fLen(L){};
-    bool chop( const std::string&, size_t );
+    bool chop( const icu::UnicodeString&, size_t );
     icu::UnicodeString getString() const;
   private:
     int fLen;
@@ -144,7 +144,7 @@ namespace Timbl{
 
   class Columns_Chopper : public virtual Chopper {
   public:
-    bool chop( const std::string&, size_t );
+    bool chop( const icu::UnicodeString&, size_t );
     icu::UnicodeString getString() const;
   };
 
@@ -156,7 +156,7 @@ namespace Timbl{
 
   class Tabbed_Chopper : public virtual Chopper {
   public:
-    bool chop( const std::string&, size_t );
+    bool chop( const icu::UnicodeString&, size_t );
     icu::UnicodeString getString() const;
   };
 
@@ -169,7 +169,7 @@ namespace Timbl{
 
   class Sparse_Chopper : public virtual Chopper {
   public:
-    bool chop( const std::string&, size_t );
+    bool chop( const icu::UnicodeString&, size_t );
     icu::UnicodeString getString() const;
   };
 
