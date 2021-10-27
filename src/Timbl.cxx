@@ -448,9 +448,8 @@ bool get_file_names( TiCC::CL_Options& opts ){
     OutputFile = correct_path( value, O_Path );
   }
   if ( opts.extract( "IL", value ) ){
-    vector<string> vec;
-    int num = TiCC::split_at( value, vec, ":" );
-    if ( num > 1 ){
+    vector<string> vec = TiCC::split_at( value, ":" );
+    if ( vec.size() > 1 ){
       levelTreeOutFile = correct_path( vec[0], O_Path );
       levelTreeLevel = TiCC::stringTo<int>( vec[1] );
     }
@@ -485,8 +484,8 @@ bool get_file_names( TiCC::CL_Options& opts ){
     Weighting W;
     if ( !string_to( value, W ) ){
       // No valid weighting, so assume it also has a filename
-      vector<string> parts;
-      size_t num = TiCC::split_at( value, parts, ":" );
+      vector<string> parts = TiCC::split_at( value, ":" );
+      size_t num = parts.size();
       if ( num == 2 ){
 	if ( !string_to( parts[1], W ) ){
 	  cerr << "invalid weighting option: " << value << endl;

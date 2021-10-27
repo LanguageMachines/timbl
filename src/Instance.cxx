@@ -1658,9 +1658,10 @@ namespace Timbl {
       if ( line.empty() ){
 	break;
       }
-      vector<string> arr;
+      vector<string> arr = TiCC::split_at( line, " " );
+      size_t num = arr.size();
       double d;
-      if ( TiCC::split_at( line, arr, " " ) != 2 ){
+      if ( num != 2 ){
 	Error( "wrong line in inputfile" );
 	return false;
       }
@@ -1674,8 +1675,8 @@ namespace Timbl {
       }
       else {
 	string stripped = arr[0].substr(1,arr[0].length()-2);
-	vector<string> parts;
-	if ( TiCC::split_at( stripped, parts, ",\t" ) != 2 ){
+	vector<string> parts = TiCC::split_at( stripped, ",\t" );
+	if ( parts.size() != 2 ){
 	  Error( "wrong line in inputfile" );
 	  return false;
 	}

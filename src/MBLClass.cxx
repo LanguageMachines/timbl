@@ -456,12 +456,11 @@ namespace Timbl {
   xmlNode *MBLClass::settingsToXml() const{
     ostringstream tmp;
     Options.Show_Settings( tmp );
-    vector<string> lines;
-    int num = TiCC::split_at( tmp.str(), lines, "\n" );
+    vector<string> lines = TiCC::split_at( tmp.str(), "\n" );
     xmlNode *result = TiCC::XmlNewNode("settings");
-    for ( int i=0; i < num; ++i ){
-      vector<string> parts;
-      if ( TiCC::split_at( lines[i], parts, ":" ) ==2 ){
+    for ( const auto& line : lines ){
+      vector<string> parts = TiCC::split_at( line, ":" );
+      if ( parts.size() ==2 ){
 	string tag = TiCC::trim( parts[0] );
 	string val = TiCC::trim( parts[1] );
 	TiCC::XmlNewTextChild( result, tag, val );
@@ -1480,8 +1479,8 @@ namespace Timbl {
 	}
 	else {
 	  if ( Buffer[0] == '#'){
-	    vector<string> vals;
-	    if ( TiCC::split_at( Buffer, vals, " " ) == 2  ){
+	    vector<string> vals = TiCC::split_at( Buffer, " " );
+	    if ( vals.size() == 2 ){
 	      WeightType tmp_w = Unknown_w;
 	      if ( !TiCC::stringTo<WeightType>( vals[1], tmp_w ) ){
 		continue;
