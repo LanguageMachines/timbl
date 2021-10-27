@@ -164,7 +164,7 @@ namespace Timbl{
     }
     else {
       wght = UnicodeString( tmp, e_pos+1 );
-      tmp = UnicodeString( tmp, 0, e_pos );
+      tmp.remove( e_pos );
     }
     tmp = TiCC::rtrim( tmp, "\t ." );
     //    cerr << "result='" << tmp << "' with weight: '" << wght << "'" << endl;
@@ -176,12 +176,12 @@ namespace Timbl{
     return extractWeight( Buffer, occ );
   }
 
-  size_t Chopper::countFeatures( const string& inBuffer,
+  size_t Chopper::countFeatures( const UnicodeString& inBuffer,
 				 InputFormatType IF,
 				 int F_length,
 				 bool chopTail ) {
     size_t result = 0;
-    UnicodeString buffer = TiCC::UnicodeFromUTF8( inBuffer );
+    UnicodeString buffer = inBuffer;
     if ( chopTail ){
       UnicodeString dummy;
       buffer = extractWeight( buffer, dummy );
@@ -226,10 +226,10 @@ namespace Timbl{
   }
 
 
-  InputFormatType Chopper::getInputFormat( const string& inBuffer,
+  InputFormatType Chopper::getInputFormat( const UnicodeString& inBuffer,
 					   bool stripTail ) {
     InputFormatType IF = UnknownInputFormat;
-    UnicodeString buffer = TiCC::UnicodeFromUTF8( inBuffer );
+    UnicodeString buffer = inBuffer;
     if ( stripTail ){
       UnicodeString dummy;
       buffer = extractWeight( buffer, dummy );

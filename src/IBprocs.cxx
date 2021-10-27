@@ -188,7 +188,8 @@ namespace Timbl {
     vector<string> splits;
     bool more = ( look_ahead(is) == '#' && getline( is, buffer ) );
     while ( info_ok && more ){
-      size_t num = TiCC::split( buffer, splits );
+      splits = TiCC::split( buffer );
+      size_t num = splits.size();
       if ( num > 2 ){
 	if ( compare_nocase_n( "Status:", splits[1] ) ){
 	  version = 2;

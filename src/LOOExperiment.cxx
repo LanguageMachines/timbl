@@ -125,12 +125,12 @@ namespace Timbl {
       if ( InputFormat() == ARFF ){
 	skipARFFHeader( testStream );
       }
-      string Buffer;
+      UnicodeString Buffer;
       while ( nextLine( testStream, Buffer ) ){
 	if ( !chopLine( Buffer ) ){
 	  Warning( "testfile, skipped line #" +
 		   TiCC::toString<int>( stats.totalLines() ) +
-		   "\n" + Buffer );
+		   "\n" + TiCC::UnicodeToUTF8(Buffer) );
 	}
 	else {
 	  chopped_to_instance( TestWords );

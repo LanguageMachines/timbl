@@ -134,9 +134,9 @@ namespace Timbl {
     virtual bool CVprepare( const std::string& = "",
 			    WeightType = GR_w,
 			    const std::string& = "" );
-    virtual bool Increment( const std::string& )
+    virtual bool Increment( const icu::UnicodeString& )
     { FatalError( "Increment" ); return false; };
-    virtual bool Decrement( const std::string& )
+    virtual bool Decrement( const icu::UnicodeString& )
     { FatalError( "Decrement" ); return false; };
     virtual bool Expand( const std::string& );
     virtual bool Remove( const std::string& ){
@@ -148,7 +148,7 @@ namespace Timbl {
     virtual void InitInstanceBase() = 0;
     virtual bool ReadInstanceBase( const std::string& );
     virtual bool WriteInstanceBase( const std::string& );
-    bool chopLine( const std::string& );
+    bool chopLine( const icu::UnicodeString& );
     bool WriteInstanceBaseXml( const std::string& );
     bool WriteInstanceBaseLevels( const std::string&, unsigned int );
     bool WriteNamesFile( const std::string& ) const;
@@ -208,9 +208,24 @@ namespace Timbl {
       }
       return res;
     }
+    const TargetValue *Classify_u( const icu::UnicodeString& Line,
+				   const ValueDistribution *& db,
+				   double& di ){
+      const TargetValue *res = classifyUnicodeString( Line, di );
+      if ( res ){
+	normalizeResult();
+	db = bestResult.getResultDist();
+      }
+      return res;
+    }
+
     const TargetValue *Classify( const std::string& Line ){
       double dum_d;
       return classifyString( Line, dum_d  );
+    }
+    const TargetValue *Classify_u( const icu::UnicodeString& Line ){
+      double dum_d;
+      return classifyUnicodeString( Line, dum_d  );
     }
 
     const TargetValue *Classify( const std::string& Line,
@@ -223,9 +238,24 @@ namespace Timbl {
       }
       return res;
     }
+    const TargetValue *Classify_u( const icu::UnicodeString& Line,
+				   const ValueDistribution *& db ){
+      double dum_d;
+      const TargetValue *res = classifyUnicodeString( Line, dum_d );
+      if ( res ){
+	normalizeResult();
+	db = bestResult.getResultDist();
+      }
+      return res;
+    }
+
     const TargetValue *Classify( const std::string& Line,
 				 double& di ){
       return classifyString( Line, di );
+    }
+    const TargetValue *Classify_u( const icu::UnicodeString& Line,
+				   double& di ){
+      return classifyUnicodeString( Line, di );
     }
 
     const neighborSet *NB_Classify( const std::string& );
@@ -234,7 +264,7 @@ namespace Timbl {
 
   protected:
     TimblExperiment( const AlgorithmType, const std::string& = "" );
-    virtual bool checkLine( const std::string& );
+    virtual bool checkLine( const icu::UnicodeString& );
     virtual bool ClassicLearn( const std::string& = "", bool = true );
     virtual const TargetValue *LocalClassify( const Instance& ,
 					      double&,
@@ -254,8 +284,8 @@ namespace Timbl {
 		       size_t = 0 );
     void normalizeResult();
     const neighborSet *LocalClassify( const Instance&  );
-    bool nextLine( std::istream &, std::string&, int& );
-    bool nextLine( std::istream &, std::string& );
+    bool nextLine( std::istream &, icu::UnicodeString&, int& );
+    bool nextLine( std::istream &, icu::UnicodeString& );
     bool skipARFFHeader( std::istream & );
 
     void show_progress( std::ostream& os, time_t, unsigned int );
@@ -295,6 +325,8 @@ namespace Timbl {
     int estimate;
     int numOfThreads;
     const TargetValue *classifyString( const std::string& , double& );
+    const TargetValue *classifyUnicodeString( const icu::UnicodeString&,
+					      double& );
   };
 
   class IB1_Experiment: public TimblExperiment {
@@ -302,8 +334,8 @@ namespace Timbl {
     IB1_Experiment( const size_t N = DEFAULT_MAX_FEATS,
 		    const std::string& s= "",
 		    const bool init = true );
-    bool Increment( const std::string& );
-    bool Decrement( const std::string& );
+    bool Increment( const icu::UnicodeString& );
+    bool Decrement( const icu::UnicodeString& );
     bool Remove( const std::string& );
     AlgorithmType Algorithm() const { return IB1_a; };
     void InitInstanceBase();
@@ -314,7 +346,7 @@ namespace Timbl {
       return new IB1_Experiment( MaxFeats(), "", false );
     };
     bool checkTestFile();
-    bool checkLine( const std::string& );
+    bool checkLine( const icu::UnicodeString& );
     bool Increment( const Instance& I ) { return UnHideInstance( I ); };
     bool Decrement( const Instance& I ) { return HideInstance( I ); };
   private:
@@ -393,7 +425,7 @@ namespace Timbl {
     void showTestingInfo( std::ostream& );
     bool checkTestFile();
     AlgorithmType Algorithm() const { return TRIBL_a; };
-    bool checkLine( const std::string& );
+    bool checkLine( const icu::UnicodeString& );
     const TargetValue *LocalClassify( const Instance& ,
 				      double&,
 				      bool& );
@@ -415,7 +447,7 @@ namespace Timbl {
       return new TRIBL2_Experiment( MaxFeats(), "", false ); };
     bool checkTestFile();
     AlgorithmType Algorithm() const { return TRIBL2_a; };
-    bool checkLine( const std::string& );
+    bool checkLine( const icu::UnicodeString& );
     const TargetValue *LocalClassify( const Instance& ,
 				      double&,
 				      bool& );
@@ -447,7 +479,7 @@ namespace Timbl {
     bool ClassicLearn( const std::string& = "", bool = true );
     bool checkTestFile();
     void showTestingInfo( std::ostream& );
-    bool checkLine( const std::string& );
+    bool checkLine( const icu::UnicodeString& );
     bool sanityCheck() const;
     const TargetValue *LocalClassify( const Instance&,
 				      double&,

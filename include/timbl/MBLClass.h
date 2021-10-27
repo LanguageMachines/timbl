@@ -107,9 +107,9 @@ namespace Timbl {
 				       std::vector<FeatureValue *>&,
 				       size_t,	size_t ) const;
     bool setInputFormat( const InputFormatType );
-    size_t countFeatures( const std::string&,
+    size_t countFeatures( const icu::UnicodeString&,
 			  const InputFormatType ) const;
-    InputFormatType getInputFormat( const std::string& ) const;
+    InputFormatType getInputFormat( const icu::UnicodeString& ) const;
     size_t examineData( const std::string& );
     void time_stamp( const char *, int =-1 ) const;
     void TestInstance( const Instance& ,
@@ -288,7 +288,7 @@ namespace Timbl {
     return os;
   }
 
-  bool empty_line( const std::string& , const InputFormatType );
+  bool empty_line( const icu::UnicodeString& , const InputFormatType );
 }
 
 #endif // TIMBL_MBLCLASS_H

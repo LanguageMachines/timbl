@@ -54,9 +54,9 @@ namespace Timbl{
       choppedInput[vSize-1] = tmp;
     }
     static Chopper *create( InputFormatType , bool, int, bool );
-    static InputFormatType getInputFormat( const std::string&,
+    static InputFormatType getInputFormat( const icu::UnicodeString&,
 					   bool=false );
-    static size_t countFeatures( const std::string&,
+    static size_t countFeatures( const icu::UnicodeString&,
 				 InputFormatType,
 				 int,
 				 bool=false );

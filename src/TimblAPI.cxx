@@ -336,12 +336,19 @@ namespace Timbl {
   }
 
 
-  bool TimblAPI::Increment( const string& s ){
-    return Valid() && pimpl->Increment( s );
+  bool TimblAPI::Increment_u( const UnicodeString& us ){
+    return Valid() && pimpl->Increment( us );
   }
 
+  bool TimblAPI::Increment( const string& s ){
+    return Valid() && pimpl->Increment( TiCC::UnicodeFromUTF8(s) );
+  }
+
+  bool TimblAPI::Decrement_u( const UnicodeString& us ){
+    return Valid() && pimpl->Decrement( us );
+  }
   bool TimblAPI::Decrement( const string& s ){
-    return Valid() && pimpl->Decrement( s );
+    return Valid() && pimpl->Decrement( TiCC::UnicodeFromUTF8(s) );
   }
 
   bool TimblAPI::Expand( const string& s ){

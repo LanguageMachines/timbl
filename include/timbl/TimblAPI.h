@@ -70,7 +70,9 @@ namespace Timbl{
 		    Weighting = GR,
 		    const std::string& = "" );
     bool Learn( const std::string& = "" );
+    bool Increment_u( const icu::UnicodeString& );
     bool Increment( const std::string& );
+    bool Decrement_u( const icu::UnicodeString& );
     bool Decrement( const std::string& );
     bool Expand( const std::string& );
     bool Remove( const std::string& );

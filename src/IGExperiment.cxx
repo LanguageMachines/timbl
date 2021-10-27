@@ -132,7 +132,7 @@ namespace Timbl {
 	    Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
 	    time_stamp( "Start:     ", 0 );
 	  }
-	  string Buffer;
+	  UnicodeString Buffer;
 	  IG_InstanceBase *outInstanceBase = 0;
 	  TargetValue *TopTarget = Targets->MajorityClass();
 	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
@@ -190,7 +190,7 @@ namespace Timbl {
 	    Info( "\nPhase 3: Learning from Datafile: " + CurrentDataFile );
 	    time_stamp( "Start:     ", 0 );
 	  }
-	  string Buffer;
+	  UnicodeString Buffer;
 	  IG_InstanceBase *PartInstanceBase = 0;
 	  IG_InstanceBase *outInstanceBase = 0;
 	  TargetValue *TopTarget = Targets->MajorityClass();
@@ -328,7 +328,7 @@ namespace Timbl {
   }
 
 
-  bool IG_Experiment::checkLine( const string& line ){
+  bool IG_Experiment::checkLine( const UnicodeString& line ){
     if ( TimblExperiment::checkLine( line ) ){
       return sanityCheck();
     }

@@ -1187,12 +1187,19 @@ namespace Timbl {
     return &CurrInst;
   }
 
-  bool empty_line( const string& Line, const InputFormatType IF ){
+  bool empty_line( const UnicodeString& Line,
+		   const InputFormatType IF ){
     // determine wether Line is empty or a commentline
-    bool result = ( Line.empty() ||
+    bool result = ( Line.isEmpty() ||
 		    ( IF == ARFF &&  // ARFF "comment"
-		      ( Line[0] == '%' || Line[0] == '@' ) ) ||
-		    ( Line.find_first_not_of( " \t" ) == string::npos ) );
+		      ( Line[0] == '%' || Line[0] == '@' ) ) );
+    if ( result ){
+      for ( int i=0; i < Line.length();++i ){
+	if ( !u_isspace( Line[i] ) ){
+	  return false;
+	}
+      }
+    }
     return result;
   }
 
@@ -1408,8 +1415,8 @@ namespace Timbl {
 	// or:
 	// 13      Ignore
 	//
-	vector<string> vals;
-	if ( TiCC::split( Buffer, vals ) == 2 ){
+	vector<string> vals = TiCC::split( Buffer );
+	if ( vals.size() == 2 ){
 	  size_t i_f = TiCC::stringTo<size_t>( vals[0] );
 	  if ( i_f > num_of_features ){
 	    Error( "in weightsfile, Feature index > Maximum, (" +
@@ -2095,7 +2102,7 @@ namespace Timbl {
     }
   }
 
-  size_t MBLClass::countFeatures( const string& inBuffer,
+  size_t MBLClass::countFeatures( const UnicodeString& inBuffer,
 				  const InputFormatType IF ) const {
     size_t result = 0;
     if ( IF == Sparse  || IF == SparseBin ){
@@ -2116,7 +2123,7 @@ namespace Timbl {
     return result;
   }
 
-  InputFormatType MBLClass::getInputFormat( const string& inBuffer ) const {
+  InputFormatType MBLClass::getInputFormat( const UnicodeString& inBuffer ) const {
     return Chopper::getInputFormat( inBuffer, chopExamples() || chopOcc() );
   }
 
@@ -2133,7 +2140,7 @@ namespace Timbl {
       return 0;
     }
     else {
-      string Buffer;
+      UnicodeString Buffer;
       ifstream datafile( FileName, ios::in);
       if (!datafile) {
 	Warning( "can't open DataFile: " + FileName );
@@ -2145,26 +2152,26 @@ namespace Timbl {
 	  NumF = MaxFeatures;
 	}
 	else {
-	  if ( !getline( datafile, Buffer ) ) {
+	  if ( !TiCC::getline( datafile, Buffer ) ) {
 	    Warning( "empty data file" );
 	  }
 	  else {
 	    bool more = true;
 	    if ( input_format == ARFF ){
-	      while ( !compare_nocase_n( "@DATA", Buffer ) ){
-		if ( !getline( datafile, Buffer ) ){
+	      while ( Buffer.caseCompare( "@DATA", 5 ) ){
+		if ( !TiCC::getline( datafile, Buffer ) ){
 		  Warning( "empty data file" );
 		  more = false;
 		  break;
 		};
 	      }
-	      if ( more && !getline( datafile, Buffer ) ){
+	      if ( more && !TiCC::getline( datafile, Buffer ) ){
 		Warning( "empty data file" );
 		more = false;
 	      };
 	    }
 	    while ( more && empty_line( Buffer, input_format ) ){
-	      if ( !getline( datafile, Buffer ) ){
+	      if ( !TiCC::getline( datafile, Buffer ) ){
 		Warning( "empty data file" );
 		more = false;
 	      };
@@ -2176,23 +2183,23 @@ namespace Timbl {
 	}
 	IF = input_format;
       }
-      else if ( !getline( datafile, Buffer ) ){
+      else if ( !TiCC::getline( datafile, Buffer ) ){
 	Warning( "empty data file: " + FileName );
       }
       // We start by reading the first line so we can figure out the number
       // of Features, and see if the file is comma seperated or not,  etc.
       //
-      else {
+      else{
 	if ( IF == ARFF ){
 	  // Remember, we DON't want to auto-detect ARFF
-	  while ( !compare_nocase_n( "@DATA", Buffer ) ){
-	    if ( !getline( datafile, Buffer ) ) {
+	  while ( Buffer.caseCompare( "@DATA", 5 ) ){
+	    if ( !TiCC::getline( datafile, Buffer ) ) {
 	      Warning( "no ARRF data after comments: " + FileName );
 	      return 0;
 	    }
 	  }
 	  do {
-	    if ( !getline( datafile, Buffer ) ) {
+	    if ( !TiCC::getline( datafile, Buffer ) ) {
 	      Warning( "no ARRF data after comments: " + FileName );
 	      return 0;
 	    }
@@ -2200,14 +2207,14 @@ namespace Timbl {
 	}
 	else {
 	  while ( empty_line( Buffer, input_format ) ) {
-	    if ( !getline( datafile, Buffer ) ) {
+	    if ( !TiCC::getline( datafile, Buffer ) ) {
 	      Warning( "no data after comments: " + FileName );
 	      return 0;
 	    }
 	  }
 	  // We found a useful line!
 	  // Now determine the input_format (if not already known,
-	  // and Count Features as well.
+	// and Count Features as well.
 	}
 	IF = getInputFormat( Buffer );
 	NumF = countFeatures( Buffer, IF );

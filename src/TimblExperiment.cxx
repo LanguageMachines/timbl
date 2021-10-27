@@ -329,18 +329,20 @@ namespace Timbl {
     return true;
   }
 
-  bool TimblExperiment::nextLine( istream& datafile, string& Line ){
+  bool TimblExperiment::nextLine( istream& datafile, UnicodeString& Line ){
     int dummy;
     return nextLine( datafile, Line, dummy );
   }
 
-  bool TimblExperiment::nextLine( istream& datafile, string& Line, int& cnt ){
+  bool TimblExperiment::nextLine( istream& datafile,
+				  UnicodeString& Line,
+				  int& cnt ){
     // Function that takes a line from a file, skipping comment
     // returns true if some line is found
     //
     bool found = false;
     cnt = 0;
-    while ( !found && getline( datafile, Line ) ){
+    while ( !found && TiCC::getline( datafile, Line ) ){
       ++cnt;
       if ( empty_line( Line, InputFormat() ) ){
 	stats.addSkipped();
@@ -353,8 +355,7 @@ namespace Timbl {
     return found;
   }
 
-  bool TimblExperiment::chopLine( const string& Line ){
-    UnicodeString line = TiCC::UnicodeFromUTF8( Line );
+  bool TimblExperiment::chopLine( const UnicodeString& line ){
     if ( !Chop( line ) ){
       stats.addSkipped();
       return false;
@@ -407,7 +408,7 @@ namespace Timbl {
 	    //
 	    ifstream datafile( FileName, ios::in);
 	    stats.clear();
-	    string Buffer;
+	    UnicodeString Buffer;
 	    if ( InputFormat() == ARFF ){
 	      skipARFFHeader( datafile );
 	    }
@@ -443,7 +444,7 @@ namespace Timbl {
 		  if ( !found ){
 		    Warning( "datafile, skipped line #" +
 			     TiCC::toString<int>( stats.totalLines() ) +
-			     "\n" + Buffer );
+			     "\n" + TiCC::UnicodeToUTF8(Buffer) );
 		  }
 		}
 		go_on = found;
@@ -509,7 +510,7 @@ namespace Timbl {
       for ( const auto& sit : fit.second ){
 	datafile.clear();
 	datafile.seekg( sit );
-	string Buffer;
+	UnicodeString Buffer;
 	nextLine( datafile, Buffer );
 	chopLine( Buffer );
 	// Progress update.
@@ -524,7 +525,7 @@ namespace Timbl {
 	//		  cerr << "add instance " << &CurrInst << endl;
 	if ( !outInstanceBase->AddInstance( CurrInst ) ){
 	  Warning( "deviating exemplar weight in:\n" +
-		   Buffer + "\nIgnoring the new weight" );
+		   TiCC::UnicodeToUTF8(Buffer) + "\nIgnoring the new weight" );
 	}
       }
     }
@@ -653,8 +654,7 @@ namespace Timbl {
   /*
     Increment the Instancebase with one instance (IB1 Class only)
   */
-  bool IB1_Experiment::Increment( const string& _inst ){
-    UnicodeString InstanceString = TiCC::UnicodeFromUTF8( _inst );
+  bool IB1_Experiment::Increment( const icu::UnicodeString& InstanceString ){
     bool result = true;
     if ( ExpInvalid() ){
       result = false;
@@ -665,7 +665,8 @@ namespace Timbl {
     }
     else {
       if ( !Chop( InstanceString ) ){
-	Error( "Couldn't convert to Instance: " + _inst );
+	Error( "Couldn't convert to Instance: "
+	       + TiCC::UnicodeToUTF8(InstanceString) );
 	result = false;    // No more input
       }
       else {
@@ -674,7 +675,8 @@ namespace Timbl {
 	bool happy = InstanceBase->AddInstance( CurrInst );
 	if ( !happy ){
 	  Warning( "deviating exemplar weight in:\n" +
-		   _inst + "\nIgnoring the new weight" );
+		   TiCC::UnicodeToUTF8(InstanceString)
+		   + "\nIgnoring the new weight" );
 	}
       }
     }
@@ -684,8 +686,7 @@ namespace Timbl {
   /*
     Decrement the Instancebase with one instance (IB1 Class only)
   */
-  bool IB1_Experiment::Decrement( const string& _inst ){
-    UnicodeString InstanceString = TiCC::UnicodeFromUTF8( _inst );
+  bool IB1_Experiment::Decrement( const UnicodeString& InstanceString ){
     bool result = true;
     if ( ExpInvalid() ){
       result = false;
@@ -696,7 +697,8 @@ namespace Timbl {
     }
     else {
       if ( !Chop( InstanceString ) ){
-	Error( "Couldn't convert to Instance: " + _inst );
+	Error( "Couldn't convert to Instance: "
+	       + TiCC::UnicodeToUTF8(InstanceString) );
 	result = false;    // No more input
       }
       else {
@@ -731,7 +733,7 @@ namespace Timbl {
 	  return false;
 	}
       }
-      string Buffer;
+      UnicodeString Buffer;
       stats.clear();
       // Open the file.
       //
@@ -761,7 +763,8 @@ namespace Timbl {
 	  if ( !happy ){
 	    Warning( "deviating exemplar weight in line #" +
 		     TiCC::toString<int>(stats.totalLines() ) + ":\n" +
-		     Buffer + "\nIgnoring the new weight" );
+		     TiCC::UnicodeToUTF8(Buffer) +
+		     "\nIgnoring the new weight" );
 	  }
 	  // Progress update.
 	  //
@@ -774,7 +777,7 @@ namespace Timbl {
 	    if ( !found ){
 	      Warning( "datafile, skipped line #" +
 		       TiCC::toString<int>( stats.totalLines() ) +
-		       "\n" + Buffer );
+		       "\n" + TiCC::UnicodeToUTF8(Buffer) );
 	    }
 	  }
 	} while( found );
@@ -804,7 +807,7 @@ namespace Timbl {
       result = false;
     }
     else {
-      string Buffer;
+      UnicodeString Buffer;
       stats.clear();
       // Open the file.
       //
@@ -842,7 +845,7 @@ namespace Timbl {
 	    if ( !found ){
 	      Warning( "datafile, skipped line #" +
 		       TiCC::toString<int>( stats.totalLines() ) +
-		       "\n" + Buffer );
+		       "\n" + TiCC::UnicodeToUTF8(Buffer) );
 	    }
 	  }
 	} while( found );
@@ -1166,7 +1169,7 @@ namespace Timbl {
 	}
       }
       if ( result ) {
-	string Buffer;
+	UnicodeString Buffer;
 	stats.clear();
 	// Open the file.
 	//
@@ -1202,7 +1205,8 @@ namespace Timbl {
 	    if ( !happy ){
 	      Warning( "deviating exemplar weight in line #" +
 		       TiCC::toString<int>(stats.totalLines()) + ":\n" +
-		       Buffer + "\nIgnoring the new weight" );
+		       TiCC::UnicodeToUTF8(Buffer)
+		       + "\nIgnoring the new weight" );
 	    }
 	    // Progress update.
 	    //
@@ -1220,7 +1224,7 @@ namespace Timbl {
 		if ( !found ){
 		  Warning( "datafile, skipped line #" +
 			   TiCC::toString<int>( stats.totalLines() ) +
-			   "\n" + Buffer );
+			   "\n" + TiCC::UnicodeToUTF8(Buffer) );
 		}
 	      }
 	      go_on = found;
@@ -1291,7 +1295,7 @@ namespace Timbl {
       else {
 	file_name = FileName;
       }
-      string Buffer;
+      UnicodeString Buffer;
       stats.clear();
       // Open the file.
       //
@@ -1317,7 +1321,7 @@ namespace Timbl {
 	  else if ( !chopLine( Buffer ) ){
 	    Warning( "datafile, skipped line #" +
 		     TiCC::toString<int>( stats.totalLines() ) +
-		     "\n" + Buffer );
+		     "\n" + TiCC::UnicodeToUTF8(Buffer) );
 	  }
 	}
 	if ( result ){
@@ -1348,7 +1352,8 @@ namespace Timbl {
 	      if ( !happy ){
 		Warning( "deviating exemplar weight in line #" +
 			 TiCC::toString<int>(stats.totalLines() ) + ":\n" +
-			 Buffer + "\nIgnoring the new weight" );
+			 TiCC::UnicodeToUTF8(Buffer) +
+			 "\nIgnoring the new weight" );
 	      }
 	      ++Added;
 	      ++TotalAdded;
@@ -1367,7 +1372,7 @@ namespace Timbl {
 	      if ( !found ){
 		Warning( "datafile, skipped line #" +
 			 TiCC::toString<int>( stats.totalLines() ) +
-			 "\n" + Buffer );
+			 "\n" + TiCC::UnicodeToUTF8(Buffer) );
 	      }
 	    }
 	  } while( found );
@@ -1475,7 +1480,7 @@ namespace Timbl {
     return true;
   }
 
-  bool TimblExperiment::checkLine( const string& line ){
+  bool TimblExperiment::checkLine( const UnicodeString& line ){
     bool result = false;
     if ( !ExpInvalid() &&
 	 ConfirmOptions() ) {
@@ -1487,8 +1492,9 @@ namespace Timbl {
       size_t i = countFeatures( line, IF );
       if ( i != NumOfFeatures() ){
 	if ( i > 0 ){
-	  Warning( "mismatch between number of features in testline '" +
-		   line + "' and the Instancebase (" + TiCC::toString<size_t>(i)
+	  Warning( "mismatch between number of features in testline '"
+		   + TiCC::UnicodeToUTF8(line)
+		   + "' and the Instancebase (" + TiCC::toString<size_t>(i)
 		   + " vs. " + TiCC::toString<size_t>(NumOfFeatures()) + ")" );
 	}
       }
@@ -1516,7 +1522,7 @@ namespace Timbl {
   }
 
 
-  bool IB1_Experiment::checkLine( const string& line ){
+  bool IB1_Experiment::checkLine( const UnicodeString& line ){
     if ( !TimblExperiment::checkLine( line ) ){
       return false;
     }
@@ -1533,7 +1539,7 @@ namespace Timbl {
     return true;
   }
 
-  json TimblExperiment::classify_to_JSON( const std::string& inst ) {
+  json TimblExperiment::classify_to_JSON( const string& inst ) {
     json result;
     double distance = 0.0;
     const TargetValue *targ = classifyString( inst, distance );
@@ -1588,7 +1594,6 @@ namespace Timbl {
     return result;
   }
 
-
   bool TimblExperiment::Classify( const string& Line,
 				  string& Result,
 				  string& Dist,
@@ -1608,25 +1613,15 @@ namespace Timbl {
   bool TimblExperiment::Classify( const string& Line,
 				  string& Result,
 				  double& Distance ){
-    Result.clear();
-    const TargetValue *targ = classifyString( Line, Distance );
-    if ( targ ){
-      Result = targ->utf8_name();
-      return true;
-    }
-    return false;
+    string dist;
+    return Classify( Line, Result, dist, Distance );
   }
 
   bool TimblExperiment::Classify( const string& Line,
 				  string& Result ) {
-    Result.clear();
+    string dist;
     double dummy;
-    const TargetValue *targ = classifyString( Line, dummy );
-    if ( targ ){
-      Result = targ->utf8_name();
-      return true;
-    }
-    return false;
+    return Classify( Line, Result, dist, dummy );
   }
 
   void TimblExperiment::testInstance( const Instance& Inst,
@@ -1720,8 +1715,8 @@ namespace Timbl {
     return Res;
   }
 
-  const TargetValue *TimblExperiment::classifyString( const string& Line,
-						      double& Distance ){
+  const TargetValue *TimblExperiment::classifyUnicodeString( const UnicodeString& Line,
+							     double& Distance ){
     Distance = -1.0;
     const TargetValue *BestT = NULL;
     if ( checkLine( Line ) &&
@@ -1733,8 +1728,15 @@ namespace Timbl {
     return BestT;
   }
 
-  const neighborSet *TimblExperiment::NB_Classify( const string& Line ){
+  const TargetValue *TimblExperiment::classifyString( const string& line,
+						      double& distance ){
+    UnicodeString us = TiCC::UnicodeFromUTF8( line );
+    return classifyUnicodeString( us, distance );
+  }
+
+  const neighborSet *TimblExperiment::NB_Classify( const string& _line ){
     initExperiment();
+    UnicodeString Line = TiCC::UnicodeFromUTF8(_line);
     if ( checkLine( Line ) &&
 	 chopLine( Line ) ){
       chopped_to_instance( TestWords );
@@ -1865,7 +1867,7 @@ namespace Timbl {
     bool exec();
     void show( ostream& ) const;
     TimblExperiment *exp;
-    string Buffer;
+    UnicodeString Buffer;
     unsigned int lineNo;
     const TargetValue *resultTarget;
     bool exact;
@@ -1878,13 +1880,13 @@ namespace Timbl {
     resultTarget = 0;
 // #pragma omp critical
 //     cerr << "exec " << lineNo << " '" << Buffer << "'" << endl;
-    if ( Buffer.empty() ){
+    if ( Buffer.isEmpty() ){
       return false;
     }
     if ( !exp->chopLine( Buffer ) ){
       exp->Warning( "testfile, skipped line #" +
 		    TiCC::toString<int>( lineNo ) +
-		    "\n" + Buffer );
+		    "\n" + TiCC::UnicodeToUTF8(Buffer) );
       return false;
     }
     else {
@@ -2039,7 +2041,7 @@ namespace Timbl {
       if ( InputFormat() == ARFF ){
 	skipARFFHeader( testStream );
       }
-      string Buffer;
+      UnicodeString Buffer;
       while ( nextLine( testStream, Buffer ) ){
 	if ( !chopLine( Buffer ) ) {
 	  Warning( "testfile, skipped line #" +
@@ -2105,12 +2107,12 @@ namespace Timbl {
       if ( InputFormat() == ARFF ){
 	skipARFFHeader( testStream );
       }
-      string Buffer;
+      UnicodeString Buffer;
       while ( nextLine( testStream, Buffer ) ){
 	if ( !chopLine( Buffer ) ) {
 	  Warning( "testfile, skipped line #" +
 		   TiCC::toString<int>( stats.totalLines() ) +
-		   "\n" + Buffer );
+		   "\n" + TiCC::UnicodeToUTF8(Buffer) );
 	}
 	else {
 	  chopped_to_instance( TestWords );
@@ -2570,7 +2572,7 @@ namespace Timbl {
   bool TimblExperiment::build_file_index( const string& file_name,
 					  fileIndex& fmIndex ){
     bool result = true;
-    string Buffer;
+    UnicodeString Buffer;
     stats.clear();
     size_t cur_pos = 0;
     // Open the file.
@@ -2620,7 +2622,7 @@ namespace Timbl {
 	  if ( !found ){
 	    Warning( "datafile, skipped line #" +
 		     TiCC::toString<int>( stats.totalLines() ) +
-		     "\n" + Buffer );
+		     "\n" + TiCC::UnicodeToUTF8(Buffer) );
 	  }
 	}
 	go_on = found;
@@ -2633,7 +2635,7 @@ namespace Timbl {
   bool TimblExperiment::build_file_multi_index( const string& file_name,
 						fileDoubleIndex& fmIndex ){
     bool result = true;
-    string Buffer;
+    UnicodeString Buffer;
     stats.clear();
     size_t cur_pos = 0;
     // Open the file.
@@ -2684,7 +2686,8 @@ namespace Timbl {
 	  if ( !found ){
 	    Warning( "datafile, skipped line #" +
 		     TiCC::toString<int>( stats.totalLines() ) +
-		     "\n" + Buffer );
+		     "\n"
+		     + TiCC::UnicodeToUTF8(Buffer) );
 	  }
 	}
 	go_on = found;

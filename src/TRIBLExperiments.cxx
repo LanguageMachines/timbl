@@ -188,7 +188,7 @@ namespace Timbl {
     return Res;
   }
 
-  bool TRIBL_Experiment::checkLine( const string& line ){
+  bool TRIBL_Experiment::checkLine( const UnicodeString& line ){
     if ( !TimblExperiment::checkLine( line ) ){
       return false;
     }
@@ -200,7 +200,7 @@ namespace Timbl {
     return true;
   }
 
-  bool TRIBL2_Experiment::checkLine( const string& line ){
+  bool TRIBL2_Experiment::checkLine( const UnicodeString& line ){
     if ( !TimblExperiment::checkLine( line ) ){
       return false;
     }
