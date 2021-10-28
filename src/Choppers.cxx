@@ -367,15 +367,17 @@ namespace Timbl{
     for ( size_t m = 0; m < vSize-1; ++m ){
       choppedInput[m] = "0";
     }
-    vector<string> parts;
-    TiCC::split_at( TiCC::UnicodeToUTF8(strippedInput), parts, ",", true );
+    vector<UnicodeString> parts = TiCC::split_exact_at( strippedInput, "," );
     for ( auto const& p : parts ){
       if ( &p == &parts.back() ){
-	choppedInput[vSize-1] = TiCC::UnicodeFromUTF8(p);
+	choppedInput[vSize-1] = p;
 	break;
       }
       size_t k;
-      if ( !TiCC::stringTo<size_t>(p, k, 1, vSize ) ){
+      if ( !TiCC::stringTo<size_t>( p, k ) ){
+	return false;
+      }
+      if ( k < 1 || k > vSize ){
 	return false;
       }
       else {
@@ -491,8 +493,8 @@ namespace Timbl{
       choppedInput[m] = DefaultSparseString;
     }
     choppedInput[vSize-1] = "";
-    vector<UnicodeString> entries
-      = TiCC::split_at_first_of( strippedInput, "()" );
+    vector<UnicodeString> entries = TiCC::split_at_first_of( strippedInput,
+							     "()" );
     size_t num_ent = entries.size();
     if ( num_ent < 1 ){
       return false;
