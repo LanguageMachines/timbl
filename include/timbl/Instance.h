@@ -160,8 +160,8 @@ namespace Timbl {
     void incr_val_freq(){ Frequency++; };
     void decr_val_freq(){ Frequency--; };
     size_t Index() const { return index; };
-    const icu::UnicodeString& Name() const { return name; };
-    const std::string utf8_name() const { return TiCC::UnicodeToUTF8(name); };
+    const icu::UnicodeString& name_u() const { return name; };
+    const std::string Name() const { return TiCC::UnicodeToUTF8(name); };
     friend std::ostream& operator<<( std::ostream& os, ValueClass const *vc );
   protected:
     const icu::UnicodeString& name;

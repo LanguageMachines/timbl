@@ -286,13 +286,13 @@ namespace Timbl {
 
   xmlNode *to_node( const FeatureValue *fv ){
     xmlNode *result = TiCC::XmlNewNode( "feature" );
-    TiCC::XmlAddContent( result, TiCC::UnicodeToUTF8(fv->Name()) );
+    TiCC::XmlAddContent( result, fv->Name() );
     return result;
   }
 
   xmlNode *to_node( const TargetValue *tv ){
     xmlNode *result = TiCC::XmlNewNode( "target" );
-    TiCC::XmlAddContent( result, TiCC::UnicodeToUTF8(tv->Name()) );
+    TiCC::XmlAddContent( result, tv->Name() );
     return result;
   }
 
@@ -360,7 +360,7 @@ namespace Timbl {
   UnicodeString VectoString( const vector<FeatureValue*>& vec ){
     UnicodeString result;
     for ( auto const& fv : vec ){
-      result += " " + fv->Name();
+      result += " " + fv->name_u();
     }
     return result;
   }

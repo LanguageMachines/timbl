@@ -197,7 +197,7 @@ namespace Timbl{
 
   inline bool FV_to_real( FeatureValue *FV, double &result ){
     if ( FV ){
-      if ( TiCC::stringTo<double>( FV->utf8_name(), result ) ){
+      if ( TiCC::stringTo<double>( FV->name_u(), result ) ){
 	return true;
       }
     }

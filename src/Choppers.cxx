@@ -393,7 +393,7 @@ namespace Timbl{
 	break;
       }
       if ( chop[0] == '1' ){
-	res += TiCC::UnicodeFromUTF8(TiCC::toString(i)) + ",";
+	res += TiCC::toUnicodeString(i) + ",";
       }
       ++i;
     }
@@ -488,7 +488,7 @@ namespace Timbl{
     // the termination dot is optional
     init( InBuf, len, true );
     for ( size_t m = 0; m < vSize-1; ++m ){
-      choppedInput[m] = DefaultUnicodeSparseString;
+      choppedInput[m] = DefaultSparseString;
     }
     choppedInput[vSize-1] = "";
     vector<UnicodeString> entries
@@ -533,8 +533,8 @@ namespace Timbl{
       if ( &chop == &choppedInput.back() ){
 	break;
       }
-      if ( chop != DefaultUnicodeSparseString ){
-	res += "(" + TiCC::UnicodeFromUTF8(TiCC::toString( i )) + ",";
+      if ( chop != DefaultSparseString ){
+	res += "(" + TiCC::toUnicodeString( i ) + ",";
 	res += CodeToStr(chop);
 	res += ")";
       }

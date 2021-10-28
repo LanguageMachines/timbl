@@ -30,8 +30,7 @@
 
 namespace Timbl{
 
-  static const std::string DefaultSparseString = "0.0000E-17";
-  static const icu::UnicodeString DefaultUnicodeSparseString = "0.0000E-17";
+  static const icu::UnicodeString DefaultSparseString = "0.0000E-17";
 
   class Chopper {
   public:

@@ -1405,8 +1405,7 @@ namespace Timbl {
       size_t freq = fv->ValFreq();
       if ( freq > 0 ){
 	if ( !TiCC::stringTo( fv->Name(), tmp ) ){
-	  Warning( "a Non Numeric value '" +
-		   TiCC::UnicodeToUTF8(fv->Name()) +
+	  Warning( "a Non Numeric value '" + fv->Name() +
 		   "' in Numeric Feature!" );
 	  return NotNumeric;
 	}
@@ -1620,8 +1619,9 @@ namespace Timbl {
 	      return false;
 	    }
 	    name = "";
-	    while( *p && !isspace( *p ) )
+	    while( *p && !isspace( *p ) ){
 	      name += *p++;
+	    }
 	    double value = 0.0;
 	    if ( !TiCC::stringTo<double>( name, value ) ){
 	      Error( "Found illegal value '" + name + "'" );
@@ -1653,12 +1653,12 @@ namespace Timbl {
     else {
       metric_matrix->Clear();
     }
-    string line;
-    while ( getline(is,line) ){
-      if ( line.empty() ){
+    UnicodeString line;
+    while ( TiCC::getline(is,line) ){
+      if ( line.isEmpty() ){
 	break;
       }
-      vector<string> arr = TiCC::split_at( line, " " );
+      vector<UnicodeString> arr = TiCC::split_at( line, " " );
       size_t num = arr.size();
       double d;
       if ( num != 2 ){
@@ -1674,15 +1674,15 @@ namespace Timbl {
 	return false;
       }
       else {
-	string stripped = arr[0].substr(1,arr[0].length()-2);
-	vector<string> parts = TiCC::split_at( stripped, ",\t" );
+	UnicodeString stripped = UnicodeString( arr[0], 1,arr[0].length()-2) ;
+	vector<UnicodeString> parts = TiCC::split_at( stripped, ",\t" );
 	if ( parts.size() != 2 ){
 	  Error( "wrong line in inputfile" );
 	  return false;
 	}
 	else {
-	  FeatureValue *F1 = Lookup(TiCC::UnicodeFromUTF8(parts[0]));
-	  FeatureValue *F2 = Lookup(TiCC::UnicodeFromUTF8(parts[1]));
+	  FeatureValue *F1 = Lookup(parts[0]);
+	  FeatureValue *F2 = Lookup(parts[1]);
 	  metric_matrix->Assign( F1, F2, d );
 	}
       }
