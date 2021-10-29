@@ -1586,15 +1586,10 @@ namespace Timbl {
       if ( buf.length() < 8 ){ // "empty" line separates matrices
 	break;
       }
+      //      cerr << "READ vcb: " << buf << endl;
+      vector<string> parts = TiCC::split( buf );
       if ( first ){
-	p = buf.c_str();
-	while ( *p && isspace(*p) ) ++p; // skip whitespace
-	while ( *p && !isspace(*p) ) ++p; // skip the featurename
-	while ( *p && isspace(*p) ){ // move along counting non space items
-	  p++;   // found something non-space
-	  Num++; // so increment counter
-	  while( *p && !isspace(*p) ) p++; // skip it
-	}
+	Num = parts.size() - 1;
 	first = false;
       }
       p = buf.c_str();  // restart
