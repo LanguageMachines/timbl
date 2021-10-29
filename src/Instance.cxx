@@ -1568,71 +1568,50 @@ namespace Timbl {
   }
 
   bool Feature::read_vc_pb_array( istream &is ){
-    const char*p;
     unsigned int Num = 0;
-    FeatureValue *FV;
     bool first = true;
     // clear all existing arrays
     for ( const auto& it : ValuesArray ){
-      FV = (FeatureValue*)it;
+      FeatureValue *FV = (FeatureValue*)it;
       if ( FV->ValueClassProb ){
 	delete FV->ValueClassProb;
 	FV->ValueClassProb = NULL;
       }
     }
-    string name;
     string buf;
     while ( getline( is, buf ) ){
       if ( buf.length() < 8 ){ // "empty" line separates matrices
 	break;
       }
-      //      cerr << "READ vcb: " << buf << endl;
       vector<string> parts = TiCC::split( buf );
       if ( first ){
 	Num = parts.size() - 1;
 	first = false;
       }
-      p = buf.c_str();  // restart
-      name = "";
-      while ( *p && isspace(*p) ) ++p; // skip whitespace
-      while ( *p && !isspace(*p) ){
-	name += *p++;
-      }
-      FV = Lookup( TiCC::UnicodeFromUTF8(name) );
+      string name = parts[0];
+      FeatureValue *FV = Lookup( TiCC::UnicodeFromUTF8(name) );
       if ( !FV ){
 	Warning( "Unknown FeatureValue '" + name + "' in file, (skipped) " );
 	continue;
       }
       else {
 	FV->ValueClassProb = new SparseValueProbClass( Num );
-	size_t ui = 0;
-	while ( *p && isspace( *p ) ){
-	  while ( *p && isspace(*p) ) ++p; // skip trailing whitespace
-	  if ( *p ){
-	    if ( ui == Num ){
-	      FatalError( "Running out range: " + TiCC::toString<size_t>(ui) );
-	      return false;
-	    }
-	    name = "";
-	    while( *p && !isspace( *p ) ){
-	      name += *p++;
-	    }
-	    double value = 0.0;
-	    if ( !TiCC::stringTo<double>( name, value ) ){
-	      Error( "Found illegal value '" + name + "'" );
-	      return false;
-	    }
-	    else if ( value > Epsilon ) {
-	      FV->ValueClassProb->Assign( ui, value );
-	    }
-	    ui++;
+	for ( size_t i=0; i < Num; ++i ){
+	  string tname = parts[i+1];
+	  double value;
+	  if ( !TiCC::stringTo<double>( tname, value ) ){
+	    Error( "Found illegal value '" + tname + "'" );
+	    return false;
+	  }
+	  else if ( value > Epsilon ) {
+	    FV->ValueClassProb->Assign( i, value );
 	  }
 	}
       }
     }
     // check if we've got all the values, assign a default if not so
     for ( const auto& it : ValuesArray ){
-      FV = (FeatureValue *)it;
+      FeatureValue *FV = (FeatureValue *)it;
       if ( FV->ValueClassProb == NULL ){
 	FV->ValueClassProb = new SparseValueProbClass( Num );
       }
