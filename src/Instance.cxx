@@ -1040,7 +1040,7 @@ namespace Timbl {
     char nextCh;
     is >> nextCh;   // skip {
     if ( nextCh != '{' ){
-      throw string( "missing '{' " );
+      throw runtime_error( "missing '{' in distribution string." );
     }
     else {
       int next;
@@ -1095,7 +1095,7 @@ namespace Timbl {
       }
       else {
 	delete result;
-	throw string( "missing '}' " );
+	throw runtime_error( "missing '}' in distribution string." );
       }
     }
     return result;
@@ -1114,7 +1114,7 @@ namespace Timbl {
     char nextCh;
     is >> nextCh;   // skip {
     if ( nextCh != '{' ){
-      throw string( "missing '{' " );
+      throw runtime_error( "missing '{' in distribution string." );
     }
     else {
       int next;
@@ -1169,7 +1169,7 @@ namespace Timbl {
       }
       else {
 	delete result;
-	throw string( "missing '}' " );
+	throw runtime_error( "missing '}' in distribution string" );
       }
     }
     return result;

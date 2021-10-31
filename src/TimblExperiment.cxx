@@ -303,9 +303,8 @@ namespace Timbl {
 	    calculatePrestored();
 	  }
 	  else {
-	    Error( string("not enough memory for Probability Arrays")
-		   + "' in ("
-		   + __FILE__  + "," + TiCC::toString(__LINE__) + ")\n"
+	    Error( "not enough memory for Probability Arrays in ("
+		   + string(__FILE__)  + "," + TiCC::toString(__LINE__) + ")\n"
 		   + "ABORTING now" );
 	    throw std::bad_alloc();
 	  }
