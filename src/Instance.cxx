@@ -1578,29 +1578,30 @@ namespace Timbl {
 	FV->ValueClassProb = NULL;
       }
     }
-    string buf;
-    while ( getline( is, buf ) ){
+    UnicodeString buf;
+    while ( TiCC::getline( is, buf ) ){
       if ( buf.length() < 8 ){ // "empty" line separates matrices
 	break;
       }
-      vector<string> parts = TiCC::split( buf );
+      vector<UnicodeString> parts = TiCC::split( buf );
       if ( first ){
 	Num = parts.size() - 1;
 	first = false;
       }
-      string name = parts[0];
-      FeatureValue *FV = Lookup( TiCC::UnicodeFromUTF8(name) );
+      UnicodeString name = parts[0];
+      FeatureValue *FV = Lookup( name );
       if ( !FV ){
-	Warning( "Unknown FeatureValue '" + name + "' in file, (skipped) " );
+	Warning( "Unknown FeatureValue '" + TiCC::UnicodeToUTF8(name)
+		 + "' in file, (skipped) " );
 	continue;
       }
       else {
 	FV->ValueClassProb = new SparseValueProbClass( Num );
 	for ( size_t i=0; i < Num; ++i ){
-	  string tname = parts[i+1];
+	  UnicodeString tname = parts[i+1];
 	  double value;
 	  if ( !TiCC::stringTo<double>( tname, value ) ){
-	    Error( "Found illegal value '" + tname + "'" );
+	    Error( "Found illegal value '" + TiCC::UnicodeToUTF8(tname) + "'" );
 	    return false;
 	  }
 	  else if ( value > Epsilon ) {
