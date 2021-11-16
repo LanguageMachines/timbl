@@ -44,6 +44,7 @@ namespace Timbl {
   using namespace Common;
   using namespace nlohmann;
 
+
   BestRec::BestRec():
     bestDistance( 0.0 )
   {}
