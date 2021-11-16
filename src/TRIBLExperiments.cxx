@@ -48,6 +48,7 @@
 
 namespace Timbl {
   using namespace std;
+  using namespace icu;
 
   void TRIBL_Experiment::InitInstanceBase(){
     srand( RandomSeed() );

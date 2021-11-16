@@ -40,6 +40,7 @@
 
 namespace Timbl {
   using namespace std;
+  using namespace icu;
 
   void IG_Experiment::InitInstanceBase(){
     srand( RandomSeed() );

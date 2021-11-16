@@ -41,6 +41,7 @@
 
 namespace Timbl {
   using namespace std;
+  using namespace icu;
 
   void LOO_Experiment::initExperiment( bool all_vd ){
     if ( !ExpInvalid() ){

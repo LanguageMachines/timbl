@@ -55,6 +55,7 @@
 #include "timbl/MBLClass.h"
 
 using namespace std;
+using namespace icu;
 using namespace nlohmann;
 
 namespace Timbl {

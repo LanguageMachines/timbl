@@ -71,6 +71,7 @@
 #endif
 
 using namespace std;
+using namespace icu;
 using namespace nlohmann;
 
 namespace Timbl {

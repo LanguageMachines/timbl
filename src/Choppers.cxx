@@ -37,6 +37,7 @@
 #include "timbl/Choppers.h"
 
 using namespace std;
+using namespace icu;
 
 namespace Timbl{
 

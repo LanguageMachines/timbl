@@ -40,6 +40,7 @@
 
 namespace Timbl {
   using namespace std;
+  using namespace icu;
   using namespace Common;
   using namespace nlohmann;
 

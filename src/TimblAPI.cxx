@@ -39,6 +39,7 @@
 #include "timbl/GetOptClass.h"
 
 using namespace std;
+using namespace icu;
 
 #include "timbl/TimblAPI.h"
 #include "timbl/TimblExperiment.h"
