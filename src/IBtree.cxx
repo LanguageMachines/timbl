@@ -843,7 +843,8 @@ namespace Timbl {
       if ( InstBase ){
 	is >> delim;
 	if ( delim != ')' ){
-	  Error( "missing last `)` in Instance base file, found: " + delim );
+	  Error( "missing last `)` in Instance base file, found: "
+		 + string(1,delim) );
 	}
       }
     }
