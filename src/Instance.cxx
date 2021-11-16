@@ -44,6 +44,7 @@
 #include "timbl/Metrics.h"
 
 using namespace std;
+using namespace icu;
 
 namespace Timbl {
   using namespace Common;
