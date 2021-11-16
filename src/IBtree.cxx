@@ -519,8 +519,8 @@ namespace Timbl {
 	result->TDistribution
 	  = ValueDistribution::read_distribution( is, Targ, false );
       }
-      catch ( const string& what ){
-	Warning( what );
+      catch ( const exception& e ){
+	Warning( e.what() );
 	Error( "problems reading a distribution from InstanceBase file" );
 	delete result;
 	return 0;
@@ -591,8 +591,8 @@ namespace Timbl {
 	result->TDistribution
 	  = ValueDistribution::read_distribution_hashed( is, Targ, false );
       }
-      catch ( const string& what ){
-	Warning( what );
+      catch ( const exception& e ){
+	Warning( e.what() );
 	Error( "problems reading a hashed distribution from InstanceBase file" );
 	delete result;
 	return 0;
@@ -697,8 +697,8 @@ namespace Timbl {
 	  TopDistribution
 	    = ValueDistribution::read_distribution( is, Targs, true );
 	}
-	catch ( const string& what ){
-	  Warning( what );
+	catch ( const exception& e ){
+	  Warning( e.what() );
 	}
       }
       if ( !TopDistribution ){
