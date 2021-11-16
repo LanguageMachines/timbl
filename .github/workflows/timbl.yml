@@ -13,7 +13,7 @@ on:
 jobs:
   notification:
     runs-on: ubuntu-latest
-    name: Notify start to #gitlama
+    name: Notify start to irc-gitlama
     steps:
       - name: IRC notification
         uses: Gottox/irc-message-action@v1
@@ -71,7 +71,7 @@ jobs:
         run: sh bootstrap.sh
       - name: configure
         env:
-          CXX:  ${{ matrix.compiler }}
+          CXX: ${{ matrix.compiler }}
         run: ./configure
       - name: make
         run: make
@@ -79,7 +79,7 @@ jobs:
         run: sudo make install
       - name: make check
         env:
-          CXX:  ${{ matrix.compiler }}
+          CXX: ${{ matrix.compiler }}
         run: LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib make check
         continue-on-error: true
       - name: show log
