@@ -73,6 +73,10 @@ PKG_CHECK_MODULES([ticcutils], [ticcutils >= 0.24] )
 CXXFLAGS="$CXXFLAGS $ticcutils_CFLAGS"
 LIBS="$LIBS $ticcutils_LIBS"
 
+PKG_CHECK_MODULES([ICU], [icu-uc >= 50 icu-io] )
+CXXFLAGS="$CXXFLAGS $ICU_CFLAGS"
+LIBS="$ICU_LIBS $LIBS"
+
 AC_CONFIG_FILES([
   Makefile
   timbl.pc
