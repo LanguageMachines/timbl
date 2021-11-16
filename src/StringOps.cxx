@@ -36,6 +36,8 @@
 #include "unicode/ustream.h"
 
 using namespace std;
+using namespace icu;
+
 namespace Timbl {
 
   UnicodeString StrToCode( const UnicodeString &par, bool trim ){
