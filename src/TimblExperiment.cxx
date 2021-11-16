@@ -2046,7 +2046,7 @@ namespace Timbl {
 	if ( !chopLine( Buffer ) ) {
 	  Warning( "testfile, skipped line #" +
 		   TiCC::toString<int>( stats.totalLines() ) +
-		   "\n" + Buffer.toUTF8() );
+		   "\n" + TiCC::UnicodeToUTF8(Buffer);
 	}
 	else {
 	  chopped_to_instance( TestWords );
