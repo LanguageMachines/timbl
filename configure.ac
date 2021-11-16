@@ -62,6 +62,9 @@ else
     export PKG_CONFIG_PATH="$prefix/lib/pkgconfig:$PKG_CONFIG_PATH"
 fi
 
+AC_OSX_PKG( [icu4c] )
+
+PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([XML2], [libxml-2.0 >= 2.6.16] )
 CXXFLAGS="$CXXFLAGS $XML2_CFLAGS"
 LIBS="$LIBS $XML2_LIBS"
