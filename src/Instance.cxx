@@ -946,12 +946,12 @@ namespace Timbl {
       n_dot_j[j] = 0;
     }
     int i = 0;
-    for ( const auto& it : ValuesArray ){
+    for ( const auto& v_it : ValuesArray ){
       n_i_dot[i] = 0;
-      FeatureValue *fv = (FeatureValue *)it;
-      for ( const auto& tit : fv->TargetDist ){
-	long int fr = tit.second->Freq();
-	n_dot_j[tit.second->Index()-1] += fr;
+      FeatureValue *fv = (FeatureValue *)v_it;
+      for ( const auto& t_it : fv->TargetDist ){
+	long int fr = t_it.second->Freq();
+	n_dot_j[t_it.second->Index()-1] += fr;
 	n_i_dot[i] += fr;
       }
       n_dot_dot += n_i_dot[i];
@@ -959,15 +959,15 @@ namespace Timbl {
     }
     if ( n_dot_dot != 0 ){
       int m = 0;
-      for ( const auto& it : ValuesArray ){
-	FeatureValue *fv = (FeatureValue *)it;
+      for ( const auto& v_it : ValuesArray ){
+	FeatureValue *fv = (FeatureValue *)v_it;
 	size_t n = 0;
-	for ( const auto& it : fv->TargetDist ){
+	for ( const auto& t_it : fv->TargetDist ){
 	  if ( n >= Size ){
 	    break;
 	  }
-	  size_t id = it.second->Index()-1;
-	  long int fr = it.second->Freq();
+	  size_t id = t_it.second->Index()-1;
+	  long int fr = t_it.second->Freq();
 	  while ( n < id ){
 	    double tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
 	      (double)n_dot_dot;

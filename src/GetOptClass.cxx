@@ -32,6 +32,7 @@
 #include <cstring>
 #include <ctime>
 #include <cctype>
+#include <algorithm>
 #include "timbl/Common.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
@@ -84,10 +85,7 @@ namespace Timbl {
       myVerbosity = NO_VERB;   // are not reset!
     }
     target_pos = -1;
-    metricsArray.resize(MaxFeats+1);
-    for ( auto& m : metricsArray ){
-      m = UnknownMetric;
-    }
+    metricsArray.resize(MaxFeats+1, UnknownMetric );
     outPath = "";
     occIn = 0;
   }
@@ -378,10 +376,7 @@ namespace Timbl {
       if ( local_metric == UnknownMetric ){
 	// Ok, so NO defaults at all (API usage for instance)
 	local_metric = Overlap;
-	for ( auto& m : metricsArray ){
-	  m = Overlap;
-	}
-
+	fill( metricsArray.begin(), metricsArray.end(), Overlap );
       }
       optline = "GLOBAL_METRIC: " + TiCC::toString(local_metric);
       Exp->SetOption( optline );
@@ -568,9 +563,7 @@ namespace Timbl {
 	}
 	else {
 	  // set the defaults
-	  for ( auto& mt : metricsArray ){
-	    mt = Def;
-	  }
+	  fill( metricsArray.begin(), metricsArray.end(), Def );
 	  return true;
 	}
       }
@@ -580,9 +573,7 @@ namespace Timbl {
       }
       else {
 	// deviating options expected. reset the array
-	for ( auto& mt : metricsArray ){
-	  mt = UnknownMetric;
-	}
+	fill( metricsArray.begin(), metricsArray.end(), UnknownMetric );
 	++p;
 	MetricType TmpMT;
 	while( p != line.end() ){

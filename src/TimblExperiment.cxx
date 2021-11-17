@@ -543,7 +543,6 @@ namespace Timbl {
   bool TimblExperiment::ClassicLearn( const string& FileName,
 				      bool warnOnSingleTarget ){
     bool result = true;
-    TiCC::Timer learnT;
     if ( is_synced ){
       CurrentDataFile = FileName; // assume magic!
     }
@@ -1920,7 +1919,7 @@ namespace Timbl {
 
   class threadBlock {
   public:
-    threadBlock( TimblExperiment *, int = 1 );
+    explicit threadBlock( TimblExperiment *, int = 1 );
     bool readLines( istream& );
     void finalize();
     vector<threadData> exps;

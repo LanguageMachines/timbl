@@ -453,10 +453,7 @@ namespace Timbl{
   }
 
   UnicodeString Columns_Chopper::getString() const {
-    UnicodeString res;
-    for ( const auto& chop : choppedInput ){
-      res += chop + " ";
-    }
+    UnicodeString res = TiCC::join( choppedInput );
     return res;
   }
 

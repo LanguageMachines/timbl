@@ -453,8 +453,8 @@ namespace Timbl {
 					std::vector<Feature*>& Feats,
 					Target  *Targ,
 					int level ){
-    IBtree *result = NULL, **pnt;
-    pnt = &result;
+    IBtree *result = NULL;
+    IBtree **pnt = &result;
     bool goon = true;
     char delim;
     while ( is && goon ) {
@@ -475,8 +475,8 @@ namespace Timbl {
 					       std::vector<Feature*>& Feats,
 					       Target  *Targ,
 					       int level ){
-    IBtree *result = NULL, **pnt;
-    pnt = &result;
+    IBtree *result = NULL;
+    IBtree **pnt = &result;
     bool goon = true;
     char delim;
     while ( is && goon ) {
