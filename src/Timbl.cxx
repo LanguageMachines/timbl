@@ -23,6 +23,7 @@
       https://github.com/LanguageMachines/timbl/issues
   or send mail to:
       lamasoftware (at ) science.ru.nl
+
 */
 
 #include <exception>
