@@ -30,6 +30,7 @@
 #include <string>
 #include <iostream>
 #include <algorithm> // for sort()
+#include <numeric> // for accumulate()
 #include <iomanip>
 #include <cassert>
 
@@ -803,7 +804,6 @@ namespace Timbl {
   }
 
   void Feature::Statistics( double DBentropy ){
-    double Prob = 0.0;
     size_t TotalVals = TotalValues();
     entropy = 0.0;
     // Loop over the values.
@@ -814,7 +814,7 @@ namespace Timbl {
       if ( Freq > 0 ){
 	double FVEntropy = 0.0;
 	for ( const auto& tit : fv->TargetDist ){
-	  Prob = tit.second->Freq() / (double)Freq;
+	  double Prob = tit.second->Freq() / (double)Freq;
 	  FVEntropy += Prob * Log2(Prob);
 	}
 	entropy += -FVEntropy * Freq / (double)TotalVals;
@@ -833,7 +833,7 @@ namespace Timbl {
     split_info = 0.0;
     for ( const auto& it : ValuesArray ){
       FeatureValue *fv = (FeatureValue*)it;
-      Prob = fv->ValFreq() / (double)TotalVals;
+      double Prob = fv->ValFreq() / (double)TotalVals;
       if ( Prob > 0 ) {
 	split_info += Prob * Log2(Prob);
       }
@@ -1207,21 +1207,16 @@ namespace Timbl {
     ValueClass( value, value_hash ){}
 
   size_t BaseFeatTargClass::EffectiveValues() const {
-    size_t result = 0;
-    for( const auto& it : ValuesArray ){
-      if ( it->ValFreq() > 0 ){
-	++result;
-      }
-    }
-    return result;
+    return count_if( ValuesArray.begin(), ValuesArray.end(),
+		     [&]( const ValueClass* v ){
+		       return (v->ValFreq() > 0); } );
   }
 
   size_t BaseFeatTargClass::TotalValues() const {
-    size_t result = 0;
-    for ( const auto& it : ValuesArray ){
-      result += it->ValFreq();
-    }
-    return result;
+    return accumulate( ValuesArray.begin(), ValuesArray.end(),
+		       0,
+		       [&]( size_t r, const ValueClass *v ){
+			 return r + v->ValFreq(); } );
   }
 
   FeatureValue *Feature::Lookup( const UnicodeString& str ) const {
