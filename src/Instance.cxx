@@ -85,10 +85,11 @@ namespace Timbl {
   }
 
   double ValueDistribution::Confidence( const TargetValue *tv ) const {
-    for ( const auto& it : distribution ){
-      if ( it.second->Value() == tv ){
-	return it.second->Weight();
-      }
+    auto it = find_if( distribution.begin(), distribution.end(),
+		       [tv]( const std::pair<const long unsigned int, Timbl::Vfield*>& v ){
+			 return v.second->Value() == tv ; } );
+    if ( it != distribution.end() ){
+      return it->second->Weight();
     }
     return 0.0;
   }
@@ -210,10 +211,10 @@ namespace Timbl {
   }
 
   void WValueDistribution::Normalize() {
-    double sum = 0.0;
-    for ( const auto& it : distribution ){
-      sum += it.second->Weight();
-    }
+    double sum = accumulate( distribution.begin(), distribution.end(),
+			     0.0,
+			     []( double r, const std::pair<const long unsigned int, Timbl::Vfield*>& v ){
+			       return r + v.second->Weight(); } );
     for ( auto& it : distribution ){
       it.second->SetWeight( it.second->Weight() / sum );
     }
