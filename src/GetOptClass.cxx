@@ -644,11 +644,8 @@ namespace Timbl {
 	  //
 	  // set defaults for those still unset
 	  //
-	  for ( auto& mt : metricsArray ){
-	    if ( mt == UnknownMetric ){
-	      mt = Def;
-	    }
-	  }
+	  replace( metricsArray.begin(), metricsArray.end(),
+		   UnknownMetric, Def );
 	}
       }
       return true;

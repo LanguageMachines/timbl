@@ -2250,9 +2250,7 @@ namespace Timbl {
     json arr = json::array();
     vector<double> wghts;
     GetCurrentWeights( wghts );
-    for ( const auto& d : wghts ){
-      arr.push_back( d );
-    }
+    copy( wghts.begin(), wghts.end(), back_inserter(arr) );
     result["weights"] = arr;
     return result;
   }
