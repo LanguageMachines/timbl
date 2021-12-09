@@ -469,17 +469,31 @@ namespace Timbl {
     return 0;
   }
 
-  bool TimblAPI::Classify( const string& s, string& d ){
-    return Valid() && pimpl->Classify( s, d );
+  bool TimblAPI::Classify( const string& s, string& cls ){
+    return Valid() && pimpl->Classify( s, cls );
   }
 
-  bool TimblAPI::Classify( const string& s, string& d, double &f ) {
-    return Valid() && pimpl->Classify( s, d, f );
+  bool TimblAPI::Classify( const string& s, string& cls, double &f ) {
+    return Valid() && pimpl->Classify( s, cls, f );
   }
 
-  bool TimblAPI::Classify( const string& s, string& d,
-			   string& e, double &f ){
-    return Valid() && pimpl->Classify( s, d, e, f );
+  bool TimblAPI::Classify( const string& s, string& cls,
+			   string& dist, double &f ){
+    return Valid() && pimpl->Classify( s, cls, dist, f );
+  }
+
+  bool TimblAPI::Classify( const string& s, UnicodeString& cls ){
+    return Valid() && pimpl->Classify( s, cls );
+  }
+
+  bool TimblAPI::Classify( const string& s, UnicodeString& cls, double &f ) {
+    return Valid() && pimpl->Classify( s, cls, f );
+  }
+
+  bool TimblAPI::Classify( const string& s,
+			   UnicodeString& cls,
+			   string& dist, double &f ){
+    return Valid() && pimpl->Classify( s, cls, dist, f );
   }
 
   size_t TimblAPI::matchDepth() const {
