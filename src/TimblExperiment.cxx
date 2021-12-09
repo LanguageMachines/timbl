@@ -1610,6 +1610,22 @@ namespace Timbl {
   }
 
   bool TimblExperiment::Classify( const string& Line,
+				  UnicodeString& Result,
+				  string& Dist,
+				  double& Distance ){
+    Result.remove();
+    Dist.clear();
+    const TargetValue *targ = classifyString( Line, Distance );
+    if ( targ ){
+      Result = targ->name_u();
+      normalizeResult();
+      Dist = bestResult.getResult();
+      return true;
+    }
+    return false;
+  }
+
+  bool TimblExperiment::Classify( const string& Line,
 				  string& Result,
 				  double& Distance ){
     string dist;
@@ -1617,7 +1633,21 @@ namespace Timbl {
   }
 
   bool TimblExperiment::Classify( const string& Line,
+				  UnicodeString& Result,
+				  double& Distance ){
+    string dist;
+    return Classify( Line, Result, dist, Distance );
+  }
+
+  bool TimblExperiment::Classify( const string& Line,
 				  string& Result ) {
+    string dist;
+    double dummy;
+    return Classify( Line, Result, dist, dummy );
+  }
+
+  bool TimblExperiment::Classify( const string& Line,
+				  UnicodeString& Result ) {
     string dist;
     double dummy;
     return Classify( Line, Result, dist, dummy );
