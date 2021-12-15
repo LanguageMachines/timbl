@@ -1,3 +1,12 @@
+6.6 2020-12-15
+[Ko vd Sloot]
+* Internally we use NFC normalized UnicodeString's now.
+  Timbl should be robust for UTF8 files, even exotic languages.
+* added some Unicode fuctions to the API
+* bumped library version
+* several code refactorings
+* added the possibility to use the options -f and -i, without -t
+
 6.5 2020-04-15
 [Ko vd Sloot]
 * adapted to the newest TiCC::CommandLine implementation
