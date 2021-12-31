@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2021
+  Copyright (c) 1998 - 2022
   ILK   - Tilburg University
   CLST  - Radboud University
   CLiPS - University of Antwerp
@@ -713,7 +713,7 @@ int main(int argc, char *argv[]){
     // Start.
     //
     cerr << "TiMBL " << TimblAPI::VersionInfo()
-	 << " (c) CLST/ILK/CLIPS 1998 - 2021.\n"
+	 << " (c) CLST/ILK/CLIPS 1998 - 2022.\n"
 	 << "Tilburg Memory Based Learner\n"
 	 << "Centre for Language and Speech Technology, Radboud University\n"
 	 << "Induction of Linguistic Knowledge Research Group, Tilburg University\n"
