@@ -82,3 +82,6 @@ To compile and install manually from source instead, provided you have all the d
     $ ./configure
     $ make
     $ make install
+
+A `Dockerfile` for a container build is also available, specify `--build-arg VERSION=development` if you want the latest
+development version rather than the latest stable release as shipped with Alpine Linux.
