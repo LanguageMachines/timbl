@@ -15,7 +15,7 @@ RUN if [ "$VERSION" = "stable" ]; then \
         apk update && apk add timbl; \
     else \
         echo -e "----------------------------------------------------------\nNOTE: Building development versions from source.\nThis version may be experimental and contains bugs!\nFor production, build with --build-arg VERSION=stable ----------------------------------------------------------\n" &&\
-        apk add build-base autoconf-archive autoconf automake libtool libtar-dev libbz2 bzip2-dev icu-dev libxml2-dev libexttextcat-dev git &&\
+        apk add build-base autoconf-archive autoconf automake libtool libtar-dev libbz2 bzip2-dev icu-dev libxml2-dev git &&\
         cd /usr/src/ &&\
         git clone https://github.com/LanguageMachines/ticcutils && cd ticcutils && sh ./bootstrap.sh && ./configure && make && make install && cd .. &&\
         cd timbl && sh bootstrap.sh && ./configure && make && make install; \
