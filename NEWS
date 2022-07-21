@@ -3,6 +3,7 @@
 * updated metadata (codemeta.json) following new (proposed) CLARIAH requirements (CLARIAH/clariah-plus#38)
 * added builds-deps.sh for automatically building and installing dependencies
 * added Dockerfile and instructions
+* no functional changes
 
 6.6 2020-12-15
 [Ko vd Sloot]
