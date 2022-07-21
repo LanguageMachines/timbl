@@ -61,6 +61,7 @@ Contents of this distribution:
 - Sources
 - Licensing information ( COPYING )
 - Build system based on GNU Autotools
+- Container build file ( Dockerfile )
 - Example data files ( in the demos directory )
 - Documentation ( in the docs directory )
 
@@ -71,10 +72,7 @@ following pakages:
 - pkg-config
 - libxml2-dev
 
-
 To install TiMBL, first consult whether your distribution's package manager has an up-to-date package for TiMBL.
-If not, for easy installation of TiMBL and all dependencies, it is included as part of our software
-distribution **LaMachine**: https://proycon.github.io/LaMachine .
 
 To compile and install manually from source instead, provided you have all the dependencies installed:
 
@@ -83,5 +81,20 @@ To compile and install manually from source instead, provided you have all the d
     $ make
     $ make install
 
+If you want to automatically download and install the latest stable versions of
+the required dependencies, then run `./build-deps.sh` prior to the above. You
+can pass a target directory prefix as first argument and you may need to
+prepend `sudo` to ensure you can install there. The dependencies are:
+
+* [ticcutils](https://github.com/LanguageMachines/ticcutils)
+
 A `Dockerfile` for a container build is also available, specify `--build-arg VERSION=development` if you want the latest
-development version rather than the latest stable release as shipped with Alpine Linux.
+development version instead.
+
+You will still need to take care to install the following 3rd party
+dependencies through your distribution's package manager, as they are not
+provided by our script:
+
+* ``icu`` - A C++ library for Unicode and Globalization support. On Debian/Ubuntu systems, install the package libicu-dev.
+* A sane build environment with a C++ compiler (e.g. gcc 4.9 or above or clang), make, autotools, libtool, pkg-config
+
