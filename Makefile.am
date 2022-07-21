@@ -10,3 +10,12 @@ pkgconfig_DATA = timbl.pc
 
 ChangeLog: NEWS
 	git pull; git2cl > ChangeLog
+
+docker:
+	docker build -t timbl:latest .
+
+docker-dev:
+	docker build -t timbl:dev --build-arg VERSION=development .
+
+deps:
+	./build-deps.sh
