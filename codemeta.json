@@ -1,7 +1,8 @@
 {
     "@context": [
         "https://doi.org/10.5063/schema/codemeta-2.0",
-        "http://schema.org"
+        "http://schema.org",
+        "https://w3id.org/software-types"
     ],
     "@type": "SoftwareSourceCode",
     "identifier": "timbl",
@@ -38,7 +39,8 @@
 					}
 
 				}
-			}
+			},
+            "position": 1
 		},
 		{
 			"@id": "https://orcid.org/0000-0003-2493-656X",
@@ -46,12 +48,14 @@
 			"givenName": "Antal",
 			"familyName": "van den Bosch",
 			"email": "antal.vandenbosch@let.ru.nl",
-			"affiliation": { "@id": "https://cls.ru.nl" }
+			"affiliation": { "@id": "https://cls.ru.nl" },
+            "position": 2
 		},
 		{
 			"@type": "Person",
 			"givenName": "Walter",
-			"familyName": "Daelemans"
+			"familyName": "Daelemans",
+            "position": 3
 		},
 		{
 			"@id": "https://orcid.org/0000-0002-1046-0006",
@@ -59,17 +63,20 @@
 			"givenName": "Maarten",
 			"familyName": "van Gompel",
 			"email": "proycon@anaproy.nl",
-			"affiliation": { "@id": "https://www.ru.nl/clst" }
+			"affiliation": { "@id": "https://knaw.huc.nl" },
+            "position": 4
 		},
 		{
 			"@type": "Person",
 			"givenName": "Ton",
-			"familyName": "Weijters"
+			"familyName": "Weijters",
+            "position": 5
 		},
 		{
 			"@type": "Person",
 			"givenName": "Jakub",
-			"familyName": "Zavrel"
+			"familyName": "Zavrel",
+            "position": 6
 		}
 	],
 	"sourceOrganization": { "@id": "https://www.ru.nl/clst" },
@@ -78,7 +85,7 @@
 		"identifier": "c++",
 		"name": "C++"
 	},
-	"operatingSystem": "POSIX",
+	"operatingSystem": [ "Linux", "BSD", "macOS" ],
 	"codeRepository": "https://github.com/LanguageMachines/timbl",
     "softwareRequirements": [
         {
@@ -96,7 +103,7 @@
 	"issueTracker": "https://github.com/LanguageMachines/timbl/issues",
 	"contIntegration": "https://travis-ci.org/LanguageMachines/timbl",
 	"releaseNotes": "https://github.com/LanguageMachines/timbl/releases",
-	"developmentStatus": "active",
+	"developmentStatus": "https://www.repostatus.org/#active",
 	"keywords":  [ "nlp", "natural language processing", "memory based learning", "machine learning", "knn", "k-nearest neighbours", "decision tree" ],
     "referencePublication": [
 		{
@@ -113,5 +120,21 @@
             "publisher": "Cambridge University Press"
 		}
 	],
-	"dateCreated": "1998"
+	"dateCreated": "1998",
+    "targetProduct": [
+        {
+            "@type": "SoftwareLibrary",
+            "executableName": "libtimbl",
+            "name": "libtimbl",
+            "runtimePlatform": [ "Linux", "BSD", "macOS" ],
+            "description": "Memory-based Learning Library with API for C++"
+        },
+        {
+            "@type": "CommandLineApplication",
+            "executableName": "timbl",
+            "name": "timbl",
+            "runtimePlatform": [ "Linux", "BSD", "macOS" ],
+            "description": "Memory-based learner, command-line tool"
+        }
+    ]
 }
