@@ -675,7 +675,6 @@ namespace Timbl {
   bool InstanceBase_base::read_IB( istream &is,
 				   vector<Feature *>& Feats, Target *Targs,
 				   int expected_version ){
-    string buf;
     NumOfTails = 0;
     DefAss = true;  // always for a restored tree
     DefaultsValid = true; // always for a restored tree
@@ -688,6 +687,7 @@ namespace Timbl {
     else {
       // first we get the value of the TopTarget. It's in the file
       // for backward compability
+      string buf;
       is >> ws >> buf;
       delete TopDistribution;
       TopDistribution = 0;

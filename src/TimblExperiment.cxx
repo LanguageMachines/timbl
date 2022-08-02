@@ -535,7 +535,6 @@ namespace Timbl {
 	return false;
       }
       delete outInstanceBase;
-      outInstanceBase = 0;
     }
     return true;
   }

@@ -509,8 +509,8 @@ bool get_file_names( TiCC::CL_Options& opts ){
 }
 
 bool Default_Output_Names( TiCC::CL_Options& opts ){
-  string value;
   if ( OutputFile == "" && TestFile != "" ){
+    string value;
     string temp = correct_path( TestFile, O_Path, false );
     temp += ".";
     switch ( algorithm ){

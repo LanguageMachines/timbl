@@ -189,17 +189,17 @@ ActionType parse( const string& Buffer, int &pos, string *pars, int &len ){
     return Quit;
   }
   else {
-    string expname;
     string::size_type p = Buf.find( '.' );
     if ( p == string::npos ){
       cerr << "missing experiment reference!" << endl;
       return UnknownAct;
     }
-    else{
-      expname = Buf.substr(0, p );
+    else {
+      string expname = Buf.substr(0, p );
       pos = lookup( expname ); // do we know it.
-      if ( pos == -1 )
+      if ( pos == -1 ){
 	return UnknownAct; // error
+      }
       Buf = Buf.substr( p+1 );
       // A well known experiment, so now we can see what we
       // must do.
@@ -452,4 +452,3 @@ int main(int argc, char *argv[] ){
     one_command( *script_file, line );
   exit(0);
 }
-
