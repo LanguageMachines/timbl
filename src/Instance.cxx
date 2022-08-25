@@ -1395,12 +1395,12 @@ namespace Timbl {
   }
 
   FeatVal_Stat Feature::prepare_numeric_stats(){
-    double tmp;
     bool first = true;
     for ( const auto& it : ValuesArray ){
       FeatureValue *fv = (FeatureValue*)it;
       size_t freq = fv->ValFreq();
       if ( freq > 0 ){
+	double tmp = -1;
 	if ( !TiCC::stringTo( fv->Name(), tmp ) ){
 	  Warning( "a Non Numeric value '" + fv->Name() +
 		   "' in Numeric Feature!" );
