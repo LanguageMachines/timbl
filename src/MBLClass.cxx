@@ -1890,20 +1890,18 @@ namespace Timbl {
 				   InstanceBase_base *IB,
 				   size_t ib_offset ){
     vector<FeatureValue *> CurrentFV(num_of_features);
-    size_t EffFeat = effective_feats - ib_offset;
     const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV,
 							       &Inst.FV,
 							       ib_offset,
 							       effective_feats );
-    tester->init( Inst, effective_feats, ib_offset );
-    ValueDistribution::dist_iterator lastpos;
-    Vfield *Bpnt = NULL;
-    if ( best_distrib ){
-      lastpos = best_distrib->begin();
-      if ( lastpos != best_distrib->end() ){
-	Bpnt = lastpos->second;
-      }
+    if ( !best_distrib ){
+      // no use to do more work then
+      return;
     }
+    tester->init( Inst, effective_feats, ib_offset );
+    auto lastpos = best_distrib->begin();
+    Vfield *Bpnt = lastpos->second;
+    size_t EffFeat = effective_feats - ib_offset;
     size_t CurPos = 0;
     while ( Bpnt ) {
       // call test() with a maximum threshold, to prevent stepping out early

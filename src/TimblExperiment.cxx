@@ -2628,7 +2628,7 @@ namespace Timbl {
 	chopped_to_instance( TrainWords );
 	//	cerr << "gives Instance " << &CurrInst << endl;
 	FeatureValue *fv0 = CurrInst.FV[0];
-	fileIndex::iterator it = fmIndex.find( fv0 );
+	auto const it = fmIndex.find( fv0 );
 	if ( it == fmIndex.end() ){
 	  set<streamsize> st;
 	  st.insert(cur_pos);
@@ -2692,7 +2692,7 @@ namespace Timbl {
 	//	cerr << "gives Instance " << &CurrInst << endl;
 	FeatureValue *fv0 = CurrInst.FV[0];
 	FeatureValue *fv1 = CurrInst.FV[1];
-	fileDoubleIndex::iterator it = fmIndex.find( fv0 );
+	auto const it = fmIndex.find( fv0 );
 	if ( it != fmIndex.end() ){
 	  it->second[fv1].insert( cur_pos );
 	}

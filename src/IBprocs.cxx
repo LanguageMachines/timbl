@@ -107,8 +107,8 @@ namespace Timbl {
       os << "   level | feature |     nodes |  nonterms | terminals |  b-factor | b-factor-n" << endl;
       InstanceBase->summarizeNodes( terminals, nonTerminals );
       unsigned int i = 0;
-      vector<unsigned int>::const_iterator nIt = nonTerminals.begin();
-      vector<unsigned int>::const_iterator tIt = terminals.begin();
+      auto nIt = nonTerminals.begin();
+      auto tIt = terminals.begin();
       while ( nIt != nonTerminals.end() ){
 	endNodes += *tIt;
 	int nodes;

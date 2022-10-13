@@ -225,7 +225,7 @@ namespace Timbl {
       // search for val, if not there: add entry with frequency factor;
       // otherwise increment the ExamplarWeight
       size_t id = val->Index();
-      VDlist::const_iterator it = distribution.find( id );
+      auto const& it = distribution.find( id );
       if ( it != distribution.end() ){
 	it->second->SetWeight( it->second->Weight() + factor );
       }
@@ -393,7 +393,7 @@ namespace Timbl {
     // search for val, if not there: add entry with frequency 'occ';
     // otherwise increment the freqency
     size_t id = val->Index();
-    VDlist::const_iterator it = distribution.find( id );
+    auto const& it = distribution.find( id );
     if ( it != distribution.end() ){
       it->second->IncFreq( occ );
     }
@@ -411,7 +411,7 @@ namespace Timbl {
     // otherwise increment the freqency
     // also set sample weight
     size_t id = val->Index();
-    VDlist::const_iterator it = distribution.find( id );
+    auto const& it = distribution.find( id );
     if ( it != distribution.end() ){
       it->second->IncFreq( occ );
     }
@@ -425,7 +425,7 @@ namespace Timbl {
   void ValueDistribution::DecFreq( const TargetValue *val ){
     // search for val, if not there, just forget
     // otherwise decrement the freqency
-    VDlist::const_iterator it = distribution.find( val->Index() );
+    auto const& it = distribution.find( val->Index() );
     if ( it != distribution.end() ){
       it->second->DecFreq();
       total_items -= 1;
@@ -473,7 +473,7 @@ namespace Timbl {
     // and signal if this ties also!
     const TargetValue *best = NULL;
     tie = false;
-    VDlist::const_iterator It = distribution.begin();
+    auto It = distribution.begin();
     if ( It != distribution.end() ){
       Vfield *pnt = It->second;
       size_t Max = pnt->Freq();
@@ -541,7 +541,7 @@ namespace Timbl {
     // OR (if do_rand) take random one of the most frequents
     // and signal if this ties also!
     const TargetValue *best = NULL;
-    VDlist::const_iterator It = distribution.begin();
+    auto It = distribution.begin();
     tie = false;
     if ( It != distribution.end() ){
       double Max = It->second->Weight();
@@ -1224,7 +1224,7 @@ namespace Timbl {
     FeatureValue *result = NULL;
     unsigned int index = TokenTree->lookup( str );
     if ( index ) {
-      IVCmaptype::const_iterator it = ValuesMap.find( index );
+      auto const& it = ValuesMap.find( index );
       if ( it != ValuesMap.end() ){
 	result = reinterpret_cast<FeatureValue*>(it->second);
       }
@@ -1243,7 +1243,7 @@ namespace Timbl {
   FeatureValue *Feature::add_value( size_t index,
 				    TargetValue *tv,
 				    int freq ){
-    IVCmaptype::const_iterator it = ValuesMap.find( index );
+    auto const& it = ValuesMap.find( index );
     if (  it == ValuesMap.end() ){
       const UnicodeString& value = TokenTree->reverse_lookup( index );
       //      cerr << "lookup(" << index << ") geeft: " << value << endl;
@@ -1349,14 +1349,14 @@ namespace Timbl {
     TargetValue *result = 0;
     size_t index = TokenTree->lookup( str );
     if ( index ) {
-      IVCmaptype::const_iterator it = ValuesMap.find( index );
+      auto const& it = ValuesMap.find( index );
       result = reinterpret_cast<TargetValue*>(it->second);
     }
     return result;
   }
 
   TargetValue *Target::ReverseLookup( size_t index ) const {
-    IVCmaptype::const_iterator it = ValuesMap.find( index );
+    auto const& it = ValuesMap.find( index );
     return reinterpret_cast<TargetValue *>(it->second);
   }
 
@@ -1535,7 +1535,7 @@ namespace Timbl {
       int old_prec = os.precision();
       os.precision(3);
       os.setf( std::ios::fixed );
-      SparseValueProbClass::IDmaptype::const_iterator it = VPC->vc_map.begin();
+      auto it = VPC->vc_map.begin();
       for ( size_t k = 1; k <= VPC->dimension; ++k ){
 	os.setf(std::ios::right, std::ios::adjustfield);
 	if ( it != VPC->vc_map.end() &&
@@ -1709,7 +1709,7 @@ namespace Timbl {
   }
 
   TargetValue *Target::add_value( size_t index, int freq ){
-    IVCmaptype::const_iterator it = ValuesMap.find( index );
+    auto const& it = ValuesMap.find( index );
     if (  it == ValuesMap.end() ){
       const UnicodeString& name = TokenTree->reverse_lookup( index );
       //      cerr << "target lookup(" << index << ") geeft: " << name << endl;

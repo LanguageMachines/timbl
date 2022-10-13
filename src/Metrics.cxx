@@ -170,8 +170,8 @@ namespace Timbl{
     if ( ! ( r && s ) ){
       return 1.0;
     }
-    SparseValueProbClass::IDiterator p1 = r->begin();
-    SparseValueProbClass::IDiterator p2 = s->begin();
+    auto p1 = r->begin();
+    auto p2 = s->begin();
     while( p1 != r->end() &&
 	   p2 != s->end() ){
       if ( p2->first < p1->first ){
@@ -210,8 +210,8 @@ namespace Timbl{
   double jd_distance( SparseValueProbClass *r, SparseValueProbClass *s ){
     double part1 = 0.0;
     double part2 = 0.0;
-    SparseValueProbClass::IDiterator p1 = r->begin();
-    SparseValueProbClass::IDiterator p2 = s->begin();
+    auto p1 = r->begin();
+    auto p2 = s->begin();
     while( p1 != r->end() &&
 	   p2 != s->end() ){
       if ( p2->first < p1->first ){
@@ -252,8 +252,8 @@ namespace Timbl{
   double js_distance( SparseValueProbClass *r, SparseValueProbClass *s ){
     double part1 = 0.0;
     double part2 = 0.0;
-    SparseValueProbClass::IDiterator p1 = r->begin();
-    SparseValueProbClass::IDiterator p2 = s->begin();
+    auto p1 = r->begin();
+    auto p2 = s->begin();
     while( p1 != r->end() &&
 	   p2 != s->end() ){
       if ( p2->first < p1->first ){

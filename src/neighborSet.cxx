@@ -98,10 +98,10 @@ namespace Timbl {
     // reserve enough space to avoid reallocations
     // reallocation invalidates pointers!
     reserve( size() + s.size() );
-    vector<double>::iterator dit1 = distances.begin();
-    vector<double>::const_iterator dit2 = s.distances.begin();
-    vector<ValueDistribution *>::iterator dis1 = distributions.begin();
-    vector<ValueDistribution *>::const_iterator dis2 = s.distributions.begin();
+    auto dit1 = distances.begin();
+    auto dit2 = s.distances.begin();
+    auto dis1 = distributions.begin();
+    auto dis2 = s.distributions.begin();
     while ( dit1 != distances.end() ){
       if ( dit2 != s.distances.end() ){
 	if (fabs(*dit1 - *dit2) < Epsilon) {

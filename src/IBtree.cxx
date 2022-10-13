@@ -1548,7 +1548,7 @@ namespace Timbl {
       if ( fv->isUnknown() ){
 	return 0;
       }
-      FI_map::const_iterator It = fast_index.find( fv->Index() );
+      auto const& It = fast_index.find( fv->Index() );
       if ( It != fast_index.end() ){
 	result = It->second;
       }

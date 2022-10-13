@@ -441,9 +441,8 @@ namespace Timbl {
 					string::iterator& it,
 					MetricType Value ){
     size_t m;
-    string::iterator eit;
     while( it != line.end() && *it != ':' ){
-      eit = it;
+      auto eit = it;
       while( eit != line.end() && isdigit( *eit ) ) ++eit;
       string tmp = string( it, eit );
       size_t k;
@@ -508,7 +507,7 @@ namespace Timbl {
 					  MetricType& Def ){
     string line = TiCC::trim( Mline );
     TiCC::to_upper( line );
-    string::iterator p = line.begin();
+    auto p = line.begin();
     if ( p != line.end() ){
       switch ( *p++ ){
       case 'O' :
