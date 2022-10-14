@@ -459,13 +459,11 @@ namespace Timbl{
   double DotProductMetric::distance( FeatureValue *, FeatureValue *,
 				     size_t, double ) const {
     throw( logic_error( "unimplemented distance() for Dotproduct metric!" ) );
-    return -1.0;
   }
 
   double CosineMetric::distance( FeatureValue *, FeatureValue *,
 				 size_t, double ) const {
     throw( logic_error( "unimplemented distance() for Cosine metric!" ) );
-    return -1.0;
   }
 
 

@@ -201,7 +201,6 @@ namespace Timbl{
       if ( F_length == 0 ){
 	throw runtime_error( "-F Compact specified, but Feature Length not set."
 			     " (-l option)" );
-	return result;
       }
       else {
 	result = (len / F_length) - 1;

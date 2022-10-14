@@ -605,7 +605,7 @@ bool Default_Output_Names( TiCC::CL_Options& opts ){
       PercFile = OutputFile;
       string::size_type pos = PercFile.rfind( '.' );
       if ( pos != string::npos ){
-	PercFile = PercFile.substr( 0, pos );
+	PercFile.resize( pos );
       }
       PercFile += ".%";
     }
@@ -894,7 +894,7 @@ int main(int argc, char *argv[]){
     }
     return EXIT_SUCCESS;
   }
-  catch( softExit& e ){
+  catch( const softExit& e ){
     return EXIT_SUCCESS;
   }
   catch( const std::string& what ){

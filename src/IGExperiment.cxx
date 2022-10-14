@@ -177,7 +177,6 @@ namespace Timbl {
 	      return false;
 	    }
 	    delete outInstanceBase;
-	    outInstanceBase = 0;
 	  }
 	}
       }
