@@ -1207,16 +1207,29 @@ namespace Timbl {
 			    size_t value_hash ):
     ValueClass( value, value_hash ){}
 
-  size_t BaseFeatTargClass::EffectiveValues() const {
+  size_t Target::EffectiveValues() const {
     return count_if( ValuesArray.begin(), ValuesArray.end(),
-		     [&]( const ValueClass* v ){
+		     [&]( const TargetValue* v ){
 		       return (v->ValFreq() > 0); } );
   }
 
-  size_t BaseFeatTargClass::TotalValues() const {
+  size_t Feature::EffectiveValues() const {
+    return count_if( ValuesArray.begin(), ValuesArray.end(),
+		     [&]( const FeatureValue* v ){
+		       return (v->ValFreq() > 0); } );
+  }
+
+  size_t Target::TotalValues() const {
     return accumulate( ValuesArray.begin(), ValuesArray.end(),
 		       0,
-		       [&]( size_t r, const ValueClass *v ){
+		       [&]( size_t r, const TargetValue *v ){
+			 return r + v->ValFreq(); } );
+  }
+
+  size_t Feature::TotalValues() const {
+    return accumulate( ValuesArray.begin(), ValuesArray.end(),
+		       0,
+		       [&]( size_t r, const FeatureValue *v ){
 			 return r + v->ValFreq(); } );
   }
 
@@ -1329,14 +1342,17 @@ namespace Timbl {
 
   BaseFeatTargClass::BaseFeatTargClass( const BaseFeatTargClass& in ):
     MsgClass( in ),
-    ValuesArray( in.ValuesArray ),
-    ValuesMap( in.ValuesMap ),
+    // ValuesArray( in.ValuesArray ),
+    // ValuesMap( in.ValuesMap ),
     TokenTree( in.TokenTree )
   {
     is_copy = true;
   }
 
   BaseFeatTargClass::~BaseFeatTargClass(){
+  }
+
+  Target::~Target() {
     if ( !is_copy ){
       for ( const auto& it : ValuesArray ){
 	delete it;
@@ -1368,7 +1384,11 @@ namespace Timbl {
       }
       delete_matrix();
       delete metric;
+      for ( const auto& it : ValuesArray ){
+	delete it;
+      }
     }
+    ValuesMap.clear();
   }
 
   bool Feature::matrixPresent( bool& isRead ) const {

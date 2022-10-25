@@ -211,17 +211,12 @@ namespace Timbl {
     FeatureValue& operator=( const FeatureValue& ); // inhibit copies
   };
 
-  typedef std::unordered_map< size_t, ValueClass *> IVCmaptype;
-  typedef std::vector<ValueClass *> VCarrtype;
-
   class BaseFeatTargClass: public MsgClass {
   public:
     explicit BaseFeatTargClass( Hash::UnicodeHash * );
     virtual ~BaseFeatTargClass();
-    size_t EffectiveValues() const;
-    size_t TotalValues() const;
-    VCarrtype ValuesArray;
-    IVCmaptype ValuesMap;
+    virtual size_t EffectiveValues() const = 0;
+    virtual size_t TotalValues() const = 0;
     virtual ValueClass *Lookup( const icu::UnicodeString& ) const = 0;
   protected:
     Hash::UnicodeHash *TokenTree;
@@ -232,19 +227,30 @@ namespace Timbl {
   };
 
 
+  typedef std::unordered_map< size_t, TargetValue *> ITVCmaptype;
+  typedef std::vector<TargetValue *> TVCarrtype;
+
   class Target: public BaseFeatTargClass {
   public:
     explicit Target( Hash::UnicodeHash *T ): BaseFeatTargClass(T) {};
+    ~Target();
     TargetValue *add_value( const icu::UnicodeString&, int freq = 1 );
     TargetValue *add_value( size_t, int freq = 1 );
-    TargetValue *Lookup( const icu::UnicodeString& ) const;
+    TargetValue *Lookup( const icu::UnicodeString& ) const override;
     TargetValue *ReverseLookup( size_t ) const;
     bool decrement_value( TargetValue * );
     bool increment_value( TargetValue * );
     TargetValue *MajorityClass() const;
+    size_t EffectiveValues() const override;
+    size_t TotalValues() const override;
+    ITVCmaptype ValuesMap;
+    TVCarrtype ValuesArray;
   };
 
   class metricClass;
+
+  typedef std::unordered_map< size_t, FeatureValue *> IFVCmaptype;
+  typedef std::vector<FeatureValue *> FVCarrtype;
 
   class Feature: public BaseFeatTargClass {
     friend class MBLClass;
@@ -276,9 +282,11 @@ namespace Timbl {
     double fvDistance( FeatureValue *, FeatureValue *, size_t=1 ) const;
     FeatureValue *add_value( const icu::UnicodeString&, TargetValue *, int=1 );
     FeatureValue *add_value( size_t, TargetValue *, int=1 );
-    FeatureValue *Lookup( const icu::UnicodeString& ) const ;
+    FeatureValue *Lookup( const icu::UnicodeString& ) const override;
     bool decrement_value( FeatureValue *, TargetValue * );
     bool increment_value( FeatureValue *, TargetValue * );
+    size_t EffectiveValues() const override;
+    size_t TotalValues() const override;
     bool isNumerical() const;
     bool isStorableMetric() const;
     bool AllocSparseArrays( size_t );
@@ -298,7 +306,9 @@ namespace Timbl {
     void ClipFreq( size_t f ){ matrix_clip_freq = f; };
     size_t ClipFreq() const { return matrix_clip_freq; };
     SparseSymetricMatrix<ValueClass *> *metric_matrix;
- private:
+    IFVCmaptype ValuesMap;
+    FVCarrtype ValuesArray;
+  private:
     metricClass *metric;
     bool ignore;
     bool numeric;
