@@ -653,6 +653,8 @@ namespace Timbl {
       SaveSize = in.SaveSize;
       SaveNum = in.SaveNum;
       weight = in.weight;
+      ValuesArray = in.ValuesArray;
+      ValuesMap = in.ValuesMap;
     }
     return *this;
   }
