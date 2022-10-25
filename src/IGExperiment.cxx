@@ -200,8 +200,9 @@ namespace Timbl {
 	  ifstream datafile( CurrentDataFile, ios::in);
 	  //
 	  for ( const auto& dit : fmIndex ){
-	    //	    FeatureValue *the_fv = (FeatureValue*)(dit.first);
-	    //	  cerr << "handle feature '" << the_fv << "' met index " << the_fv->Index() << endl;
+	    //	    FeatureValue *the_fv = dit.first;
+	    //	  cerr << "handle feature '" << the_fv << "' met index "
+	    //         << the_fv->Index() << endl;
 	    if ( dit.second.size() < 1 ){
 	      FatalError( "panic" );
 	    }

@@ -663,8 +663,7 @@ namespace Timbl {
     if ( !is_copy ){
       // Loop over all values.
       //
-      for ( const auto& it : ValuesArray ){
-	FeatureValue *FV = (FeatureValue*)it;
+      for ( const auto& FV : ValuesArray ){
 	size_t freq = FV->ValFreq();
 	FV->ValueClassProb->Clear();
 	if ( freq > 0 ){
@@ -703,8 +702,7 @@ namespace Timbl {
     entropy = 0.0;
     vector<D_D*> ddv;
     ddv.reserve( ValuesArray.size() );
-    for ( const auto& it : ValuesArray ){
-      FeatureValue *FV = (FeatureValue*)it;
+    for ( const auto& FV : ValuesArray ){
       if ( FV->ValFreq() > 0 ){
 	ddv.push_back( new D_D( FV ) );
       }
@@ -810,8 +808,7 @@ namespace Timbl {
     size_t TotalVals = TotalValues();
     entropy = 0.0;
     // Loop over the values.
-    for ( const auto& it : ValuesArray ){
-      FeatureValue *fv = (FeatureValue*)it;
+    for ( const auto& fv : ValuesArray ){
       // Entropy for this FV pair.
       size_t Freq = fv->ValFreq();
       if ( Freq > 0 ){
@@ -834,8 +831,7 @@ namespace Timbl {
     // And the split. info.
     //
     split_info = 0.0;
-    for ( const auto& it : ValuesArray ){
-      FeatureValue *fv = (FeatureValue*)it;
+    for ( const auto& fv : ValuesArray ){
       double Prob = fv->ValFreq() / (double)TotalVals;
       if ( Prob > 0 ) {
 	split_info += Prob * Log2(Prob);
@@ -949,9 +945,8 @@ namespace Timbl {
       n_dot_j[j] = 0;
     }
     int i = 0;
-    for ( const auto& v_it : ValuesArray ){
+    for ( const auto& fv : ValuesArray ){
       n_i_dot[i] = 0;
-      FeatureValue *fv = (FeatureValue *)v_it;
       for ( const auto& t_it : fv->TargetDist ){
 	long int fr = t_it.second->Freq();
 	n_dot_j[t_it.second->Index()-1] += fr;
@@ -962,8 +957,7 @@ namespace Timbl {
     }
     if ( n_dot_dot != 0 ){
       int m = 0;
-      for ( const auto& v_it : ValuesArray ){
-	FeatureValue *fv = (FeatureValue *)v_it;
+      for ( const auto& fv : ValuesArray ){
 	size_t n = 0;
 	for ( const auto& t_it : fv->TargetDist ){
 	  if ( n >= Size ){
@@ -1307,8 +1301,7 @@ namespace Timbl {
   bool Feature::AllocSparseArrays( size_t Dim ){
     // Loop over all values.
     //
-    for ( const auto& it : ValuesArray ){
-      FeatureValue *FV = (FeatureValue*)it;
+    for ( const auto& FV : ValuesArray ){
       // Loop over all classes.
       if ( FV->ValueClassProb == NULL ){
 	if ( !(FV->ValueClassProb = new SparseValueProbClass( Dim )) ){
@@ -1418,8 +1411,7 @@ namespace Timbl {
 
   FeatVal_Stat Feature::prepare_numeric_stats(){
     bool first = true;
-    for ( const auto& it : ValuesArray ){
-      FeatureValue *fv = (FeatureValue*)it;
+    for ( const auto& fv : ValuesArray ){
       size_t freq = fv->ValFreq();
       if ( freq > 0 ){
 	double tmp = -1;
@@ -1578,8 +1570,7 @@ namespace Timbl {
   }
 
   void Feature::print_vc_pb_array( ostream &os ) const {
-    for ( const auto& it : ValuesArray ){
-      FeatureValue *FV = (FeatureValue*)it;
+    for ( const auto& FV : ValuesArray ){
       if ( FV->ValueClassProb ){
 	os << FV << FV->ValueClassProb << endl;
       }
@@ -1590,8 +1581,7 @@ namespace Timbl {
     unsigned int Num = 0;
     bool first = true;
     // clear all existing arrays
-    for ( const auto& it : ValuesArray ){
-      FeatureValue *FV = (FeatureValue*)it;
+    for ( const auto& FV : ValuesArray ){
       if ( FV->ValueClassProb ){
 	delete FV->ValueClassProb;
 	FV->ValueClassProb = NULL;
@@ -1630,8 +1620,7 @@ namespace Timbl {
       }
     }
     // check if we've got all the values, assign a default if not so
-    for ( const auto& it : ValuesArray ){
-      FeatureValue *FV = (FeatureValue *)it;
+    for ( const auto& FV : ValuesArray ){
       if ( FV->ValueClassProb == NULL ){
 	FV->ValueClassProb = new SparseValueProbClass( Num );
       }
@@ -1693,16 +1682,14 @@ namespace Timbl {
     ios::fmtflags old_flags = os.flags();
     os.unsetf(std::ios_base::floatfield);
     if ( full ){
-      for ( const auto& it1 : ValuesArray ){
-	FeatureValue *FV_i = (FeatureValue *)it1;
+      for ( const auto& FV_i : ValuesArray ){
 	os.width(6);
 	os.setf(ios::left, ios::adjustfield);
 	os << FV_i << ":";
 	os.width(12);
 	os.precision(3);
 	os.setf(ios::right, ios::adjustfield);
-	for ( const auto& it2 : ValuesArray ){
-	  FeatureValue *FV_j = (FeatureValue *)it2;
+	for ( const auto& FV_j : ValuesArray ){
 	  os.width(12);
 	  os.precision(3);
 	  os.setf(ios::right,ios::adjustfield );
