@@ -221,7 +221,7 @@ namespace Timbl {
   }
 
   void WValueDistribution::Normalize_1( double factor, const Target *targ ) {
-    for ( const auto& val : targ->ValuesArray ){
+    for ( const auto& val : targ->values_array ){
       // search for val, if not there: add entry with frequency factor;
       // otherwise increment the ExamplarWeight
       size_t id = val->Index();
@@ -233,7 +233,7 @@ namespace Timbl {
 	distribution[id] = new Vfield( val, 1, factor );
       }
     }
-    total_items += targ->ValuesArray.size();
+    total_items += targ->values_array.size();
     Normalize();
   }
 
@@ -621,11 +621,13 @@ namespace Timbl {
     n_max (0.0),
     SaveSize(0),
     SaveNum(0),
-    weight(0.0)
+    weight(0.0),
+    is_reference(false)
   {}
 
   Feature::Feature( const Feature& in ): BaseFeatTargClass( in ){
     *this = in;
+    is_reference = true;
   }
 
   Feature& Feature::operator=( const Feature& in ){
@@ -652,17 +654,17 @@ namespace Timbl {
       SaveSize = in.SaveSize;
       SaveNum = in.SaveNum;
       weight = in.weight;
-      ValuesArray = in.ValuesArray;
-      ValuesMap = in.ValuesMap;
+      values_array = in.values_array;
+      reverse_values = in.reverse_values;
     }
     return *this;
   }
 
   void Feature::InitSparseArrays(){
-    if ( !is_copy ){
+    if ( !is_reference ){
       // Loop over all values.
       //
-      for ( const auto& FV : ValuesArray ){
+      for ( const auto& FV : values_array ){
 	size_t freq = FV->ValFreq();
 	FV->ValueClassProb->Clear();
 	if ( freq > 0 ){
@@ -700,8 +702,8 @@ namespace Timbl {
     size_t TotalVals = TotalValues();
     entropy = 0.0;
     vector<D_D*> ddv;
-    ddv.reserve( ValuesArray.size() );
-    for ( const auto& FV : ValuesArray ){
+    ddv.reserve( values_array.size() );
+    for ( const auto& FV : values_array ){
       if ( FV->ValFreq() > 0 ){
 	ddv.push_back( new D_D( FV ) );
       }
@@ -807,7 +809,7 @@ namespace Timbl {
     size_t TotalVals = TotalValues();
     entropy = 0.0;
     // Loop over the values.
-    for ( const auto& fv : ValuesArray ){
+    for ( const auto& fv : values_array ){
       // Entropy for this FV pair.
       size_t Freq = fv->ValFreq();
       if ( Freq > 0 ){
@@ -830,7 +832,7 @@ namespace Timbl {
     // And the split. info.
     //
     split_info = 0.0;
-    for ( const auto& fv : ValuesArray ){
+    for ( const auto& fv : values_array ){
       double Prob = fv->ValFreq() / (double)TotalVals;
       if ( Prob > 0 ) {
 	split_info += Prob * Log2(Prob);
@@ -852,7 +854,7 @@ namespace Timbl {
 				     Target *Targets ){
     chi_square = 0.0;
     long int n_dot_dot = 0;
-    size_t Size = Targets->ValuesArray.size();
+    size_t Size = Targets->values_array.size();
     if ( !n_dot_j ) {
       n_dot_j = new long int[Size];
       n_i_dot = new long int[Num_Vals];
@@ -920,8 +922,8 @@ namespace Timbl {
   void Feature::ChiSquareStatistics( Target *Targets ){
     chi_square = 0.0;
     long int n_dot_dot = 0;
-    size_t Size = Targets->ValuesArray.size();
-    size_t Num_Vals = ValuesArray.size();
+    size_t Size = Targets->values_array.size();
+    size_t Num_Vals = values_array.size();
     if ( !n_dot_j ) {
       n_dot_j = new long int[Size];
       n_i_dot = new long int[Num_Vals];
@@ -944,7 +946,7 @@ namespace Timbl {
       n_dot_j[j] = 0;
     }
     int i = 0;
-    for ( const auto& fv : ValuesArray ){
+    for ( const auto& fv : values_array ){
       n_i_dot[i] = 0;
       for ( const auto& t_it : fv->TargetDist ){
 	long int fr = t_it.second->Freq();
@@ -956,7 +958,7 @@ namespace Timbl {
     }
     if ( n_dot_dot != 0 ){
       int m = 0;
-      for ( const auto& fv : ValuesArray ){
+      for ( const auto& fv : values_array ){
 	size_t n = 0;
 	for ( const auto& t_it : fv->TargetDist ){
 	  if ( n >= Size ){
@@ -1203,26 +1205,26 @@ namespace Timbl {
     ValueClass( value, value_hash ){}
 
   size_t Target::EffectiveValues() const {
-    return count_if( ValuesArray.begin(), ValuesArray.end(),
+    return count_if( values_array.begin(), values_array.end(),
 		     [&]( const TargetValue* v ){
 		       return (v->ValFreq() > 0); } );
   }
 
   size_t Feature::EffectiveValues() const {
-    return count_if( ValuesArray.begin(), ValuesArray.end(),
+    return count_if( values_array.begin(), values_array.end(),
 		     [&]( const FeatureValue* v ){
 		       return (v->ValFreq() > 0); } );
   }
 
   size_t Target::TotalValues() const {
-    return accumulate( ValuesArray.begin(), ValuesArray.end(),
+    return accumulate( values_array.begin(), values_array.end(),
 		       0,
 		       [&]( size_t r, const TargetValue *v ){
 			 return r + v->ValFreq(); } );
   }
 
   size_t Feature::TotalValues() const {
-    return accumulate( ValuesArray.begin(), ValuesArray.end(),
+    return accumulate( values_array.begin(), values_array.end(),
 		       0,
 		       [&]( size_t r, const FeatureValue *v ){
 			 return r + v->ValFreq(); } );
@@ -1232,8 +1234,8 @@ namespace Timbl {
     FeatureValue *result = NULL;
     unsigned int index = TokenTree->lookup( str );
     if ( index ) {
-      auto const& it = ValuesMap.find( index );
-      if ( it != ValuesMap.end() ){
+      auto const& it = reverse_values.find( index );
+      if ( it != reverse_values.end() ){
 	result = it->second;
       }
     }
@@ -1251,21 +1253,21 @@ namespace Timbl {
   FeatureValue *Feature::add_value( size_t index,
 				    TargetValue *tv,
 				    int freq ){
-    auto const& it = ValuesMap.find( index );
-    if (  it == ValuesMap.end() ){
+    auto const& it = reverse_values.find( index );
+    if (  it == reverse_values.end() ){
       const UnicodeString& value = TokenTree->reverse_lookup( index );
       //      cerr << "lookup(" << index << ") geeft: " << value << endl;
       // we want to store the singleton value for this index
       // so we MUST reverse lookup the index
       FeatureValue *fv = new FeatureValue( value, index );
       fv->ValFreq( freq );
-      ValuesMap[index] = fv;
-      ValuesArray.push_back( fv );
+      reverse_values[index] = fv;
+      values_array.push_back( fv );
     }
     else {
       it->second->IncValFreq( freq );
     }
-    FeatureValue *result = ValuesMap[index];
+    FeatureValue *result = reverse_values[index];
     if ( tv ){
       result->TargetDist.IncFreq(tv, freq );
     }
@@ -1300,7 +1302,7 @@ namespace Timbl {
   bool Feature::AllocSparseArrays( size_t Dim ){
     // Loop over all values.
     //
-    for ( const auto& FV : ValuesArray ){
+    for ( const auto& FV : values_array ){
       // Loop over all classes.
       if ( FV->ValueClassProb == NULL ){
 	if ( !(FV->ValueClassProb = new SparseValueProbClass( Dim )) ){
@@ -1330,59 +1332,52 @@ namespace Timbl {
   }
 
   BaseFeatTargClass::BaseFeatTargClass( Hash::UnicodeHash *T ):
-    TokenTree( T ),
-    is_copy(false){
-  }
+    TokenTree( T )
+  {}
 
   BaseFeatTargClass::BaseFeatTargClass( const BaseFeatTargClass& in ):
     MsgClass( in ),
-    // ValuesArray( in.ValuesArray ),
-    // ValuesMap( in.ValuesMap ),
     TokenTree( in.TokenTree )
-  {
-    is_copy = true;
-  }
+  {}
 
   BaseFeatTargClass::~BaseFeatTargClass(){
   }
 
   Target::~Target() {
-    if ( !is_copy ){
-      for ( const auto& it : ValuesArray ){
-	delete it;
-      }
+    for ( const auto& it : values_array ){
+      delete it;
     }
-    ValuesMap.clear();
+    reverse_values.clear();
   }
 
   TargetValue *Target::Lookup( const UnicodeString& str ) const {
     TargetValue *result = 0;
     size_t index = TokenTree->lookup( str );
     if ( index ) {
-      auto const& it = ValuesMap.find( index );
+      auto const& it = reverse_values.find( index );
       result = it->second;
     }
     return result;
   }
 
   TargetValue *Target::ReverseLookup( size_t index ) const {
-    auto const& it = ValuesMap.find( index );
+    auto const& it = reverse_values.find( index );
     return it->second;
   }
 
   Feature::~Feature(){
-    if ( !is_copy ){
+    if ( !is_reference ){
       if ( n_dot_j ) {
 	delete [] n_dot_j;
 	delete [] n_i_dot;
       }
       delete_matrix();
       delete metric;
-      for ( const auto& it : ValuesArray ){
+      for ( const auto& it : values_array ){
 	delete it;
       }
     }
-    ValuesMap.clear();
+    reverse_values.clear();
   }
 
   bool Feature::matrixPresent( bool& isRead ) const {
@@ -1410,7 +1405,7 @@ namespace Timbl {
 
   FeatVal_Stat Feature::prepare_numeric_stats(){
     bool first = true;
-    for ( const auto& fv : ValuesArray ){
+    for ( const auto& fv : values_array ){
       size_t freq = fv->ValFreq();
       if ( freq > 0 ){
 	double tmp = -1;
@@ -1457,19 +1452,19 @@ namespace Timbl {
 
   void Feature::StandardDeviationStatistics( ){
     double sum = 0.0;
-    vector<double> store( ValuesArray.size() );
-    for ( unsigned int i=0; i < ValuesArray.size(); ++i ){
-      FeatureValue *FV = ValuesArray[i];
+    vector<double> store( values_array.size() );
+    for ( unsigned int i=0; i < values_array.size(); ++i ){
+      FeatureValue *FV = values_array[i];
       double val = TiCC::stringTo<double>( FV->Name() );
       store[i] = val;
       sum += val;
     }
     double total = 0.0;
-    for ( unsigned int i=0; i < ValuesArray.size(); ++i ){
+    for ( unsigned int i=0; i < values_array.size(); ++i ){
       double diff = sum - store[i];
       total += diff*diff;
     }
-    standard_deviation = sqrt( total / ValuesArray.size() );
+    standard_deviation = sqrt( total / values_array.size() );
   }
 
   void Feature::clear_matrix(){
@@ -1515,8 +1510,8 @@ namespace Timbl {
     }
     if ( PrestoreStatus != ps_failed && metric->isStorable( ) ) {
       try {
-	for ( const auto& FV_i : ValuesArray ){
-	  for ( const auto& FV_j : ValuesArray ){
+	for ( const auto& FV_i : values_array ){
+	  for ( const auto& FV_j : values_array ){
 	    if ( FV_i->ValFreq() >= matrix_clip_freq &&
 		 FV_j->ValFreq() >= matrix_clip_freq &&
 		 ( Prestored_metric != metric->type() ||
@@ -1566,7 +1561,7 @@ namespace Timbl {
   }
 
   void Feature::print_vc_pb_array( ostream &os ) const {
-    for ( const auto& FV : ValuesArray ){
+    for ( const auto& FV : values_array ){
       if ( FV->ValueClassProb ){
 	os << FV << FV->ValueClassProb << endl;
       }
@@ -1577,7 +1572,7 @@ namespace Timbl {
     unsigned int Num = 0;
     bool first = true;
     // clear all existing arrays
-    for ( const auto& FV : ValuesArray ){
+    for ( const auto& FV : values_array ){
       if ( FV->ValueClassProb ){
 	delete FV->ValueClassProb;
 	FV->ValueClassProb = NULL;
@@ -1616,7 +1611,7 @@ namespace Timbl {
       }
     }
     // check if we've got all the values, assign a default if not so
-    for ( const auto& FV : ValuesArray ){
+    for ( const auto& FV : values_array ){
       if ( FV->ValueClassProb == NULL ){
 	FV->ValueClassProb = new SparseValueProbClass( Num );
       }
@@ -1678,14 +1673,14 @@ namespace Timbl {
     ios::fmtflags old_flags = os.flags();
     os.unsetf(std::ios_base::floatfield);
     if ( full ){
-      for ( const auto& FV_i : ValuesArray ){
+      for ( const auto& FV_i : values_array ){
 	os.width(6);
 	os.setf(ios::left, ios::adjustfield);
 	os << FV_i << ":";
 	os.width(12);
 	os.precision(3);
 	os.setf(ios::right, ios::adjustfield);
-	for ( const auto& FV_j : ValuesArray ){
+	for ( const auto& FV_j : values_array ){
 	  os.width(12);
 	  os.precision(3);
 	  os.setf(ios::right,ios::adjustfield );
@@ -1714,27 +1709,27 @@ namespace Timbl {
   }
 
   TargetValue *Target::add_value( size_t index, int freq ){
-    auto const& it = ValuesMap.find( index );
-    if (  it == ValuesMap.end() ){
+    auto const& it = reverse_values.find( index );
+    if (  it == reverse_values.end() ){
       const UnicodeString& name = TokenTree->reverse_lookup( index );
       //      cerr << "target lookup(" << index << ") geeft: " << name << endl;
       // we want to store the singleton value for this index
       // so we MUST reverse lookup the index
       TargetValue *tv = new TargetValue( name, index );
       tv->ValFreq( freq );
-      ValuesMap[index] = tv;
-      ValuesArray.push_back( tv );
+      reverse_values[index] = tv;
+      values_array.push_back( tv );
     }
     else {
       it->second->IncValFreq( freq );
     }
-    return ValuesMap[index];
+    return reverse_values[index];
   }
 
   TargetValue *Target::MajorityClass() const {
     TargetValue *result = 0;
     size_t freq = 0;
-    for ( const auto& it : ValuesArray ){
+    for ( const auto& it : values_array ){
       if ( it->ValFreq() > freq ){
 	result = it;
 	freq = result->ValFreq();

@@ -220,15 +220,10 @@ namespace Timbl {
     virtual ValueClass *Lookup( const icu::UnicodeString& ) const = 0;
   protected:
     Hash::UnicodeHash *TokenTree;
-    bool is_copy;
     BaseFeatTargClass( const BaseFeatTargClass& );
   private:
     BaseFeatTargClass& operator=( const BaseFeatTargClass& );
   };
-
-
-  typedef std::unordered_map< size_t, TargetValue *> ITVCmaptype;
-  typedef std::vector<TargetValue *> TVCarrtype;
 
   class Target: public BaseFeatTargClass {
   public:
@@ -243,14 +238,12 @@ namespace Timbl {
     TargetValue *MajorityClass() const;
     size_t EffectiveValues() const override;
     size_t TotalValues() const override;
-    ITVCmaptype ValuesMap;
-    TVCarrtype ValuesArray;
+    std::vector<TargetValue *> values_array;
+  private:
+    std::unordered_map< size_t, TargetValue *> reverse_values;
   };
 
   class metricClass;
-
-  typedef std::unordered_map< size_t, FeatureValue *> IFVCmaptype;
-  typedef std::vector<FeatureValue *> FVCarrtype;
 
   class Feature: public BaseFeatTargClass {
     friend class MBLClass;
@@ -306,8 +299,7 @@ namespace Timbl {
     void ClipFreq( size_t f ){ matrix_clip_freq = f; };
     size_t ClipFreq() const { return matrix_clip_freq; };
     SparseSymetricMatrix<ValueClass *> *metric_matrix;
-    IFVCmaptype ValuesMap;
-    FVCarrtype ValuesArray;
+    std::vector<FeatureValue *> values_array;
   private:
     metricClass *metric;
     bool ignore;
@@ -340,6 +332,8 @@ namespace Timbl {
     void StandardDeviationStatistics();
     Feature( const Feature& );
     Feature& operator=( const Feature& );
+    std::unordered_map< size_t, FeatureValue *> reverse_values;
+    bool is_reference;
   };
 
   class Instance {

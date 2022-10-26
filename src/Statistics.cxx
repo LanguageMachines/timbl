@@ -82,7 +82,7 @@ namespace Timbl {
   void ConfusionMatrix::Print( ostream& os, const Target *tg ) const {
     os << "Confusion Matrix:" << endl;
     os << "        ";
-    for ( const auto& val : tg->ValuesArray ){
+    for ( const auto& val : tg->values_array ){
       // Print the class names.
       os.width(6);
       os.setf(ios::right, ios::adjustfield);
@@ -94,17 +94,17 @@ namespace Timbl {
       os << "-------";
     }
     os << endl;
-    for ( unsigned int i=0; i < tg->ValuesArray.size(); ++i ){
+    for ( unsigned int i=0; i < tg->values_array.size(); ++i ){
       os.width(6);
       os.setf(ios::right, ios::adjustfield);
-      os << tg->ValuesArray[i] << " | ";
+      os << tg->values_array[i] << " | ";
       for ( const auto& mv : mat[i] ){
 	os.width(6);
 	os.setf(ios::right, ios::adjustfield);
 	os << mv << " ";
       }
       os << endl;
-      if ( i == tg->ValuesArray.size() - 1 ){
+      if ( i == tg->values_array.size() - 1 ){
 	os <<  "   -*- | ";
 	for ( const auto& mv : mat[size] ){
 	  os.width(6);
@@ -147,13 +147,13 @@ namespace Timbl {
       os << "Scores per Value Class:" << endl;
       os << "class  |\tTP\tFP\tTN\tFN\tprecision\trecall(TPR)\tFPR\t\tF-score\t\tAUC" << endl;
     }
-    for ( unsigned int i=0; i < tg->ValuesArray.size(); ++i ){
+    for ( unsigned int i=0; i < tg->values_array.size(); ++i ){
       // so we loop over all known (trained) target values
       size_t TP = 0;
       size_t FP = 0;
       size_t FN = 0;
       size_t TN = 0;
-      ValueClass *tv = tg->ValuesArray[i];
+      ValueClass *tv = tg->values_array[i];
       size_t testCount = 0;
       for ( unsigned int j=0; j < size; ++j ){
 	testCount += mat[i][j];

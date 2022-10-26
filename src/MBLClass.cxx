@@ -783,22 +783,22 @@ namespace Timbl {
 	Order[i] = feat->StandardDeviation();
 	break;
       case OneoverFeature:
-	Order[i] =  1.0 / feat->ValuesArray.size();
+	Order[i] =  1.0 / feat->values_array.size();
 	break;
       case GRoverFeature:
-	Order[i] =  feat->GainRatio() / feat->ValuesArray.size();
+	Order[i] =  feat->GainRatio() / feat->values_array.size();
 	break;
       case IGoverFeature:
-	Order[i] =  feat->InfoGain() / feat->ValuesArray.size();
+	Order[i] =  feat->InfoGain() / feat->values_array.size();
 	break;
       case X2overFeature:
-	Order[i] =  feat->ChiSquare() / feat->ValuesArray.size();
+	Order[i] =  feat->ChiSquare() / feat->values_array.size();
 	break;
       case SVoverFeature:
-	Order[i] =  feat->SharedVariance() / feat->ValuesArray.size();
+	Order[i] =  feat->SharedVariance() / feat->values_array.size();
 	break;
       case SDoverFeature:
-	Order[i] =  feat->StandardDeviation() / feat->ValuesArray.size();
+	Order[i] =  feat->StandardDeviation() / feat->values_array.size();
 	break;
       case OneoverSplitInfo:
 	Order[i] =  1.0 / feat->SplitInfo();
@@ -1010,9 +1010,9 @@ namespace Timbl {
       // Print the possible classes.
       //
       os << "Targets : ";
-      for ( const auto& it : Targets->ValuesArray ){
+      for ( const auto& it : Targets->values_array ){
 	os << it;
-	if ( &it != &Targets->ValuesArray.back() ){
+	if ( &it != &Targets->values_array.back() ){
 	  os << ",";
 	}
       }
@@ -1037,7 +1037,7 @@ namespace Timbl {
   }
 
   bool MBLClass::allocate_arrays(){
-    size_t Dim = Targets->ValuesArray.size();
+    size_t Dim = Targets->values_array.size();
     for ( const auto& feat : Features ){
       if ( !feat->Ignore() &&
 	   !feat->isNumerical() ) {
@@ -1298,7 +1298,7 @@ namespace Timbl {
       }
       else {
 	os << "# DB Entropy: " << DBEntropy << endl;
-	os << "# Classes: " << Targets->ValuesArray.size() << endl;
+	os << "# Classes: " << Targets->values_array.size() << endl;
 	os << "# Lines of data: " << Targets->TotalValues() << endl;
 	int OldPrec = os.precision(DBL_DIG);
 	if ( CurrentWeighting() == SD_w ){
@@ -1553,7 +1553,7 @@ namespace Timbl {
       double Entropy = 0.0;
       // first get the Database Entropy
       size_t totval = Targets->TotalValues();
-      for ( const auto& it : Targets->ValuesArray ){
+      for ( const auto& it : Targets->values_array ){
 	double Ratio = it->ValFreq() / (double)totval;
 	if ( Ratio > 0 ){
 	  Entropy += Ratio * Log2(Ratio);
@@ -1590,7 +1590,7 @@ namespace Timbl {
 	  }
 	}
       }
-      else if ( Features[g]->ValuesArray.size() == 1 ){
+      else if ( Features[g]->values_array.size() == 1 ){
 	feat_status[g] = Singleton;
       }
       delete tmpMetric;
@@ -1737,9 +1737,9 @@ namespace Timbl {
     else {
       // Print the possible classes.
       //
-      for ( const auto& it : Targets->ValuesArray ){
+      for ( const auto& it : Targets->values_array ){
 	os << it;
-	if ( &it != &Targets->ValuesArray.back() ){
+	if ( &it != &Targets->values_array.back() ){
 	  os << ",";
 	}
       }
@@ -1756,9 +1756,9 @@ namespace Timbl {
 	else {
 	  // Loop over the values.
 	  //
-	  for ( const auto& val : feat->ValuesArray ){
+	  for ( const auto& val : feat->values_array ){
 	    os << val;
-	    if ( &val != &feat->ValuesArray.back() ){
+	    if ( &val != &feat->values_array.back() ){
 	      os << ",";
 	    }
 	  }
