@@ -137,24 +137,28 @@ namespace Timbl {
     virtual IB_InstanceBase *TRIBL2_test( const Instance& ,
 					  const ValueDistribution *&,
 					  size_t& );
-    bool read_hash( std::istream &,
-		    Hash::UnicodeHash *,
-		    Hash::UnicodeHash * ) const;
+    bool read_hash( std::istream&,
+		    Hash::UnicodeHash&,
+		    Hash::UnicodeHash& ) const;
     virtual InstanceBase_base *Copy() const = 0;
     virtual InstanceBase_base *clone() const = 0;
-    void Save( std::ostream &, bool=false );
-    void Save( std::ostream &, Hash::UnicodeHash *, Hash::UnicodeHash *, bool=false );
+    void Save( std::ostream&,
+	       bool=false );
+    void Save( std::ostream&,
+	       Hash::UnicodeHash&,
+	       Hash::UnicodeHash&,
+	       bool=false );
     void toXML( std::ostream& );
     void printStatsTree( std::ostream&, unsigned int startLevel );
     virtual bool ReadIB( std::istream&,
 			 std::vector<Feature *>&,
 			 Target&,
 			 int );
-    virtual bool ReadIB( std::istream &,
+    virtual bool ReadIB( std::istream&,
 			 std::vector<Feature *>&,
 			 Target&,
-			 Hash::UnicodeHash *,
-			 Hash::UnicodeHash *,
+			 Hash::UnicodeHash&,
+			 Hash::UnicodeHash&,
 			 int );
     virtual void Prune( const TargetValue *, long = 0 );
     virtual bool IsPruned() const { return false; };
@@ -213,10 +217,11 @@ namespace Timbl {
 		  std::vector<Feature *>&,
 		  Target&,
 		  int );
-    bool read_IB( std::istream &, std::vector<Feature *>&,
+    bool read_IB( std::istream&,
+		  std::vector<Feature *>&,
 		  Target&,
-		  Hash::UnicodeHash *,
-		  Hash::UnicodeHash *, int );
+		  Hash::UnicodeHash&,
+		  Hash::UnicodeHash&, int );
     void fill_index();
     const IBtree *fast_search_node( FeatureValue * );
   };
@@ -257,9 +262,16 @@ namespace Timbl {
     bool IsPruned() const { return Pruned; };
     const ValueDistribution *IG_test( const Instance& , size_t&, bool&,
 				      const TargetValue *& );
-    bool ReadIB( std::istream &, std::vector<Feature *>&, Target&, int );
-    bool ReadIB( std::istream &, std::vector<Feature *>&, Target&,
-		 Hash::UnicodeHash *, Hash::UnicodeHash *, int );
+    bool ReadIB( std::istream&,
+		 std::vector<Feature *>&,
+		 Target&,
+		 int );
+    bool ReadIB( std::istream&,
+		 std::vector<Feature *>&,
+		 Target&,
+		 Hash::UnicodeHash&,
+		 Hash::UnicodeHash&,
+		 int );
     bool MergeSub( InstanceBase_base * );
   protected:
     bool Pruned;

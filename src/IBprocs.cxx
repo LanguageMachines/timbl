@@ -464,7 +464,8 @@ namespace Timbl {
       os << "# Bin_Size: " << Bin_Size << endl;
       if ( hashed_trees ){
 	InstanceBase->Save( os,
-			    TargetStrings, FeatureStrings,
+			    *Targets->hash(),
+			    *Features[0]->hash(),
 			    keep_distributions );
       }
       else {

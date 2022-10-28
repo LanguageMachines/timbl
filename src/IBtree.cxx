@@ -404,25 +404,25 @@ namespace Timbl {
     }
   }
 
-  void save_hash( ostream &os,
-		  Hash::UnicodeHash *cats,
-		  Hash::UnicodeHash *feats ){
-    int Size = cats->num_of_entries();
+  void save_hash( ostream& os,
+		  Hash::UnicodeHash& cats,
+		  Hash::UnicodeHash& feats ){
+    int Size = cats.num_of_entries();
     os << "Classes" << endl;
     for ( int i=1; i <= Size; ++i ){
-      os << i << "\t" << cats->reverse_lookup( i ) << endl;
+      os << i << "\t" << cats.reverse_lookup( i ) << endl;
     }
-    Size = feats->num_of_entries();
+    Size = feats.num_of_entries();
     os << "Features" << endl;
     for ( int i=1; i <= Size; ++i ){
-      os << i << "\t" << feats->reverse_lookup( i ) << endl;
+      os << i << "\t" << feats.reverse_lookup( i ) << endl;
     }
     os << endl;
   }
 
-  void InstanceBase_base::Save( ostream &os,
-				Hash::UnicodeHash *cats,
-				Hash::UnicodeHash *feats,
+  void InstanceBase_base::Save( ostream& os,
+				Hash::UnicodeHash& cats,
+				Hash::UnicodeHash& feats,
 				bool persist ) {
     // save an IBtree for later use.
     bool temp_persist =  PersistentDistributions;
@@ -723,9 +723,9 @@ namespace Timbl {
     return (InstBase != NULL);
   }
 
-  bool InstanceBase_base::read_hash( istream &is,
-				     Hash::UnicodeHash *cats,
-				     Hash::UnicodeHash *feats ) const {
+  bool InstanceBase_base::read_hash( istream& is,
+				     Hash::UnicodeHash& cats,
+				     Hash::UnicodeHash& feats ) const {
     UnicodeString line;
     is >> ws;
     is >> line;
@@ -738,7 +738,7 @@ namespace Timbl {
       vector<UnicodeString> vals = TiCC::split( line );
       if ( vals.size() == 2 ){
 	// just ignore index!
-	cats->hash( vals[1] );
+	cats.hash( vals[1] );
       }
       else {
 	break;
@@ -753,7 +753,7 @@ namespace Timbl {
       vector<UnicodeString> vals = TiCC::split( line );
       if ( vals.size() == 2 ){
 	// just ignore index!
-	feats->hash( vals[1] );
+	feats.hash( vals[1] );
       }
       else {
 	break;
@@ -762,11 +762,11 @@ namespace Timbl {
     return true;
   }
 
-  bool InstanceBase_base::ReadIB( istream &is,
+  bool InstanceBase_base::ReadIB( istream& is,
 				  vector<Feature *>& Feats,
 				  Target& Targs,
-				  Hash::UnicodeHash *cats,
-				  Hash::UnicodeHash *feats,
+				  Hash::UnicodeHash& cats,
+				  Hash::UnicodeHash& feats,
 				  int expected_version ){
     if ( read_IB( is, Feats, Targs, cats, feats, expected_version ) ){
       InstBase->redo_distributions();
@@ -781,11 +781,11 @@ namespace Timbl {
     }
   }
 
-  bool IG_InstanceBase::ReadIB( istream &is,
+  bool IG_InstanceBase::ReadIB( istream& is,
 				vector<Feature *>& Feats,
 				Target& Targs,
-				Hash::UnicodeHash *cats,
-				Hash::UnicodeHash *feats,
+				Hash::UnicodeHash& cats,
+				Hash::UnicodeHash& feats,
 				int expected_version ){
     if ( read_IB( is, Feats, Targs, cats, feats, expected_version ) ){
       if ( PersistentDistributions ){
@@ -801,11 +801,11 @@ namespace Timbl {
     }
   }
 
-  bool InstanceBase_base::read_IB( istream &is,
+  bool InstanceBase_base::read_IB( istream& is,
 				   vector<Feature *>& Feats,
 				   Target& Targs,
-				   Hash::UnicodeHash *cats,
-				   Hash::UnicodeHash *feats,
+				   Hash::UnicodeHash& cats,
+				   Hash::UnicodeHash& feats,
 				   int expected_version ){
     char delim;
     NumOfTails = 0;

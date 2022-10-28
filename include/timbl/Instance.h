@@ -218,6 +218,7 @@ namespace Timbl {
     virtual size_t EffectiveValues() const = 0;
     virtual size_t TotalValues() const = 0;
     virtual ValueClass *Lookup( const icu::UnicodeString& ) const = 0;
+    Hash::UnicodeHash *hash() const { return TokenTree; };
   protected:
     Hash::UnicodeHash *TokenTree;
     BaseFeatTargClass( const BaseFeatTargClass& );
