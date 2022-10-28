@@ -451,7 +451,7 @@ namespace Timbl {
 
   IBtree* InstanceBase_base::read_list( istream &is,
 					std::vector<Feature*>& Feats,
-					Target  *Targ,
+					Target& Targ,
 					int level ){
     IBtree *result = NULL;
     IBtree **pnt = &result;
@@ -473,7 +473,7 @@ namespace Timbl {
 
   IBtree* InstanceBase_base::read_list_hashed( istream &is,
 					       std::vector<Feature*>& Feats,
-					       Target  *Targ,
+					       Target& Targ,
 					       int level ){
     IBtree *result = NULL;
     IBtree **pnt = &result;
@@ -495,7 +495,7 @@ namespace Timbl {
 
   IBtree *InstanceBase_base::read_local( istream &is,
 					 vector<Feature*>& Feats,
-					 Target *Targ,
+					 Target& Targ,
 					 int level ){
     if ( !is ){
       return NULL;
@@ -513,7 +513,7 @@ namespace Timbl {
       return NULL;
     }
     is >> ws >> buf;
-    result->TValue = Targ->Lookup( buf );
+    result->TValue = Targ.Lookup( buf );
     int nxt = look_ahead(is);
     if ( nxt == '{' ){
       try {
@@ -563,7 +563,7 @@ namespace Timbl {
 
   IBtree *InstanceBase_base::read_local_hashed( istream &is,
 						vector<Feature*>& Feats,
-						Target *Targ,
+						Target& Targ,
 						int level ){
     if ( !is ){
       return NULL;
@@ -581,7 +581,7 @@ namespace Timbl {
       return NULL;
     }
     is >> index;
-    result->TValue = Targ->ReverseLookup( index );
+    result->TValue = Targ.ReverseLookup( index );
     int nxt = look_ahead(is);
     if ( nxt == '{' ){
       //
@@ -632,9 +632,10 @@ namespace Timbl {
   }
 
   bool InstanceBase_base::ReadIB( istream &is,
-				  vector<Feature *>& Feats, Target *Targs,
+				  vector<Feature *>& Feats,
+				  Target& Targ,
 				  int expected_version ){
-    if ( read_IB( is, Feats, Targs, expected_version ) ){
+    if ( read_IB( is, Feats, Targ, expected_version ) ){
       InstBase->redo_distributions();
       ValueDistribution *Top
 	= InstBase->sum_distributions( PersistentDistributions );
@@ -656,9 +657,10 @@ namespace Timbl {
   }
 
   bool IG_InstanceBase::ReadIB( istream &is,
-				vector<Feature *>& Feats, Target *Targs,
+				vector<Feature *>& Feats,
+				Target& Targ,
 				int expected_version ){
-    if ( read_IB( is, Feats, Targs, expected_version ) ){
+    if ( read_IB( is, Feats, Targ, expected_version ) ){
       if ( PersistentDistributions ){
 	ValueDistribution *Top
 	  = InstBase->sum_distributions( PersistentDistributions );
@@ -673,7 +675,8 @@ namespace Timbl {
   }
 
   bool InstanceBase_base::read_IB( istream &is,
-				   vector<Feature *>& Feats, Target *Targs,
+				   vector<Feature *>& Feats,
+				   Target& Targs,
 				   int expected_version ){
     NumOfTails = 0;
     DefAss = true;  // always for a restored tree
@@ -761,7 +764,7 @@ namespace Timbl {
 
   bool InstanceBase_base::ReadIB( istream &is,
 				  vector<Feature *>& Feats,
-				  Target *Targs,
+				  Target& Targs,
 				  Hash::UnicodeHash *cats,
 				  Hash::UnicodeHash *feats,
 				  int expected_version ){
@@ -780,7 +783,7 @@ namespace Timbl {
 
   bool IG_InstanceBase::ReadIB( istream &is,
 				vector<Feature *>& Feats,
-				Target *Targs,
+				Target& Targs,
 				Hash::UnicodeHash *cats,
 				Hash::UnicodeHash *feats,
 				int expected_version ){
@@ -799,7 +802,8 @@ namespace Timbl {
   }
 
   bool InstanceBase_base::read_IB( istream &is,
-				   vector<Feature *>& Feats, Target *Targs,
+				   vector<Feature *>& Feats,
+				   Target& Targs,
 				   Hash::UnicodeHash *cats,
 				   Hash::UnicodeHash *feats,
 				   int expected_version ){

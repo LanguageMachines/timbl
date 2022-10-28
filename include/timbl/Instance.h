@@ -100,15 +100,15 @@ namespace Timbl {
     void clear();
     dist_iterator begin() const { return distribution.begin(); };
     dist_iterator end() const { return distribution.end(); };
-    virtual const TargetValue* BestTarget( bool &, bool = false ) const;
+    virtual const TargetValue* BestTarget( bool&, bool = false ) const;
     void Merge( const ValueDistribution& );
     virtual void SetFreq( const TargetValue *, int, double=1.0 );
     virtual bool IncFreq( const TargetValue *, size_t, double=1.0 );
     void DecFreq( const TargetValue * );
-    static ValueDistribution *read_distribution( std::istream &,
-						 Target *, bool );
-    static ValueDistribution *read_distribution_hashed( std::istream &,
-							Target *, bool );
+    static ValueDistribution *read_distribution( std::istream&,
+						 Target& , bool );
+    static ValueDistribution *read_distribution_hashed( std::istream&,
+							Target& , bool );
     const std::string DistToString() const;
     const std::string DistToStringW( int ) const;
     double Confidence( const TargetValue * ) const;
@@ -226,6 +226,9 @@ namespace Timbl {
   };
 
   class Target: public BaseFeatTargClass {
+    friend class MBLClass;
+    friend class WValueDistribution;
+    friend class ConfusionMatrix;
   public:
     explicit Target( Hash::UnicodeHash *T ): BaseFeatTargClass(T) {};
     ~Target();
@@ -238,8 +241,9 @@ namespace Timbl {
     TargetValue *MajorityClass() const;
     size_t EffectiveValues() const override;
     size_t TotalValues() const override;
-    std::vector<TargetValue *> values_array;
+    size_t num_of_values() const { return values_array.size(); };
   private:
+    std::vector<TargetValue *> values_array;
     std::unordered_map< size_t, TargetValue *> reverse_values;
   };
 
@@ -299,7 +303,6 @@ namespace Timbl {
     void ClipFreq( size_t f ){ matrix_clip_freq = f; };
     size_t ClipFreq() const { return matrix_clip_freq; };
     SparseSymetricMatrix<ValueClass *> *metric_matrix;
-    std::vector<FeatureValue *> values_array;
   private:
     metricClass *metric;
     bool ignore;
@@ -325,13 +328,14 @@ namespace Timbl {
     size_t SaveNum;
     double weight;
     void Statistics( double );
-    void NumStatistics( std::vector<FeatureValue *>&, double, int );
-    void ChiSquareStatistics( std::vector<FeatureValue *>&, size_t, Target * );
+    void NumStatistics( std::vector<FeatureValue *>&, double );
+    void ChiSquareStatistics( std::vector<FeatureValue *>&, Target * );
     void ChiSquareStatistics( Target * );
     void SharedVarianceStatistics( Target *, int );
     void StandardDeviationStatistics();
     Feature( const Feature& );
     Feature& operator=( const Feature& );
+    std::vector<FeatureValue *> values_array;
     std::unordered_map< size_t, FeatureValue *> reverse_values;
     bool is_reference;
   };

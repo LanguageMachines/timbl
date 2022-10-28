@@ -146,10 +146,16 @@ namespace Timbl {
     void Save( std::ostream &, Hash::UnicodeHash *, Hash::UnicodeHash *, bool=false );
     void toXML( std::ostream& );
     void printStatsTree( std::ostream&, unsigned int startLevel );
-    virtual bool ReadIB( std::istream&, std::vector<Feature *>&,
-			 Target *, int );
-    virtual bool ReadIB( std::istream &, std::vector<Feature *>&, Target *,
-			 Hash::UnicodeHash *, Hash::UnicodeHash *, int );
+    virtual bool ReadIB( std::istream&,
+			 std::vector<Feature *>&,
+			 Target&,
+			 int );
+    virtual bool ReadIB( std::istream &,
+			 std::vector<Feature *>&,
+			 Target&,
+			 Hash::UnicodeHash *,
+			 Hash::UnicodeHash *,
+			 int );
     virtual void Prune( const TargetValue *, long = 0 );
     virtual bool IsPruned() const { return false; };
     void CleanPartition(  bool );
@@ -186,22 +192,31 @@ namespace Timbl {
     size_t Depth;
     unsigned long int NumOfTails;
     IBtree *read_list( std::istream &,
-		       std::vector<Feature*>&, Target *,
+		       std::vector<Feature*>&,
+		       Target&,
 		       int );
     IBtree *read_local( std::istream &,
-			std::vector<Feature*>&, Target *,
+			std::vector<Feature*>&,
+			Target&,
 			int );
     IBtree *read_list_hashed( std::istream &,
-			      std::vector<Feature*>&, Target *,
+			      std::vector<Feature*>&,
+			      Target&,
 			      int );
     IBtree *read_local_hashed( std::istream &,
-			       std::vector<Feature*>&, Target *,
+			       std::vector<Feature*>&,
+			       Target&,
 			       int );
     void write_tree( std::ostream &os, const IBtree * ) const;
     void write_tree_hashed( std::ostream &os, const IBtree * ) const;
-    bool read_IB( std::istream &, std::vector<Feature *>&, Target *, int );
-    bool read_IB( std::istream &, std::vector<Feature *>&, Target *,
-		  Hash::UnicodeHash *, Hash::UnicodeHash *, int );
+    bool read_IB( std::istream&,
+		  std::vector<Feature *>&,
+		  Target&,
+		  int );
+    bool read_IB( std::istream &, std::vector<Feature *>&,
+		  Target&,
+		  Hash::UnicodeHash *,
+		  Hash::UnicodeHash *, int );
     void fill_index();
     const IBtree *fast_search_node( FeatureValue * );
   };
@@ -242,8 +257,8 @@ namespace Timbl {
     bool IsPruned() const { return Pruned; };
     const ValueDistribution *IG_test( const Instance& , size_t&, bool&,
 				      const TargetValue *& );
-    bool ReadIB( std::istream &, std::vector<Feature *>&, Target *, int );
-    bool ReadIB( std::istream &, std::vector<Feature *>&, Target *,
+    bool ReadIB( std::istream &, std::vector<Feature *>&, Target&, int );
+    bool ReadIB( std::istream &, std::vector<Feature *>&, Target&,
 		 Hash::UnicodeHash *, Hash::UnicodeHash *, int );
     bool MergeSub( InstanceBase_base * );
   protected:

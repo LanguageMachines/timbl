@@ -233,7 +233,7 @@ namespace Timbl {
 	distribution[id] = new Vfield( val, 1, factor );
       }
     }
-    total_items += targ->values_array.size();
+    total_items += targ->num_of_values();
     Normalize();
   }
 
@@ -696,8 +696,8 @@ namespace Timbl {
   }
 
   void Feature::NumStatistics( vector<FeatureValue *>& FVBin,
-			       double DBentropy,
-			       int BinSize ){
+			       double DBentropy ){
+    size_t BinSize = FVBin.size();
     double Prob, FVEntropy;
     size_t TotalVals = TotalValues();
     entropy = 0.0;
@@ -730,7 +730,7 @@ namespace Timbl {
     for ( size_t j=0; j < dd_len; ++j ){
       delete ddv[j];
     }
-    for ( int k=0; k < BinSize; k++ ){
+    for ( size_t k=0; k < BinSize; k++ ){
       FeatureValue *pnt = FVBin[k];
       size_t Freq = pnt->TargetDist.totalSize();
       pnt->ValFreq( Freq );
@@ -753,7 +753,7 @@ namespace Timbl {
     // And the split info.
     //
     split_info = 0.0;
-    for ( int l=0; l < BinSize; ++l ){
+    for ( size_t l=0; l < BinSize; ++l ){
       size_t Freq = FVBin[l]->ValFreq();
       if ( Freq > 0 ){
 	Prob = Freq / (double)TotalVals;
@@ -789,9 +789,9 @@ namespace Timbl {
       sprintf( dumname, "dum%d", i );
       FVBin[i] = new FeatureValue( dumname );
     }
-    NumStatistics( FVBin, DBentropy, BinSize );
+    NumStatistics( FVBin, DBentropy );
     if ( full ){
-      ChiSquareStatistics( FVBin, BinSize, Targets );
+      ChiSquareStatistics( FVBin, Targets );
       int cnt = 0;   // count effective values in Bin
       for ( int i=0; i < BinSize; ++i ){
 	if ( FVBin[i]->ValFreq() > 0 ){
@@ -850,11 +850,11 @@ namespace Timbl {
   }
 
   void Feature::ChiSquareStatistics( vector<FeatureValue *>& FVA,
-				     size_t Num_Vals,
 				     Target *Targets ){
+    size_t Num_Vals = FVA.size();
     chi_square = 0.0;
     long int n_dot_dot = 0;
-    size_t Size = Targets->values_array.size();
+    size_t Size = Targets->num_of_values();
     if ( !n_dot_j ) {
       n_dot_j = new long int[Size];
       n_i_dot = new long int[Num_Vals];
@@ -922,7 +922,7 @@ namespace Timbl {
   void Feature::ChiSquareStatistics( Target *Targets ){
     chi_square = 0.0;
     long int n_dot_dot = 0;
-    size_t Size = Targets->values_array.size();
+    size_t Size = Targets->num_of_values();
     size_t Num_Vals = values_array.size();
     if ( !n_dot_j ) {
       n_dot_j = new long int[Size];
@@ -1029,7 +1029,7 @@ namespace Timbl {
   }
 
   ValueDistribution *ValueDistribution::read_distribution( istream &is,
-							   Target *Targ,
+							   Target& Targ,
 							   bool do_fr ){
     // read a distribution from stream is into Target
     // if do_f we also adjust the value of Frequency of the Target, which is
@@ -1050,10 +1050,10 @@ namespace Timbl {
 	is >> freq;
 	TargetValue *target;
 	if ( do_fr ){
-	  target = Targ->add_value( buf, freq );
+	  target = Targ.add_value( buf, freq );
 	}
 	else {
-	  target = Targ->Lookup( buf );
+	  target = Targ.Lookup( buf );
 	}
 	if ( !target ){
 	  delete result;
@@ -1102,7 +1102,7 @@ namespace Timbl {
 
 
   ValueDistribution *ValueDistribution::read_distribution_hashed( istream &is,
-								  Target *Targ,
+								  Target& Targ,
 								  bool do_fr ){
 
     ValueDistribution *result = 0;
@@ -1124,10 +1124,10 @@ namespace Timbl {
 	is >> freq;
 	TargetValue *target;
 	if ( do_fr ){
-	  target = Targ->add_value( index, freq );
+	  target = Targ.add_value( index, freq );
 	}
 	else {
-	  target = Targ->ReverseLookup( index );
+	  target = Targ.ReverseLookup( index );
 	}
 	if ( !target ){
 	  delete result;

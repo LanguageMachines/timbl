@@ -60,7 +60,7 @@ namespace Timbl {
 	delete confusionInfo;
 	confusionInfo = 0;
 	if ( Verbosity(ADVANCED_STATS) ){
-	  confusionInfo = new ConfusionMatrix( Targets->values_array.size() );
+	  confusionInfo = new ConfusionMatrix( Targets->num_of_values() );
 	}
 	if ( !is_copy ){
 	  InitWeights();
@@ -488,13 +488,13 @@ namespace Timbl {
 	}
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 Targets,
+					 *Targets,
 					 TargetStrings, FeatureStrings,
 					 Version );
 	}
 	else {
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 Targets,
+					 *Targets,
 					 Version );
 	}
 	if ( result ){

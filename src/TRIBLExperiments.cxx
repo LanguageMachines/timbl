@@ -348,13 +348,13 @@ namespace Timbl {
 	}
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 Targets,
+					 *Targets,
 					 TargetStrings, FeatureStrings,
 					 Version );
 	}
 	else {
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 Targets,
+					 *Targets,
 					 Version );
 	}
       }
@@ -399,13 +399,13 @@ namespace Timbl {
 	}
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 Targets,
+					 *Targets,
 					 TargetStrings, FeatureStrings,
 					 Version );
 	}
 	else {
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 Targets,
+					 *Targets,
 					 Version );
 	}
       }
