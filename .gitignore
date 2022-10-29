@@ -1,9 +1,15 @@
 src/*.o
 src/*.lo
 src/*.la
+src/*.out
+*.gz
 src/.deps
 src/.libs
 src/timbl
+src/simpletest
+src/simpletest.log
+src/simpletest.trs
+src/test-suite.log
 demos/*.o
 demos/*.lo
 demos/Makefile
@@ -39,6 +45,7 @@ missing
 stamp-h1
 test-driver
 timbl.pc
+ChangeLog
 m4/libtool.m
 m4/libtool.m4
 m4/ltoptions.m4
