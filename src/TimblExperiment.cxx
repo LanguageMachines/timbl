@@ -86,7 +86,7 @@ namespace Timbl {
   }
 
   bool resultStore::reset( int _beam, normType _norm,
-			   double _factor, const Target *_targets ) {
+			   double _factor, const Targets *_targets ) {
     clear();
     beam = _beam;
     norm = _norm;
@@ -282,7 +282,7 @@ namespace Timbl {
 	delete confusionInfo;
 	confusionInfo = 0;
 	if ( Verbosity(ADVANCED_STATS) ){
-	  confusionInfo = new ConfusionMatrix( Targets->num_of_values() );
+	  confusionInfo = new ConfusionMatrix( targets->num_of_values() );
 	}
 	initDecay();
 	calculate_fv_entropy( true );
@@ -473,7 +473,7 @@ namespace Timbl {
 		if ( !Verbosity(SILENT) ){
 		  Info( "Preparation took " + prepT.toString() );
 		}
-		if ( warnOnSingleTarget && Targets->EffectiveValues() <=1 ){
+		if ( warnOnSingleTarget && targets->EffectiveValues() <=1 ){
 		  Warning( "Training file contains only 1 class." );
 		}
 		result = true;
@@ -1010,7 +1010,7 @@ namespace Timbl {
   bool TimblExperiment::showStatistics( ostream& os ) const {
     os << endl;
     if ( confusionInfo ){
-      confusionInfo->FScore( os, Targets, Verbosity(CLASS_STATS) );
+      confusionInfo->FScore( os, targets, Verbosity(CLASS_STATS) );
     }
     os << "overall accuracy:        "
        << stats.testedCorrect()/(double) stats.dataLines()
@@ -1042,7 +1042,7 @@ namespace Timbl {
     }
     if ( confusionInfo && Verbosity(CONF_MATRIX) ){
       os << endl;
-      confusionInfo->Print( os, Targets );
+      confusionInfo->Print( os, targets );
     }
     return true;
   }
@@ -1668,7 +1668,7 @@ namespace Timbl {
     bool recurse = true;
     bool Tie = false;
     exact = false;
-    if ( !bestResult.reset( beamSize, normalisation, norm_factor, Targets ) ){
+    if ( !bestResult.reset( beamSize, normalisation, norm_factor, targets ) ){
       Warning( "no normalisation possible because a BeamSize is specified\n"
 	       "output is NOT normalized!" );
     }
@@ -2517,13 +2517,13 @@ namespace Timbl {
 					    (RandomSeed()>=0) );
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
+					 *targets,
 					 *Features[0]->hash(),
 					 Version );
 	}
 	else {
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
+					 *targets,
 					 Version );
 	}
       }

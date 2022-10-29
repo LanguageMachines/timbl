@@ -139,7 +139,7 @@ namespace Timbl {
     int Progress() const { return progress; };
     void Progress( int p ){ progress =  p; };
     std::string extract_limited_m( size_t );
-    Target *Targets;
+    Targets *targets;
     std::vector<Feature *> Features;
     std::vector<Feature *> PermFeatures;
     std::vector<size_t> permutation;
@@ -245,7 +245,7 @@ namespace Timbl {
     };
     void fill_table();
     void InvalidMessage() const ;
-    double calculate_db_entropy( Target * );
+    double calculate_db_entropy( Targets * );
     void do_numeric_statistics( );
 
     void test_instance( const Instance& ,

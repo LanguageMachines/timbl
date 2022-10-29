@@ -80,7 +80,7 @@ namespace Timbl {
     Vfield& operator=( const Vfield& );
   };
 
-  class Target;
+  class Targets;
 
   class WValueDistribution;
 
@@ -106,9 +106,11 @@ namespace Timbl {
     virtual bool IncFreq( const TargetValue *, size_t, double=1.0 );
     void DecFreq( const TargetValue * );
     static ValueDistribution *read_distribution( std::istream&,
-						 Target& , bool );
+						 Targets&,
+						 bool );
     static ValueDistribution *read_distribution_hashed( std::istream&,
-							Target& , bool );
+							Targets&,
+							bool );
     const std::string DistToString() const;
     const std::string DistToStringW( int ) const;
     double Confidence( const TargetValue * ) const;
@@ -139,7 +141,7 @@ namespace Timbl {
     const std::string SaveHashed() const;
     const std::string Save() const;
     void Normalize();
-    void Normalize_1( double, const Target * );
+    void Normalize_1( double, const Targets * );
     void Normalize_2();
     void MergeW( const ValueDistribution&, double );
   private:
@@ -226,13 +228,13 @@ namespace Timbl {
     BaseFeatTargClass& operator=( const BaseFeatTargClass& );
   };
 
-  class Target: public BaseFeatTargClass {
+  class Targets: public BaseFeatTargClass {
     friend class MBLClass;
     friend class WValueDistribution;
     friend class ConfusionMatrix;
   public:
-    explicit Target( Hash::UnicodeHash *T ): BaseFeatTargClass(T) {};
-    ~Target();
+    explicit Targets( Hash::UnicodeHash *T ): BaseFeatTargClass(T) {};
+    ~Targets();
     TargetValue *add_value( const icu::UnicodeString&, int freq = 1 );
     TargetValue *add_value( size_t, int freq = 1 );
     TargetValue *Lookup( const icu::UnicodeString& ) const override;
@@ -299,8 +301,8 @@ namespace Timbl {
     void print_vc_pb_array( std::ostream& ) const;
     bool read_vc_pb_array( std::istream &  );
     FeatVal_Stat prepare_numeric_stats();
-    void Statistics( double, Target *, bool );
-    void NumStatistics( double, Target *, int, bool );
+    void Statistics( double, Targets *, bool );
+    void NumStatistics( double, Targets *, int, bool );
     void ClipFreq( size_t f ){ matrix_clip_freq = f; };
     size_t ClipFreq() const { return matrix_clip_freq; };
     SparseSymetricMatrix<ValueClass *> *metric_matrix;
@@ -330,9 +332,9 @@ namespace Timbl {
     double weight;
     void Statistics( double );
     void NumStatistics( std::vector<FeatureValue *>&, double );
-    void ChiSquareStatistics( std::vector<FeatureValue *>&, Target * );
-    void ChiSquareStatistics( Target * );
-    void SharedVarianceStatistics( Target *, int );
+    void ChiSquareStatistics( std::vector<FeatureValue *>&, Targets * );
+    void ChiSquareStatistics( Targets * );
+    void SharedVarianceStatistics( Targets *, int );
     void StandardDeviationStatistics();
     Feature( const Feature& );
     Feature& operator=( const Feature& );

@@ -79,10 +79,11 @@ namespace Timbl {
     }
   }
 
-  void ConfusionMatrix::Print( ostream& os, const Target *tg ) const {
+  void ConfusionMatrix::Print( ostream& os,
+			       const Targets *targets ) const {
     os << "Confusion Matrix:" << endl;
     os << "        ";
-    for ( const auto& val : tg->values_array ){
+    for ( const auto& val : targets->values_array ){
       // Print the class names.
       os.width(6);
       os.setf(ios::right, ios::adjustfield);
@@ -94,17 +95,17 @@ namespace Timbl {
       os << "-------";
     }
     os << endl;
-    for ( unsigned int i=0; i < tg->values_array.size(); ++i ){
+    for ( unsigned int i=0; i < targets->values_array.size(); ++i ){
       os.width(6);
       os.setf(ios::right, ios::adjustfield);
-      os << tg->values_array[i] << " | ";
+      os << targets->values_array[i] << " | ";
       for ( const auto& mv : mat[i] ){
 	os.width(6);
 	os.setf(ios::right, ios::adjustfield);
 	os << mv << " ";
       }
       os << endl;
-      if ( i == tg->values_array.size() - 1 ){
+      if ( i == targets->values_array.size() - 1 ){
 	os <<  "   -*- | ";
 	for ( const auto& mv : mat[size] ){
 	  os.width(6);
@@ -133,7 +134,8 @@ namespace Timbl {
   }
 
   void ConfusionMatrix::FScore( ostream& os,
-				const Target* tg, bool cs_too ) const {
+				const Targets* targets,
+				bool cs_too ) const {
     double maf = 0.0;
     double mif = 0.0;
     double maa = 0.0;
@@ -147,13 +149,13 @@ namespace Timbl {
       os << "Scores per Value Class:" << endl;
       os << "class  |\tTP\tFP\tTN\tFN\tprecision\trecall(TPR)\tFPR\t\tF-score\t\tAUC" << endl;
     }
-    for ( unsigned int i=0; i < tg->values_array.size(); ++i ){
+    for ( unsigned int i=0; i < targets->values_array.size(); ++i ){
       // so we loop over all known (trained) target values
       size_t TP = 0;
       size_t FP = 0;
       size_t FN = 0;
       size_t TN = 0;
-      ValueClass *tv = tg->values_array[i];
+      ValueClass *tv = targets->values_array[i];
       size_t testCount = 0;
       for ( unsigned int j=0; j < size; ++j ){
 	testCount += mat[i][j];

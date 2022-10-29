@@ -48,7 +48,7 @@ namespace Timbl {
   class Feature;
   class FeatureValue;
   class Instance;
-  class Target;
+  class Targets;
   class TargetValue;
   class ValueDistribution;
   class WValueDistribution;
@@ -152,11 +152,11 @@ namespace Timbl {
     void printStatsTree( std::ostream&, unsigned int startLevel );
     virtual bool ReadIB( std::istream&,
 			 std::vector<Feature *>&,
-			 Target&,
+			 Targets&,
 			 int );
     virtual bool ReadIB( std::istream&,
 			 std::vector<Feature *>&,
-			 Target&,
+			 Targets&,
 			 Hash::UnicodeHash&,
 			 int );
     virtual void Prune( const TargetValue *, long = 0 );
@@ -196,29 +196,29 @@ namespace Timbl {
     unsigned long int NumOfTails;
     IBtree *read_list( std::istream &,
 		       std::vector<Feature*>&,
-		       Target&,
+		       Targets&,
 		       int );
     IBtree *read_local( std::istream &,
 			std::vector<Feature*>&,
-			Target&,
+			Targets&,
 			int );
     IBtree *read_list_hashed( std::istream &,
 			      std::vector<Feature*>&,
-			      Target&,
+			      Targets&,
 			      int );
     IBtree *read_local_hashed( std::istream &,
 			       std::vector<Feature*>&,
-			       Target&,
+			       Targets&,
 			       int );
     void write_tree( std::ostream &os, const IBtree * ) const;
     void write_tree_hashed( std::ostream &os, const IBtree * ) const;
     bool read_IB( std::istream&,
 		  std::vector<Feature *>&,
-		  Target&,
+		  Targets&,
 		  int );
     bool read_IB( std::istream&,
 		  std::vector<Feature *>&,
-		  Target&,
+		  Targets&,
 		  Hash::UnicodeHash&, int );
     void fill_index();
     const IBtree *fast_search_node( FeatureValue * );
@@ -262,11 +262,11 @@ namespace Timbl {
 				      const TargetValue *& );
     bool ReadIB( std::istream&,
 		 std::vector<Feature *>&,
-		 Target&,
+		 Targets&,
 		 int );
     bool ReadIB( std::istream&,
 		 std::vector<Feature *>&,
-		 Target&,
+		 Targets&,
 		 Hash::UnicodeHash&,
 		 int );
     bool MergeSub( InstanceBase_base * );

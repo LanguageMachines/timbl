@@ -462,9 +462,9 @@ namespace Timbl {
     return 0;
   }
 
-  const Target *TimblAPI::myTargets() const{
+  const Targets *TimblAPI::myTargets() const{
     if ( Valid() ){
-      return pimpl->Targets;
+      return pimpl->targets;
     }
     return 0;
   }

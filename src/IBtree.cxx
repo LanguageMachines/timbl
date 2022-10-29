@@ -451,7 +451,7 @@ namespace Timbl {
 
   IBtree* InstanceBase_base::read_list( istream &is,
 					std::vector<Feature*>& Feats,
-					Target& Targ,
+					Targets& Targ,
 					int level ){
     IBtree *result = NULL;
     IBtree **pnt = &result;
@@ -473,7 +473,7 @@ namespace Timbl {
 
   IBtree* InstanceBase_base::read_list_hashed( istream &is,
 					       std::vector<Feature*>& Feats,
-					       Target& Targ,
+					       Targets& Targ,
 					       int level ){
     IBtree *result = NULL;
     IBtree **pnt = &result;
@@ -495,7 +495,7 @@ namespace Timbl {
 
   IBtree *InstanceBase_base::read_local( istream &is,
 					 vector<Feature*>& Feats,
-					 Target& Targ,
+					 Targets& Targ,
 					 int level ){
     if ( !is ){
       return NULL;
@@ -563,7 +563,7 @@ namespace Timbl {
 
   IBtree *InstanceBase_base::read_local_hashed( istream &is,
 						vector<Feature*>& Feats,
-						Target& Targ,
+						Targets& Targ,
 						int level ){
     if ( !is ){
       return NULL;
@@ -633,7 +633,7 @@ namespace Timbl {
 
   bool InstanceBase_base::ReadIB( istream &is,
 				  vector<Feature *>& Feats,
-				  Target& Targ,
+				  Targets& Targ,
 				  int expected_version ){
     if ( read_IB( is, Feats, Targ, expected_version ) ){
       InstBase->redo_distributions();
@@ -658,7 +658,7 @@ namespace Timbl {
 
   bool IG_InstanceBase::ReadIB( istream &is,
 				vector<Feature *>& Feats,
-				Target& Targ,
+				Targets& Targ,
 				int expected_version ){
     if ( read_IB( is, Feats, Targ, expected_version ) ){
       if ( PersistentDistributions ){
@@ -676,7 +676,7 @@ namespace Timbl {
 
   bool InstanceBase_base::read_IB( istream &is,
 				   vector<Feature *>& Feats,
-				   Target& Targs,
+				   Targets& Targs,
 				   int expected_version ){
     NumOfTails = 0;
     DefAss = true;  // always for a restored tree
@@ -764,7 +764,7 @@ namespace Timbl {
 
   bool InstanceBase_base::ReadIB( istream& is,
 				  vector<Feature *>& Feats,
-				  Target& Targs,
+				  Targets& Targs,
 				  Hash::UnicodeHash& feats,
 				  int expected_version ){
     if ( read_IB( is, Feats, Targs, feats, expected_version ) ){
@@ -782,7 +782,7 @@ namespace Timbl {
 
   bool IG_InstanceBase::ReadIB( istream& is,
 				vector<Feature *>& Feats,
-				Target& Targs,
+				Targets& Targs,
 				Hash::UnicodeHash& feats,
 				int expected_version ){
     if ( read_IB( is, Feats, Targs, feats, expected_version ) ){
@@ -801,7 +801,7 @@ namespace Timbl {
 
   bool InstanceBase_base::read_IB( istream& is,
 				   vector<Feature *>& Feats,
-				   Target& Targs,
+				   Targets& Targs,
 				   Hash::UnicodeHash& feats,
 				   int expected_version ){
     char delim;

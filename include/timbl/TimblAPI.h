@@ -91,7 +91,7 @@ namespace Timbl{
     const neighborSet *classifyNS( const std::string& );
     bool classifyNS( const std::string&, neighborSet& );
     const Instance *lastHandledInstance() const;
-    const Target *myTargets() const;
+    const Targets *myTargets() const;
     bool Classify( const std::string&,
 		   std::string& );
     bool Classify( const std::string&,

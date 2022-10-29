@@ -60,7 +60,7 @@ namespace Timbl {
 	delete confusionInfo;
 	confusionInfo = 0;
 	if ( Verbosity(ADVANCED_STATS) ){
-	  confusionInfo = new ConfusionMatrix( Targets->num_of_values() );
+	  confusionInfo = new ConfusionMatrix( targets->num_of_values() );
 	}
 	if ( !is_copy ){
 	  InitWeights();
@@ -135,7 +135,7 @@ namespace Timbl {
 	  }
 	  UnicodeString Buffer;
 	  IG_InstanceBase *outInstanceBase = 0;
-	  TargetValue *TopTarget = Targets->MajorityClass();
+	  TargetValue *TopTarget = targets->MajorityClass();
 	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
 	  // Open the file.
 	  //
@@ -193,7 +193,7 @@ namespace Timbl {
 	  UnicodeString Buffer;
 	  IG_InstanceBase *PartInstanceBase = 0;
 	  IG_InstanceBase *outInstanceBase = 0;
-	  TargetValue *TopTarget = Targets->MajorityClass();
+	  TargetValue *TopTarget = targets->MajorityClass();
 	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
 	  // Open the file.
 	  //
@@ -368,7 +368,7 @@ namespace Timbl {
     exact = false;
     bool Tie = false;
     initExperiment();
-    if ( !bestResult.reset( beamSize, normalisation, norm_factor, Targets ) ){
+    if ( !bestResult.reset( beamSize, normalisation, norm_factor, targets ) ){
       Warning( "no normalisation possible because a BeamSize is specified\n"
 	       "output is NOT normalized!" );
     }
@@ -488,13 +488,13 @@ namespace Timbl {
 	}
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
+					 *targets,
 					 *Features[0]->hash(),
 					 Version );
 	}
 	else {
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
+					 *targets,
 					 Version );
 	}
 	if ( result ){

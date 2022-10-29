@@ -54,7 +54,7 @@ namespace Timbl {
       }
     }
     if ( result ){
-      Targets->decrement_value( Inst.TV );
+      targets->decrement_value( Inst.TV );
     }
     return result;
   }
@@ -72,7 +72,7 @@ namespace Timbl {
       }
     }
     if ( result ){
-      Targets->increment_value( Inst.TV );
+      targets->increment_value( Inst.TV );
     }
     return result;
   }
@@ -464,7 +464,7 @@ namespace Timbl {
       os << "# Bin_Size: " << Bin_Size << endl;
       if ( hashed_trees ){
 	InstanceBase->Save( os,
-			    *Targets->hash(),
+			    *targets->hash(),
 			    *Features[0]->hash(),
 			    keep_distributions );
       }

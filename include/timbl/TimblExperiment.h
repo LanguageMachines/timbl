@@ -67,7 +67,7 @@ namespace Timbl {
       targets(0)
 	{};
     ~resultStore();
-    bool reset( int, normType, double, const Target * );
+    bool reset( int, normType, double, const Targets * );
     void clear();
     void addConstant( const ValueDistribution *, const TargetValue * );
     void addTop( const ValueDistribution *, const TargetValue * );
@@ -103,7 +103,7 @@ namespace Timbl {
     normType norm;
     double factor;
     const TargetValue *best_target;
-    const Target *targets;
+    const Targets *targets;
     std::string topCache;
     std::string resultCache;
   };

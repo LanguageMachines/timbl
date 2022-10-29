@@ -107,7 +107,7 @@ namespace Timbl {
     const TargetValue *Res = NULL;
     bool Tie = false;
     exact = false;
-    if ( !bestResult.reset( beamSize, normalisation, norm_factor, Targets ) ){
+    if ( !bestResult.reset( beamSize, normalisation, norm_factor, targets ) ){
       Warning( "no normalisation possible because a BeamSize is specified\n"
 	       "output is NOT normalized!" );
     }
@@ -218,7 +218,7 @@ namespace Timbl {
 						       bool& exact ){
     const TargetValue *Res = NULL;
     exact = false;
-    if ( !bestResult.reset( beamSize, normalisation, norm_factor, Targets ) ){
+    if ( !bestResult.reset( beamSize, normalisation, norm_factor, targets ) ){
       Warning( "no normalisation possible because a BeamSize is specified\n"
 	       "output is NOT normalized!" );
     }
@@ -246,7 +246,8 @@ namespace Timbl {
 	  bestArray.addToNeighborSet( nSet, num_of_neighbors );
 	  WValueDistribution *ResultDist2 = getBestDistribution();
 	  bool Tie2 = false;
-	  const TargetValue *Res2 = ResultDist2->BestTarget( Tie2, (RandomSeed() >= 0) );
+	  const TargetValue *Res2 = ResultDist2->BestTarget( Tie2,
+							     (RandomSeed() >= 0) );
 	  --num_of_neighbors;
 	  if ( !Tie2 ){
 	    delete ResultDist1;
@@ -348,13 +349,13 @@ namespace Timbl {
 	}
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
+					 *targets,
 					 *Features[0]->hash(),
 					 Version );
 	}
 	else {
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
+					 *targets,
 					 Version );
 	}
       }
@@ -399,13 +400,13 @@ namespace Timbl {
 	}
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
+					 *targets,
 					 *Features[0]->hash(),
 					 Version );
 	}
 	else {
 	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
+					 *targets,
 					 Version );
 	}
       }

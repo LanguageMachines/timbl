@@ -220,7 +220,7 @@ namespace Timbl {
     }
   }
 
-  void WValueDistribution::Normalize_1( double factor, const Target *targ ) {
+  void WValueDistribution::Normalize_1( double factor, const Targets *targ ) {
     for ( const auto& val : targ->values_array ){
       // search for val, if not there: add entry with frequency factor;
       // otherwise increment the ExamplarWeight
@@ -773,15 +773,15 @@ namespace Timbl {
     }
   }
 
-  void Feature::Statistics( double DBentropy, Target *Targets, bool full ){
+  void Feature::Statistics( double DBentropy, Targets *Targs, bool full ){
     Statistics( DBentropy );
     if ( full ){
-      ChiSquareStatistics( Targets );
-      SharedVarianceStatistics( Targets, EffectiveValues() );
+      ChiSquareStatistics( Targs );
+      SharedVarianceStatistics( Targs, EffectiveValues() );
     }
   }
 
-  void Feature::NumStatistics( double DBentropy, Target *Targets,
+  void Feature::NumStatistics( double DBentropy, Targets *Targs,
 			       int BinSize, bool full ){
     char dumname[80];
     vector<FeatureValue *> FVBin(BinSize);
@@ -791,14 +791,14 @@ namespace Timbl {
     }
     NumStatistics( FVBin, DBentropy );
     if ( full ){
-      ChiSquareStatistics( FVBin, Targets );
+      ChiSquareStatistics( FVBin, Targs );
       int cnt = 0;   // count effective values in Bin
       for ( int i=0; i < BinSize; ++i ){
 	if ( FVBin[i]->ValFreq() > 0 ){
 	  ++cnt;
 	}
       }
-      SharedVarianceStatistics( Targets, cnt );
+      SharedVarianceStatistics( Targs, cnt );
     }
     for ( int i=0; i < BinSize; ++i ){
       delete FVBin[i];
@@ -850,11 +850,11 @@ namespace Timbl {
   }
 
   void Feature::ChiSquareStatistics( vector<FeatureValue *>& FVA,
-				     Target *Targets ){
+				     Targets *Targs ){
     size_t Num_Vals = FVA.size();
     chi_square = 0.0;
     long int n_dot_dot = 0;
-    size_t Size = Targets->num_of_values();
+    size_t Size = Targs->num_of_values();
     if ( !n_dot_j ) {
       n_dot_j = new long int[Size];
       n_i_dot = new long int[Num_Vals];
@@ -919,10 +919,10 @@ namespace Timbl {
     }
   }
 
-  void Feature::ChiSquareStatistics( Target *Targets ){
+  void Feature::ChiSquareStatistics( Targets *Targs ){
     chi_square = 0.0;
     long int n_dot_dot = 0;
-    size_t Size = Targets->num_of_values();
+    size_t Size = Targs->num_of_values();
     size_t Num_Vals = values_array.size();
     if ( !n_dot_j ) {
       n_dot_j = new long int[Size];
@@ -1029,7 +1029,7 @@ namespace Timbl {
   }
 
   ValueDistribution *ValueDistribution::read_distribution( istream &is,
-							   Target& Targ,
+							   Targets& Targ,
 							   bool do_fr ){
     // read a distribution from stream is into Target
     // if do_f we also adjust the value of Frequency of the Target, which is
@@ -1102,7 +1102,7 @@ namespace Timbl {
 
 
   ValueDistribution *ValueDistribution::read_distribution_hashed( istream &is,
-								  Target& Targ,
+								  Targets& Targ,
 								  bool do_fr ){
 
     ValueDistribution *result = 0;
@@ -1204,7 +1204,7 @@ namespace Timbl {
 			    size_t value_hash ):
     ValueClass( value, value_hash ){}
 
-  size_t Target::EffectiveValues() const {
+  size_t Targets::EffectiveValues() const {
     return count_if( values_array.begin(), values_array.end(),
 		     [&]( const TargetValue* v ){
 		       return (v->ValFreq() > 0); } );
@@ -1216,7 +1216,7 @@ namespace Timbl {
 		       return (v->ValFreq() > 0); } );
   }
 
-  size_t Target::TotalValues() const {
+  size_t Targets::TotalValues() const {
     return accumulate( values_array.begin(), values_array.end(),
 		       0,
 		       [&]( size_t r, const TargetValue *v ){
@@ -1343,14 +1343,14 @@ namespace Timbl {
   BaseFeatTargClass::~BaseFeatTargClass(){
   }
 
-  Target::~Target() {
+  Targets::~Targets() {
     for ( const auto& it : values_array ){
       delete it;
     }
     reverse_values.clear();
   }
 
-  TargetValue *Target::Lookup( const UnicodeString& str ) const {
+  TargetValue *Targets::Lookup( const UnicodeString& str ) const {
     TargetValue *result = 0;
     size_t index = TokenTree->lookup( str );
     if ( index ) {
@@ -1360,7 +1360,7 @@ namespace Timbl {
     return result;
   }
 
-  TargetValue *Target::ReverseLookup( size_t index ) const {
+  TargetValue *Targets::ReverseLookup( size_t index ) const {
     auto const& it = reverse_values.find( index );
     return it->second;
   }
@@ -1438,7 +1438,7 @@ namespace Timbl {
   inline int min( int i1, int i2 ) { return (i1>i2?i2:i1); }
   inline size_t min( size_t i1, size_t i2 ) { return (i1>i2?i2:i1); }
 
-  void Feature::SharedVarianceStatistics( Target *Targ, int eff_cnt ){
+  void Feature::SharedVarianceStatistics( Targets *Targ, int eff_cnt ){
     size_t NumInst = Targ->TotalValues();
     int NumCats = Targ->EffectiveValues();
     int k = min( NumCats, eff_cnt ) - 1;
@@ -1702,13 +1702,13 @@ namespace Timbl {
     os.flags( old_flags );
   }
 
-  TargetValue *Target::add_value( const UnicodeString& valstr, int freq ){
+  TargetValue *Targets::add_value( const UnicodeString& valstr, int freq ){
     unsigned int hash_val = TokenTree->hash( valstr );
     //    cerr << "target hash(" << valstr << ") geeft: " << hash_val << endl;
     return add_value( hash_val, freq );
   }
 
-  TargetValue *Target::add_value( size_t index, int freq ){
+  TargetValue *Targets::add_value( size_t index, int freq ){
     auto const& it = reverse_values.find( index );
     if (  it == reverse_values.end() ){
       const UnicodeString& name = TokenTree->reverse_lookup( index );
@@ -1726,7 +1726,7 @@ namespace Timbl {
     return reverse_values[index];
   }
 
-  TargetValue *Target::MajorityClass() const {
+  TargetValue *Targets::MajorityClass() const {
     TargetValue *result = 0;
     size_t freq = 0;
     for ( const auto& it : values_array ){
@@ -1738,7 +1738,7 @@ namespace Timbl {
     return result;
   }
 
-  bool Target::increment_value( TargetValue *TV ){
+  bool Targets::increment_value( TargetValue *TV ){
     bool result = false;
     if ( TV ){
       TV->incr_val_freq();
@@ -1747,7 +1747,7 @@ namespace Timbl {
     return result;
   }
 
-  bool Target::decrement_value( TargetValue *TV ){
+  bool Targets::decrement_value( TargetValue *TV ){
     bool result = false;
     if ( TV ){
       TV->decr_val_freq();

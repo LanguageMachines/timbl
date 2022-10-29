@@ -113,7 +113,7 @@ namespace Timbl {
       delete confusionInfo;
       confusionInfo = 0;
       if ( Verbosity(ADVANCED_STATS) ){
-	confusionInfo = new ConfusionMatrix( Targets->num_of_values() );
+	confusionInfo = new ConfusionMatrix( targets->num_of_values() );
       }
       showTestingInfo( *mylog );
       // Start time.
