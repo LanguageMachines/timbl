@@ -765,10 +765,9 @@ namespace Timbl {
   bool InstanceBase_base::ReadIB( istream& is,
 				  vector<Feature *>& Feats,
 				  Target& Targs,
-				  Hash::UnicodeHash& cats,
 				  Hash::UnicodeHash& feats,
 				  int expected_version ){
-    if ( read_IB( is, Feats, Targs, cats, feats, expected_version ) ){
+    if ( read_IB( is, Feats, Targs, feats, expected_version ) ){
       InstBase->redo_distributions();
       ValueDistribution *Top
 	= InstBase->sum_distributions( PersistentDistributions );
@@ -784,10 +783,9 @@ namespace Timbl {
   bool IG_InstanceBase::ReadIB( istream& is,
 				vector<Feature *>& Feats,
 				Target& Targs,
-				Hash::UnicodeHash& cats,
 				Hash::UnicodeHash& feats,
 				int expected_version ){
-    if ( read_IB( is, Feats, Targs, cats, feats, expected_version ) ){
+    if ( read_IB( is, Feats, Targs, feats, expected_version ) ){
       if ( PersistentDistributions ){
 	ValueDistribution *Top
 	  = InstBase->sum_distributions( PersistentDistributions );
@@ -804,7 +802,6 @@ namespace Timbl {
   bool InstanceBase_base::read_IB( istream& is,
 				   vector<Feature *>& Feats,
 				   Target& Targs,
-				   Hash::UnicodeHash& cats,
 				   Hash::UnicodeHash& feats,
 				   int expected_version ){
     char delim;
@@ -812,7 +809,7 @@ namespace Timbl {
     DefAss = true;  // always for a restored tree
     DefaultsValid = true; // always for a restored tree
     Version = expected_version;
-    read_hash( is, cats, feats );
+    read_hash( is, *Targs.hash(), feats );
     is >> delim;
     if ( !is || delim != '(' ){
       Error( "missing first `(` in Instance Base file" );

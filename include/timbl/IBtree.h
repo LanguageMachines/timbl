@@ -158,7 +158,6 @@ namespace Timbl {
 			 std::vector<Feature *>&,
 			 Target&,
 			 Hash::UnicodeHash&,
-			 Hash::UnicodeHash&,
 			 int );
     virtual void Prune( const TargetValue *, long = 0 );
     virtual bool IsPruned() const { return false; };
@@ -220,7 +219,6 @@ namespace Timbl {
     bool read_IB( std::istream&,
 		  std::vector<Feature *>&,
 		  Target&,
-		  Hash::UnicodeHash&,
 		  Hash::UnicodeHash&, int );
     void fill_index();
     const IBtree *fast_search_node( FeatureValue * );
@@ -269,7 +267,6 @@ namespace Timbl {
     bool ReadIB( std::istream&,
 		 std::vector<Feature *>&,
 		 Target&,
-		 Hash::UnicodeHash&,
 		 Hash::UnicodeHash&,
 		 int );
     bool MergeSub( InstanceBase_base * );

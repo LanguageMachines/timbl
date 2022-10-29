@@ -349,7 +349,6 @@ namespace Timbl {
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is, PermFeatures,
 					 *Targets,
-					 *Targets->hash(),
 					 *Features[0]->hash(),
 					 Version );
 	}
@@ -401,7 +400,6 @@ namespace Timbl {
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is, PermFeatures,
 					 *Targets,
-					 *Targets->hash(),
 					 *Features[0]->hash(),
 					 Version );
 	}
