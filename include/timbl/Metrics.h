@@ -144,14 +144,14 @@ namespace Timbl{
   public:
   CosineMetric(): similarityMetricClass( Cosine ){};
     double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
-    double get_max_similarity() const { return 1.0; };
+    double get_max_similarity() const override { return 1.0; };
   };
 
   class DotProductMetric: public similarityMetricClass {
   public:
   DotProductMetric(): similarityMetricClass( DotProduct ){};
     double distance( FeatureValue *, FeatureValue *, size_t, double ) const;
-    double get_max_similarity() const {
+    double get_max_similarity() const override {
       return std::numeric_limits<int>::max();
     };
   };

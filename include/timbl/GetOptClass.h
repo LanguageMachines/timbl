@@ -93,7 +93,7 @@ namespace Timbl {
     std::string inPath;
     std::string outPath;
     int occIn;
-    void Error( const std::string& ) const;
+    void Error( const std::string& ) const override;
     inline bool parse_range( std::string&,
 			     std::string::iterator&,
 			     MetricType );

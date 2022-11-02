@@ -232,14 +232,14 @@ namespace Timbl {
       effFeat(0),
       testInst(0)
 	{};
-    IB_InstanceBase *Copy() const;
-    IB_InstanceBase *clone() const;
+    IB_InstanceBase *Copy() const override;
+    IB_InstanceBase *clone() const override;
     const ValueDistribution *InitGraphTest( std::vector<FeatureValue *>&,
 					    const std::vector<FeatureValue *> *,
 					    size_t,
-					    size_t );
+					    size_t ) override;
     const ValueDistribution *NextGraphTest( std::vector<FeatureValue *>&,
-				      size_t& );
+				      size_t& ) override;
   private:
     IB_InstanceBase( const IB_InstanceBase& ); // inhibit copy
     IB_InstanceBase& operator=( const IB_InstanceBase& ); // inhibit copy
@@ -253,23 +253,25 @@ namespace Timbl {
     IG_InstanceBase( size_t size, unsigned long& cnt,
 		     bool rand, bool pruned, bool keep_dists ):
       InstanceBase_base( size, cnt, rand, keep_dists ), Pruned( pruned ) {};
-    IG_InstanceBase *clone() const;
-    IG_InstanceBase *Copy() const;
-    void Prune( const TargetValue *, long = 0 );
+    IG_InstanceBase *clone() const override;
+    IG_InstanceBase *Copy() const override;
+    void Prune( const TargetValue *, long = 0 ) override;
     void specialPrune( const TargetValue * );
-    bool IsPruned() const { return Pruned; };
-    const ValueDistribution *IG_test( const Instance& , size_t&, bool&,
-				      const TargetValue *& );
+    bool IsPruned() const override { return Pruned; };
+    const ValueDistribution *IG_test( const Instance& ,
+				      size_t&,
+				      bool&,
+				      const TargetValue *& ) override;
     bool ReadIB( std::istream&,
 		 std::vector<Feature *>&,
 		 Targets&,
-		 int );
+		 int ) override;
     bool ReadIB( std::istream&,
 		 std::vector<Feature *>&,
 		 Targets&,
 		 Hash::UnicodeHash&,
-		 int );
-    bool MergeSub( InstanceBase_base * );
+		 int ) override;
+    bool MergeSub( InstanceBase_base * ) override;
   protected:
     bool Pruned;
   };
@@ -279,13 +281,13 @@ namespace Timbl {
     TRIBL_InstanceBase( size_t size, unsigned long& cnt,
 			bool rand, bool keep_dists ):
       InstanceBase_base( size, cnt, rand, keep_dists ), Threshold(0) {};
-    TRIBL_InstanceBase *clone() const;
-    TRIBL_InstanceBase *Copy() const;
+    TRIBL_InstanceBase *clone() const override;
+    TRIBL_InstanceBase *Copy() const override;
     IB_InstanceBase *TRIBL_test( const Instance&,
 				 size_t,
 				 const TargetValue *&,
 				 const ValueDistribution *&,
-				 size_t& );
+				 size_t& ) override;
   private:
     IB_InstanceBase *IBPartition( IBtree * ) const;
     void AssignDefaults( size_t );
@@ -298,11 +300,11 @@ namespace Timbl {
 			 bool rand, bool keep_dists ):
       InstanceBase_base( size, cnt, rand, keep_dists ) {
     };
-    TRIBL2_InstanceBase *clone() const;
-    TRIBL2_InstanceBase *Copy() const;
+    TRIBL2_InstanceBase *clone() const override;
+    TRIBL2_InstanceBase *Copy() const override;
     IB_InstanceBase *TRIBL2_test( const Instance& ,
 				  const ValueDistribution *&,
-				  size_t& );
+				  size_t& ) override;
   private:
     IB_InstanceBase *IBPartition( IBtree * ) const;
   };

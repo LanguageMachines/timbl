@@ -42,7 +42,7 @@ namespace Timbl{
   public:
     double test( FeatureValue *FV,
 		 FeatureValue *G,
-		 Feature *Feat ) const;
+		 Feature *Feat ) const override;
   };
 
   class valueDiffTestFunction: public metricTestFunction {
@@ -53,7 +53,7 @@ namespace Timbl{
       {};
     double test( FeatureValue *,
 		 FeatureValue *,
-		 Feature * ) const;
+		 Feature * ) const override;
   protected:
     int threshold;
   };
@@ -88,10 +88,10 @@ namespace Timbl{
 		    const std::vector<size_t>&,
 		    int );
     ~DistanceTester();
-    double getDistance( size_t ) const;
+    double getDistance( size_t ) const override;
     size_t test( std::vector<FeatureValue *>&,
 		 size_t,
-		 double );
+		 double ) override;
   private:
     DistanceTester( const DistanceTester& ); // inhibit copies
     DistanceTester& operator=( const DistanceTester& ); // inhibit copies
@@ -107,7 +107,7 @@ namespace Timbl{
     ~SimilarityTester() {};
     virtual size_t test( std::vector<FeatureValue *>&,
 			 size_t,
-			 double ) = 0;
+			 double ) override = 0;
   protected:
   private:
     SimilarityTester( const SimilarityTester & ); // inhibit copies
@@ -119,10 +119,10 @@ namespace Timbl{
   CosineTester( const std::vector<Feature*>& pf,
 		const std::vector<size_t>& p ):
     SimilarityTester( pf, p ){};
-    double getDistance( size_t ) const;
+    double getDistance( size_t ) const override;
     size_t test( std::vector<FeatureValue *>&,
 		 size_t,
-		 double );
+		 double ) override;
   private:
     CosineTester( const CosineTester & ); // inhibit copies
     CosineTester& operator=( const CosineTester & ); // inhibit copies
@@ -133,10 +133,10 @@ namespace Timbl{
   DotProductTester( const std::vector<Feature*>& pf,
 		    const std::vector<size_t>& p ):
     SimilarityTester( pf, p ){};
-    double getDistance( size_t ) const;
+    double getDistance( size_t ) const override;
     size_t test( std::vector<FeatureValue *>&,
 		 size_t,
-		 double );
+		 double ) override;
   private:
     DotProductTester( const DotProductTester & ); // inhibit copies
     DotProductTester& operator=( const DotProductTester & ); // inhibit copies

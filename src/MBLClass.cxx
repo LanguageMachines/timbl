@@ -227,9 +227,10 @@ namespace Timbl {
     mylog = &cout;
   }
 
-  MBLClass::MBLClass( const string& name ){
-    tableFilled = false;
-    exp_name = name;
+  MBLClass::MBLClass( const string& name ):
+    exp_name( name ),
+    tableFilled(false)
+  {
   }
 
   MBLClass &MBLClass::operator=( const MBLClass& m ){
