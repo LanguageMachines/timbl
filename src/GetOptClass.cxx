@@ -127,6 +127,7 @@ namespace Timbl {
     local_normalisation( in.local_normalisation ),
     local_norm_factor( in.local_norm_factor ),
     MaxFeats( in.MaxFeats ),
+    target_pos( in.target_pos ),
     no_neigh( in.no_neigh ),
     mvd_limit( in.mvd_limit ),
     estimate( in.estimate ),

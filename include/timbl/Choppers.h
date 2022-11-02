@@ -34,6 +34,9 @@ namespace Timbl{
 
   class Chopper {
   public:
+    Chopper():
+      vSize(0)
+    {};
     virtual ~Chopper() {};
     virtual bool chop( const icu::UnicodeString&, size_t ) = 0;
     const icu::UnicodeString& getField( size_t i ) const {
@@ -68,24 +71,28 @@ namespace Timbl{
 
   class ExChopper: public virtual Chopper {
   public:
-    double getExW() const { return exW; };
+    double getExW() const override { return exW; };
   protected:
-    void init( const icu::UnicodeString&, size_t, bool );
+    void init( const icu::UnicodeString&, size_t, bool ) override;
     double exW;
   };
 
   class OccChopper: public virtual Chopper {
   public:
-    int getOcc() const { return occ; };
+    OccChopper():
+      Chopper(),
+      occ(-1)
+    {};
+    int getOcc() const override { return occ; };
   protected:
-    void init( const icu::UnicodeString&, size_t, bool );
+    void init( const icu::UnicodeString&, size_t, bool ) override;
     int occ;
   };
 
   class C45_Chopper : public virtual Chopper {
   public:
-    bool chop( const icu::UnicodeString&, size_t );
-    icu::UnicodeString getString() const;
+    bool chop( const icu::UnicodeString&, size_t ) override;
+    icu::UnicodeString getString() const override;
   };
 
   class C45_ExChopper : public C45_Chopper, public ExChopper {
@@ -96,7 +103,7 @@ namespace Timbl{
 
   class ARFF_Chopper : public C45_Chopper {
   public:
-    bool chop( const icu::UnicodeString&, size_t );
+    bool chop( const icu::UnicodeString&, size_t ) override;
   };
 
   class ARFF_ExChopper : public C45_ExChopper {
@@ -107,8 +114,8 @@ namespace Timbl{
 
   class Bin_Chopper : public virtual Chopper {
   public:
-    bool chop( const icu::UnicodeString&, size_t );
-    icu::UnicodeString getString() const;
+    bool chop( const icu::UnicodeString&, size_t ) override;
+    icu::UnicodeString getString() const override;
   };
 
   class Bin_ExChopper : public Bin_Chopper, public ExChopper {
@@ -120,8 +127,8 @@ namespace Timbl{
   class Compact_Chopper : public virtual Chopper {
   public:
     explicit Compact_Chopper( int L ): fLen(L){};
-    bool chop( const icu::UnicodeString&, size_t );
-    icu::UnicodeString getString() const;
+    bool chop( const icu::UnicodeString&, size_t ) override;
+    icu::UnicodeString getString() const override;
   private:
     int fLen;
     Compact_Chopper();
@@ -143,8 +150,8 @@ namespace Timbl{
 
   class Columns_Chopper : public virtual Chopper {
   public:
-    bool chop( const icu::UnicodeString&, size_t );
-    icu::UnicodeString getString() const;
+    bool chop( const icu::UnicodeString&, size_t ) override;
+    icu::UnicodeString getString() const override;
   };
 
   class Columns_ExChopper : public Columns_Chopper, public ExChopper {
@@ -155,8 +162,8 @@ namespace Timbl{
 
   class Tabbed_Chopper : public virtual Chopper {
   public:
-    bool chop( const icu::UnicodeString&, size_t );
-    icu::UnicodeString getString() const;
+    bool chop( const icu::UnicodeString&, size_t ) override;
+    icu::UnicodeString getString() const override;
   };
 
   class Tabbed_ExChopper : public Tabbed_Chopper, public ExChopper {
@@ -168,8 +175,8 @@ namespace Timbl{
 
   class Sparse_Chopper : public virtual Chopper {
   public:
-    bool chop( const icu::UnicodeString&, size_t );
-    icu::UnicodeString getString() const;
+    bool chop( const icu::UnicodeString&, size_t ) override;
+    icu::UnicodeString getString() const override;
   };
 
   class Sparse_ExChopper : public Sparse_Chopper, public ExChopper {
