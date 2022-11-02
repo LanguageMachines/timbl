@@ -278,11 +278,11 @@ namespace Timbl{
   }
 
   double DotProductTester::getDistance( size_t pos ) const{
-#ifdef DBGTEST
-    cerr << "getDistance, maxSim = " << std::numeric_limits<int>::max() << endl;
+#ifdef DBGTEST_DOT
+    cerr << "getDistance, maxSim = " << std::numeric_limits<long int>::max() << endl;
     cerr << " distances[" << pos << "]= " <<  distances[pos] << endl;
 #endif
-    return (std::numeric_limits<int>::max() - distances[pos])/std::numeric_limits<int>::max();;
+    return (std::numeric_limits<long int>::max() - distances[pos])/std::numeric_limits<long int>::max();;
   }
 
 }
