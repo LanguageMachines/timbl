@@ -134,20 +134,20 @@ namespace Timbl {
   class WValueDistribution: public ValueDistribution {
   public:
     WValueDistribution(): ValueDistribution() {};
-    const TargetValue* BestTarget( bool &, bool = false ) const;
-    void SetFreq( const TargetValue *, int, double );
-    bool IncFreq( const TargetValue *, size_t, double );
-    WValueDistribution *to_WVD_Copy( ) const;
-    const std::string SaveHashed() const;
-    const std::string Save() const;
+    const TargetValue* BestTarget( bool &, bool = false ) const override;
+    void SetFreq( const TargetValue *, int, double ) override;
+    bool IncFreq( const TargetValue *, size_t, double ) override;
+    WValueDistribution *to_WVD_Copy( ) const override;
+    const std::string SaveHashed() const override;
+    const std::string Save() const override;
     void Normalize();
     void Normalize_1( double, const Targets * );
     void Normalize_2();
     void MergeW( const ValueDistribution&, double );
   private:
-    void DistToString( std::string&, double=0 ) const;
-    void DistToStringWW( std::string&, int ) const;
-    WValueDistribution *clone() const {
+    void DistToString( std::string&, double=0 ) const override;
+    void DistToStringWW( std::string&, int ) const override;
+    WValueDistribution *clone() const override {
       return new WValueDistribution; };
   };
 

@@ -56,19 +56,19 @@ namespace Timbl {
     public:
     OptionClassT( const std::string& n, Type *tp, Type t ):OptionClass(n),
       Content(tp) { *Content = t; };
-    virtual bool set_option( const std::string& line ){
+    virtual bool set_option( const std::string& line ) override {
       Type T;
       bool result = TiCC::stringTo<Type>( line, T );
       if ( result ) *Content = T;
       return result;
     };
-    virtual std::ostream& show_opt( std::ostream &os ) const {
+    virtual std::ostream& show_opt( std::ostream &os ) const override {
       os.width(20);
       os.setf( std::ios::left, std::ios::adjustfield );
       os << Name << " : " << TiCC::toString<Type>(*Content);
       return os;
     };
-    virtual std::ostream& show_full( std::ostream &os ) const {
+    virtual std::ostream& show_full( std::ostream &os ) const override {
       return show_opt( os );
     };
     private:
@@ -89,7 +89,7 @@ namespace Timbl {
   }
 
   template <>
-    inline std::ostream& OptionClassT<bool>::show_full( std::ostream &os ) const {
+    inline std::ostream& OptionClassT<bool>::show_full( std::ostream &os ) const{
     os.width(20);
     os.setf( std::ios::left, std::ios::adjustfield );
     os.setf( std::ios::boolalpha );
@@ -257,9 +257,9 @@ namespace Timbl {
       for ( size_t i=0; i < s; i++ )
 	TA[i] = m;
     };
-    bool set_option( const std::string& line );
-    std::ostream& show_opt( std::ostream &os ) const;
-    std::ostream& show_full( std::ostream &os ) const;
+    bool set_option( const std::string& line ) override;
+    std::ostream& show_opt( std::ostream &os ) const override;
+    std::ostream& show_full( std::ostream &os ) const override;
   private:
     const MetricType& def;
   };
@@ -315,20 +315,20 @@ namespace Timbl {
       Content( tp), minVal( Min ), maxVal( Max )
       { *Content = t; };
 
-    virtual bool set_option( const std::string& line ){
+    virtual bool set_option( const std::string& line ) override {
       Type T;
       bool result = TiCC::stringTo<Type>( line, T, minVal, maxVal );
       if ( result ) *Content = T;
       return result;
     };
-    virtual std::ostream& show_opt( std::ostream &os ) const {
+    virtual std::ostream& show_opt( std::ostream &os ) const override {
       os.width(20);
       os.setf( std::ios::showpoint );
       os.setf( std::ios::left, std::ios::adjustfield );
       os << Name << " : " << *Content;
       return os;
     };
-    virtual std::ostream& show_full( std::ostream &os ) const {
+    virtual std::ostream& show_full( std::ostream &os ) const override {
       os.width(20);
       os.setf( std::ios::showpoint );
       os.setf( std::ios::left, std::ios::adjustfield );

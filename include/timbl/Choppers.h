@@ -71,6 +71,10 @@ namespace Timbl{
 
   class ExChopper: public virtual Chopper {
   public:
+    ExChopper():
+      Chopper(),
+      exW(-1.0)
+    {};
     double getExW() const override { return exW; };
   protected:
     void init( const icu::UnicodeString&, size_t, bool ) override;

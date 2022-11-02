@@ -134,13 +134,13 @@ namespace Timbl {
     virtual bool CVprepare( const std::string& = "",
 			    WeightType = GR_w,
 			    const std::string& = "" );
-    virtual bool Increment( const icu::UnicodeString& )
-    { FatalError( "Increment" ); return false; };
-    virtual bool Decrement( const icu::UnicodeString& )
-    { FatalError( "Decrement" ); return false; };
+    virtual bool Increment( const icu::UnicodeString& ){
+      FatalError( "Increment" ); return false; };
+    virtual bool Decrement( const icu::UnicodeString& ){
+      FatalError( "Decrement" ); return false; };
     virtual bool Expand( const std::string& );
     virtual bool Remove( const std::string& ){
-    FatalError( "Remove" ); return false;};
+      FatalError( "Remove" ); return false;};
     virtual bool Test( const std::string&,
 		       const std::string& );
     virtual bool NS_Test( const std::string&,
@@ -275,7 +275,7 @@ namespace Timbl {
     TimblExperiment( const AlgorithmType, const std::string& = "" );
     virtual bool checkLine( const icu::UnicodeString& );
     virtual bool ClassicLearn( const std::string& = "", bool = true );
-    virtual const TargetValue *LocalClassify( const Instance& ,
+    virtual const TargetValue *LocalClassify( const Instance&,
 					      double&,
 					      bool& );
     virtual bool GetInstanceBase( std::istream& ) = 0;
@@ -292,7 +292,7 @@ namespace Timbl {
 		       InstanceBase_base *,
 		       size_t = 0 );
     void normalizeResult();
-    const neighborSet *LocalClassify( const Instance&  );
+    const neighborSet *LocalClassify( const Instance& );
     bool nextLine( std::istream &, icu::UnicodeString&, int& );
     bool nextLine( std::istream &, icu::UnicodeString& );
     bool skipARFFHeader( std::istream & );
@@ -343,23 +343,23 @@ namespace Timbl {
     IB1_Experiment( const size_t N = DEFAULT_MAX_FEATS,
 		    const std::string& s= "",
 		    const bool init = true );
-    bool Increment( const icu::UnicodeString& );
-    bool Decrement( const icu::UnicodeString& );
-    bool Remove( const std::string& );
-    AlgorithmType Algorithm() const { return IB1_a; };
-    void InitInstanceBase();
+    bool Increment( const icu::UnicodeString& ) override;
+    bool Decrement( const icu::UnicodeString& ) override;
+    bool Remove( const std::string& ) override;
+    AlgorithmType Algorithm() const override { return IB1_a; };
+    void InitInstanceBase() override;
     bool NS_Test( const std::string&,
-		  const std::string& );
+		  const std::string& ) override;
   protected:
-    TimblExperiment *clone() const {
+    TimblExperiment *clone() const override {
       return new IB1_Experiment( MaxFeats(), "", false );
     };
-    bool checkTestFile();
-    bool checkLine( const icu::UnicodeString& );
+    bool checkTestFile() override;
+    bool checkLine( const icu::UnicodeString& ) override;
     bool Increment( const Instance& I ) { return UnHideInstance( I ); };
     bool Decrement( const Instance& I ) { return HideInstance( I ); };
   private:
-    bool GetInstanceBase( std::istream& );
+    bool GetInstanceBase( std::istream& ) override;
   };
 
   class IB2_Experiment: public IB1_Experiment {
@@ -368,14 +368,17 @@ namespace Timbl {
     IB1_Experiment( N, s ) {
       IB2_offset( 0 );
     };
-    bool Prepare( const std::string& = "", bool = false, bool = false );
-    bool Expand( const std::string& );
-    bool Remove( const std::string& );
-    bool Learn( const std::string& = "", bool = false );
-    AlgorithmType Algorithm() const { return IB2_a; };
+    bool Prepare( const std::string& = "",
+		  bool=false,
+		  bool=false ) override;
+    bool Expand( const std::string& ) override;
+    bool Remove( const std::string& ) override;
+    bool Learn( const std::string& = "", bool = false ) override;
+    AlgorithmType Algorithm() const override { return IB2_a; };
   protected:
-    bool checkTestFile( );
-    TimblExperiment *clone() const { return new IB2_Experiment( MaxFeats() ); };
+    bool checkTestFile() override;
+    TimblExperiment *clone() const override {
+      return new IB2_Experiment( MaxFeats() ); };
     bool Expand_N( const std::string& );
     bool show_learn_progress( std::ostream& os, time_t, size_t );
   };
@@ -386,29 +389,31 @@ namespace Timbl {
     IB1_Experiment( N, s ) {
     };
     bool Test( const std::string&,
-	       const std::string& );
-    AlgorithmType Algorithm() const { return LOO_a; };
-    bool ReadInstanceBase( const std::string& );
-    void initExperiment( bool = false );
+	       const std::string& ) override;
+    AlgorithmType Algorithm() const override { return LOO_a; };
+    bool ReadInstanceBase( const std::string& ) override;
+    void initExperiment( bool = false ) override;
   protected:
-    bool checkTestFile( );
-    void showTestingInfo( std::ostream& );
+    bool checkTestFile() override;
+    void showTestingInfo( std::ostream& ) override;
   };
 
   class CV_Experiment: public IB1_Experiment {
   public:
   CV_Experiment( int N = DEFAULT_MAX_FEATS, const std::string& s = "" ):
     IB1_Experiment( N, s ), CV_fileW(Unknown_w) { };
-    bool Learn( const std::string& = "", bool = true );
-    bool Prepare( const std::string& = "", bool = true, bool = false );
+    bool Learn( const std::string& = "", bool = true ) override;
+    bool Prepare( const std::string& = "",
+		  bool=true,
+		  bool=false ) override;
     bool Test( const std::string&,
-	       const std::string& );
+	       const std::string& ) override;
     bool CVprepare( const std::string& = "",
 		    WeightType = GR_w,
-		    const std::string& = "" );
-    AlgorithmType Algorithm() const { return CV_a; };
+		    const std::string& = "" ) override;
+    AlgorithmType Algorithm() const override { return CV_a; };
   protected:
-    bool checkTestFile();
+    bool checkTestFile() override;
     bool get_file_names( const std::string& );
   private:
     CV_Experiment( const CV_Experiment& );
@@ -427,19 +432,19 @@ namespace Timbl {
     TimblExperiment( TRIBL_a, s ) {
       if ( init ) InitClass( N );
     };
-    void InitInstanceBase();
+    void InitInstanceBase() override;
   protected:
-    TimblExperiment *clone() const {
+    TimblExperiment *clone() const override {
       return new TRIBL_Experiment( MaxFeats(), "", false ); };
-    void showTestingInfo( std::ostream& );
-    bool checkTestFile();
-    AlgorithmType Algorithm() const { return TRIBL_a; };
-    bool checkLine( const icu::UnicodeString& );
-    const TargetValue *LocalClassify( const Instance& ,
+    void showTestingInfo( std::ostream& ) override;
+    bool checkTestFile() override;
+    AlgorithmType Algorithm() const override { return TRIBL_a; };
+    bool checkLine( const icu::UnicodeString& ) override;
+    const TargetValue *LocalClassify( const Instance&,
 				      double&,
-				      bool& );
+				      bool& ) override;
   private:
-    bool GetInstanceBase( std::istream& );
+    bool GetInstanceBase( std::istream& ) override;
   };
 
   class TRIBL2_Experiment: public TimblExperiment {
@@ -450,18 +455,18 @@ namespace Timbl {
     TimblExperiment( TRIBL2_a, s ) {
       if ( init ) InitClass( N );
     };
-    void InitInstanceBase();
+    void InitInstanceBase() override;
   protected:
-    TimblExperiment *clone() const {
+    TimblExperiment *clone() const override {
       return new TRIBL2_Experiment( MaxFeats(), "", false ); };
-    bool checkTestFile();
-    AlgorithmType Algorithm() const { return TRIBL2_a; };
-    bool checkLine( const icu::UnicodeString& );
+    bool checkTestFile() override;
+    AlgorithmType Algorithm() const override { return TRIBL2_a; };
+    bool checkLine( const icu::UnicodeString& ) override;
     const TargetValue *LocalClassify( const Instance& ,
 				      double&,
-				      bool& );
+				      bool& ) override;
   private:
-    bool GetInstanceBase( std::istream& );
+    bool GetInstanceBase( std::istream& ) override;
   };
 
   class IG_Experiment: public TimblExperiment {
@@ -472,30 +477,30 @@ namespace Timbl {
     TimblExperiment( IGTREE_a, s ) {
       if ( init ) InitClass( N );
     };
-    AlgorithmType Algorithm() const { return IGTREE_a; };
-    void InitInstanceBase();
-    bool WriteInstanceBase( const std::string& );
-    bool ReadInstanceBase( const std::string& );
-    void initExperiment( bool = false );
-    bool Expand( const std::string& ){
+    AlgorithmType Algorithm() const override { return IGTREE_a; };
+    void InitInstanceBase() override;
+    bool WriteInstanceBase( const std::string& ) override;
+    bool ReadInstanceBase( const std::string& ) override;
+    void initExperiment( bool = false ) override;
+    bool Expand( const std::string& ) override {
       FatalError( "Expand not supported for IGTree" );
       return false;
     };
 
   protected:
-    TimblExperiment *clone() const {
+    TimblExperiment *clone() const override{
       return new IG_Experiment( MaxFeats(), "", false ); };
-    bool ClassicLearn( const std::string& = "", bool = true );
-    bool checkTestFile();
-    void showTestingInfo( std::ostream& );
-    bool checkLine( const icu::UnicodeString& );
+    bool ClassicLearn( const std::string& = "", bool = true ) override;
+    bool checkTestFile() override;
+    void showTestingInfo( std::ostream& ) override;
+    bool checkLine( const icu::UnicodeString& ) override;
     bool sanityCheck() const;
     const TargetValue *LocalClassify( const Instance&,
 				      double&,
-				      bool& );
+				      bool& ) override;
   private:
 
-    bool GetInstanceBase( std::istream& );
+    bool GetInstanceBase( std::istream& ) override;
   };
 
 }

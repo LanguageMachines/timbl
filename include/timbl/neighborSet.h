@@ -46,30 +46,30 @@ namespace Timbl{
   class zeroDecay: public decayStruct {
   public:
     zeroDecay():decayStruct(){};
-    std::ostream& put( std::ostream& ) const;
-    DecayType type() const { return Zero;};
+    std::ostream& put( std::ostream& ) const override;
+    DecayType type() const override { return Zero;};
   };
 
   class invLinDecay: public decayStruct {
   public:
     invLinDecay():decayStruct(){};
-    std::ostream& put( std::ostream& ) const;
-    DecayType type() const { return InvLinear;};
+    std::ostream& put( std::ostream& ) const override;
+    DecayType type() const override { return InvLinear;};
   };
 
   class invDistDecay: public decayStruct {
   public:
     invDistDecay():decayStruct(){};
-    std::ostream& put( std::ostream& ) const;
-    DecayType type() const { return InvDist;};
+    std::ostream& put( std::ostream& ) const override;
+    DecayType type() const override { return InvDist;};
   };
 
   class expDecay: public decayStruct {
   public:
     explicit expDecay( double alp ): decayStruct(alp,1.0){};
     expDecay( double alp, double bet ): decayStruct(alp,bet){};
-    std::ostream& put( std::ostream& ) const;
-    DecayType type() const { return ExpDecay;};
+    std::ostream& put( std::ostream& ) const override;
+    DecayType type() const override { return ExpDecay;};
   };
 
   class neighborSet {

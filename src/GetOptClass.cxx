@@ -486,7 +486,7 @@ namespace Timbl {
 	  return false;
 	}
 	else {
-	  for ( size_t j=k+1; j <= m && j <= metricsArray.size(); ++j ){
+	  for ( size_t j=k+1; j <= m && j < metricsArray.size(); ++j ){
 	    if ( metricsArray[j] != UnknownMetric
 		 && metricsArray[j] != Value ){
 	      Error( "metric of feature " + TiCC::toString<int>(j) +

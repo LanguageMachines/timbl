@@ -186,15 +186,16 @@ namespace TiCC {
     }
     throw( std::runtime_error( "conversion from string '"
 			       + str + "' to decayType failed" ) );
-    return UnknownDecay;
   }
 
   template <>
     inline std::string toString<DecayType>( const DecayType& W, bool b ){
-    if ( b )
+    if ( b ){
       return DecayName[W][1];
-    else
+    }
+    else {
       return DecayName[W][0];
+    }
   }
 
   template <>
@@ -208,7 +209,6 @@ namespace TiCC {
     }
     throw( std::runtime_error( "conversion from string '"
 			       + str + "' to ordeningType failed" ) );
-    return UnknownOrdening;
   }
 
   template <>
@@ -228,7 +228,6 @@ namespace TiCC {
     }
     throw( std::runtime_error( "conversion from string '"
 			       + str + "' to metricType failed" ) );
-    return UnknownMetric;
   }
 
   template <>
@@ -255,15 +254,16 @@ namespace TiCC {
     }
     throw( std::runtime_error( "conversion from string '"
 			       + str + "' to weightType failed" ) );
-    return Unknown_w;
   }
 
   template <>
     inline std::string toString<WeightType>( const WeightType& W, bool b ){
-    if ( b )
+    if ( b ){
       return WeightName[W][1];
-    else
+    }
+    else {
       return WeightName[W][0];
+    }
   }
 
   template <>
@@ -282,7 +282,6 @@ namespace TiCC {
     }
     throw( std::runtime_error( "conversion from string '"
 			       + str + "' to algorithmType failed" ) );
-    return Unknown_a;
   }
 
   template <>
@@ -305,16 +304,17 @@ namespace TiCC {
     }
     throw( std::runtime_error( "conversion from string '"
 			       + str + "' to weightType failed" ) );
-    return UnknownInputFormat;
   }
 
   template <>
     inline std::string toString<InputFormatType>( const InputFormatType& i,
 						  bool b ){
-    if ( b )
+    if ( b ){
       return InputFormatName[i][1];
-    else
+    }
+    else {
       return InputFormatName[i][0];
+    }
   }
 
   template <>
@@ -328,16 +328,17 @@ namespace TiCC {
     }
     throw( std::runtime_error( "conversion from string '"
 			       + str + "' to smoothingType failed" ) );
-    return UnknownSmoothing;
   }
 
   template <>
     inline std::string toString<SmoothingType>( const SmoothingType& s,
 						bool b ){
-    if ( b )
+    if ( b ){
       return SmoothingName[s][1];
-    else
+    }
+    else {
       return SmoothingName[s][0];
+    }
   }
 
   template <>
@@ -356,16 +357,17 @@ namespace TiCC {
     }
     throw( std::runtime_error( "conversion from string '"
 			       + str + "' to normalisationType failed" ) );
-    return unknownNorm;
   }
 
   template <>
     inline std::string toString<normType>( const normType& s,
 					   bool b ){
-    if ( b )
+    if ( b ){
       return NormalisationName[s][1];
-    else
+    }
+    else {
       return NormalisationName[s][0];
+    }
   }
 
   inline bool string_to_verbflag( const std::string& line,

@@ -262,7 +262,6 @@ namespace Timbl{
   }
 
   void ExChopper::init( const UnicodeString& s, size_t len, bool stripDot ) {
-    exW = -1.0;
     UnicodeString split = s;
     vSize = len+1;
     choppedInput.resize(vSize);
@@ -448,7 +447,7 @@ namespace Timbl{
     for ( size_t i=0; i < res ; ++i ){
       choppedInput[i] = StrToCode( splits[i] );
     }
-    return ( res == vSize ); // Enough?
+    return true;
   }
 
   UnicodeString Columns_Chopper::getString() const {
@@ -470,7 +469,7 @@ namespace Timbl{
     for ( size_t i=0; i < res ; ++i ){
       choppedInput[i] = StrToCode( splits[i], false );
     }
-    return ( res == vSize ); // Enough?
+    return true;
   }
 
   UnicodeString Tabbed_Chopper::getString() const {
