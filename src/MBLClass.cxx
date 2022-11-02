@@ -1813,7 +1813,7 @@ namespace Timbl {
   }
 
   UnicodeString MBLClass::formatInstance( const vector<FeatureValue *>& OrgFV,
-					  vector<FeatureValue *>& RedFV,
+					  const vector<FeatureValue *>& RedFV,
 					  size_t OffSet,
 					  size_t Size ) const {
     UnicodeString result;

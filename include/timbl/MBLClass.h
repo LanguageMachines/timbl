@@ -104,7 +104,7 @@ namespace Timbl {
     bool HideInstance( const Instance& );
     bool UnHideInstance( const Instance&  );
     icu::UnicodeString formatInstance( const std::vector<FeatureValue *>&,
-				       std::vector<FeatureValue *>&,
+				       const std::vector<FeatureValue *>&,
 				       size_t,	size_t ) const;
     bool setInputFormat( const InputFormatType );
     size_t countFeatures( const icu::UnicodeString&,
