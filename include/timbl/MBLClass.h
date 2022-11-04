@@ -243,7 +243,7 @@ namespace Timbl {
 	return false;
       }
     };
-    void fill_table();
+    void fill_table( size_t );
     void InvalidMessage() const ;
     double calculate_db_entropy( Targets * );
     void do_numeric_statistics( );

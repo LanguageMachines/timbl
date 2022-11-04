@@ -60,13 +60,15 @@ using namespace nlohmann;
 
 namespace Timbl {
 
-  void MBLClass::fill_table(){
+  void MBLClass::fill_table( size_t Size ){
     if ( tableFilled ){
       return;
     }
     else {
       tableFilled = true;
     }
+    MaxFeatures = Size;
+    UserOptions.resize(MaxFeatures+1);
     //cerr << "fill table() for " << (void*)this << endl;
     bool stat =
       Options.Add( new IntegerOption( "FLENGTH",
@@ -192,39 +194,7 @@ namespace Timbl {
   }
 
   void MBLClass::InitClass( const size_t Size ){
-    GlobalMetric = 0;
-    is_copy = false;
-    is_synced = false;
-    sock_os = 0;
-    sock_is_json = false;
-    targets   = NULL;
-    err_count = 0;
-    MBL_init = false;
-    tableFilled = false;
-    need_all_weights = false;
-    InstanceBase = NULL;
-    TargetStrings = NULL;
-    FeatureStrings = NULL;
-    num_of_features = 0;
-    target_pos = std::numeric_limits<size_t>::max();
-    mvd_threshold = 1;
-    effective_feats = 0;
-    num_of_num_features = 0;
-    DBEntropy = -1.0;
-    ChopInput = 0;
-    MaxFeatures = Size;
-    runningPhase = LearnWords;
-    do_sloppy_loo = false;
-    do_silly_testing = false;
-    do_diversify = false;
-    keep_distributions = false;
-    UserOptions.resize(MaxFeatures+1);
-    tester = 0;
-    //    cerr << "call fill table() in InitClass()" << endl;
-    fill_table();
-    decay = 0;
-    myerr = &cerr;
-    mylog = &cout;
+    fill_table( Size );
   }
 
   MBLClass::MBLClass( const string& name ):
@@ -294,10 +264,7 @@ namespace Timbl {
     if ( this != &m ){
       is_copy = true;
       is_synced = false;
-      MaxFeatures        = m.MaxFeatures;
-      UserOptions.resize(MaxFeatures+1);
-      //      cerr << "call fill table() in assign" << endl;
-      fill_table();
+      fill_table( m.MaxFeatures );
       F_length           = m.F_length;
       MaxBests           = m.MaxBests;
       TreeOrder          = m.TreeOrder;
