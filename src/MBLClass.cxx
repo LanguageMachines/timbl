@@ -228,8 +228,37 @@ namespace Timbl {
   }
 
   MBLClass::MBLClass( const string& name ):
+    sock_os(0),
+    sock_is_json(false),
+    targets(NULL),
+    InstanceBase(NULL),
+    mylog(&cout),
+    myerr(&cerr),
+    runningPhase(LearnWords),
+    GlobalMetric(0),
+    TargetStrings(NULL),
+    FeatureStrings(NULL),
     exp_name( name ),
-    tableFilled(false)
+    decay(0),
+    is_copy(false),
+    is_synced(false),
+    MBL_init(false),
+    do_diversify(false),
+    tableFilled(false),
+    ChopInput(0),
+    MaxFeatures(0),
+    err_count(0),
+    num_of_features(0),
+    num_of_num_features(0),
+    target_pos(std::numeric_limits<size_t>::max()),
+    effective_feats(0),
+    mvd_threshold(1),
+    do_sloppy_loo(false),
+    do_silly_testing(false),
+    need_all_weights(false),
+    keep_distributions(false),
+    DBEntropy(-1.0),
+    tester(0)
   {
   }
 
