@@ -29,12 +29,12 @@
 #define TIMBL_OPTIONS_H
 
 #include <vector>
+#include <map>
 #include <climits>
 #include <cstdio>
 #include "ticcutils/StringOps.h"
 
 namespace Timbl {
-  const int MAX_TABLE_SIZE =  50;
 
   class OptionClass {
     friend class OptionTableClass;
@@ -351,44 +351,81 @@ namespace Timbl {
 
   enum SetOptRes { Opt_OK, Opt_Frozen, Opt_Unknown, Opt_Ill_Val};
 
+  struct ci_less
+  {
+    // case-independent (ci) compare_less binary function
+    struct nocase_compare
+    {
+      bool operator() (const unsigned char& c1, const unsigned char& c2) const {
+          return tolower (c1) < tolower (c2);
+      }
+    };
+    bool operator() (const std::string & s1, const std::string & s2) const {
+      return std::lexicographical_compare
+        (s1.begin (), s1.end (),   // source range
+	 s2.begin (), s2.end (),   // dest range
+	 nocase_compare ());  // comparison
+    }
+  };
+
   class OptionTableClass {
   public:
     bool Add( OptionClass *opt ){
-      Table[table_size++] = opt;
-      return table_size < MAX_TABLE_SIZE;
+      //      std::cerr << "Table add: " << opt->Name << std::endl;
+      runtime_table[opt->Name] = opt;
+      return true;
     };
-    void SetFreezeMark(void){ table_start = table_size; };
-    void FreezeTable(void){ table_frozen = true; };
+    void FreezeTable(void);
+    void SetFreezeMark(){
+      //      std::cerr << "SetFreezeMark()" << std::endl;
+      table_init = true;
+    };
     bool TableFrozen(void){ return table_frozen; };
     SetOptRes SetOption( const std::string& );
     void Show_Settings( std::ostream& ) const;
     void Show_Options( std::ostream& ) const;
     OptionTableClass():
-      table_start(0), table_size(0), table_frozen(false),Table(0){
-      Table = new OptionClass *[MAX_TABLE_SIZE]; };
+      table_init(false),table_frozen(false){};
     ~OptionTableClass(){
-      for ( int i=0; i < table_size; i++ )
-	delete Table[i];
-      delete [] Table;
+      for ( const auto& it : global_table ){
+	delete it.second;
+      }
+      for ( const auto& it : runtime_table ){
+	delete it.second;
+      }
     };
   private:
-    int table_start;
-    int table_size;
+    bool table_init;
     bool table_frozen;
-    OptionClass **Table;
+    std::map<std::string,OptionClass *,ci_less> runtime_table;
+    std::map<std::string,OptionClass *,ci_less> global_table;
     inline OptionClass *look_up( const std::string&, bool & );
     OptionTableClass( const OptionTableClass& );
     OptionTableClass& operator=( const OptionTableClass& );
   };
 
+  inline void OptionTableClass::FreezeTable(void){
+    global_table = runtime_table;
+    runtime_table.clear();
+    table_frozen = true;
+  }
+
   inline void OptionTableClass::Show_Settings( std::ostream& os ) const{
-    for ( int i=0; i <table_size; i++)
-      Table[i]->show_opt( os ) << std::endl;
+    for ( const auto& it: global_table ){
+      it.second->show_opt( os ) << std::endl;
+    }
+    for ( const auto& it: runtime_table ){
+      it.second->show_opt( os ) << std::endl;
+    }
   }
 
   inline void OptionTableClass::Show_Options( std::ostream& os ) const {
-    for ( int i=0; i <table_size; i++)
-      Table[i]->show_full( os ) << std::endl;
+    for ( const auto& it: global_table ){
+      it.second->show_full( os ) << std::endl;
+    }
+    for ( const auto& it: runtime_table ){
+      it.second->show_full( os ) << std::endl;
+    }
   }
 
   inline void split_line( const std::string& line,
@@ -409,11 +446,21 @@ namespace Timbl {
 
   inline OptionClass *OptionTableClass::look_up( const std::string& option_name,
 						 bool &runtime ){
-    for ( int i=0; i < table_size; i++ )
-      if ( compare_nocase( option_name, Table[i]->Name ) ){
-	runtime = (i >= table_start || !table_frozen );
-	return Table[i];
+    //    std::cerr << "lookup: " << option_name << std::endl;
+    const auto itr = runtime_table.find( option_name );
+    if ( itr != runtime_table.end() ){
+      runtime = true;
+      //      std::cerr << "FOUND: runtime= " << option_name << std::endl;
+      return itr->second;
+    }
+    else {
+      const auto itg = global_table.find( option_name );
+      if ( itg != global_table.end() ){
+	runtime = table_frozen;
+	//	std::cerr << "FOUND global= " << option_name << std::endl;
+	return itg->second;
       }
+    }
     return NULL;
   }
 
@@ -425,14 +472,16 @@ namespace Timbl {
     split_line( line, option_name, value );
     OptionClass *option = look_up( option_name, runtime );
     if ( option ){
-      if ( !runtime )
+      if ( !runtime ){
 	result = Opt_Frozen; // may not be changed at this stage
-      else
-	if ( !option->set_option( value ) )
-	  result = Opt_Ill_Val; // illegal value
+      }
+      else if ( !option->set_option( value ) ){
+	result = Opt_Ill_Val; // illegal value
+      }
     }
-    else
+    else {
       result = Opt_Unknown; // What the hell ???
+    }
     return result;
   }
 

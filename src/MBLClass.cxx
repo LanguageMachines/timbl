@@ -102,6 +102,7 @@ namespace Timbl {
 				      &target_pos,
 				      std::numeric_limits<size_t>::max(),
 				      0, MaxFeatures ) );
+    //    cerr << "STAT 1=" << (stat?"true":"false") << endl;
     if ( stat ){
       Options.SetFreezeMark();
       stat =
@@ -151,6 +152,7 @@ namespace Timbl {
 	&& Options.Add( new IntegerOption( "CLIP_FACTOR",
 					   &clip_factor, 10, 0, 1000000 ) );
     }
+    //    cerr << "STAT 2=" << (stat?"true":"false") << endl;
     if ( !stat ){
       FatalError( "Too many options for OptionTable" );
     }
@@ -2302,8 +2304,9 @@ namespace Timbl {
     }
     Options.FreezeTable();
     if ( Weighting > IG_w ||
-	 TreeOrder >= X2Order )
+	 TreeOrder >= X2Order ){
       need_all_weights = true;
+    }
   }
 
 } // namespace

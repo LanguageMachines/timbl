@@ -294,7 +294,7 @@ namespace Timbl {
 	if ( !outPath.empty() ){
 	  Exp->setOutPath( outPath );
 	}
-      }
+      } //first
       if ( clones > 0 ){
 	Exp->Clones( clones );
       }
