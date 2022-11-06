@@ -644,7 +644,7 @@ namespace Timbl {
 				  const bool init ):
     TimblExperiment( IB1_a, s ){
     if ( init ) {
-      InitClass( N );
+      init_options_table(N);
     }
     TreeOrder = GRoverFeature;
   }

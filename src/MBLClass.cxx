@@ -60,7 +60,7 @@ using namespace nlohmann;
 
 namespace Timbl {
 
-  void MBLClass::fill_table( size_t Size ){
+  void MBLClass::init_options_table( size_t Size ){
     if ( tableFilled ){
       return;
     }
@@ -193,10 +193,6 @@ namespace Timbl {
     return result;
   }
 
-  void MBLClass::InitClass( const size_t Size ){
-    fill_table( Size );
-  }
-
   MBLClass::MBLClass( const string& name ):
     sock_os(0),
     sock_is_json(false),
@@ -264,7 +260,7 @@ namespace Timbl {
     if ( this != &m ){
       is_copy = true;
       is_synced = false;
-      fill_table( m.MaxFeatures );
+      init_options_table( m.MaxFeatures );
       F_length           = m.F_length;
       MaxBests           = m.MaxBests;
       TreeOrder          = m.TreeOrder;

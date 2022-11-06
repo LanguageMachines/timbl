@@ -77,6 +77,7 @@ namespace Timbl {
     int getOcc() const { return doOcc; };
   protected:
     explicit MBLClass( const std::string& = "" );
+    void init_options_table( size_t );
     MBLClass& operator=( const MBLClass& );
     enum PhaseValue { TrainWords, LearnWords, TestWords, TrainLearnWords };
     friend std::ostream& operator<< ( std::ostream&, const PhaseValue& );
@@ -94,7 +95,6 @@ namespace Timbl {
     void writePermutation( std::ostream& ) const;
     void LearningInfo( std::ostream& );
     virtual ~MBLClass();
-    void InitClass( const size_t );
     void Initialize( size_t = 0 );
     bool PutInstanceBase( std::ostream& ) const;
     VerbosityFlags get_verbosity() const { return verbosity; };
@@ -243,7 +243,6 @@ namespace Timbl {
 	return false;
       }
     };
-    void fill_table( size_t );
     void InvalidMessage() const ;
     double calculate_db_entropy( Targets * );
     void do_numeric_statistics( );

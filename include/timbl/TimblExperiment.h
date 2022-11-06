@@ -430,7 +430,7 @@ namespace Timbl {
 		    const std::string& s = "",
 		    const bool init = true ):
     TimblExperiment( TRIBL_a, s ) {
-      if ( init ) InitClass( N );
+      if ( init ) init_options_table( N );
     };
     void InitInstanceBase() override;
   protected:
@@ -453,7 +453,7 @@ namespace Timbl {
 		     const std::string& s = "",
 		     const bool init = true ):
     TimblExperiment( TRIBL2_a, s ) {
-      if ( init ) InitClass( N );
+      if ( init ) init_options_table( N );
     };
     void InitInstanceBase() override;
   protected:
@@ -475,7 +475,7 @@ namespace Timbl {
 		 const std::string& s = "",
 		 const bool init = true ):
     TimblExperiment( IGTREE_a, s ) {
-      if ( init ) InitClass( N );
+      if ( init ) init_options_table( N );
     };
     AlgorithmType Algorithm() const override { return IGTREE_a; };
     void InitInstanceBase() override;
