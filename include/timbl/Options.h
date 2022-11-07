@@ -52,14 +52,16 @@ namespace Timbl {
   };
 
   template <class Type>
-    class OptionClassT: public OptionClass {
-    public:
+  class OptionClassT: public OptionClass {
+  public:
     OptionClassT( const std::string& n, Type *tp, Type t ):OptionClass(n),
-      Content(tp) { *Content = t; };
+							   Content(tp) { *Content = t; };
     virtual bool set_option( const std::string& line ) override {
       Type T;
       bool result = TiCC::stringTo<Type>( line, T );
-      if ( result ) *Content = T;
+      if ( result ) {
+	*Content = T;
+      }
       return result;
     };
     virtual std::ostream& show_opt( std::ostream &os ) const override {
@@ -115,8 +117,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     InputFormatType i = UnknownInputFormat;
-    for ( ++i; i < MaxInputFormat-1; ++i )
+    for ( ++i; i < MaxInputFormat-1; ++i ){
       os << TiCC::toString<InputFormatType>(i) << ", ";
+    }
     os << TiCC::toString<InputFormatType>(i) << "}, [ "
        << TiCC::toString<InputFormatType>(*Content) << "]";
     return os;
@@ -131,8 +134,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     MetricType i = UnknownMetric;
-    for ( ++i; i < MaxMetric-1; ++i )
+    for ( ++i; i < MaxMetric-1; ++i ){
       os << TiCC::toString<MetricType>(i) << ", ";
+    }
     os << TiCC::toString<MetricType>(i) << "}, [ "
        << TiCC::toString<MetricType>(*Content) << "]";
     return os;
@@ -146,8 +150,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     AlgorithmType i = Unknown_a;
-    for ( ++i; i < Max_a-1; ++i )
+    for ( ++i; i < Max_a-1; ++i ){
       os << TiCC::toString<AlgorithmType>(i) << ", ";
+    }
     os << TiCC::toString<AlgorithmType>(i) << "}, [ "
        << TiCC::toString<AlgorithmType>(*Content) << "]";
     return os;
@@ -161,8 +166,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     DecayType i = UnknownDecay;
-    for ( ++i; i < MaxDecay-1; ++i )
+    for ( ++i; i < MaxDecay-1; ++i ){
       os << TiCC::toString<DecayType>(i) << ", ";
+    }
     os << TiCC::toString<DecayType>(i) << "}, [ "
        << TiCC::toString<DecayType>(*Content) << "]";
     return os;
@@ -176,8 +182,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     SmoothingType i = UnknownSmoothing;
-    for ( ++i; i < MaxSmoothing-1; ++i )
+    for ( ++i; i < MaxSmoothing-1; ++i ){
       os << TiCC::toString<SmoothingType>(i) << ", ";
+    }
     os << TiCC::toString<SmoothingType>(i) << "}, [ "
        << TiCC::toString<SmoothingType>(*Content) << "]";
     return os;
@@ -191,8 +198,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     WeightType i = Unknown_w;
-    for ( ++i; i < Max_w-1; ++i )
+    for ( ++i; i < Max_w-1; ++i ){
       os << TiCC::toString<WeightType>(i) << ", ";
+    }
     os << TiCC::toString<WeightType>(i) << "}, [ "
        << TiCC::toString<WeightType>(*Content) << "]";
     return os;
@@ -206,8 +214,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     OrdeningType i = UnknownOrdening;
-    for ( ++i; i < MaxOrdening-1; ++i )
+    for ( ++i; i < MaxOrdening-1; ++i ){
       os << TiCC::toString<OrdeningType>(i) << ", ";
+    }
     os << TiCC::toString<OrdeningType>(i) << "}, [ "
        << TiCC::toString<OrdeningType>(*Content) << "]";
     return os;
@@ -221,8 +230,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     normType i = unknownNorm;
-    for ( ++i; i < maxNorm-1; ++i )
+    for ( ++i; i < maxNorm-1; ++i ){
       os << TiCC::toString<normType>(i) << ", ";
+    }
     os << TiCC::toString<normType>(i) << "}, [ "
        << TiCC::toString<normType>(*Content) << "]";
     return os;
@@ -232,16 +242,16 @@ namespace Timbl {
   // Array of options types
   //
   template <class Type>
-    class OptionArrayClass: public OptionClass {
-    public:
+  class OptionArrayClass: public OptionClass {
+  public:
     OptionArrayClass( const std::string& n,
 		      std::vector<Type>& ta,
 		      const size_t size ):
       OptionClass( n ), TA(ta), Size(size ){};
-    protected:
+  protected:
     std::vector<Type>& TA;
     size_t Size;
-    private:
+  private:
     OptionArrayClass(const OptionArrayClass&);
     OptionArrayClass& operator = (const OptionArrayClass&);
   };
@@ -253,9 +263,8 @@ namespace Timbl {
 		       std::vector<MetricType>& mp,
 		       MetricType& m,
 		       size_t s ):
-    OptionArrayClass<MetricType>( n, mp, s ), def(m){
-      for ( size_t i=0; i < s; i++ )
-	TA[i] = m;
+      OptionArrayClass<MetricType>( n, mp, s ), def(m){
+      TA.resize(s,m);
     };
     bool set_option( const std::string& line ) override;
     std::ostream& show_opt( std::ostream &os ) const override;
@@ -271,8 +280,9 @@ namespace Timbl {
     bool result = TiCC::split_at( line, res, "=" ) == 2 &&
       TiCC::stringTo<MetricType>( res[1], m ) &&
       TiCC::stringTo<size_t>( res[0], i, 0, Size );
-    if ( result )
+    if ( result ){
       TA[i] = m;
+    }
     return result;
   }
 
@@ -280,9 +290,11 @@ namespace Timbl {
     os.width(20);
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : ";
-    for ( size_t i=0; i < Size; i++ )
-      if ( TA[i] != def )
+    for ( size_t i=0; i < Size; i++ ){
+      if ( TA[i] != def ){
 	os << i << ":" << TiCC::toString<MetricType>(TA[i]) << ", ";
+      }
+    }
     return os;
   }
 
@@ -293,10 +305,12 @@ namespace Timbl {
     bool first = true;
     for ( size_t i=0; i < Size; i++ ){
       if ( TA[i] != def ){
-	if ( !first )
+	if ( !first ){
 	  os << ",";
-	else
+	}
+	else {
 	  first = false;
+	}
 	os << i << ":" << TiCC::toString<MetricType>(TA[i]);
       }
     }
@@ -318,7 +332,9 @@ namespace Timbl {
     virtual bool set_option( const std::string& line ) override {
       Type T;
       bool result = TiCC::stringTo<Type>( line, T, minVal, maxVal );
-      if ( result ) *Content = T;
+      if ( result ) {
+	*Content = T;
+      }
       return result;
     };
     virtual std::ostream& show_opt( std::ostream &os ) const override {
@@ -362,9 +378,9 @@ namespace Timbl {
     };
     bool operator() (const std::string & s1, const std::string & s2) const {
       return std::lexicographical_compare
-        (s1.begin (), s1.end (),   // source range
-	 s2.begin (), s2.end (),   // dest range
-	 nocase_compare ());  // comparison
+        (s1.begin(), s1.end(),   // source range
+	 s2.begin(), s2.end(),   // dest range
+	 nocase_compare());      // comparison
     }
   };
 
@@ -376,9 +392,6 @@ namespace Timbl {
       return true;
     };
     void FreezeTable(void);
-    void SetFreezeMark(){
-      //      std::cerr << "SetFreezeMark()" << std::endl;
-    };
     bool TableFrozen(void){ return table_frozen; };
     SetOptRes SetOption( const std::string& );
     void Show_Settings( std::ostream& ) const;

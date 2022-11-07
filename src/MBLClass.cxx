@@ -104,7 +104,6 @@ namespace Timbl {
 				      0, MaxFeatures ) );
     //    cerr << "STAT 1=" << (stat?"true":"false") << endl;
     if ( stat ){
-      Options.SetFreezeMark();
       stat =
 	Options.Add( new BoolOption( "DO_SILLY",
 				     &do_silly_testing, false ) )
