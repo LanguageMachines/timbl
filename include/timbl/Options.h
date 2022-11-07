@@ -378,14 +378,13 @@ namespace Timbl {
     void FreezeTable(void);
     void SetFreezeMark(){
       //      std::cerr << "SetFreezeMark()" << std::endl;
-      table_init = true;
     };
     bool TableFrozen(void){ return table_frozen; };
     SetOptRes SetOption( const std::string& );
     void Show_Settings( std::ostream& ) const;
     void Show_Options( std::ostream& ) const;
     OptionTableClass():
-      table_init(false),table_frozen(false){};
+      table_frozen(false){};
     ~OptionTableClass(){
       for ( const auto& it : global_table ){
 	delete it.second;
@@ -395,7 +394,6 @@ namespace Timbl {
       }
     };
   private:
-    bool table_init;
     bool table_frozen;
     std::map<std::string,OptionClass *,ci_less> runtime_table;
     std::map<std::string,OptionClass *,ci_less> global_table;
