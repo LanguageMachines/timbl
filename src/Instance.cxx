@@ -1344,6 +1344,7 @@ namespace Timbl {
   }
 
   Targets::~Targets() {
+    delete target_hash;
     for ( const auto& it : values_array ){
       delete it;
     }
@@ -1754,6 +1755,10 @@ namespace Timbl {
       result = true;
     }
     return result;
+  }
+
+  Feature_s::~Feature_s(){
+    //    delete feature_hash;
   }
 
   Instance::Instance():

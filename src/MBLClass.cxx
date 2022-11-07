@@ -208,7 +208,6 @@ namespace Timbl {
     num_of_neighbors(1),
     dynamic_neighbors(false),
     decay_flag(Zero),
-    TargetStrings(NULL),
     FeatureStrings(NULL),
     exp_name( name ),
     MaxBests(500),
@@ -320,7 +319,6 @@ namespace Timbl {
       MBL_init = false;
       need_all_weights = false;
       InstanceBase = m.InstanceBase->Copy();
-      TargetStrings = m.TargetStrings;
       FeatureStrings = m.FeatureStrings;
       effective_feats = m.effective_feats;
       num_of_num_features    = m.num_of_num_features;
@@ -340,7 +338,7 @@ namespace Timbl {
     if ( !is_copy ){
       delete InstanceBase;
       delete targets;
-      delete TargetStrings;
+      delete features;
       delete FeatureStrings;
     }
     else {
@@ -2274,11 +2272,12 @@ namespace Timbl {
     }
     Features.resize(num_of_features,NULL);
     PermFeatures.resize(num_of_features,NULL);
-    FeatureStrings = new Hash::UnicodeHash(); // all features share the same hash
-    TargetStrings = new Hash::UnicodeHash(); // targets has it's own hash
-    targets = new Targets( TargetStrings );
+    auto feature_hash = new Hash::UnicodeHash(); // all features share the same hash
+    features = new Feature_s( feature_hash );
+    auto target_hash = new Hash::UnicodeHash(); // targets has it's own hash
+    targets = new Targets( target_hash );
     for ( size_t i=0; i< num_of_features; ++i ){
-      Features[i] = new Feature( FeatureStrings );
+      Features[i] = new Feature( feature_hash );
       PermFeatures[i] = NULL;
     }
     CurrInst.Init( num_of_features );

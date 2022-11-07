@@ -220,7 +220,7 @@ namespace Timbl {
     virtual size_t EffectiveValues() const = 0;
     virtual size_t TotalValues() const = 0;
     virtual ValueClass *Lookup( const icu::UnicodeString& ) const = 0;
-    Hash::UnicodeHash *hash() const { return TokenTree; };
+    virtual Hash::UnicodeHash *hash() const { return TokenTree; };
   protected:
     Hash::UnicodeHash *TokenTree;
     BaseFeatTargClass( const BaseFeatTargClass& );
@@ -233,7 +233,10 @@ namespace Timbl {
     friend class WValueDistribution;
     friend class ConfusionMatrix;
   public:
-    explicit Targets( Hash::UnicodeHash *T ): BaseFeatTargClass(T) {};
+    explicit Targets( Hash::UnicodeHash *T ):
+      BaseFeatTargClass(T),
+      target_hash( T )
+    {};
     ~Targets();
     TargetValue *add_value( const icu::UnicodeString&, int freq = 1 );
     TargetValue *add_value( size_t, int freq = 1 );
@@ -245,7 +248,9 @@ namespace Timbl {
     size_t EffectiveValues() const override;
     size_t TotalValues() const override;
     size_t num_of_values() const { return values_array.size(); };
+    Hash::UnicodeHash *hash() const override { return target_hash; };
   private:
+    Hash::UnicodeHash *target_hash;
     std::vector<TargetValue *> values_array;
     std::unordered_map< size_t, TargetValue *> reverse_values;
   };
@@ -341,6 +346,20 @@ namespace Timbl {
     std::vector<FeatureValue *> values_array;
     std::unordered_map< size_t, FeatureValue *> reverse_values;
     bool is_reference;
+  };
+
+  class Feature_s {
+  public:
+    Feature_s( Hash::UnicodeHash *hash ):
+      feature_hash( hash )
+    {
+    }
+    ~Feature_s();
+    Hash::UnicodeHash *hash() const { return feature_hash; };
+  private:
+    std::vector<FeatureValue *> values_array;
+    std::unordered_map< size_t, FeatureValue *> reverse_values;
+    Hash::UnicodeHash *feature_hash;
   };
 
   class Instance {

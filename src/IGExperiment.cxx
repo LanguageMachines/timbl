@@ -489,7 +489,7 @@ namespace Timbl {
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is, PermFeatures,
 					 *targets,
-					 *Features[0]->hash(),
+					 *features->hash(),
 					 Version );
 	}
 	else {

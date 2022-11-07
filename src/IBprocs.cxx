@@ -465,7 +465,7 @@ namespace Timbl {
       if ( hashed_trees ){
 	InstanceBase->Save( os,
 			    *targets->hash(),
-			    *Features[0]->hash(),
+			    *features->hash(),
 			    keep_distributions );
       }
       else {

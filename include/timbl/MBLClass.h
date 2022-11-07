@@ -140,6 +140,7 @@ namespace Timbl {
     void Progress( int p ){ progress =  p; };
     std::string extract_limited_m( size_t );
     Targets *targets;
+    Feature_s *features;
     std::vector<Feature *> Features;
     std::vector<Feature *> PermFeatures;
     std::vector<size_t> permutation;
@@ -173,7 +174,6 @@ namespace Timbl {
     size_t num_of_neighbors;
     bool dynamic_neighbors;
     DecayType decay_flag;
-    Hash::UnicodeHash *TargetStrings;
     Hash::UnicodeHash *FeatureStrings;
     std::string exp_name;
     Instance CurrInst;
