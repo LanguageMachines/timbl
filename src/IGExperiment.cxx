@@ -478,23 +478,23 @@ namespace Timbl {
 					    KeepDistributions() );
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
-	  Features[i]->SetWeight( 1.0 );
-	  if ( Features[permutation[i]]->Ignore() ){
-	    PermFeatures[i] = NULL;
+	  (*features)[i]->SetWeight( 1.0 );
+	  if ( (*features)[permutation[i]]->Ignore() ){
+	    features->perm_features[i] = NULL;
 	  }
 	  else {
-	    PermFeatures[pos++] = Features[permutation[i]];
+	    features->perm_features[pos++] = (*features)[permutation[i]];
 	  }
 	}
 	if ( Hashed ){
-	  result = InstanceBase->ReadIB( is, PermFeatures,
+	  result = InstanceBase->ReadIB( is,
 					 features,
 					 *targets,
 					 *features->hash(),
 					 Version );
 	}
 	else {
-	  result = InstanceBase->ReadIB( is, PermFeatures,
+	  result = InstanceBase->ReadIB( is,
 					 features,
 					 *targets,
 					 Version );

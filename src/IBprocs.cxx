@@ -46,9 +46,9 @@ namespace Timbl {
     InstanceBase->RemoveInstance( Inst );
     MBL_init = do_sloppy_loo; // must be only true if you are REALY sure
     for ( size_t i=0; i < effective_feats && result; ++i ){
-      PermFeatures[i]->clear_matrix();
-      if ( !PermFeatures[i]->decrement_value( Inst.FV[i],
-					      Inst.TV ) ){
+      features->perm_features[i]->clear_matrix();
+      if ( !features->perm_features[i]->decrement_value( Inst.FV[i],
+							 Inst.TV ) ){
 	FatalError( "Unable to Hide an Instance!" );
 	result = false;
       }
@@ -64,9 +64,9 @@ namespace Timbl {
     InstanceBase->AddInstance( Inst );
     MBL_init = do_sloppy_loo; // must be only true if you are REALY sure
     for ( size_t i=0; i < effective_feats && result; ++i ){
-      PermFeatures[i]->clear_matrix();
-      if ( !PermFeatures[i]->increment_value( Inst.FV[i],
-					      Inst.TV ) ){
+      features->perm_features[i]->clear_matrix();
+      if ( !features->perm_features[i]->increment_value( Inst.FV[i],
+							 Inst.TV ) ){
 	FatalError( "Unable to UnHide this Instance!" );
 	result = false;
       }
@@ -371,8 +371,8 @@ namespace Timbl {
 	    //   But we didn't
 	    int scancount = sscanf( buf.c_str(), "[%lf-%lf]", &min, &max );
 	    if ( scancount == 2 ){
-	      Features[k-1]->Min( min );
-	      Features[k-1]->Max( max );
+	      (*features)[k-1]->Min( min );
+	      (*features)[k-1]->Max( max );
 	      if ( is ){
 		is >> ws >> buf;
 		if ( !buf.empty() && (buf[0] == '.' || buf[0] == ',' ) ){
@@ -404,7 +404,7 @@ namespace Timbl {
     bool excl = false;
     os << "< ";
     for ( size_t j=0; j < num_of_features-1; ++j ){
-      if ( !excl && Features[permutation[j+1]]->Ignore() ){
+      if ( !excl && (*features)[permutation[j+1]]->Ignore() ){
 	excl = true;
 	os << permutation[j]+1 << "! ";
       }
@@ -431,8 +431,8 @@ namespace Timbl {
       os << "# Numeric: ";
       bool first = true;
       for ( size_t i=0; i < num_of_features; ++i ){
-	if ( !Features[i]->Ignore() &&
-	     Features[i]->isNumerical() ){
+	if ( !(*features)[i]->Ignore() &&
+	     (*features)[i]->isNumerical() ){
 	  if ( !first ){
 	    os << ", ";
 	  }
@@ -447,16 +447,16 @@ namespace Timbl {
 	os << "# Ranges: ";
 	first = true;
 	for ( size_t j=0; j < num_of_features; ++j ){
-	  if ( !Features[j]->Ignore() &&
-	       Features[j]->isNumerical() ){
+	  if ( !(*features)[j]->Ignore() &&
+	       (*features)[j]->isNumerical() ){
 	    if ( !first ){
 	      os << " , ";
 	    }
 	    else {
 	      first = false;
 	    }
-	    os << j+1 << " [" << Features[j]->Min()
-	       << "-" << Features[j]->Max() << "]";
+	    os << j+1 << " [" << (*features)[j]->Min()
+	       << "-" << (*features)[j]->Max() << "]";
 	  }
 	}
 	os << " ." << endl;

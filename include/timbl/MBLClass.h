@@ -141,8 +141,8 @@ namespace Timbl {
     std::string extract_limited_m( size_t );
     Targets *targets;
     Feature_s *features;
-    std::vector<Feature *> Features;
-    std::vector<Feature *> PermFeatures;
+    // std::vector<Feature *> Features;
+    // std::vector<Feature *> PermFeatures;
     std::vector<size_t> permutation;
     InstanceBase_base *InstanceBase;
     std::ostream *mylog;

@@ -450,7 +450,6 @@ namespace Timbl {
   }
 
   IBtree* InstanceBase_base::read_list( istream &is,
-					std::vector<Feature*>& Feats,
 					Feature_s *feats,
 					Targets& Targ,
 					int level ){
@@ -460,7 +459,7 @@ namespace Timbl {
     char delim;
     while ( is && goon ) {
       is >> delim;    // skip the opening `[` or separating ','
-      *pnt = read_local( is, Feats, feats, Targ, level );
+      *pnt = read_local( is, feats, Targ, level );
       if ( !(*pnt) ){
 	delete result;
 	return NULL;
@@ -473,7 +472,6 @@ namespace Timbl {
   }
 
   IBtree* InstanceBase_base::read_list_hashed( istream &is,
-					       std::vector<Feature*>& Feats,
 					       Feature_s *feats,
 					       Targets& Targ,
 					       int level ){
@@ -483,7 +481,7 @@ namespace Timbl {
     char delim;
     while ( is && goon ) {
       is >> delim;    // skip the opening `[` or separating ','
-      *pnt = read_local_hashed( is, Feats, feats, Targ, level );
+      *pnt = read_local_hashed( is, feats, Targ, level );
       if ( !(*pnt) ){
 	delete result;
 	return NULL;
@@ -496,7 +494,6 @@ namespace Timbl {
   }
 
   IBtree *InstanceBase_base::read_local( istream &is,
-					 vector<Feature*>& Feats,
 					 Feature_s* feats,
 					 Targets& Targ,
 					 int level ){
@@ -508,8 +505,7 @@ namespace Timbl {
     UnicodeString buf;
     char delim;
     is >> ws >> buf;
-    Feats[level]->add_value( buf, NULL, 1 );
-    result->FValue = feats->add_value( level, buf, NULL, 1 );
+    result->FValue = feats->perm_features[level]->add_value( buf, NULL, 1 );
     is >> delim;
     if ( !is || delim != '(' ){
       Error( "missing `(` in Instance Base file" );
@@ -537,7 +533,7 @@ namespace Timbl {
       }
     }
     if ( look_ahead(is) == '[' ){
-      result->link = read_list( is, Feats, feats, Targ, level+1 );
+      result->link = read_list( is, feats, Targ, level+1 );
       if ( !(result->link) ){
 	delete result;
 	return 0;
@@ -566,7 +562,6 @@ namespace Timbl {
   }
 
   IBtree *InstanceBase_base::read_local_hashed( istream &is,
-						vector<Feature*>& Feats,
 						Feature_s* feats,
 						Targets& Targ,
 						int level ){
@@ -578,8 +573,7 @@ namespace Timbl {
     char delim;
     int index;
     is >> index;
-    Feats[level]->add_value( index, NULL, 1 );
-    result->FValue = feats->add_value( level, index, NULL, 1 );
+    result->FValue = feats->perm_features[level]->add_value( index, NULL, 1 );
     is >> delim;
     if ( !is || delim != '(' ){
       Error( "missing `(` in Instance Base file" );
@@ -606,7 +600,7 @@ namespace Timbl {
       }
     }
     if ( look_ahead(is) == '[' ){
-      result->link = read_list_hashed( is, Feats, feats, Targ, level+1 );
+      result->link = read_list_hashed( is, feats, Targ, level+1 );
       if ( !(result->link) ){
 	delete result;
 	return NULL;
@@ -638,11 +632,10 @@ namespace Timbl {
   }
 
   bool InstanceBase_base::ReadIB( istream &is,
-				  vector<Feature *>& Feats,
 				  Feature_s *feats,
 				  Targets& Targ,
 				  int expected_version ){
-    if ( read_IB( is, Feats, feats, Targ, expected_version ) ){
+    if ( read_IB( is, feats, Targ, expected_version ) ){
       InstBase->redo_distributions();
       ValueDistribution *Top
 	= InstBase->sum_distributions( PersistentDistributions );
@@ -664,11 +657,10 @@ namespace Timbl {
   }
 
   bool IG_InstanceBase::ReadIB( istream &is,
-				vector<Feature *>& Feats,
 				Feature_s *feats,
 				Targets& Targ,
 				int expected_version ){
-    if ( read_IB( is, Feats, feats, Targ, expected_version ) ){
+    if ( read_IB( is, feats, Targ, expected_version ) ){
       if ( PersistentDistributions ){
 	ValueDistribution *Top
 	  = InstBase->sum_distributions( PersistentDistributions );
@@ -683,7 +675,6 @@ namespace Timbl {
   }
 
   bool InstanceBase_base::read_IB( istream &is,
-				   vector<Feature *>& Feats,
 				   Feature_s *feats,
 				   Targets& Targs,
 				   int expected_version ){
@@ -719,7 +710,7 @@ namespace Timbl {
       }
       else {
 	if ( look_ahead( is ) == '[' ){
-	  InstBase = read_list( is, Feats, feats, Targs, 0 );
+	  InstBase = read_list( is, feats, Targs, 0 );
 	}
 	if ( InstBase ){
 	  is >> ws >> buf;
@@ -772,12 +763,11 @@ namespace Timbl {
   }
 
   bool InstanceBase_base::ReadIB( istream& is,
-				  vector<Feature *>& Feats,
 				  Feature_s *feats,
 				  Targets& Targs,
 				  Hash::UnicodeHash& feat_hash,
 				  int expected_version ){
-    if ( read_IB( is, Feats, feats, Targs, feat_hash, expected_version ) ){
+    if ( read_IB( is, feats, Targs, feat_hash, expected_version ) ){
       InstBase->redo_distributions();
       ValueDistribution *Top
 	= InstBase->sum_distributions( PersistentDistributions );
@@ -791,12 +781,11 @@ namespace Timbl {
   }
 
   bool IG_InstanceBase::ReadIB( istream& is,
-				vector<Feature *>& Feats,
 				Feature_s *feats,
 				Targets& Targs,
 				Hash::UnicodeHash& feat_hash,
 				int expected_version ){
-    if ( read_IB( is, Feats, feats, Targs, feat_hash, expected_version ) ){
+    if ( read_IB( is, feats, Targs, feat_hash, expected_version ) ){
       if ( PersistentDistributions ){
 	ValueDistribution *Top
 	  = InstBase->sum_distributions( PersistentDistributions );
@@ -811,7 +800,6 @@ namespace Timbl {
   }
 
   bool InstanceBase_base::read_IB( istream& is,
-				   vector<Feature *>& Feats,
 				   Feature_s *feats,
 				   Targets& Targs,
 				   Hash::UnicodeHash& feat_hash,
@@ -851,7 +839,7 @@ namespace Timbl {
 	Error( "problems reading Top Distribution from Instance Base file" );
       }
       if ( look_ahead( is ) == '[' ){
-	InstBase = read_list_hashed( is, Feats, feats, Targs, 0 );
+	InstBase = read_list_hashed( is, feats, Targs, 0 );
       }
       if ( InstBase ){
 	is >> delim;
