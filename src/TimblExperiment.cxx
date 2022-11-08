@@ -1784,7 +1784,7 @@ namespace Timbl {
   double TimblExperiment::sum_remaining_weights( size_t level ) const {
     double result = 0.0;
     for ( size_t i = level; i < EffectiveFeatures(); ++i ){
-      result += features->perm_features[i]->Weight();
+      result += features->perm_feats[i]->Weight();
     }
     return result;
   }
@@ -2506,10 +2506,10 @@ namespace Timbl {
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	  (*features)[i]->SetWeight( 1.0 );
 	  if ( (*features)[permutation[i]]->Ignore() ){
-	    features->perm_features[i] = NULL;
+	    features->perm_feats[i] = NULL;
 	  }
 	  else {
-	    features->perm_features[pos++] = (*features)[permutation[i]];
+	    features->perm_feats[pos++] = (*features)[permutation[i]];
 	  }
 	}
 	InstanceBase = new IB_InstanceBase( EffectiveFeatures(),

@@ -195,7 +195,7 @@ namespace Timbl {
 
   class FeatureValue: public ValueClass {
     friend class Feature;
-    friend class Feature_s;
+    friend class Features;
     friend struct D_D;
   public:
     explicit FeatureValue( const icu::UnicodeString& );
@@ -260,7 +260,7 @@ namespace Timbl {
 
   class Feature: public BaseFeatTargClass {
     friend class MBLClass;
-    friend class Feature_s;
+    friend class Features;
   public:
     explicit Feature( Hash::UnicodeHash *T );
     ~Feature();
@@ -350,20 +350,20 @@ namespace Timbl {
     bool is_reference;
   };
 
-  class Feature_s {
+  class Features {
     friend class MBLClass;
   public:
-    Feature_s( Hash::UnicodeHash *hash ):
+    Features( Hash::UnicodeHash *hash ):
       feature_hash( hash )
     {
     }
-    ~Feature_s();
+    ~Features();
     Hash::UnicodeHash *hash() const { return feature_hash; };
     FeatureValue *Lookup( size_t,
 			  const icu::UnicodeString& ) const;
-    Feature *operator[]( size_t i ) const { return features[i]; };
-    std::vector<Feature *> features;
-    std::vector<Feature *> perm_features;
+    Feature *operator[]( size_t i ) const { return feats[i]; };
+    std::vector<Feature *> feats;
+    std::vector<Feature *> perm_feats;
   private:
     Hash::UnicodeHash *feature_hash;
   };

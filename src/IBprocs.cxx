@@ -46,8 +46,8 @@ namespace Timbl {
     InstanceBase->RemoveInstance( Inst );
     MBL_init = do_sloppy_loo; // must be only true if you are REALY sure
     for ( size_t i=0; i < effective_feats && result; ++i ){
-      features->perm_features[i]->clear_matrix();
-      if ( !features->perm_features[i]->decrement_value( Inst.FV[i],
+      features->perm_feats[i]->clear_matrix();
+      if ( !features->perm_feats[i]->decrement_value( Inst.FV[i],
 							 Inst.TV ) ){
 	FatalError( "Unable to Hide an Instance!" );
 	result = false;
@@ -64,8 +64,8 @@ namespace Timbl {
     InstanceBase->AddInstance( Inst );
     MBL_init = do_sloppy_loo; // must be only true if you are REALY sure
     for ( size_t i=0; i < effective_feats && result; ++i ){
-      features->perm_features[i]->clear_matrix();
-      if ( !features->perm_features[i]->increment_value( Inst.FV[i],
+      features->perm_feats[i]->clear_matrix();
+      if ( !features->perm_feats[i]->increment_value( Inst.FV[i],
 							 Inst.TV ) ){
 	FatalError( "Unable to UnHide this Instance!" );
 	result = false;

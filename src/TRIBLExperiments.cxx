@@ -341,10 +341,10 @@ namespace Timbl {
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	  (*features)[i]->SetWeight( 1.0 );
 	  if ( (*features)[permutation[i]]->Ignore() ){
-	    features->perm_features[i] = NULL;
+	    features->perm_feats[i] = NULL;
 	  }
 	  else {
-	    features->perm_features[pos++] = (*features)[permutation[i]];
+	    features->perm_feats[pos++] = (*features)[permutation[i]];
 	  }
 	}
 	if ( Hashed ){
@@ -394,10 +394,10 @@ namespace Timbl {
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	  (*features)[i]->SetWeight( 1.0 );
 	  if ( (*features)[permutation[i]]->Ignore() ){
-	    features->perm_features[i] = NULL;
+	    features->perm_feats[i] = NULL;
 	  }
 	  else {
-	    features->perm_features[pos++] = (*features)[permutation[i]];
+	    features->perm_feats[pos++] = (*features)[permutation[i]];
 	  }
 	}
 	if ( Hashed ){

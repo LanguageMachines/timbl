@@ -1274,19 +1274,6 @@ namespace Timbl {
     return result;
   }
 
-  FeatureValue *Feature_s::Lookup( size_t index,
-				   const UnicodeString& str ) const {
-    FeatureValue *result = NULL;
-    unsigned int hash_val = feature_hash->lookup( str );
-    if ( hash_val) {
-      auto const& it = features[index]->reverse_values.find( hash_val );
-      if ( it != features[index]->reverse_values.end() ){
-	result = it->second;
-      }
-    }
-    return result;
-  }
-
   bool Feature::increment_value( FeatureValue *FV,
 				 TargetValue *tv ){
     bool result = false;
@@ -1770,7 +1757,7 @@ namespace Timbl {
     return result;
   }
 
-  Feature_s::~Feature_s(){
+  Features::~Features(){
     //    delete feature_hash;
   }
 

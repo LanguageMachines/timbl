@@ -305,13 +305,13 @@ namespace Timbl {
       decay = 0;
       targets   = m.targets;
       features = m.features;
-      for ( unsigned int i=0; i < m.features->features.size(); ++i ){
-	features->features[i] = new Feature( *m.features->features[i] );
-	if ( m.features->perm_features[i] ) {
-	  features->perm_features[i] = features->features[permutation[i]];
+      for ( unsigned int i=0; i < m.features->feats.size(); ++i ){
+	features->feats[i] = new Feature( *m.features->feats[i] );
+	if ( m.features->perm_feats[i] ) {
+	  features->perm_feats[i] = features->feats[permutation[i]];
 	}
 	else {
-	  features->perm_features[i] = 0;
+	  features->perm_feats[i] = 0;
 	}
       }
 
@@ -516,7 +516,7 @@ namespace Timbl {
     else {
       int OldPrec = os.precision(DBL_DIG);
       size_t pos = 0;
-      for ( auto const& feat : features->features ){
+      for ( auto const& feat : features->feats ){
 	os.precision(DBL_DIG);
 	os << "Feature " << ++pos << "\t : " << feat->Weight() << endl;
       }
@@ -680,7 +680,7 @@ namespace Timbl {
   }
 
   void MBLClass::InitWeights(void){
-    for ( auto const& feat : features->features ){
+    for ( auto const& feat : features->feats ){
       if ( feat->Ignore() ){
 	feat->SetWeight( 0.0 );
       }
@@ -718,7 +718,7 @@ namespace Timbl {
 
   void MBLClass::diverseWeights(void){
     double minW = DBL_MAX;
-    for ( auto const& feat : features->features ){
+    for ( auto const& feat : features->feats ){
       if ( feat->Ignore() ){
 	continue;
       }
@@ -726,7 +726,7 @@ namespace Timbl {
 	minW =  feat->Weight();
       }
     }
-    for ( auto const& feat : features->features ){
+    for ( auto const& feat : features->feats ){
       if ( feat->Ignore() ){
 	continue;
       }
@@ -770,7 +770,7 @@ namespace Timbl {
     calculate_fv_entropy(false);
     vector<double> Order(num_of_features);
     size_t i = 0;
-    for ( auto const& feat : features->features ){
+    for ( auto const& feat : features->feats ){
       switch( TreeOrder ){
       case DataFile:
 	Order[i] = feat->Weight();
@@ -834,10 +834,10 @@ namespace Timbl {
     }
     for ( size_t j=0; j < num_of_features; ++j ){
       if ( j < effective_feats ){
-	features->perm_features[j] = (*features)[permutation[j]];
+	features->perm_feats[j] = (*features)[permutation[j]];
       }
       else {
-	features->perm_features[j] = NULL;
+	features->perm_feats[j] = NULL;
       }
     }
   }
@@ -846,7 +846,7 @@ namespace Timbl {
     unsigned int TotalCount = 0;
     bool dummy;
     size_t m = 1;
-    for ( const auto& feat : features->features ){
+    for ( const auto& feat : features->feats ){
       if ( !feat->Ignore() &&
 	   feat->isStorableMetric() &&
 	   feat->matrixPresent( dummy ) ){
@@ -923,7 +923,7 @@ namespace Timbl {
 
   bool MBLClass::writeMatrices( ostream& os ) const {
     size_t pos = 0;
-    for ( const auto& feat : features->features ){
+    for ( const auto& feat : features->feats ){
       os << "Feature " << ++pos;
       bool dummy;
       if ( !feat->matrixPresent(  dummy ) ){
@@ -1035,7 +1035,7 @@ namespace Timbl {
       }
       os << "." << endl << endl;
       size_t pos = 0;
-      for ( const auto& feat : features->features ){
+      for ( const auto& feat : features->feats ){
 	os << "feature # " << ++pos ;
 	if ( feat->Ignore() ){
 	  os << " Ignored, (-s option)" << endl;
@@ -1055,7 +1055,7 @@ namespace Timbl {
 
   bool MBLClass::allocate_arrays(){
     size_t Dim = targets->values_array.size();
-    for ( const auto& feat : features->features ){
+    for ( const auto& feat : features->feats ){
       if ( !feat->Ignore() &&
 	   !feat->isNumerical() ) {
 	if ( !feat->AllocSparseArrays( Dim ) ){
@@ -1071,7 +1071,7 @@ namespace Timbl {
     if ( !is_copy ){
       result = allocate_arrays();
       if ( result ){
-	for ( const auto& feat : features->features ){
+	for ( const auto& feat : features->feats ){
 	  if ( !feat->Ignore() &&
 	       !feat->isNumerical() ){
 	    feat->ClipFreq( (int)rint(clip_factor *
@@ -1094,14 +1094,14 @@ namespace Timbl {
   void MBLClass::calculatePrestored(){
     if ( !is_copy ){
       for ( size_t j = tribl_offset; j < effective_feats; ++j ) {
-	if ( !features->perm_features[j]->Ignore() &&
-	     features->perm_features[j]->isStorableMetric() ){
-	  features->perm_features[j]->store_matrix( mvd_threshold );
+	if ( !features->perm_feats[j]->Ignore() &&
+	     features->perm_feats[j]->isStorableMetric() ){
+	  features->perm_feats[j]->store_matrix( mvd_threshold );
 	}
       }
       if ( Verbosity(VD_MATRIX) ){
 	size_t pos = 0;
-	for ( auto const& feat : features->features ){
+	for ( auto const& feat : features->feats ){
 	  ++pos;
 	  if ( !feat->Ignore() ){
 	    bool dummy;
@@ -1156,8 +1156,7 @@ namespace Timbl {
       // First the Features
       for ( size_t k = 0; k < effective_feats; ++k ){
 	size_t j = permutation[k];
-	CurrInst.FV[k] = features->Lookup( j, ChopInput->getField(j) );
-	//	CurrInst.FV[k] = (*features)[j]->Lookup( ChopInput->getField(j) );
+	CurrInst.FV[k] = (*features)[j]->Lookup( ChopInput->getField(j) );
       } // k
       // and the Target
       CurrInst.TV = targets->Lookup( ChopInput->getField( num_of_features ) );
@@ -1181,8 +1180,7 @@ namespace Timbl {
       for ( size_t m = 0; m < effective_feats; ++m ){
 	size_t j = permutation[m];
 	const UnicodeString& fld =  ChopInput->getField(j);
-	CurrInst.FV[m] = features->Lookup( j, fld );
-	//	CurrInst.FV[m] = (*features)[j]->Lookup( fld );
+	CurrInst.FV[m] = (*features)[j]->Lookup( fld );
 	if ( !CurrInst.FV[m] ){
 	  // for "unknown" values have to add a dummy value
 	  CurrInst.FV[m] = new FeatureValue( fld );
@@ -1238,7 +1236,7 @@ namespace Timbl {
 	if (  CurrentWeighting() == SD_w ){
 	  os << "Feats\tVals\tStandard Deviation" << endl;
 	  size_t pos = 0;
-	  for ( const auto& feat : features->features ){
+	  for ( const auto& feat : features->feats ){
 	    os << setw(5) << ++pos;
 	    os.setf(ios::right, ios::adjustfield);
 	    if ( feat->Ignore() ){
@@ -1260,7 +1258,7 @@ namespace Timbl {
 	else if ( need_all_weights ){
 	  os << "Feats\tVals\tX-square\tVariance\tInfoGain\tGainRatio" << endl;
 	  size_t pos = 0;
-	  for ( const auto& feat : features->features ) {
+	  for ( const auto& feat : features->feats ) {
 	    os << setw(5) << ++pos;
 	    os.setf(ios::right, ios::adjustfield);
 	    if ( feat->Ignore() ){
@@ -1285,7 +1283,7 @@ namespace Timbl {
 	else {
 	  os << "Feats\tVals\tInfoGain\tGainRatio" << endl;
 	  size_t pos = 0;
-	  for ( const auto& feat : features->features ) {
+	  for ( const auto& feat : features->feats ) {
 	    os << setw(5) << ++pos;
 	    os.setf(ios::right, ios::adjustfield);
 	    if ( feat->Ignore() ){
@@ -1325,7 +1323,7 @@ namespace Timbl {
 	  os << "# " << TiCC::toString( SD_w ) << endl;
 	  os << "# Fea." << "\t" << "Weight" << endl;
 	  size_t pos = 0;
-	  for ( const auto& feat : features->features ){
+	  for ( const auto& feat : features->feats ){
 	    os.precision(DBL_DIG);
 	    os << ++pos << "\t";
 	    if ( feat->Ignore() ){
@@ -1341,7 +1339,7 @@ namespace Timbl {
 	  os << "# " << TiCC::toString( No_w ) << endl;
 	  os << "# Fea." << "\t" << "Weight" << endl;
 	  size_t pos = 0;
-	  for (  const auto& feat : features->features ){
+	  for (  const auto& feat : features->feats ){
 	    os.precision(DBL_DIG);
 	    os << ++pos << "\t";
 	    if ( feat->Ignore() ){
@@ -1355,7 +1353,7 @@ namespace Timbl {
 	  os << "# " << TiCC::toString( GR_w ) << endl;
 	  os << "# Fea." << "\t" << "Weight" << endl;
 	  pos = 0;
-	  for (  const auto& feat : features->features ){
+	  for (  const auto& feat : features->feats ){
 	    os.precision(DBL_DIG);
 	    os << ++pos << "\t";
 	    if ( feat->Ignore() ){
@@ -1369,7 +1367,7 @@ namespace Timbl {
 	  os << "# " << TiCC::toString( IG_w ) << endl;
 	  os << "# Fea." << "\t" << "Weight" << endl;
 	  pos = 0;
-	  for (  const auto& feat : features->features ){
+	  for (  const auto& feat : features->feats ){
 	    os.precision(DBL_DIG);
 	    os << ++pos << "\t";
 	    if ( feat->Ignore() ){
@@ -1384,7 +1382,7 @@ namespace Timbl {
 	    os << "# " << TiCC::toString( SV_w ) << endl;
 	    os << "# Fea." << "\t" << "Weight" << endl;
 	    pos = 0;
-	    for (  const auto& feat : features->features ){
+	    for (  const auto& feat : features->feats ){
 	      os.precision(DBL_DIG);
 	      os << ++pos << "\t";
 	      if ( feat->Ignore() ){
@@ -1398,7 +1396,7 @@ namespace Timbl {
 	    os << "# " << TiCC::toString( X2_w ) << endl;
 	    os << "# Fea." << "\t" << "Weight" << endl;
 	    pos = 0;
-	    for (  const auto& feat : features->features ){
+	    for (  const auto& feat : features->feats ){
 	      os.precision(DBL_DIG);
 	      os << ++pos << "\t";
 	      if ( feat->Ignore() ){
@@ -1552,7 +1550,7 @@ namespace Timbl {
       }
       // make shure all weights are correct
       // Paranoid?
-      for ( const auto& feat : features->features ){
+      for ( const auto& feat : features->feats ){
 	feat->InfoGain( feat->Weight() );
 	feat->GainRatio( feat->Weight() );
 	feat->ChiSquare( feat->Weight() );
@@ -1731,7 +1729,7 @@ namespace Timbl {
       }
     }
     if ( always || realy_first ){
-      for ( const auto& feat : features->features ){
+      for ( const auto& feat : features->feats ){
 	if ( Weighting != UserDefined_w ){
 	  if ( CurrentWeighting() == SD_w ){
 	    feat->StandardDeviationStatistics( );
@@ -1764,7 +1762,7 @@ namespace Timbl {
       }
       os << "." << endl << endl;
       size_t pos = 0;
-      for ( auto const& feat : features->features ){
+      for ( auto const& feat : features->feats ){
 	os << "a" << ++pos << ": ";
 	if ( feat->Ignore() ){
 	  os << "Ignore" << endl;
@@ -1986,7 +1984,7 @@ namespace Timbl {
     GlobalMetric = getMetricClass( globalMetricOption );
     delete tester;
     tester = getTester( globalMetricOption,
-			features->features, permutation, mvd_threshold );
+			features->feats, permutation, mvd_threshold );
   }
 
   void MBLClass::test_instance( const Instance& Inst,
@@ -2271,12 +2269,12 @@ namespace Timbl {
 		  TiCC::toString<size_t>( num_of_features+1 ) );
     }
     auto feature_hash = new Hash::UnicodeHash(); // all features share the same hash
-    features = new Feature_s( feature_hash );
-    features->features.resize(num_of_features,NULL);
-    features->perm_features.resize(num_of_features,NULL);
+    features = new Features( feature_hash );
+    features->feats.resize(num_of_features,NULL);
+    features->perm_feats.resize(num_of_features,NULL);
     for ( size_t i=0; i< num_of_features; ++i ){
-      features->features[i] = new Feature( feature_hash );
-      features->perm_features[i] = NULL;
+      features->feats[i] = new Feature( feature_hash );
+      features->perm_feats[i] = NULL;
     }
     auto target_hash = new Hash::UnicodeHash(); // targets has it's own hash
     targets = new Targets( target_hash );
