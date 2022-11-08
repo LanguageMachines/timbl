@@ -2517,12 +2517,14 @@ namespace Timbl {
 					    (RandomSeed()>=0) );
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is, PermFeatures,
+					 features,
 					 *targets,
 					 *features->hash(),
 					 Version );
 	}
 	else {
 	  result = InstanceBase->ReadIB( is, PermFeatures,
+					 features,
 					 *targets,
 					 Version );
 	}

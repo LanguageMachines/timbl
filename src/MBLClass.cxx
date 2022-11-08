@@ -315,6 +315,17 @@ namespace Timbl {
 	}
       }
       targets   = m.targets;
+      features = m.features;
+      for ( unsigned int i=0; i < m.features->features.size(); ++i ){
+	features->features[i] = new Feature( *m.features->features[i] );
+	if ( m.features->perm_features[i] ) {
+	  features->perm_features[i] = features->features[permutation[i]];
+	}
+	else {
+	  features->perm_features[i] = 0;
+	}
+      }
+
       err_count = 0;
       MBL_init = false;
       need_all_weights = false;
@@ -1148,8 +1159,10 @@ namespace Timbl {
 	else {
 	  // Add it to the Instance.
 	  //	  cerr << "Feature add: " << ChopInput->getField(i) << endl;
-	  CurrInst.FV[i] = Features[i]->add_value( ChopInput->getField(i),
-						   CurrInst.TV, occ );
+	  CurrInst.FV[i] = features->add_value( i, ChopInput->getField(i),
+						CurrInst.TV, occ );
+	  Features[i]->add_value( ChopInput->getField(i),
+				  CurrInst.TV, occ );
 	}
       } // i
       //      cerr << "new instance: " << CurrInst << endl;
@@ -1159,7 +1172,8 @@ namespace Timbl {
       // First the Features
       for ( size_t k = 0; k < effective_feats; ++k ){
 	size_t j = permutation[k];
-	CurrInst.FV[k] = Features[j]->Lookup( ChopInput->getField(j) );
+	CurrInst.FV[k] = features->Lookup( j, ChopInput->getField(j) );
+	//	CurrInst.FV[k] = Features[j]->Lookup( ChopInput->getField(j) );
       } // k
       // and the Target
       CurrInst.TV = targets->Lookup( ChopInput->getField( num_of_features ) );
@@ -1173,8 +1187,10 @@ namespace Timbl {
       // Then the Features
       for ( size_t l = 0; l < effective_feats; ++l ){
 	size_t j = permutation[l];
-	CurrInst.FV[l] = Features[j]->add_value( ChopInput->getField(j),
-						 CurrInst.TV, occ );
+	CurrInst.FV[l] = features->add_value( j, ChopInput->getField(j),
+					      CurrInst.TV, occ );
+	Features[j]->add_value( ChopInput->getField(j),
+				CurrInst.TV, occ );
       } // for l
       break;
     case TestWords:
@@ -1183,7 +1199,8 @@ namespace Timbl {
       for ( size_t m = 0; m < effective_feats; ++m ){
 	size_t j = permutation[m];
 	const UnicodeString& fld =  ChopInput->getField(j);
-	CurrInst.FV[m] = Features[j]->Lookup( fld );
+	CurrInst.FV[m] = features->Lookup( j, fld );
+	//	CurrInst.FV[m] = Features[j]->Lookup( fld );
 	if ( !CurrInst.FV[m] ){
 	  // for "unknown" values have to add a dummy value
 	  CurrInst.FV[m] = new FeatureValue( fld );
@@ -2274,11 +2291,17 @@ namespace Timbl {
     PermFeatures.resize(num_of_features,NULL);
     auto feature_hash = new Hash::UnicodeHash(); // all features share the same hash
     features = new Feature_s( feature_hash );
+    features->features.resize(num_of_features,NULL);
+    features->perm_features.resize(num_of_features,NULL);
     auto target_hash = new Hash::UnicodeHash(); // targets has it's own hash
     targets = new Targets( target_hash );
     for ( size_t i=0; i< num_of_features; ++i ){
       Features[i] = new Feature( feature_hash );
       PermFeatures[i] = NULL;
+    }
+    for ( size_t i=0; i< num_of_features; ++i ){
+      features->features[i] = new Feature( feature_hash );
+      features->perm_features[i] = NULL;
     }
     CurrInst.Init( num_of_features );
     effective_feats = num_of_features;
