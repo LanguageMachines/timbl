@@ -39,6 +39,8 @@ namespace Timbl{
     {};
     virtual ~Chopper() {};
     virtual bool chop( const icu::UnicodeString&, size_t ) = 0;
+    const icu::UnicodeString& operator[]( int i ) const {
+      return choppedInput[i]; }
     const icu::UnicodeString& getField( size_t i ) const {
       return choppedInput[i];
     };

@@ -1165,12 +1165,11 @@ namespace Timbl {
       // Lookup for Incremental TreeBuilding
       // Assumes that somehow Permutation and effective_feats are known
       // First the Target
-      CurrInst.TV = targets->add_value( ChopInput->getField(num_of_features ),
-					occ );
+      CurrInst.TV = targets->add_value( (*ChopInput)[num_of_features], occ );
       // Then the Features
       for ( size_t l = 0; l < effective_feats; ++l ){
 	size_t j = permutation[l];
-	CurrInst.FV[l] = (*features)[j]->add_value( ChopInput->getField(j),
+	CurrInst.FV[l] = (*features)[j]->add_value( (*ChopInput)[j],
 						    CurrInst.TV, occ );
       } // for l
       break;

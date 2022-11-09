@@ -359,8 +359,6 @@ namespace Timbl {
     }
     ~Features();
     Hash::UnicodeHash *hash() const { return feature_hash; };
-    FeatureValue *Lookup( size_t,
-			  const icu::UnicodeString& ) const;
     Feature *operator[]( size_t i ) const { return feats[i]; };
     std::vector<Feature *> feats;
     std::vector<Feature *> perm_feats;
