@@ -216,40 +216,38 @@ namespace Timbl {
 
   class BaseFeatTargClass: public MsgClass {
   public:
-    explicit BaseFeatTargClass( Hash::UnicodeHash * );
-    virtual ~BaseFeatTargClass();
+    BaseFeatTargClass(){};
+    virtual ~BaseFeatTargClass(){};
     virtual size_t EffectiveValues() const = 0;
     virtual size_t TotalValues() const = 0;
     virtual ValueClass *Lookup( const icu::UnicodeString& ) const = 0;
-    virtual Hash::UnicodeHash *hash() const { return TokenTree; };
+    virtual Hash::UnicodeHash *hash() const = 0;
   protected:
-    Hash::UnicodeHash *TokenTree;
     BaseFeatTargClass( const BaseFeatTargClass& );
   private:
     BaseFeatTargClass& operator=( const BaseFeatTargClass& );
   };
 
-  class Targets: public BaseFeatTargClass {
+  class Targets {
     friend class MBLClass;
     friend class WValueDistribution;
     friend class ConfusionMatrix;
   public:
     explicit Targets( Hash::UnicodeHash *T ):
-      BaseFeatTargClass(T),
       target_hash( T )
     {};
     ~Targets();
     TargetValue *add_value( const icu::UnicodeString&, int freq = 1 );
     TargetValue *add_value( size_t, int freq = 1 );
-    TargetValue *Lookup( const icu::UnicodeString& ) const override;
+    TargetValue *Lookup( const icu::UnicodeString& ) const;
     TargetValue *ReverseLookup( size_t ) const;
     bool decrement_value( TargetValue * );
     bool increment_value( TargetValue * );
     TargetValue *MajorityClass() const;
-    size_t EffectiveValues() const override;
-    size_t TotalValues() const override;
+    size_t EffectiveValues() const;
+    size_t TotalValues() const;
     size_t num_of_values() const { return values_array.size(); };
-    Hash::UnicodeHash *hash() const override { return target_hash; };
+    Hash::UnicodeHash *hash() const { return target_hash; };
   private:
     Hash::UnicodeHash *target_hash;
     std::vector<TargetValue *> values_array;
@@ -313,7 +311,9 @@ namespace Timbl {
     void ClipFreq( size_t f ){ matrix_clip_freq = f; };
     size_t ClipFreq() const { return matrix_clip_freq; };
     SparseSymetricMatrix<ValueClass *> *metric_matrix;
+    Hash::UnicodeHash *hash() const override { return 0; };
   private:
+    Hash::UnicodeHash *TokenTree;
     metricClass *metric;
     bool ignore;
     bool numeric;

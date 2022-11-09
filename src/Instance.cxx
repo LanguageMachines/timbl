@@ -599,7 +599,8 @@ namespace Timbl {
   }
 
   Feature::Feature( Hash::UnicodeHash *T ):
-    BaseFeatTargClass(T),
+    BaseFeatTargClass(),
+    TokenTree(T),
     metric_matrix( 0 ),
     metric( 0 ),
     ignore( false ),
@@ -656,6 +657,7 @@ namespace Timbl {
       weight = in.weight;
       values_array = in.values_array;
       reverse_values = in.reverse_values;
+      TokenTree = in.TokenTree;
     }
     return *this;
   }
@@ -1379,17 +1381,9 @@ namespace Timbl {
     }
   }
 
-  BaseFeatTargClass::BaseFeatTargClass( Hash::UnicodeHash *T ):
-    TokenTree( T )
-  {}
-
   BaseFeatTargClass::BaseFeatTargClass( const BaseFeatTargClass& in ):
-    MsgClass( in ),
-    TokenTree( in.TokenTree )
+    MsgClass( in )
   {}
-
-  BaseFeatTargClass::~BaseFeatTargClass(){
-  }
 
   Targets::~Targets() {
     delete target_hash;
@@ -1401,7 +1395,7 @@ namespace Timbl {
 
   TargetValue *Targets::Lookup( const UnicodeString& str ) const {
     TargetValue *result = 0;
-    size_t index = TokenTree->lookup( str );
+    size_t index = target_hash->lookup( str );
     if ( index ) {
       auto const& it = reverse_values.find( index );
       result = it->second;
@@ -1752,7 +1746,7 @@ namespace Timbl {
   }
 
   TargetValue *Targets::add_value( const UnicodeString& valstr, int freq ){
-    unsigned int hash_val = TokenTree->hash( valstr );
+    unsigned int hash_val = target_hash->hash( valstr );
     //    cerr << "target hash(" << valstr << ") geeft: " << hash_val << endl;
     return add_value( hash_val, freq );
   }
@@ -1760,7 +1754,7 @@ namespace Timbl {
   TargetValue *Targets::add_value( size_t index, int freq ){
     auto const& it = reverse_values.find( index );
     if (  it == reverse_values.end() ){
-      const UnicodeString& name = TokenTree->reverse_lookup( index );
+      const UnicodeString& name = target_hash->reverse_lookup( index );
       //      cerr << "target lookup(" << index << ") geeft: " << name << endl;
       // we want to store the singleton value for this index
       // so we MUST reverse lookup the index
