@@ -1232,7 +1232,7 @@ namespace Timbl {
 
   FeatureValue *Feature::Lookup( const UnicodeString& str ) const {
     FeatureValue *result = NULL;
-    unsigned int index = feature_hash->lookup( str );
+    unsigned int index = TokenTree->lookup( str );
     if ( index ) {
       auto const& it = reverse_values.find( index );
       if ( it != reverse_values.end() ){
