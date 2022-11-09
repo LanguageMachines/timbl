@@ -1232,9 +1232,9 @@ namespace Timbl {
 
   FeatureValue *Feature::Lookup( const UnicodeString& str ) const {
     FeatureValue *result = NULL;
-    unsigned int index = TokenTree->lookup( str );
-    if ( index ) {
-      auto const& it = reverse_values.find( index );
+    unsigned int hash_val = TokenTree->lookup( str );
+    if ( hash_val > 0 ) {
+      auto const& it = reverse_values.find( hash_val );
       if ( it != reverse_values.end() ){
 	result = it->second;
       }
@@ -1250,24 +1250,24 @@ namespace Timbl {
     return add_value( hash_val, tv, freq );
   }
 
-  FeatureValue *Feature::add_value( size_t index,
+  FeatureValue *Feature::add_value( size_t hash_val,
 				    TargetValue *tv,
 				    int freq ){
-    auto const& it = reverse_values.find( index );
+    auto const& it = reverse_values.find( hash_val );
     if (  it == reverse_values.end() ){
-      const UnicodeString& value = TokenTree->reverse_lookup( index );
+      const UnicodeString& value = TokenTree->reverse_lookup( hash_val );
       //      cerr << "lookup(" << index << ") geeft: " << value << endl;
       // we want to store the singleton value for this index
       // so we MUST reverse lookup the index
-      FeatureValue *fv = new FeatureValue( value, index );
+      FeatureValue *fv = new FeatureValue( value, hash_val );
       fv->ValFreq( freq );
-      reverse_values[index] = fv;
+      reverse_values[hash_val] = fv;
       values_array.push_back( fv );
     }
     else {
       it->second->IncValFreq( freq );
     }
-    FeatureValue *result = reverse_values[index];
+    FeatureValue *result = reverse_values[hash_val];
     if ( tv ){
       result->TargetDist.IncFreq(tv, freq );
     }
