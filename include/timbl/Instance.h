@@ -221,7 +221,6 @@ namespace Timbl {
     virtual size_t EffectiveValues() const = 0;
     virtual size_t TotalValues() const = 0;
     virtual ValueClass *Lookup( const icu::UnicodeString& ) const = 0;
-    virtual Hash::UnicodeHash *hash() const = 0;
   protected:
     BaseFeatTargClass( const BaseFeatTargClass& );
   private:
@@ -311,7 +310,6 @@ namespace Timbl {
     void ClipFreq( size_t f ){ matrix_clip_freq = f; };
     size_t ClipFreq() const { return matrix_clip_freq; };
     SparseSymetricMatrix<ValueClass *> *metric_matrix;
-    Hash::UnicodeHash *hash() const override { return 0; };
   private:
     Hash::UnicodeHash *TokenTree;
     metricClass *metric;
