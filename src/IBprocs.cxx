@@ -125,7 +125,7 @@ namespace Timbl {
 	  if ( nodes == 0 ){
 	    break;
 	  }
-	  os << setw(8) << i << " |"<< setw(8) << permutation[i-1] + 1 << " |"
+	  os << setw(8) << i << " |"<< setw(8) << features->permutation[i-1] + 1 << " |"
 	     << setw(10) << nodes << " |"
 	     << setw(10) << *(nIt-1) << " |" << setw(10) << *(tIt-1) << " |"
 	     << setw(10) << (*nIt + *tIt)/double(nodes) << " |"
@@ -243,7 +243,7 @@ namespace Timbl {
 	      }
 	      string tmp = string_tok( perms, pos, ", !" );
 	      size_t index = TiCC::stringTo<size_t>( tmp );
-	      permutation.push_back( --index );
+	      features->permutation.push_back( --index );
 	      if ( index >= MaxFeatures ){
 		Error ( "illegal value " + TiCC::toString<size_t>(index) +
 			" in permutation, not between 1 and " +
@@ -404,15 +404,15 @@ namespace Timbl {
     bool excl = false;
     os << "< ";
     for ( size_t j=0; j < num_of_features-1; ++j ){
-      if ( !excl && (*features)[permutation[j+1]]->Ignore() ){
+      if ( !excl && (*features)[features->permutation[j+1]]->Ignore() ){
 	excl = true;
-	os << permutation[j]+1 << "! ";
+	os << features->permutation[j]+1 << "! ";
       }
       else {
-	os << permutation[j]+1 << ", ";
+	os << features->permutation[j]+1 << ", ";
       }
     }
-    os << permutation[num_of_features-1]+1 << " >" << endl;
+    os << features->permutation[num_of_features-1]+1 << " >" << endl;
   }
 
   bool MBLClass::PutInstanceBase( ostream& os ) const {

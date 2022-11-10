@@ -254,6 +254,8 @@ namespace Timbl {
     tester(0),
     doOcc(0)
   {
+    auto feature_hash = new Hash::UnicodeHash(); // all features share the same hash
+    features = new Features( feature_hash );
   }
 
   MBLClass &MBLClass::operator=( const MBLClass& m ){
@@ -300,7 +302,6 @@ namespace Timbl {
       do_sloppy_loo      = m.do_sloppy_loo;
       do_silly_testing   = m.do_silly_testing;
       do_diversify       = m.do_diversify;
-      permutation = m.permutation;
       tester = 0;
       decay = 0;
       targets   = m.targets;
@@ -308,7 +309,7 @@ namespace Timbl {
       for ( unsigned int i=0; i < m.features->feats.size(); ++i ){
 	features->feats[i] = new Feature( *m.features->feats[i] );
 	if ( m.features->perm_feats[i] ) {
-	  features->perm_feats[i] = features->feats[permutation[i]];
+	  features->perm_feats[i] = features->feats[features->permutation[i]];
 	}
 	else {
 	  features->perm_feats[i] = 0;
@@ -528,9 +529,9 @@ namespace Timbl {
   void MBLClass::calculatePermutation( const vector<double>& W ){
     vector<double> WR = W;
     size_t IgnoredFeatures = 0;
-    permutation.resize(num_of_features);
+    features->permutation.resize(num_of_features);
     for ( size_t j=0; j < num_of_features; ++j ){
-      permutation[j] = j;
+      features->permutation[j] = j;
       if ( (*features)[j]->Ignore() ){
 	WR[j] = -0.1;         // To be shure that they are placed AFTER
 	// those which are realy Zero
@@ -549,7 +550,7 @@ namespace Timbl {
 	  }
 	}
 	WR[Max] = -1;
-	permutation[k] = Max;
+	features->permutation[k] = Max;
       }
     }
   }
@@ -563,14 +564,14 @@ namespace Timbl {
     set<size_t> ignore;
     map<string,set<size_t>> metrics;
     // using TiCC::operator<<;
-    // cerr << "permutation: " << permutation << endl;
+    // cerr << "permutation: " << features->permutation << endl;
     for ( size_t k=0; k < num_of_features; ++k ){
-      if ( (*features)[permutation[k]]->Ignore() ){
+      if ( (*features)[features->permutation[k]]->Ignore() ){
 	//	cerr << "Add " << k+1 << " to ignore" << endl;
 	ignore.insert(k+1);
       }
       else {
-	MetricType m = (*features)[permutation[k]]->getMetricType();
+	MetricType m = (*features)[features->permutation[k]]->getMetricType();
 	if ( m != gm ){
 	  metrics[TiCC::toString( m )].insert(k+1);
 	}
@@ -580,8 +581,8 @@ namespace Timbl {
     //  	 << lim + ignore.size()<< endl;
 
     for ( size_t i=lim+ignore.size(); i < num_of_features; ++i ){
-      //      cerr << "Add " << permutation[i]+1 << " to ignore" << endl;
-      ignore.insert( permutation[i]+1 );
+      //      cerr << "Add " << features->permutation[i]+1 << " to ignore" << endl;
+      ignore.insert( features->permutation[i]+1 );
     }
     if ( !ignore.empty() ){
       result += ":I";
@@ -657,9 +658,9 @@ namespace Timbl {
        << ( Weighting==UserDefined_w?"weightfile":TiCC::toString(TreeOrder, true))
        << " :" << endl << "< ";
     for ( size_t j=0; j < num_of_features-1; ++j ){
-      os << permutation[j]+1 << ", ";
+      os << features->permutation[j]+1 << ", ";
     }
-    os << permutation[num_of_features-1]+1 << " >" << endl;
+    os << features->permutation[num_of_features-1]+1 << " >" << endl;
   }
 
   void MBLClass::time_stamp( const char *line, int number ) const {
@@ -834,7 +835,7 @@ namespace Timbl {
     }
     for ( size_t j=0; j < num_of_features; ++j ){
       if ( j < effective_feats ){
-	features->perm_feats[j] = (*features)[permutation[j]];
+	features->perm_feats[j] = (*features)[features->permutation[j]];
       }
       else {
 	features->perm_feats[j] = NULL;
@@ -1156,7 +1157,7 @@ namespace Timbl {
       // Lookup for TreeBuilding
       // First the Features
       for ( size_t k = 0; k < effective_feats; ++k ){
-	size_t j = permutation[k];
+	size_t j = features->permutation[k];
 	CurrInst.FV[k] = (*features)[j]->Lookup( ChopInput->getField(j) );
       } // k
       // and the Target
@@ -1169,7 +1170,7 @@ namespace Timbl {
       CurrInst.TV = targets->add_value( (*ChopInput)[num_of_features], occ );
       // Then the Features
       for ( size_t l = 0; l < effective_feats; ++l ){
-	size_t j = permutation[l];
+	size_t j = features->permutation[l];
 	CurrInst.FV[l] = features->add_value( j,
 					      (*ChopInput)[j],
 					      CurrInst.TV,
@@ -1180,7 +1181,7 @@ namespace Timbl {
       // Lookup for Testing
       // This might fail for unknown values, then we create a dummy value
       for ( size_t m = 0; m < effective_feats; ++m ){
-	size_t j = permutation[m];
+	size_t j = features->permutation[m];
 	const UnicodeString& fld =  ChopInput->getField(j);
 	CurrInst.FV[m] = (*features)[j]->Lookup( fld );
 	if ( !CurrInst.FV[m] ){
@@ -1844,7 +1845,7 @@ namespace Timbl {
     }
     size_t *InvPerm = new size_t[num_of_features];
     for ( size_t i=0; i< num_of_features; ++i ){
-      InvPerm[permutation[i]] = i;
+      InvPerm[features->permutation[i]] = i;
     }
     for ( size_t j=0; j< num_of_features; ++j ){
       switch ( input_format ) {
@@ -1986,7 +1987,7 @@ namespace Timbl {
     GlobalMetric = getMetricClass( globalMetricOption );
     delete tester;
     tester = getTester( globalMetricOption,
-			features->feats, permutation, mvd_threshold );
+			features->feats, features->permutation, mvd_threshold );
   }
 
   void MBLClass::test_instance( const Instance& Inst,
@@ -2270,12 +2271,10 @@ namespace Timbl {
       FatalError( "Initialize: TARGET_POS cannot exceed NUM_OF_FEATURES+1 " +
 		  TiCC::toString<size_t>( num_of_features+1 ) );
     }
-    auto feature_hash = new Hash::UnicodeHash(); // all features share the same hash
-    features = new Features( feature_hash );
     features->feats.resize(num_of_features,NULL);
     features->perm_feats.resize(num_of_features,NULL);
     for ( size_t i=0; i< num_of_features; ++i ){
-      features->feats[i] = new Feature( feature_hash );
+      features->feats[i] = new Feature( features->hash() );
       features->perm_feats[i] = NULL;
     }
     auto target_hash = new Hash::UnicodeHash(); // targets has it's own hash

@@ -1802,7 +1802,7 @@ namespace Timbl {
     int cnt = 0;
     size_t *InvPerm = new size_t[NumOfFeatures()];
     for ( size_t i = 0; i < NumOfFeatures(); ++i ){
-      InvPerm[permutation[i]] = i;
+      InvPerm[features->permutation[i]] = i;
     }
     for ( size_t i = 0; i < NumOfFeatures(); ++i ){
       if ( !(*features)[i]->Ignore() &&
@@ -2505,11 +2505,11 @@ namespace Timbl {
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	  (*features)[i]->SetWeight( 1.0 );
-	  if ( (*features)[permutation[i]]->Ignore() ){
+	  if ( (*features)[features->permutation[i]]->Ignore() ){
 	    features->perm_feats[i] = NULL;
 	  }
 	  else {
-	    features->perm_feats[pos++] = (*features)[permutation[i]];
+	    features->perm_feats[pos++] = (*features)[features->permutation[i]];
 	  }
 	}
 	InstanceBase = new IB_InstanceBase( EffectiveFeatures(),

@@ -370,6 +370,7 @@ namespace Timbl {
     Feature *operator[]( size_t i ) const { return feats[i]; };
     std::vector<Feature *> feats;
     std::vector<Feature *> perm_feats;
+    std::vector<size_t> permutation;
   private:
     Hash::UnicodeHash *feature_hash;
   };
