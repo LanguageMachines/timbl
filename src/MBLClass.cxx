@@ -1146,8 +1146,8 @@ namespace Timbl {
 	else {
 	  // Add it to the Instance.
 	  //	  cerr << "Feature add: " << ChopInput->getField(i) << endl;
-	  CurrInst.FV[i] = features->add_value( i, ChopInput->getField(i),
-						CurrInst.TV, occ );
+	  CurrInst.FV[i] = (*features)[i]->add_value( ChopInput->getField(i),
+						      CurrInst.TV, occ );
 
 	}
       } // i
@@ -1171,10 +1171,9 @@ namespace Timbl {
       // Then the Features
       for ( size_t l = 0; l < effective_feats; ++l ){
 	size_t j = features->permutation[l];
-	CurrInst.FV[l] = features->add_value( j,
-					      (*ChopInput)[j],
-					      CurrInst.TV,
-					      occ );
+	CurrInst.FV[l] = (*features)[j]->add_value((*ChopInput)[j],
+						   CurrInst.TV,
+						   occ );
       } // for l
       break;
     case TestWords:

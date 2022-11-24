@@ -343,16 +343,14 @@ namespace Timbl {
     {
     }
     ~Feature_List();
-    FeatureValue *add_value( size_t,
-			     const icu::UnicodeString&,
-			     TargetValue *,
-			     int freq = 1 );
-    FeatureValue *add_value( size_t,
-			     size_t,
-			     TargetValue *,
-			     int freq = 1 );
-    FeatureValue *Lookup( size_t,
-			  const icu::UnicodeString& ) const;
+    // FeatureValue *add_value( size_t,
+    // 			     const icu::UnicodeString&,
+    // 			     TargetValue *,
+    // 			     int freq = 1 );
+    // FeatureValue *add_value( size_t,
+    // 			     size_t,
+    // 			     TargetValue *,
+    // 			     int freq = 1 );
     Hash::UnicodeHash *hash() const { return feature_hash; };
     Feature *operator[]( size_t i ) const { return feats[i]; };
     std::vector<Feature *> feats;
