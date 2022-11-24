@@ -599,7 +599,6 @@ namespace Timbl {
   }
 
   Feature::Feature( Hash::UnicodeHash *T ):
-    BaseFeatTargClass(),
     TokenTree(T),
     metric_matrix( 0 ),
     metric( 0 ),
@@ -626,7 +625,7 @@ namespace Timbl {
     is_reference(false)
   {}
 
-  Feature::Feature( const Feature& in ): BaseFeatTargClass( in ){
+  Feature::Feature( const Feature& in ): MsgClass( in ){
     *this = in;
     is_reference = true;
   }
@@ -1380,10 +1379,6 @@ namespace Timbl {
       return false;
     }
   }
-
-  BaseFeatTargClass::BaseFeatTargClass( const BaseFeatTargClass& in ):
-    MsgClass( in )
-  {}
 
   Targets::~Targets() {
     delete target_hash;

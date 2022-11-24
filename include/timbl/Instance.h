@@ -214,20 +214,7 @@ namespace Timbl {
     FeatureValue& operator=( const FeatureValue& ); // inhibit copies
   };
 
-  class BaseFeatTargClass: public MsgClass {
-  public:
-    BaseFeatTargClass(){};
-    virtual ~BaseFeatTargClass(){};
-    virtual size_t EffectiveValues() const = 0;
-    virtual size_t TotalValues() const = 0;
-    virtual ValueClass *Lookup( const icu::UnicodeString& ) const = 0;
-  protected:
-    BaseFeatTargClass( const BaseFeatTargClass& );
-  private:
-    BaseFeatTargClass& operator=( const BaseFeatTargClass& );
-  };
-
-  class Targets {
+  class Targets: public MsgClass {
     friend class MBLClass;
     friend class WValueDistribution;
     friend class ConfusionMatrix;
@@ -255,7 +242,7 @@ namespace Timbl {
 
   class metricClass;
 
-  class Feature: public BaseFeatTargClass {
+  class Feature: public MsgClass {
     friend class MBLClass;
     friend class Features;
   public:
@@ -286,11 +273,11 @@ namespace Timbl {
     double fvDistance( FeatureValue *, FeatureValue *, size_t=1 ) const;
     FeatureValue *add_value( const icu::UnicodeString&, TargetValue *, int=1 );
     FeatureValue *add_value( size_t, TargetValue *, int=1 );
-    FeatureValue *Lookup( const icu::UnicodeString& ) const override;
+    FeatureValue *Lookup( const icu::UnicodeString& ) const;
     bool decrement_value( FeatureValue *, TargetValue * );
     bool increment_value( FeatureValue *, TargetValue * );
-    size_t EffectiveValues() const override;
-    size_t TotalValues() const override;
+    size_t EffectiveValues() const;
+    size_t TotalValues() const;
     bool isNumerical() const;
     bool isStorableMetric() const;
     bool AllocSparseArrays( size_t );
