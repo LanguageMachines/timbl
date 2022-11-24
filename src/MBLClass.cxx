@@ -255,7 +255,7 @@ namespace Timbl {
     doOcc(0)
   {
     auto feature_hash = new Hash::UnicodeHash(); // all features share the same hash
-    features = new Features( feature_hash );
+    features = new Feature_List( feature_hash );
   }
 
   MBLClass &MBLClass::operator=( const MBLClass& m ){

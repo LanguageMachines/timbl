@@ -140,8 +140,7 @@ namespace Timbl {
     void Progress( int p ){ progress =  p; };
     std::string extract_limited_m( size_t );
     Targets *targets;
-    Features *features;
-    //    std::vector<size_t> permutation;
+    Feature_List *features;
     InstanceBase_base *InstanceBase;
     std::ostream *mylog;
     std::ostream *myerr;

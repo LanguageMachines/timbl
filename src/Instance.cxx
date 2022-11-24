@@ -1275,8 +1275,8 @@ namespace Timbl {
     return result;
   }
 
-  FeatureValue *Features::Lookup( size_t index,
-				  const UnicodeString& str ) const {
+  FeatureValue *Feature_List::Lookup( size_t index,
+				      const UnicodeString& str ) const {
     FeatureValue *result = NULL;
     unsigned int hash_val = feature_hash->lookup( str );
     if ( hash_val > 0 ) {
@@ -1288,19 +1288,19 @@ namespace Timbl {
     return result;
   }
 
-  FeatureValue *Features::add_value( size_t index,
-				     const UnicodeString& valstr,
-				     TargetValue *tv,
-				     int freq ){
+  FeatureValue *Feature_List::add_value( size_t index,
+					 const UnicodeString& valstr,
+					 TargetValue *tv,
+					 int freq ){
     unsigned int hash_val = feature_hash->hash( valstr );
     //    cerr << "hash(" << valstr << ") geeft: " << hash_val << endl;
     return add_value( index, hash_val, tv, freq );
   }
 
-  FeatureValue *Features::add_value( size_t index,
-				     size_t hash_val,
-				     TargetValue *tv,
-				     int freq ){
+  FeatureValue *Feature_List::add_value( size_t index,
+					 size_t hash_val,
+					 TargetValue *tv,
+					 int freq ){
     auto feat = feats[index];
     auto const& it = feat->reverse_values.find( hash_val );
     if (  it == feat->reverse_values.end() ){
@@ -1794,7 +1794,7 @@ namespace Timbl {
     return result;
   }
 
-  Features::~Features(){
+  Feature_List::~Feature_List(){
     //    delete feature_hash;
   }
 
