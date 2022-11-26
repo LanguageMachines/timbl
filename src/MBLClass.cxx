@@ -1564,6 +1564,60 @@ namespace Timbl {
     return true;
   }
 
+  bool MBLClass::recalculate_stats( Feature_List& feats,
+				    vector<FeatVal_Stat>& feat_status,
+				    bool YES ){
+    bool nothing_changed = true;
+    for ( size_t g = 0; g < num_of_features; ++g ) {
+      feat_status[g] = Unknown;
+      if ( feats.feats[g]->Ignore() ){
+	continue;
+      }
+      bool metricChanged = false;
+      MetricType TmpMetricType = UserOptions[g+1];
+      metricClass *tmpMetric = getMetricClass( TmpMetricType );
+      if ( tmpMetric->isNumerical() ){
+	feat_status[g] = feats[g]->prepare_numeric_stats();
+	if ( feat_status[g] == SingletonNumeric &&
+	     input_format == SparseBin &&
+	     GlobalMetric->isSimilarityMetric( ) ){
+	  // ok
+	}
+	else if ( feat_status[g] != NumericValue ){
+	  if ( GlobalMetric->isNumerical() ){
+	    TmpMetricType = Overlap;
+	  }
+	  else {
+	    TmpMetricType = globalMetricOption;
+	  }
+	}
+      }
+      else if ( feats[g]->values_array.size() == 1 ){
+	feat_status[g] = Singleton;
+      }
+      delete tmpMetric;
+      if ( YES ){
+	bool isRead;
+	if ( feats.feats[g]->metric &&
+	     feats.feats[g]->getMetricType() != TmpMetricType &&
+	     feats.feats[g]->isStorableMetric() &&
+	     feats.feats[g]->matrixPresent( isRead ) &&
+	     isRead ){
+	  Error( "The metric " + TiCC::toString(feats.feats[g]->getMetricType()) +
+		 " for feature " + TiCC::toString( g+1 ) +
+		 " is set from a file. It cannot be changed!" );
+	  abort();
+	}
+	metricChanged = !feats.feats[g]->setMetricType(TmpMetricType);
+      }
+      if ( metricChanged ){
+	nothing_changed = false;
+      }
+    } // end g
+    return nothing_changed;
+  }
+
+
   void MBLClass::calculate_fv_entropy( bool always ){
     bool realy_first =  DBEntropy < 0.0;
     if ( always || realy_first ){
@@ -1585,52 +1639,9 @@ namespace Timbl {
     // and do the statistics for those features where the metric is changed.
     vector<FeatVal_Stat> feat_status(num_of_features);
     bool nothing_changed = true;
-    for ( size_t g = 0; g < num_of_features; ++g ) {
-      feat_status[g] = Unknown;
-      if ( (*features)[g]->Ignore() ){
-	continue;
-      }
-      bool metricChanged = false;
-      MetricType TmpMetricType = UserOptions[g+1];
-      metricClass *tmpMetric = getMetricClass( TmpMetricType );
-      if ( tmpMetric->isNumerical() ){
-	feat_status[g] = (*features)[g]->prepare_numeric_stats();
-	if ( feat_status[g] == SingletonNumeric &&
-	     input_format == SparseBin &&
-	     GlobalMetric->isSimilarityMetric( ) ){
-	  // ok
-	}
-	else if ( feat_status[g] != NumericValue ){
-	  if ( GlobalMetric->isNumerical() ){
-	    TmpMetricType = Overlap;
-	  }
-	  else {
-	    TmpMetricType = globalMetricOption;
-	  }
-	}
-      }
-      else if ( (*features)[g]->values_array.size() == 1 ){
-	feat_status[g] = Singleton;
-      }
-      delete tmpMetric;
-      if ( always || realy_first ){
-	bool isRead;
-	if ( (*features)[g]->metric &&
-	     (*features)[g]->getMetricType() != TmpMetricType &&
-	     (*features)[g]->isStorableMetric() &&
-	     (*features)[g]->matrixPresent( isRead ) &&
-	     isRead ){
-	  Error( "The metric " + TiCC::toString((*features)[g]->getMetricType()) +
-		 " for feature " + TiCC::toString( g+1 ) +
-		 " is set from a file. It cannot be changed!" );
-	  return;
-	}
-	metricChanged = !(*features)[g]->setMetricType(TmpMetricType);
-      }
-      if ( metricChanged ){
-	nothing_changed = false;
-      }
-    } // end g
+    nothing_changed = recalculate_stats( *features,
+					 feat_status,
+					 always||realy_first );
     if ( ( CurrentWeighting() == SD_w ||
 	   GlobalMetric->isSimilarityMetric() )
 	 && !nothing_changed ){

@@ -163,6 +163,9 @@ namespace Timbl {
     void set_order(void);
     void calculatePermutation( const std::vector<double>& );
     void  calculate_fv_entropy( bool );
+    bool recalculate_stats( Feature_List&,
+			    std::vector<FeatVal_Stat>&,
+			    bool );
     OptionTableClass Options;
     PhaseValue runningPhase;
     WeightType Weighting;
