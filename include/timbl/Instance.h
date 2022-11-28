@@ -369,8 +369,6 @@ namespace Timbl {
     void Occurrences( const int o ) { occ = o; };
     size_t size() const { return FV.size(); };
     std::vector<FeatureValue *> FV;
-    void permute( const std::vector<size_t>& ); // Obsolete
-    //         NO implementation provided, so the linker will punish us!
     TargetValue *TV;
   private:
     Instance( const Instance& ); // inhibit copies

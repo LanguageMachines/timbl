@@ -1168,7 +1168,7 @@ namespace Timbl {
 	}
       } while ( is && next != '}' );
       if ( is ){
-	is >> nextCh;   // skip }
+	is >> nextCh;   // skip thr '}'
       }
       else {
 	delete result;

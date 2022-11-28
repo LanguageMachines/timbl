@@ -59,6 +59,7 @@ using namespace icu;
 using namespace nlohmann;
 
 namespace Timbl {
+  using TiCC::operator<<;
 
   void MBLClass::init_options_table( size_t Size ){
     if ( tableFilled ){
@@ -305,16 +306,6 @@ namespace Timbl {
       decay = 0;
       targets   = m.targets;
       *features = *m.features;
-      // for ( unsigned int i=0; i < m.features->feats.size(); ++i ){
-      // 	features->feats[i] = new Feature( *m.features->feats[i] );
-      // 	if ( m.features->perm_feats[i] ) {
-      // 	  features->perm_feats[i] = features->feats[m.features->permutation[i]];
-      // 	}
-      // 	else {
-      // 	  features->perm_feats[i] = 0;
-      // 	}
-      // }
-
       err_count = 0;
       MBL_init = false;
       need_all_weights = false;
@@ -560,8 +551,6 @@ namespace Timbl {
     result += TiCC::toString( gm );
     set<size_t> ignore;
     map<string,set<size_t>> metrics;
-    // using TiCC::operator<<;
-    // cerr << "permutation: " << features->permutation << endl;
     for ( size_t k=0; k < num_of_features; ++k ){
       if ( (*features)[features->permutation[k]]->Ignore() ){
 	//	cerr << "Add " << k+1 << " to ignore" << endl;
@@ -574,30 +563,20 @@ namespace Timbl {
 	}
       }
     }
-    // cerr << "lim=" << lim << " so start ignoring at: "
-    //  	 << lim + ignore.size()<< endl;
-
     for ( size_t i=lim+ignore.size(); i < num_of_features; ++i ){
-      //      cerr << "Add " << features->permutation[i]+1 << " to ignore" << endl;
       ignore.insert( features->permutation[i]+1 );
     }
     if ( !ignore.empty() ){
       result += ":I";
-      // using TiCC::operator<<;
-      // cerr << "IGNORE bevat:" << ignore << endl;
       for ( auto it = ignore.begin(); it != ignore.end(); ++it ){
 	size_t value = *it;
-	//	cerr << "START it=" << *it << " value = " << value << endl;
 	size_t steps = 0;
 	for ( ; value <= *ignore.rbegin(); ++value ){
-	  //	  cerr << "value = " << value << endl;
 	  if ( ignore.find(value) == ignore.end() ){
 	    break;
 	  }
 	  ++steps;
 	}
-	// cerr << "END it=" << *it << " value = " << value << endl;
-	// cerr << "STEPS =" << steps << endl;
 	if ( value == *it+1 ){
 	  // so only one value, output it
 	  if ( *it != *ignore.begin() ){
@@ -614,7 +593,6 @@ namespace Timbl {
 	else {
 	  // a range. output with a hyphen
 	  result += TiCC::toString(*it) + "-" + TiCC::toString( value-1) + ",";
-	  //	  cerr << "advance it met " << steps-1 << endl;
 	  for ( size_t j=0; j < steps-1;++j){
 	    ++it;
 	    if ( it == ignore.end() ){
@@ -1127,7 +1105,6 @@ namespace Timbl {
     if ( occ > 1 ){
       CurrInst.Occurrences( occ );
     }
-    //    cerr << "to instance: Chopped input=" << ChopInput->getString() << endl;
     switch ( phase  ){
     case LearnWords:
       // Add the target.
@@ -2008,15 +1985,11 @@ namespace Timbl {
 							       ib_offset,
 							       effective_feats );
     tester->init( Inst, effective_feats, ib_offset );
-    //    cerr << "start test Instance = " << &Inst << " met " << TiCC::toString(CurrentFV) << endl;
-    //    cerr << "BA at start = " << bestArray << endl;
     size_t CurPos = 0;
     while ( best_distrib ){
-      //      cerr << "test:" << TiCC::toString(CurrentFV) << endl;
       size_t EndPos = tester->test( CurrentFV,
 				    CurPos,
 				    Threshold + Epsilon );
-      //      cerr << "EndPos = " << EndPos << endl;
       if ( EndPos == EffFeat ){
 	// we finished with a certain amount of succes
 	double Distance = tester->getDistance(EndPos);
@@ -2027,9 +2000,7 @@ namespace Timbl {
 				    ib_offset,
 				    num_of_features );
 	  }
-	  //	  cerr << "Ok add " << best_distrib << "at distance " << Distance << endl;
 	  Threshold = bestArray.addResult( Distance, best_distrib, origI );
-	  //	  cerr << "BA = " << bestArray << endl;
 	  if ( do_silly_testing ){
 	    Threshold = DBL_MAX;
 	  }
@@ -2040,18 +2011,15 @@ namespace Timbl {
 	}
       }
       else {
-	EndPos++; // out of luck, compensate for roll-back
+	++EndPos; // out of luck, compensate for roll-back
       }
       size_t pos=EndPos-1;
-      //      cerr << "start rollback " << pos << endl;
       while ( true ){
-	//	cerr << "rollback " << pos << endl;
+	// rollback
 	if ( tester->getDistance(pos) <= Threshold ){
 	  CurPos = pos;
-	  //	  cerr << "voor next test " << endl;
 	  best_distrib = IB->NextGraphTest( CurrentFV,
 					    CurPos );
-	  //	  cerr << "na next test, curpos=" << CurPos << "-" << TiCC::toString(CurrentFV) << endl;
 	  break;
 	}
 	if ( pos == 0 ){
@@ -2060,7 +2028,6 @@ namespace Timbl {
 	--pos;
       }
     }
-    //    cerr << "BA at end = " << bestArray << endl;
   }
 
   void MBLClass::test_instance_sim( const Instance& Inst,
