@@ -37,10 +37,12 @@
 #include "timbl/IBtree.h"
 #include "timbl/TimblExperiment.h"
 #include "ticcutils/Timer.h"
+#include "ticcutils/PrettyPrint.h"
 
 namespace Timbl {
   using namespace std;
   using namespace icu;
+  using TiCC::operator<<;
 
   void IG_Experiment::InitInstanceBase(){
     srand( RandomSeed() );

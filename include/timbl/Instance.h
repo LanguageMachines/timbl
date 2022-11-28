@@ -343,6 +343,7 @@ namespace Timbl {
     {
     }
     ~Feature_List();
+    Feature_List &operator=( const Feature_List& );
     Hash::UnicodeHash *hash() const { return feature_hash; };
     Feature *operator[]( size_t i ) const { return feats[i]; };
     std::vector<Feature *> feats;

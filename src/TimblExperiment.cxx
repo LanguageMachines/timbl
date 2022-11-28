@@ -75,6 +75,7 @@ using namespace icu;
 using namespace nlohmann;
 
 namespace Timbl {
+  using TiCC::operator<<;
 
   const string timbl_short_opts = "a:b:B:c:C:d:De:f:F:G::hHi:I:k:l:L:m:M:n:N:o:O:p:P:q:QR:s::t:T:u:U:v:Vw:W:xX:Z%";
   const string timbl_long_opts = ",Beam:,clones:,Diversify,occurrences:,sloppy::,silly::,Threshold:,Treeorder:,matrixin:,matrixout:,version,help,limit:";
@@ -494,7 +495,6 @@ namespace Timbl {
   }
 
   ostream& operator<< ( ostream& os, const fileIndex& fi ){
-    using TiCC::operator<<;
     for ( const auto& it : fi ){
       os << "<";
       os << it.first << "," << it.second;

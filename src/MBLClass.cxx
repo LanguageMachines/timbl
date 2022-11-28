@@ -208,7 +208,6 @@ namespace Timbl {
     num_of_neighbors(1),
     dynamic_neighbors(false),
     decay_flag(Zero),
-    FeatureStrings(NULL),
     exp_name( name ),
     MaxBests(500),
     decay(0),
@@ -305,22 +304,21 @@ namespace Timbl {
       tester = 0;
       decay = 0;
       targets   = m.targets;
-      features = m.features;
-      for ( unsigned int i=0; i < m.features->feats.size(); ++i ){
-	features->feats[i] = new Feature( *m.features->feats[i] );
-	if ( m.features->perm_feats[i] ) {
-	  features->perm_feats[i] = features->feats[features->permutation[i]];
-	}
-	else {
-	  features->perm_feats[i] = 0;
-	}
-      }
+      *features = *m.features;
+      // for ( unsigned int i=0; i < m.features->feats.size(); ++i ){
+      // 	features->feats[i] = new Feature( *m.features->feats[i] );
+      // 	if ( m.features->perm_feats[i] ) {
+      // 	  features->perm_feats[i] = features->feats[m.features->permutation[i]];
+      // 	}
+      // 	else {
+      // 	  features->perm_feats[i] = 0;
+      // 	}
+      // }
 
       err_count = 0;
       MBL_init = false;
       need_all_weights = false;
       InstanceBase = m.InstanceBase->Copy();
-      FeatureStrings = m.FeatureStrings;
       effective_feats = m.effective_feats;
       num_of_num_features    = m.num_of_num_features;
       DBEntropy = -1.0;
@@ -340,7 +338,6 @@ namespace Timbl {
       delete InstanceBase;
       delete targets;
       delete features;
-      delete FeatureStrings;
     }
     else {
       if ( is_synced ){

@@ -35,6 +35,7 @@
 #include <cassert>
 
 #include "ticcutils/StringOps.h"
+#include "ticcutils/PrettyPrint.h"
 #include "ticcutils/UniHash.h"
 
 #include "timbl/Common.h"
@@ -47,8 +48,10 @@
 using namespace std;
 using namespace icu;
 
+
 namespace Timbl {
   using namespace Common;
+  using TiCC::operator<<;
 
   size_t Vfield::Index() { return value->Index(); }
 
@@ -599,8 +602,8 @@ namespace Timbl {
   }
 
   Feature::Feature( Hash::UnicodeHash *T ):
-    TokenTree(T),
     metric_matrix( 0 ),
+    TokenTree(T),
     metric( 0 ),
     ignore( false ),
     numeric( false ),
@@ -1744,6 +1747,27 @@ namespace Timbl {
       result = true;
     }
     return result;
+  }
+
+  Feature_List &Feature_List::operator=( const Feature_List& l ){
+    if ( this != &l ){
+      feats.resize(l.feats.size());
+      perm_feats.resize(l.feats.size());
+      permutation = l.permutation;
+      feature_hash = l.feature_hash; // shared ??
+      for ( unsigned int i=0; i < l.feats.size(); ++i ){
+	feats[i] = new Feature( *l.feats[i] );
+      }
+      for ( unsigned int i=0; i < l.feats.size(); ++i ){
+	if ( l.perm_feats[i] ) {
+	  perm_feats[i] = feats[permutation[i]];
+	}
+	else {
+	  perm_feats[i] = 0;
+	}
+      }
+    }
+    return *this;
   }
 
   Feature_List::~Feature_List(){

@@ -174,7 +174,6 @@ namespace Timbl {
     size_t num_of_neighbors;
     bool dynamic_neighbors;
     DecayType decay_flag;
-    Hash::UnicodeHash *FeatureStrings;
     std::string exp_name;
     Instance CurrInst;
     BestArray bestArray;
