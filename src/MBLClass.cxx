@@ -1594,7 +1594,8 @@ namespace Timbl {
 
   void MBLClass::calculate_fv_entropy( bool always ){
     bool realy_first =  DBEntropy < 0.0;
-    if ( always || realy_first ){
+    bool redo = always || realy_first;
+    if ( redo ){
       // if it's the first time (DBEntropy == 0 ) or
       // if always, we have to (re)calculate everything
       double Entropy = 0.0;
@@ -1614,7 +1615,7 @@ namespace Timbl {
     vector<FeatVal_Stat> feat_status(num_of_features);
     bool changed = recalculate_stats( *features,
 				      feat_status,
-				      always||realy_first );
+				      redo );
     if ( ( CurrentWeighting() == SD_w ||
 	   GlobalMetric->isSimilarityMetric() )
 	 && changed ){
@@ -1622,15 +1623,15 @@ namespace Timbl {
       // otherwise we can't do Standard Deviation weighting,
       // or Similarity Metrics!
       bool first = true;
-      ostringstream ostr1;
+      string str1;
       for ( size_t ff = 0; ff < num_of_features; ++ff ){
 	if ( feat_status[ff] == NotNumeric ){
 	  if ( first ){
-	    ostr1 << "The following feature(s) have non numeric value: ";
+	    str1 += "The following feature(s) have non numeric value: ";
 	    first = false;
 	  }
 	  else {
-	    ostr1 << ", ";
+	    str1 += ", ";
 	  }
 	  size_t n = ff;
 	  while ( ff < num_of_features-1 &&
@@ -1638,15 +1639,15 @@ namespace Timbl {
 	    ++ff;
 	  }
 	  if ( n != ff ){
-	    ostr1 << n+1 << "-" << ff+1;
+	    str1 += to_string(n+1) + "-" + to_string(ff+1);
 	  }
 	  else {
-	    ostr1 << ff+1;
+	    str1 + to_string(ff+1);
 	  }
 	}
       }
       if ( !first  ){
-	Error( ostr1.str() );
+	Error( str1 );
 	if ( GlobalMetric->isSimilarityMetric() ){
 	  Error( "Therefore InnerProduct/Cosine operations are impossible" );
 	}
@@ -1660,17 +1661,16 @@ namespace Timbl {
     // a result of a forced recalculation
     if ( realy_first ){
       bool first = true;
-      ostringstream ostr1;
-      ostringstream ostr2;
+      string str1;
       for ( size_t ff = 0; ff < num_of_features; ++ff ) {
 	if ( feat_status[ff] == Singleton ||
 	     feat_status[ff] == SingletonNumeric ){
 	  if ( first ){
-	    ostr1 << "The following feature(s) have only 1 value: ";
+	    str1 += "The following feature(s) have only 1 value: ";
 	    first = false;
 	  }
 	  else {
-	    ostr1 << ", ";
+	    str1 += ", ";
 	  }
 	  size_t n = ff;
 	  while ( ff < num_of_features-1 &&
@@ -1679,42 +1679,44 @@ namespace Timbl {
 	    ++ff;
 	  }
 	  if ( n != ff ){
-	    ostr1 << n+1 << "-" << ff+1;
+	    str1 += to_string(n+1) + "-" + to_string(ff+1);
 	  }
 	  else {
-	    ostr1 << ff+1;
+	    str1 += to_string(ff+1);
 	  }
 	}
       }
       if ( !first && !is_copy ){
-	Warning( ostr1.str() );
+	Warning( str1 );
       }
+      string str2;
       first = true;
       for ( size_t ff = 0; ff < num_of_features; ++ff ){
 	if ( feat_status[ff] == NotNumeric ){
 	  if ( first ){
-	    ostr2 << "The following feature(s) contained non-numeric values and\nwill be treated as NON-Numeric: ";
+	    str2 += "The following feature(s) contained non-numeric values and"
+	      "\nwill be treated as NON-Numeric: ";
 	    first = false;
 	  }
 	  else {
-	    ostr2 << ", ";
+	    str2 += ", ";
 	  }
 	  size_t n = ff;
 	  while ( ff < num_of_features-1 &&
 		  feat_status[ff+1] == NotNumeric ) ff++;
 	  if ( n != ff ){
-	    ostr2 << n+1 << "-" << ff+1;
+	    str2 += to_string(n+1) + "-" + to_string(ff+1);
 	  }
 	  else {
-	    ostr2 << ff+1;
+	    str2 += to_string(ff+1);
 	  }
 	}
       }
       if ( !first  ){
-	Warning( ostr2.str() );
+	Warning( str2 );
       }
     }
-    if ( always || realy_first ){
+    if ( redo ){
       for ( const auto& feat : features->feats ){
 	if ( Weighting != UserDefined_w ){
 	  if ( CurrentWeighting() == SD_w ){
