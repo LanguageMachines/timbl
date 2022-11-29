@@ -1541,7 +1541,7 @@ namespace Timbl {
   bool MBLClass::recalculate_stats( Feature_List& feats,
 				    vector<FeatVal_Stat>& feat_status,
 				    bool YES ){
-    bool nothing_changed = true;
+    bool changed = false;
     for ( size_t g = 0; g < num_of_features; ++g ) {
       feat_status[g] = Unknown;
       if ( feats.feats[g]->Ignore() ){
@@ -1585,10 +1585,10 @@ namespace Timbl {
 	metricChanged = !feats.feats[g]->setMetricType(TmpMetricType);
       }
       if ( metricChanged ){
-	nothing_changed = false;
+	changed = true;
       }
     } // end g
-    return nothing_changed;
+    return changed;
   }
 
 
@@ -1612,13 +1612,12 @@ namespace Timbl {
     // Loop over the Features, see if the numerics are non-singular
     // and do the statistics for those features where the metric is changed.
     vector<FeatVal_Stat> feat_status(num_of_features);
-    bool nothing_changed = true;
-    nothing_changed = recalculate_stats( *features,
-					 feat_status,
-					 always||realy_first );
+    bool changed = recalculate_stats( *features,
+				      feat_status,
+				      always||realy_first );
     if ( ( CurrentWeighting() == SD_w ||
 	   GlobalMetric->isSimilarityMetric() )
-	 && !nothing_changed ){
+	 && changed ){
       // check to see if ALL features are still Numeric.
       // otherwise we can't do Standard Deviation weighting,
       // or Similarity Metrics!

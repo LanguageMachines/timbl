@@ -996,14 +996,16 @@ namespace Timbl {
     }
   }
 
-  double Feature::fvDistance( FeatureValue *F, FeatureValue *G,
+  double Feature::fvDistance( FeatureValue *F,
+			      FeatureValue *G,
 			      size_t limit ) const {
     double result = 0.0;
     if ( F != G ){
       bool dummy;
-      if ( metric->isStorable() && matrixPresent( dummy ) &&
-	   F->ValFreq() >= matrix_clip_freq &&
-	   G->ValFreq() >= matrix_clip_freq ){
+      if ( metric->isStorable()
+	   && matrixPresent( dummy )
+	   && F->ValFreq() >= matrix_clip_freq
+	   && G->ValFreq() >= matrix_clip_freq ){
 	result = metric_matrix->Extract( F, G );
       }
       else if ( metric->isNumerical() ) {
