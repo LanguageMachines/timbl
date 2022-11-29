@@ -46,8 +46,8 @@ namespace Timbl {
     InstanceBase->RemoveInstance( Inst );
     MBL_init = do_sloppy_loo; // must be only true if you are REALY sure
     for ( size_t i=0; i < effective_feats && result; ++i ){
-      features->perm_feats[i]->clear_matrix();
-      if ( !features->perm_feats[i]->decrement_value( Inst.FV[i],
+      features.perm_feats[i]->clear_matrix();
+      if ( !features.perm_feats[i]->decrement_value( Inst.FV[i],
 							 Inst.TV ) ){
 	FatalError( "Unable to Hide an Instance!" );
 	result = false;
@@ -64,8 +64,8 @@ namespace Timbl {
     InstanceBase->AddInstance( Inst );
     MBL_init = do_sloppy_loo; // must be only true if you are REALY sure
     for ( size_t i=0; i < effective_feats && result; ++i ){
-      features->perm_feats[i]->clear_matrix();
-      if ( !features->perm_feats[i]->increment_value( Inst.FV[i],
+      features.perm_feats[i]->clear_matrix();
+      if ( !features.perm_feats[i]->increment_value( Inst.FV[i],
 							 Inst.TV ) ){
 	FatalError( "Unable to UnHide this Instance!" );
 	result = false;
@@ -125,7 +125,7 @@ namespace Timbl {
 	  if ( nodes == 0 ){
 	    break;
 	  }
-	  os << setw(8) << i << " |"<< setw(8) << features->permutation[i-1] + 1 << " |"
+	  os << setw(8) << i << " |"<< setw(8) << features.permutation[i-1] + 1 << " |"
 	     << setw(10) << nodes << " |"
 	     << setw(10) << *(nIt-1) << " |" << setw(10) << *(tIt-1) << " |"
 	     << setw(10) << (*nIt + *tIt)/double(nodes) << " |"
@@ -243,7 +243,7 @@ namespace Timbl {
 	      }
 	      string tmp = string_tok( perms, pos, ", !" );
 	      size_t index = TiCC::stringTo<size_t>( tmp );
-	      features->permutation.push_back( --index );
+	      features.permutation.push_back( --index );
 	      if ( index >= MaxFeatures ){
 		Error ( "illegal value " + TiCC::toString<size_t>(index) +
 			" in permutation, not between 1 and " +
@@ -371,8 +371,8 @@ namespace Timbl {
 	    //   But we didn't
 	    int scancount = sscanf( buf.c_str(), "[%lf-%lf]", &min, &max );
 	    if ( scancount == 2 ){
-	      (*features)[k-1]->Min( min );
-	      (*features)[k-1]->Max( max );
+	      features[k-1]->Min( min );
+	      features[k-1]->Max( max );
 	      if ( is ){
 		is >> ws >> buf;
 		if ( !buf.empty() && (buf[0] == '.' || buf[0] == ',' ) ){
@@ -404,15 +404,15 @@ namespace Timbl {
     bool excl = false;
     os << "< ";
     for ( size_t j=0; j < num_of_features-1; ++j ){
-      if ( !excl && (*features)[features->permutation[j+1]]->Ignore() ){
+      if ( !excl && features[features.permutation[j+1]]->Ignore() ){
 	excl = true;
-	os << features->permutation[j]+1 << "! ";
+	os << features.permutation[j]+1 << "! ";
       }
       else {
-	os << features->permutation[j]+1 << ", ";
+	os << features.permutation[j]+1 << ", ";
       }
     }
-    os << features->permutation[num_of_features-1]+1 << " >" << endl;
+    os << features.permutation[num_of_features-1]+1 << " >" << endl;
   }
 
   bool MBLClass::PutInstanceBase( ostream& os ) const {
@@ -431,8 +431,8 @@ namespace Timbl {
       os << "# Numeric: ";
       bool first = true;
       for ( size_t i=0; i < num_of_features; ++i ){
-	if ( !(*features)[i]->Ignore() &&
-	     (*features)[i]->isNumerical() ){
+	if ( !features[i]->Ignore() &&
+	     features[i]->isNumerical() ){
 	  if ( !first ){
 	    os << ", ";
 	  }
@@ -447,16 +447,16 @@ namespace Timbl {
 	os << "# Ranges: ";
 	first = true;
 	for ( size_t j=0; j < num_of_features; ++j ){
-	  if ( !(*features)[j]->Ignore() &&
-	       (*features)[j]->isNumerical() ){
+	  if ( !features[j]->Ignore() &&
+	       features[j]->isNumerical() ){
 	    if ( !first ){
 	      os << " , ";
 	    }
 	    else {
 	      first = false;
 	    }
-	    os << j+1 << " [" << (*features)[j]->Min()
-	       << "-" << (*features)[j]->Max() << "]";
+	    os << j+1 << " [" << features[j]->Min()
+	       << "-" << features[j]->Max() << "]";
 	  }
 	}
 	os << " ." << endl;
@@ -465,7 +465,7 @@ namespace Timbl {
       if ( hashed_trees ){
 	InstanceBase->Save( os,
 			    *targets->hash(),
-			    *features->hash(),
+			    *features.hash(),
 			    keep_distributions );
       }
       else {

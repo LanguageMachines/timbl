@@ -339,19 +339,19 @@ namespace Timbl {
 					       KeepDistributions() );
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
-	  (*features)[i]->SetWeight( 1.0 );
-	  if ( (*features)[features->permutation[i]]->Ignore() ){
-	    features->perm_feats[i] = NULL;
+	  features[i]->SetWeight( 1.0 );
+	  if ( features[features.permutation[i]]->Ignore() ){
+	    features.perm_feats[i] = NULL;
 	  }
 	  else {
-	    features->perm_feats[pos++] = (*features)[features->permutation[i]];
+	    features.perm_feats[pos++] = features[features.permutation[i]];
 	  }
 	}
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is,
 					 features,
 					 *targets,
-					 *features->hash(),
+					 *features.hash(),
 					 Version );
 	}
 	else {
@@ -392,19 +392,19 @@ namespace Timbl {
 						KeepDistributions() );
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
-	  (*features)[i]->SetWeight( 1.0 );
-	  if ( (*features)[features->permutation[i]]->Ignore() ){
-	    features->perm_feats[i] = NULL;
+	  features[i]->SetWeight( 1.0 );
+	  if ( features[features.permutation[i]]->Ignore() ){
+	    features.perm_feats[i] = NULL;
 	  }
 	  else {
-	    features->perm_feats[pos++] = (*features)[features->permutation[i]];
+	    features.perm_feats[pos++] = features[features.permutation[i]];
 	  }
 	}
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is,
 					 features,
 					 *targets,
-					 *features->hash(),
+					 *features.hash(),
 					 Version );
 	}
 	else {

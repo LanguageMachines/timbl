@@ -450,7 +450,7 @@ namespace Timbl {
   }
 
   IBtree* InstanceBase_base::read_list( istream &is,
-					Feature_List *feats,
+					Feature_List& feats,
 					Targets& Targ,
 					int level ){
     IBtree *result = NULL;
@@ -472,7 +472,7 @@ namespace Timbl {
   }
 
   IBtree* InstanceBase_base::read_list_hashed( istream &is,
-					       Feature_List *feats,
+					       Feature_List& feats,
 					       Targets& Targ,
 					       int level ){
     IBtree *result = NULL;
@@ -494,7 +494,7 @@ namespace Timbl {
   }
 
   IBtree *InstanceBase_base::read_local( istream &is,
-					 Feature_List* feats,
+					 Feature_List& feats,
 					 Targets& Targ,
 					 int level ){
     if ( !is ){
@@ -505,7 +505,7 @@ namespace Timbl {
     UnicodeString buf;
     char delim;
     is >> ws >> buf;
-    result->FValue = feats->perm_feats[level]->add_value( buf, NULL, 1 );
+    result->FValue = feats.perm_feats[level]->add_value( buf, NULL, 1 );
     is >> delim;
     if ( !is || delim != '(' ){
       Error( "missing `(` in Instance Base file" );
@@ -562,7 +562,7 @@ namespace Timbl {
   }
 
   IBtree *InstanceBase_base::read_local_hashed( istream &is,
-						Feature_List* feats,
+						Feature_List& feats,
 						Targets& Targ,
 						int level ){
     if ( !is ){
@@ -573,7 +573,7 @@ namespace Timbl {
     char delim;
     int index;
     is >> index;
-    result->FValue = feats->perm_feats[level]->add_value( index, NULL, 1 );
+    result->FValue = feats.perm_feats[level]->add_value( index, NULL, 1 );
     is >> delim;
     if ( !is || delim != '(' ){
       Error( "missing `(` in Instance Base file" );
@@ -632,7 +632,7 @@ namespace Timbl {
   }
 
   bool InstanceBase_base::ReadIB( istream &is,
-				  Feature_List* feats,
+				  Feature_List& feats,
 				  Targets& Targ,
 				  int expected_version ){
     if ( read_IB( is, feats, Targ, expected_version ) ){
@@ -657,7 +657,7 @@ namespace Timbl {
   }
 
   bool IG_InstanceBase::ReadIB( istream &is,
-				Feature_List *feats,
+				Feature_List& feats,
 				Targets& Targ,
 				int expected_version ){
     if ( read_IB( is, feats, Targ, expected_version ) ){
@@ -675,7 +675,7 @@ namespace Timbl {
   }
 
   bool InstanceBase_base::read_IB( istream &is,
-				   Feature_List *feats,
+				   Feature_List& feats,
 				   Targets& Targs,
 				   int expected_version ){
     NumOfTails = 0;
@@ -763,7 +763,7 @@ namespace Timbl {
   }
 
   bool InstanceBase_base::ReadIB( istream& is,
-				  Feature_List *feats,
+				  Feature_List& feats,
 				  Targets& Targs,
 				  Hash::UnicodeHash& feat_hash,
 				  int expected_version ){
@@ -781,7 +781,7 @@ namespace Timbl {
   }
 
   bool IG_InstanceBase::ReadIB( istream& is,
-				Feature_List *feats,
+				Feature_List& feats,
 				Targets& Targs,
 				Hash::UnicodeHash& feat_hash,
 				int expected_version ){
@@ -800,7 +800,7 @@ namespace Timbl {
   }
 
   bool InstanceBase_base::read_IB( istream& is,
-				   Feature_List *feats,
+				   Feature_List& feats,
 				   Targets& Targs,
 				   Hash::UnicodeHash& feat_hash,
 				   int expected_version ){

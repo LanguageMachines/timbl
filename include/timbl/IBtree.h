@@ -152,11 +152,11 @@ namespace Timbl {
     void toXML( std::ostream& );
     void printStatsTree( std::ostream&, unsigned int startLevel );
     virtual bool ReadIB( std::istream&,
-			 Feature_List *feats,
+			 Feature_List&,
 			 Targets&,
 			 int );
     virtual bool ReadIB( std::istream&,
-			 Feature_List *feats,
+			 Feature_List&,
 			 Targets&,
 			 Hash::UnicodeHash&,
 			 int );
@@ -195,30 +195,30 @@ namespace Timbl {
 
     size_t Depth;
     unsigned long int NumOfTails;
-    IBtree *read_list( std::istream &,
-		       Feature_List *,
+    IBtree *read_list( std::istream&,
+		       Feature_List&,
 		       Targets&,
 		       int );
-    IBtree *read_local( std::istream &,
-			Feature_List *,
+    IBtree *read_local( std::istream&,
+			Feature_List&,
 			Targets&,
 			int );
-    IBtree *read_list_hashed( std::istream &,
-			      Feature_List *,
+    IBtree *read_list_hashed( std::istream&,
+			      Feature_List&,
 			      Targets&,
 			      int );
-    IBtree *read_local_hashed( std::istream &,
-			       Feature_List *,
+    IBtree *read_local_hashed( std::istream&,
+			       Feature_List&,
 			       Targets&,
 			       int );
     void write_tree( std::ostream &os, const IBtree * ) const;
     void write_tree_hashed( std::ostream &os, const IBtree * ) const;
     bool read_IB( std::istream&,
-		  Feature_List *,
+		  Feature_List& ,
 		  Targets&,
 		  int );
     bool read_IB( std::istream&,
-		  Feature_List *,
+		  Feature_List& ,
 		  Targets&,
 		  Hash::UnicodeHash&, int );
     void fill_index();
@@ -264,11 +264,11 @@ namespace Timbl {
 				      bool&,
 				      const TargetValue *& ) override;
     bool ReadIB( std::istream&,
-		 Feature_List *feats,
+		 Feature_List&,
 		 Targets&,
 		 int ) override;
     bool ReadIB( std::istream&,
-		 Feature_List *feats,
+		 Feature_List&,
 		 Targets&,
 		 Hash::UnicodeHash&,
 		 int ) override;

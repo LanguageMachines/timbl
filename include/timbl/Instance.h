@@ -338,6 +338,10 @@ namespace Timbl {
   class Feature_List {
     friend class MBLClass;
   public:
+    Feature_List():
+      feature_hash(0)
+    {
+    }
     Feature_List( Hash::UnicodeHash *hash ):
       feature_hash( hash )
     {
@@ -345,6 +349,9 @@ namespace Timbl {
     ~Feature_List();
     Feature_List &operator=( const Feature_List& );
     Hash::UnicodeHash *hash() const { return feature_hash; };
+    void set_hash( Hash::UnicodeHash *hash ){
+      feature_hash = hash;
+    };
     Feature *operator[]( size_t i ) const { return feats[i]; };
     std::vector<Feature *> feats;
     std::vector<Feature *> perm_feats;

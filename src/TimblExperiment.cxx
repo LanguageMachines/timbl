@@ -296,8 +296,8 @@ namespace Timbl {
 	    //
 	    // invalidate MVDM matrices, they might be changing in size
 	    for ( size_t j=0; j < NumOfFeatures(); ++j ){
-	      if ( !(*features)[j]->Ignore() ){
-		(*features)[j]->clear_matrix();
+	      if ( !features[j]->Ignore() ){
+		features[j]->clear_matrix();
 	      }
 	    }
 	  }
@@ -1784,7 +1784,7 @@ namespace Timbl {
   double TimblExperiment::sum_remaining_weights( size_t level ) const {
     double result = 0.0;
     for ( size_t i = level; i < EffectiveFeatures(); ++i ){
-      result += features->perm_feats[i]->Weight();
+      result += features.perm_feats[i]->Weight();
     }
     return result;
   }
@@ -1802,18 +1802,18 @@ namespace Timbl {
     int cnt = 0;
     size_t *InvPerm = new size_t[NumOfFeatures()];
     for ( size_t i = 0; i < NumOfFeatures(); ++i ){
-      InvPerm[features->permutation[i]] = i;
+      InvPerm[features.permutation[i]] = i;
     }
     for ( size_t i = 0; i < NumOfFeatures(); ++i ){
-      if ( !(*features)[i]->Ignore() &&
+      if ( !features[i]->Ignore() &&
 	   InvPerm[i]+1 > TRIBL_offset() ){
-	MetricType mt =  (*features)[i]->getMetricType();
+	MetricType mt =  features[i]->getMetricType();
 	if ( mt != globalMetricOption ){
 	  ++cnt;
 	  os << endl << "   Feature[" << i+1 << "] : " << TiCC::toString( mt, true );
-	  if ( (*features)[i]->isStorableMetric() ){
+	  if ( features[i]->isStorableMetric() ){
 	    bool readM = false;
-	    if ( (*features)[i]->matrixPresent( readM ) ){
+	    if ( features[i]->matrixPresent( readM ) ){
 	      if ( readM ){
 		os << " (User Defined)";
 	      }
@@ -1858,7 +1858,7 @@ namespace Timbl {
   void TimblExperiment::show_ignore_info( ostream& os ) const{
     bool first = true;
     for ( size_t i=0; i< NumOfFeatures(); ++i ){
-      if ( (*features)[i]->Ignore() ){
+      if ( features[i]->Ignore() ){
 	if ( first ){
 	  first = false;
 	  os << "Ignored features : { ";
@@ -2504,12 +2504,12 @@ namespace Timbl {
 	srand( RandomSeed() );
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
-	  (*features)[i]->SetWeight( 1.0 );
-	  if ( (*features)[features->permutation[i]]->Ignore() ){
-	    features->perm_feats[i] = NULL;
+	  features[i]->SetWeight( 1.0 );
+	  if ( features[features.permutation[i]]->Ignore() ){
+	    features.perm_feats[i] = NULL;
 	  }
 	  else {
-	    features->perm_feats[pos++] = (*features)[features->permutation[i]];
+	    features.perm_feats[pos++] = features[features.permutation[i]];
 	  }
 	}
 	InstanceBase = new IB_InstanceBase( EffectiveFeatures(),
@@ -2519,7 +2519,7 @@ namespace Timbl {
 	  result = InstanceBase->ReadIB( is,
 					 features,
 					 *targets,
-					 *features->hash(),
+					 *features.hash(),
 					 Version );
 	}
 	else {
@@ -2591,7 +2591,7 @@ namespace Timbl {
     else {
       initExperiment();
       for ( size_t i=0; i< NumOfFeatures(); ++i ){
-	res.push_back( (*features)[i]->Weight() );
+	res.push_back( features[i]->Weight() );
       }
     }
     return true;
