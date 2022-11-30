@@ -1892,9 +1892,6 @@ namespace Timbl {
   public:
     threadData():exp(0), lineNo(0), resultTarget(0),
 		 exact(false), distance(-1), confidence(0) {};
-    ~threadData(){
-      delete exp;
-    }
     bool exec();
     void show( ostream& ) const;
     TimblExperiment *exp;
