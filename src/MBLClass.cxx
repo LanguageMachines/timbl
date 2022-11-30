@@ -306,7 +306,9 @@ namespace Timbl {
       do_diversify       = m.do_diversify;
       tester = 0;
       decay = 0;
+      delete targets.target_hash;
       targets  = m.targets;
+      delete features.feature_hash;
       features = m.features;
       err_count = 0;
       MBL_init = false;
