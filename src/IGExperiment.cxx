@@ -62,7 +62,7 @@ namespace Timbl {
 	delete confusionInfo;
 	confusionInfo = 0;
 	if ( Verbosity(ADVANCED_STATS) ){
-	  confusionInfo = new ConfusionMatrix( targets->num_of_values() );
+	  confusionInfo = new ConfusionMatrix( targets.num_of_values() );
 	}
 	if ( !is_copy ){
 	  InitWeights();
@@ -137,7 +137,7 @@ namespace Timbl {
 	  }
 	  UnicodeString Buffer;
 	  IG_InstanceBase *outInstanceBase = 0;
-	  TargetValue *TopTarget = targets->MajorityClass();
+	  TargetValue *TopTarget = targets.MajorityClass();
 	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
 	  // Open the file.
 	  //
@@ -195,7 +195,7 @@ namespace Timbl {
 	  UnicodeString Buffer;
 	  IG_InstanceBase *PartInstanceBase = 0;
 	  IG_InstanceBase *outInstanceBase = 0;
-	  TargetValue *TopTarget = targets->MajorityClass();
+	  TargetValue *TopTarget = targets.MajorityClass();
 	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
 	  // Open the file.
 	  //
@@ -491,14 +491,14 @@ namespace Timbl {
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is,
 					 features,
-					 *targets,
+					 targets,
 					 *features.hash(),
 					 Version );
 	}
 	else {
 	  result = InstanceBase->ReadIB( is,
 					 features,
-					 *targets,
+					 targets,
 					 Version );
 	}
 	if ( result ){

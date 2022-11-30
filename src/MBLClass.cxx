@@ -256,6 +256,8 @@ namespace Timbl {
   {
     auto feature_hash = new Hash::UnicodeHash(); // all features share the same hash
     features.set_hash( feature_hash );
+    auto target_hash = new Hash::UnicodeHash(); // targets has it's own hash
+    targets.set_hash( target_hash );
   }
 
   MBLClass &MBLClass::operator=( const MBLClass& m ){
@@ -304,7 +306,7 @@ namespace Timbl {
       do_diversify       = m.do_diversify;
       tester = 0;
       decay = 0;
-      targets   = m.targets;
+      targets  = m.targets;
       features = m.features;
       err_count = 0;
       MBL_init = false;
@@ -327,7 +329,6 @@ namespace Timbl {
     CurrInst.clear();
     if ( !is_copy ){
       delete InstanceBase;
-      delete targets;
     }
     else {
       if ( is_synced ){
@@ -1002,9 +1003,9 @@ namespace Timbl {
       // Print the possible classes.
       //
       os << "Targets : ";
-      for ( const auto& it : targets->values_array ){
+      for ( const auto& it : targets.values_array ){
 	os << it;
-	if ( &it != &targets->values_array.back() ){
+	if ( &it != &targets.values_array.back() ){
 	  os << ",";
 	}
       }
@@ -1029,7 +1030,7 @@ namespace Timbl {
   }
 
   bool MBLClass::allocate_arrays(){
-    size_t Dim = targets->values_array.size();
+    size_t Dim = targets.values_array.size();
     for ( const auto& feat : features.feats ){
       if ( !feat->Ignore() &&
 	   !feat->isNumerical() ) {
@@ -1107,7 +1108,7 @@ namespace Timbl {
     switch ( phase  ){
     case LearnWords:
       // Add the target.
-      CurrInst.TV = targets->add_value( ChopInput->getField( num_of_features ),
+      CurrInst.TV = targets.add_value( ChopInput->getField( num_of_features ),
 					occ );
       // Now add the Feature values.
       for ( size_t i = 0; i < num_of_features; ++i ){
@@ -1134,13 +1135,13 @@ namespace Timbl {
 	CurrInst.FV[k] = features[j]->Lookup( ChopInput->getField(j) );
       } // k
       // and the Target
-      CurrInst.TV = targets->Lookup( ChopInput->getField( num_of_features ) );
+      CurrInst.TV = targets.Lookup( ChopInput->getField( num_of_features ) );
       break;
     case TrainLearnWords:
       // Lookup for Incremental TreeBuilding
       // Assumes that somehow Permutation and effective_feats are known
       // First the Target
-      CurrInst.TV = targets->add_value( (*ChopInput)[num_of_features], occ );
+      CurrInst.TV = targets.add_value( (*ChopInput)[num_of_features], occ );
       // Then the Features
       for ( size_t l = 0; l < effective_feats; ++l ){
 	size_t j = features.permutation[l];
@@ -1163,7 +1164,7 @@ namespace Timbl {
 
       } // i
       // the last string is the target
-      CurrInst.TV = targets->Lookup( ChopInput->getField(num_of_features) );
+      CurrInst.TV = targets.Lookup( ChopInput->getField(num_of_features) );
       break;
     default:
       FatalError( "Wrong value in Switch: "
@@ -1205,7 +1206,7 @@ namespace Timbl {
       os.setf(ios::showpoint );
       int OldPrec = os.precision(8);
       os << "DB Entropy        : " << DBEntropy << endl;
-      os << "Number of Classes : " << targets->EffectiveValues() << endl;
+      os << "Number of Classes : " << targets.EffectiveValues() << endl;
       os << endl;
       if ( Verbosity(FEAT_W) ){
 	if (  CurrentWeighting() == SD_w ){
@@ -1290,8 +1291,8 @@ namespace Timbl {
       }
       else {
 	os << "# DB Entropy: " << DBEntropy << endl;
-	os << "# Classes: " << targets->values_array.size() << endl;
-	os << "# Lines of data: " << targets->TotalValues() << endl;
+	os << "# Classes: " << targets.values_array.size() << endl;
+	os << "# Lines of data: " << targets.TotalValues() << endl;
 	int OldPrec = os.precision(DBL_DIG);
 	if ( CurrentWeighting() == SD_w ){
 	  os << "#" << endl;
@@ -1599,8 +1600,8 @@ namespace Timbl {
       // if always, we have to (re)calculate everything
       double Entropy = 0.0;
       // first get the Database Entropy
-      size_t totval = targets->TotalValues();
-      for ( const auto& it : targets->values_array ){
+      size_t totval = targets.TotalValues();
+      for ( const auto& it : targets.values_array ){
 	double Ratio = it->ValFreq() / (double)totval;
 	if ( Ratio > 0 ){
 	  Entropy += Ratio * Log2(Ratio);
@@ -1741,9 +1742,9 @@ namespace Timbl {
     else {
       // Print the possible classes.
       //
-      for ( const auto& it : targets->values_array ){
+      for ( const auto& it : targets.values_array ){
 	os << it;
-	if ( &it != &targets->values_array.back() ){
+	if ( &it != &targets.values_array.back() ){
 	  os << ",";
 	}
       }
@@ -2251,8 +2252,6 @@ namespace Timbl {
       features.feats[i] = new Feature( features.hash() );
       features.perm_feats[i] = NULL;
     }
-    auto target_hash = new Hash::UnicodeHash(); // targets has it's own hash
-    targets = new Targets( target_hash );
     CurrInst.Init( num_of_features );
     effective_feats = num_of_features;
     num_of_num_features = 0;

@@ -223,8 +223,9 @@ namespace Timbl {
     }
   }
 
-  void WValueDistribution::Normalize_1( double factor, const Targets *targ ) {
-    for ( const auto& val : targ->values_array ){
+  void WValueDistribution::Normalize_1( double factor,
+					const Targets& targ ) {
+    for ( const auto& val : targ.values_array ){
       // search for val, if not there: add entry with frequency factor;
       // otherwise increment the ExamplarWeight
       size_t id = val->Index();
@@ -236,7 +237,7 @@ namespace Timbl {
 	distribution[id] = new Vfield( val, 1, factor );
       }
     }
-    total_items += targ->num_of_values();
+    total_items += targ.num_of_values();
     Normalize();
   }
 
@@ -777,7 +778,9 @@ namespace Timbl {
     }
   }
 
-  void Feature::Statistics( double DBentropy, Targets *Targs, bool full ){
+  void Feature::Statistics( double DBentropy,
+			    Targets& Targs,
+			    bool full ){
     Statistics( DBentropy );
     if ( full ){
       ChiSquareStatistics( Targs );
@@ -785,7 +788,7 @@ namespace Timbl {
     }
   }
 
-  void Feature::NumStatistics( double DBentropy, Targets *Targs,
+  void Feature::NumStatistics( double DBentropy, Targets& Targs,
 			       int BinSize, bool full ){
     char dumname[80];
     vector<FeatureValue *> FVBin(BinSize);
@@ -854,11 +857,11 @@ namespace Timbl {
   }
 
   void Feature::ChiSquareStatistics( vector<FeatureValue *>& FVA,
-				     Targets *Targs ){
+				     Targets& Targs ){
     size_t Num_Vals = FVA.size();
     chi_square = 0.0;
     long int n_dot_dot = 0;
-    size_t Size = Targs->num_of_values();
+    size_t Size = Targs.num_of_values();
     if ( !n_dot_j ) {
       n_dot_j = new long int[Size];
       n_i_dot = new long int[Num_Vals];
@@ -923,10 +926,10 @@ namespace Timbl {
     }
   }
 
-  void Feature::ChiSquareStatistics( Targets *Targs ){
+  void Feature::ChiSquareStatistics( Targets& Targs ){
     chi_square = 0.0;
     long int n_dot_dot = 0;
-    size_t Size = Targs->num_of_values();
+    size_t Size = Targs.num_of_values();
     size_t Num_Vals = values_array.size();
     if ( !n_dot_j ) {
       n_dot_j = new long int[Size];
@@ -1337,10 +1340,22 @@ namespace Timbl {
     }
   }
 
+  Targets &Targets::operator=( const Targets& t ){
+    if ( this != &t ){
+      values_array = t.values_array;
+      reverse_values = t.reverse_values;
+      target_hash = t.target_hash; // shared ??
+      is_reference =true;
+    }
+    return *this;
+  }
+
+
   Targets::~Targets() {
-    delete target_hash;
-    for ( const auto& it : values_array ){
-      delete it;
+    if ( !is_reference ){
+      for ( const auto& it : values_array ){
+	delete it;
+      }
     }
     reverse_values.clear();
   }
@@ -1433,9 +1448,9 @@ namespace Timbl {
   inline int min( int i1, int i2 ) { return (i1>i2?i2:i1); }
   inline size_t min( size_t i1, size_t i2 ) { return (i1>i2?i2:i1); }
 
-  void Feature::SharedVarianceStatistics( Targets *Targ, int eff_cnt ){
-    size_t NumInst = Targ->TotalValues();
-    int NumCats = Targ->EffectiveValues();
+  void Feature::SharedVarianceStatistics( Targets& Targ, int eff_cnt ){
+    size_t NumInst = Targ.TotalValues();
+    int NumCats = Targ.EffectiveValues();
     int k = min( NumCats, eff_cnt ) - 1;
     if ( k == 0 || NumInst == 0 ){
       shared_variance = 0;

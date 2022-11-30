@@ -350,14 +350,14 @@ namespace Timbl {
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is,
 					 features,
-					 *targets,
+					 targets,
 					 *features.hash(),
 					 Version );
 	}
 	else {
 	  result = InstanceBase->ReadIB( is,
 					 features,
-					 *targets,
+					 targets,
 					 Version );
 	}
       }
@@ -403,14 +403,14 @@ namespace Timbl {
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is,
 					 features,
-					 *targets,
+					 targets,
 					 *features.hash(),
 					 Version );
 	}
 	else {
 	  result = InstanceBase->ReadIB( is,
 					 features,
-					 *targets,
+					 targets,
 					 Version );
 	}
       }

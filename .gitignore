@@ -1,7 +1,9 @@
+*~
 src/*.o
 src/*.lo
 src/*.la
 src/*.out
+src/*~
 *.gz
 src/.deps
 src/.libs

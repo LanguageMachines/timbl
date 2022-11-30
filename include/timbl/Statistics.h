@@ -41,8 +41,8 @@ namespace Timbl {
     explicit ConfusionMatrix( size_t );
     virtual ~ConfusionMatrix();
     void Increment( const TargetValue*, const TargetValue* );
-    void Print( std::ostream&, const Targets * ) const;
-    void FScore( std::ostream&, const Targets *, bool ) const;
+    void Print( std::ostream&, const Targets& ) const;
+    void FScore( std::ostream&, const Targets&, bool ) const;
     void merge( const ConfusionMatrix * );
   };
 

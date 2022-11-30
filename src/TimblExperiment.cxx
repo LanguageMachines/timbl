@@ -87,12 +87,12 @@ namespace Timbl {
   }
 
   bool resultStore::reset( int _beam, normType _norm,
-			   double _factor, const Targets *_targets ) {
+			   double _factor, const Targets& _targets ) {
     clear();
     beam = _beam;
     norm = _norm;
     factor = _factor;
-    targets = _targets;
+    targets = &_targets;
     bool result = true;
     if ( norm != noNorm &&
 	 beam != 0 ){
@@ -191,7 +191,7 @@ namespace Timbl {
 	dist->Normalize();
 	break;
       case addFactorNorm:
-	dist->Normalize_1( factor, targets );
+	dist->Normalize_1( factor, *targets );
 	break;
       case logProbNorm:
 	dist->Normalize_2();
@@ -283,7 +283,7 @@ namespace Timbl {
 	delete confusionInfo;
 	confusionInfo = 0;
 	if ( Verbosity(ADVANCED_STATS) ){
-	  confusionInfo = new ConfusionMatrix( targets->num_of_values() );
+	  confusionInfo = new ConfusionMatrix( targets.num_of_values() );
 	}
 	initDecay();
 	calculate_fv_entropy( true );
@@ -474,7 +474,7 @@ namespace Timbl {
 		if ( !Verbosity(SILENT) ){
 		  Info( "Preparation took " + prepT.toString() );
 		}
-		if ( warnOnSingleTarget && targets->EffectiveValues() <=1 ){
+		if ( warnOnSingleTarget && targets.EffectiveValues() <=1 ){
 		  Warning( "Training file contains only 1 class." );
 		}
 		result = true;
@@ -2518,14 +2518,14 @@ namespace Timbl {
 	if ( Hashed ){
 	  result = InstanceBase->ReadIB( is,
 					 features,
-					 *targets,
+					 targets,
 					 *features.hash(),
 					 Version );
 	}
 	else {
 	  result = InstanceBase->ReadIB( is,
 					 features,
-					 *targets,
+					 targets,
 					 Version );
 	}
       }

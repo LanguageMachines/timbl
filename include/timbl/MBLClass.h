@@ -139,7 +139,7 @@ namespace Timbl {
     int Progress() const { return progress; };
     void Progress( int p ){ progress =  p; };
     std::string extract_limited_m( size_t );
-    Targets *targets;
+    Targets targets;
     Feature_List features;
     InstanceBase_base *InstanceBase;
     std::ostream *mylog;

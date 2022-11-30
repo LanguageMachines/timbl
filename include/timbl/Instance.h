@@ -141,7 +141,7 @@ namespace Timbl {
     const std::string SaveHashed() const override;
     const std::string Save() const override;
     void Normalize();
-    void Normalize_1( double, const Targets * );
+    void Normalize_1( double, const Targets& );
     void Normalize_2();
     void MergeW( const ValueDistribution&, double );
   private:
@@ -220,9 +220,11 @@ namespace Timbl {
     friend class ConfusionMatrix;
   public:
     explicit Targets( Hash::UnicodeHash *T ):
-      target_hash( T )
+      target_hash( T ),
+      is_reference(false)
     {};
     ~Targets();
+    Targets& operator=( const Targets& );
     TargetValue *add_value( const icu::UnicodeString&, int freq = 1 );
     TargetValue *add_value( size_t, int freq = 1 );
     TargetValue *Lookup( const icu::UnicodeString& ) const;
@@ -234,10 +236,14 @@ namespace Timbl {
     size_t TotalValues() const;
     size_t num_of_values() const { return values_array.size(); };
     Hash::UnicodeHash *hash() const { return target_hash; };
+    void set_hash( Hash::UnicodeHash *hash ){
+      target_hash = hash;
+    };
   private:
     Hash::UnicodeHash *target_hash;
     std::vector<TargetValue *> values_array;
     std::unordered_map< size_t, TargetValue *> reverse_values;
+    bool is_reference;
   };
 
   class metricClass;
@@ -292,8 +298,8 @@ namespace Timbl {
     void print_vc_pb_array( std::ostream& ) const;
     bool read_vc_pb_array( std::istream &  );
     FeatVal_Stat prepare_numeric_stats();
-    void Statistics( double, Targets *, bool );
-    void NumStatistics( double, Targets *, int, bool );
+    void Statistics( double, Targets&, bool );
+    void NumStatistics( double, Targets&, int, bool );
     void ClipFreq( size_t f ){ matrix_clip_freq = f; };
     size_t ClipFreq() const { return matrix_clip_freq; };
     SparseSymetricMatrix<ValueClass *> *metric_matrix;
@@ -324,9 +330,9 @@ namespace Timbl {
     double weight;
     void Statistics( double );
     void NumStatistics( std::vector<FeatureValue *>&, double );
-    void ChiSquareStatistics( std::vector<FeatureValue *>&, Targets * );
-    void ChiSquareStatistics( Targets * );
-    void SharedVarianceStatistics( Targets *, int );
+    void ChiSquareStatistics( std::vector<FeatureValue *>&, Targets& );
+    void ChiSquareStatistics( Targets& );
+    void SharedVarianceStatistics( Targets&, int );
     void StandardDeviationStatistics();
     Feature( const Feature& );
     Feature& operator=( const Feature& );

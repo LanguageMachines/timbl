@@ -67,7 +67,7 @@ namespace Timbl {
       targets(0)
 	{};
     ~resultStore();
-    bool reset( int, normType, double, const Targets * );
+    bool reset( int, normType, double, const Targets&  );
     void clear();
     void addConstant( const ValueDistribution *, const TargetValue * );
     void addTop( const ValueDistribution *, const TargetValue * );

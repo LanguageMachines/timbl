@@ -462,11 +462,11 @@ namespace Timbl {
     return 0;
   }
 
-  const Targets *TimblAPI::myTargets() const{
+  const Targets& TimblAPI::myTargets() const{
     if ( Valid() ){
       return pimpl->targets;
     }
-    return 0;
+    abort();
   }
 
   bool TimblAPI::Classify( const string& s, string& cls ){
