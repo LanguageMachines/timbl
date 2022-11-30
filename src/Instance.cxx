@@ -1358,6 +1358,7 @@ namespace Timbl {
       for ( const auto& it : values_array ){
 	delete it;
       }
+      delete target_hash;
     }
     reverse_values.clear();
   }
@@ -1786,8 +1787,15 @@ namespace Timbl {
 	  perm_feats[i] = 0;
 	}
       }
+      is_reference = true;
     }
     return *this;
+  }
+
+  Feature_List::~Feature_List(){
+    if ( !is_reference ){
+      delete feature_hash;
+    }
   }
 
   Instance::Instance():

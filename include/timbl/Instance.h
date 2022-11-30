@@ -345,13 +345,16 @@ namespace Timbl {
     friend class MBLClass;
   public:
     Feature_List():
-      feature_hash(0)
+      feature_hash(0),
+      is_reference(false)
     {
     }
-    Feature_List( Hash::UnicodeHash *hash ):
-      feature_hash( hash )
+    explicit Feature_List( Hash::UnicodeHash *hash ):
+      feature_hash( hash ),
+      is_reference(false)
     {
     }
+    ~Feature_List();
     Feature_List &operator=( const Feature_List& );
     Hash::UnicodeHash *hash() const { return feature_hash; };
     void set_hash( Hash::UnicodeHash *hash ){
@@ -363,6 +366,7 @@ namespace Timbl {
     std::vector<size_t> permutation;
   private:
     Hash::UnicodeHash *feature_hash;
+    bool is_reference;
   };
 
   class Instance {
