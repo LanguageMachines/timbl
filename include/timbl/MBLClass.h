@@ -243,7 +243,6 @@ namespace Timbl {
       }
     };
     void InvalidMessage() const ;
-    double calculate_db_entropy( Targets * );
     void do_numeric_statistics( );
 
     void test_instance( const Instance& ,

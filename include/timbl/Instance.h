@@ -298,8 +298,8 @@ namespace Timbl {
     void print_vc_pb_array( std::ostream& ) const;
     bool read_vc_pb_array( std::istream &  );
     FeatVal_Stat prepare_numeric_stats();
-    void Statistics( double, Targets&, bool );
-    void NumStatistics( double, Targets&, int, bool );
+    void Statistics( double, const Targets&, bool );
+    void NumStatistics( double, const Targets&, int, bool );
     void ClipFreq( size_t f ){ matrix_clip_freq = f; };
     size_t ClipFreq() const { return matrix_clip_freq; };
     SparseSymetricMatrix<ValueClass *> *metric_matrix;
@@ -330,9 +330,9 @@ namespace Timbl {
     double weight;
     void Statistics( double );
     void NumStatistics( std::vector<FeatureValue *>&, double );
-    void ChiSquareStatistics( std::vector<FeatureValue *>&, Targets& );
-    void ChiSquareStatistics( Targets& );
-    void SharedVarianceStatistics( Targets&, int );
+    void ChiSquareStatistics( std::vector<FeatureValue *>&, const Targets& );
+    void ChiSquareStatistics( const Targets& );
+    void SharedVarianceStatistics( const Targets&, int );
     void StandardDeviationStatistics();
     Feature( const Feature& );
     Feature& operator=( const Feature& );
@@ -352,7 +352,6 @@ namespace Timbl {
       feature_hash( hash )
     {
     }
-    ~Feature_List();
     Feature_List &operator=( const Feature_List& );
     Hash::UnicodeHash *hash() const { return feature_hash; };
     void set_hash( Hash::UnicodeHash *hash ){

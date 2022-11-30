@@ -155,11 +155,10 @@ namespace Timbl {
 			 Feature_List&,
 			 Targets&,
 			 int );
-    virtual bool ReadIB( std::istream&,
-			 Feature_List&,
-			 Targets&,
-			 Hash::UnicodeHash&,
-			 int );
+    virtual bool ReadIB_hashed( std::istream&,
+				Feature_List&,
+				Targets&,
+				int );
     virtual void Prune( const TargetValue *, long = 0 );
     virtual bool IsPruned() const { return false; };
     void CleanPartition(  bool );
@@ -217,10 +216,10 @@ namespace Timbl {
 		  Feature_List& ,
 		  Targets&,
 		  int );
-    bool read_IB( std::istream&,
-		  Feature_List& ,
-		  Targets&,
-		  Hash::UnicodeHash&, int );
+    bool read_IB_hashed( std::istream&,
+			 Feature_List& ,
+			 Targets&,
+			 int );
     void fill_index();
     const IBtree *fast_search_node( FeatureValue * );
   };
@@ -267,11 +266,10 @@ namespace Timbl {
 		 Feature_List&,
 		 Targets&,
 		 int ) override;
-    bool ReadIB( std::istream&,
-		 Feature_List&,
-		 Targets&,
-		 Hash::UnicodeHash&,
-		 int ) override;
+    bool ReadIB_hashed( std::istream&,
+			Feature_List&,
+			Targets&,
+			int ) override;
     bool MergeSub( InstanceBase_base * ) override;
   protected:
     bool Pruned;

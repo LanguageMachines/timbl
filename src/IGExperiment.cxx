@@ -489,11 +489,10 @@ namespace Timbl {
 	  }
 	}
 	if ( Hashed ){
-	  result = InstanceBase->ReadIB( is,
-					 features,
-					 targets,
-					 *features.hash(),
-					 Version );
+	  result = InstanceBase->ReadIB_hashed( is,
+						features,
+						targets,
+						Version );
 	}
 	else {
 	  result = InstanceBase->ReadIB( is,

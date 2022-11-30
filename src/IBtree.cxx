@@ -762,12 +762,11 @@ namespace Timbl {
     return true;
   }
 
-  bool InstanceBase_base::ReadIB( istream& is,
-				  Feature_List& feats,
-				  Targets& Targs,
-				  Hash::UnicodeHash& feat_hash,
-				  int expected_version ){
-    if ( read_IB( is, feats, Targs, feat_hash, expected_version ) ){
+  bool InstanceBase_base::ReadIB_hashed( istream& is,
+					 Feature_List& feats,
+					 Targets& Targs,
+					 int expected_version ){
+    if ( read_IB_hashed( is, feats, Targs, expected_version ) ){
       InstBase->redo_distributions();
       ValueDistribution *Top
 	= InstBase->sum_distributions( PersistentDistributions );
@@ -780,12 +779,11 @@ namespace Timbl {
     }
   }
 
-  bool IG_InstanceBase::ReadIB( istream& is,
-				Feature_List& feats,
-				Targets& Targs,
-				Hash::UnicodeHash& feat_hash,
-				int expected_version ){
-    if ( read_IB( is, feats, Targs, feat_hash, expected_version ) ){
+  bool IG_InstanceBase::ReadIB_hashed( istream& is,
+				       Feature_List& feats,
+				       Targets& Targs,
+				       int expected_version ){
+    if ( read_IB_hashed( is, feats, Targs, expected_version ) ){
       if ( PersistentDistributions ){
 	ValueDistribution *Top
 	  = InstBase->sum_distributions( PersistentDistributions );
@@ -799,17 +797,16 @@ namespace Timbl {
     }
   }
 
-  bool InstanceBase_base::read_IB( istream& is,
-				   Feature_List& feats,
-				   Targets& Targs,
-				   Hash::UnicodeHash& feat_hash,
-				   int expected_version ){
+  bool InstanceBase_base::read_IB_hashed( istream& is,
+					  Feature_List& feats,
+					  Targets& Targs,
+					  int expected_version ){
     char delim;
     NumOfTails = 0;
     DefAss = true;  // always for a restored tree
     DefaultsValid = true; // always for a restored tree
     Version = expected_version;
-    read_hash( is, *Targs.hash(), feat_hash );
+    read_hash( is, *Targs.hash(), *feats.hash() );
     is >> delim;
     if ( !is || delim != '(' ){
       Error( "missing first `(` in Instance Base file" );

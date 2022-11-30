@@ -779,7 +779,7 @@ namespace Timbl {
   }
 
   void Feature::Statistics( double DBentropy,
-			    Targets& Targs,
+			    const Targets& Targs,
 			    bool full ){
     Statistics( DBentropy );
     if ( full ){
@@ -788,8 +788,10 @@ namespace Timbl {
     }
   }
 
-  void Feature::NumStatistics( double DBentropy, Targets& Targs,
-			       int BinSize, bool full ){
+  void Feature::NumStatistics( double DBentropy,
+			       const Targets& Targs,
+			       int BinSize,
+			       bool full ){
     char dumname[80];
     vector<FeatureValue *> FVBin(BinSize);
     for ( int i=0; i < BinSize; ++i ){
@@ -857,7 +859,7 @@ namespace Timbl {
   }
 
   void Feature::ChiSquareStatistics( vector<FeatureValue *>& FVA,
-				     Targets& Targs ){
+				     const Targets& Targs ){
     size_t Num_Vals = FVA.size();
     chi_square = 0.0;
     long int n_dot_dot = 0;
@@ -926,7 +928,7 @@ namespace Timbl {
     }
   }
 
-  void Feature::ChiSquareStatistics( Targets& Targs ){
+  void Feature::ChiSquareStatistics( const Targets& Targs ){
     chi_square = 0.0;
     long int n_dot_dot = 0;
     size_t Size = Targs.num_of_values();
@@ -1448,7 +1450,8 @@ namespace Timbl {
   inline int min( int i1, int i2 ) { return (i1>i2?i2:i1); }
   inline size_t min( size_t i1, size_t i2 ) { return (i1>i2?i2:i1); }
 
-  void Feature::SharedVarianceStatistics( Targets& Targ, int eff_cnt ){
+  void Feature::SharedVarianceStatistics( const Targets& Targ,
+					  int eff_cnt ){
     size_t NumInst = Targ.TotalValues();
     int NumCats = Targ.EffectiveValues();
     int k = min( NumCats, eff_cnt ) - 1;
@@ -1785,10 +1788,6 @@ namespace Timbl {
       }
     }
     return *this;
-  }
-
-  Feature_List::~Feature_List(){
-    //    delete feature_hash;
   }
 
   Instance::Instance():
