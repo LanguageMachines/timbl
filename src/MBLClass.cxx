@@ -2241,21 +2241,13 @@ namespace Timbl {
       FatalError( "Initialize: TARGET_POS cannot exceed NUM_OF_FEATURES+1 " +
 		  TiCC::toString<size_t>( num_of_features+1 ) );
     }
-    auto feature_hash = new Hash::UnicodeHash(); // all features share the same hash
-    features.set_hash( feature_hash );
-    auto target_hash = new Hash::UnicodeHash(); // targets has it's own hash
-    targets.set_hash( target_hash );
-    features.feats.resize(num_of_features,NULL);
-    features.perm_feats.resize(num_of_features,NULL);
-    for ( size_t i=0; i< num_of_features; ++i ){
-      features.feats[i] = new Feature( features.hash() );
-      features.perm_feats[i] = NULL;
-    }
+    targets.init();
+    features.init( num_of_features );
     CurrInst.Init( num_of_features );
-    effective_feats = num_of_features;
-    num_of_num_features = 0;
     delete GlobalMetric;
     GlobalMetric = getMetricClass( globalMetricOption );
+    effective_feats = num_of_features;
+    num_of_num_features = 0;
     // the user thinks about features running from 1 to Num
     // we know better, so shift the UserOptions one down.
     for ( size_t j = 0; j < num_of_features; ++j ){

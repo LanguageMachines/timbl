@@ -1363,6 +1363,10 @@ namespace Timbl {
     reverse_values.clear();
   }
 
+  void Targets::init(){
+    target_hash = new Hash::UnicodeHash();
+  }
+
   TargetValue *Targets::Lookup( const UnicodeString& str ) const {
     TargetValue *result = 0;
     size_t index = target_hash->lookup( str );
@@ -1795,6 +1799,16 @@ namespace Timbl {
   Feature_List::~Feature_List(){
     if ( !is_reference ){
       delete feature_hash;
+    }
+  }
+
+  void Feature_List::init( size_t num_of_features ){
+    feature_hash = new Hash::UnicodeHash(); // all features share the same hash
+    feats.resize(num_of_features,NULL);
+    perm_feats.resize(num_of_features,NULL);
+    for ( size_t i=0; i< num_of_features; ++i ){
+      feats[i] = new Feature( feature_hash );
+      perm_feats[i] = NULL;
     }
   }
 

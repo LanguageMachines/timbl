@@ -61,7 +61,7 @@ namespace Timbl {
       value(val), frequency(freq), weight(w) {};
     Vfield( const Vfield& in ):
       value(in.value), frequency(in.frequency), weight(in.weight) {};
-    Vfield& operator=( const Vfield& ) = delete;
+    Vfield& operator=( const Vfield& ) = delete; // forbid copies
     ~Vfield(){};
     std::ostream& put( std::ostream& ) const;
     const TargetValue *Value() const { return value; };
@@ -200,8 +200,6 @@ namespace Timbl {
   public:
     explicit FeatureValue( const icu::UnicodeString& );
     FeatureValue( const icu::UnicodeString&, size_t );
-    FeatureValue( const FeatureValue& ) = delete; // inhibit copies
-    FeatureValue& operator=( const FeatureValue& ) = delete; // inhibit copies
     ~FeatureValue();
     void ReconstructDistribution( const ValueDistribution& vd ) {
       TargetDist.Merge( vd );
@@ -225,6 +223,7 @@ namespace Timbl {
     {};
     ~Targets();
     Targets& operator=( const Targets& );
+    void init();
     TargetValue *add_value( const icu::UnicodeString&, int freq = 1 );
     TargetValue *add_value( size_t, int freq = 1 );
     TargetValue *Lookup( const icu::UnicodeString& ) const;
@@ -236,9 +235,6 @@ namespace Timbl {
     size_t TotalValues() const;
     size_t num_of_values() const { return values_array.size(); };
     Hash::UnicodeHash *hash() const { return target_hash; };
-    void set_hash( Hash::UnicodeHash *hash ){
-      target_hash = hash;
-    };
   private:
     Hash::UnicodeHash *target_hash;
     std::vector<TargetValue *> values_array;
@@ -356,10 +352,8 @@ namespace Timbl {
     }
     Feature_List &operator=( const Feature_List& );
     ~Feature_List();
+    void init( size_t );
     Hash::UnicodeHash *hash() const { return feature_hash; };
-    void set_hash( Hash::UnicodeHash *hash ){
-      feature_hash = hash;
-    };
     Feature *operator[]( size_t i ) const { return feats[i]; };
     std::vector<Feature *> feats;
     std::vector<Feature *> perm_feats;
