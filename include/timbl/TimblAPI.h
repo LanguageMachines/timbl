@@ -146,7 +146,7 @@ namespace Timbl{
     bool initExperiment();
   private:
     TimblAPI();
-    TimblAPI& operator=( const TimblAPI& ); // so nobody may use them
+    TimblAPI& operator=( const TimblAPI& ); // forbid copies
     TimblExperiment *pimpl;
     bool i_am_fine;
   };

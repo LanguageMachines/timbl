@@ -386,6 +386,18 @@ namespace Timbl {
 
   class OptionTableClass {
   public:
+    OptionTableClass():
+      table_frozen(false){};
+    OptionTableClass( const OptionTableClass& ) = delete; // forbid copies
+    OptionTableClass& operator=( const OptionTableClass& ) = delete; // forbid copies
+    ~OptionTableClass(){
+      for ( const auto& it : global_table ){
+	delete it.second;
+      }
+      for ( const auto& it : runtime_table ){
+	delete it.second;
+      }
+    };
     bool Add( OptionClass *opt ){
       //      std::cerr << "Table add: " << opt->Name << std::endl;
       runtime_table[opt->Name] = opt;
@@ -396,23 +408,11 @@ namespace Timbl {
     SetOptRes SetOption( const std::string& );
     void Show_Settings( std::ostream& ) const;
     void Show_Options( std::ostream& ) const;
-    OptionTableClass():
-      table_frozen(false){};
-    ~OptionTableClass(){
-      for ( const auto& it : global_table ){
-	delete it.second;
-      }
-      for ( const auto& it : runtime_table ){
-	delete it.second;
-      }
-    };
   private:
     bool table_frozen;
     std::map<std::string,OptionClass *,ci_less> runtime_table;
     std::map<std::string,OptionClass *,ci_less> global_table;
     inline OptionClass *look_up( const std::string&, bool & );
-    OptionTableClass( const OptionTableClass& );
-    OptionTableClass& operator=( const OptionTableClass& );
   };
 
   inline void OptionTableClass::FreezeTable(void){

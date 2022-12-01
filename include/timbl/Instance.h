@@ -57,10 +57,11 @@ namespace Timbl {
     friend std::ostream& operator<<( std::ostream&, const Vfield& );
     friend std::ostream& operator<<( std::ostream&, const Vfield * );
   public:
-  Vfield( const TargetValue *val, int freq, double w ):
-    value(val), frequency(freq), weight(w) {};
-  Vfield( const Vfield& in ):
-    value(in.value), frequency(in.frequency), weight(in.weight) {};
+    Vfield( const TargetValue *val, int freq, double w ):
+      value(val), frequency(freq), weight(w) {};
+    Vfield( const Vfield& in ):
+      value(in.value), frequency(in.frequency), weight(in.weight) {};
+    Vfield& operator=( const Vfield& ) = delete;
     ~Vfield(){};
     std::ostream& put( std::ostream& ) const;
     const TargetValue *Value() const { return value; };
@@ -77,7 +78,6 @@ namespace Timbl {
     size_t frequency;
     double weight;
   private:
-    Vfield& operator=( const Vfield& );
   };
 
   class Targets;
@@ -155,6 +155,8 @@ namespace Timbl {
   public:
     ValueClass( const icu::UnicodeString& n, size_t i ):
       name( n ), index( i ), Frequency( 1 ) {};
+    ValueClass( const ValueClass& ) = delete; // forbid copies
+    ValueClass& operator=( const ValueClass& ) = delete; // forbid copies
     virtual ~ValueClass() {};
     void ValFreq( size_t f ){ Frequency = f; };
     void IncValFreq( int f ){ Frequency += f; };
@@ -169,8 +171,6 @@ namespace Timbl {
     const icu::UnicodeString& name;
     size_t index;
     size_t Frequency;
-    ValueClass( const ValueClass& );
-    ValueClass& operator=( const ValueClass& );
   };
 
   class TargetValue: public ValueClass {
@@ -200,6 +200,8 @@ namespace Timbl {
   public:
     explicit FeatureValue( const icu::UnicodeString& );
     FeatureValue( const icu::UnicodeString&, size_t );
+    FeatureValue( const FeatureValue& ) = delete; // inhibit copies
+    FeatureValue& operator=( const FeatureValue& ) = delete; // inhibit copies
     ~FeatureValue();
     void ReconstructDistribution( const ValueDistribution& vd ) {
       TargetDist.Merge( vd );
@@ -210,8 +212,6 @@ namespace Timbl {
   private:
     SparseValueProbClass *ValueClassProb;
     ValueDistribution TargetDist;
-    FeatureValue( const FeatureValue& ); // inhibit copies
-    FeatureValue& operator=( const FeatureValue& ); // inhibit copies
   };
 
   class Targets: public MsgClass {
@@ -304,6 +304,8 @@ namespace Timbl {
     size_t ClipFreq() const { return matrix_clip_freq; };
     SparseSymetricMatrix<ValueClass *> *metric_matrix;
   private:
+    Feature( const Feature& );
+    Feature& operator=( const Feature& );
     Hash::UnicodeHash *TokenTree;
     metricClass *metric;
     bool ignore;
@@ -334,8 +336,6 @@ namespace Timbl {
     void ChiSquareStatistics( const Targets& );
     void SharedVarianceStatistics( const Targets&, int );
     void StandardDeviationStatistics();
-    Feature( const Feature& );
-    Feature& operator=( const Feature& );
     std::vector<FeatureValue *> values_array;
     std::unordered_map< size_t, FeatureValue *> reverse_values;
     bool is_reference;
@@ -354,8 +354,8 @@ namespace Timbl {
       is_reference(false)
     {
     }
-    ~Feature_List();
     Feature_List &operator=( const Feature_List& );
+    ~Feature_List();
     Hash::UnicodeHash *hash() const { return feature_hash; };
     void set_hash( Hash::UnicodeHash *hash ){
       feature_hash = hash;
@@ -374,8 +374,9 @@ namespace Timbl {
     friend std::ostream& operator<<(std::ostream&, const Instance * );
   public:
     Instance();
-    explicit Instance( size_t s ): TV(NULL), sample_weight(0.0), occ(1)
-      { Init( s ); };
+    explicit Instance( size_t s ): Instance() { Init( s ); };
+    Instance( const Instance& ) = delete; // inhibit copies
+    Instance& operator=( const Instance& ) = delete; // inhibit copies
     ~Instance();
     void Init( size_t );
     void clear();
@@ -387,8 +388,6 @@ namespace Timbl {
     std::vector<FeatureValue *> FV;
     TargetValue *TV;
   private:
-    Instance( const Instance& ); // inhibit copies
-    Instance& operator=( const Instance& ); // inhibit copies
     double sample_weight; // relative weight
     int occ;
   };

@@ -66,6 +66,8 @@ namespace Timbl {
       best_target(0),
       targets(0)
 	{};
+    resultStore( const resultStore& ) = delete; // inhibit copies
+    resultStore& operator=( const resultStore& ) = delete; // inhibit copies
     ~resultStore();
     bool reset( int, normType, double, const Targets&  );
     void clear();
@@ -93,8 +95,6 @@ namespace Timbl {
       }
     };
   private:
-    resultStore( const resultStore& ); // inhibit copies
-    resultStore& operator=( const resultStore& ); // inhibit copies
     const ValueDistribution *rawDist;
     WValueDistribution *dist;
     bool disposable;
@@ -385,8 +385,8 @@ namespace Timbl {
 
   class LOO_Experiment: public IB1_Experiment {
   public:
-  LOO_Experiment( int N, const std::string& s = "" ):
-    IB1_Experiment( N, s ) {
+    LOO_Experiment( int N, const std::string& s = "" ):
+      IB1_Experiment( N, s ) {
     };
     bool Test( const std::string&,
 	       const std::string& ) override;
@@ -400,8 +400,10 @@ namespace Timbl {
 
   class CV_Experiment: public IB1_Experiment {
   public:
-  CV_Experiment( int N = DEFAULT_MAX_FEATS, const std::string& s = "" ):
-    IB1_Experiment( N, s ), CV_fileW(Unknown_w) { };
+    CV_Experiment( int N = DEFAULT_MAX_FEATS, const std::string& s = "" ):
+      IB1_Experiment( N, s ), CV_fileW(Unknown_w) { };
+    CV_Experiment( const CV_Experiment& ) = delete; // forbid copies
+    CV_Experiment& operator=( const CV_Experiment& ) = delete; // forbid copies
     bool Learn( const std::string& = "", bool = true ) override;
     bool Prepare( const std::string& = "",
 		  bool=true,
@@ -416,8 +418,6 @@ namespace Timbl {
     bool checkTestFile() override;
     bool get_file_names( const std::string& );
   private:
-    CV_Experiment( const CV_Experiment& );
-    CV_Experiment& operator=( const CV_Experiment& );
     std::vector<std::string> FileNames;
     std::string CV_WfileName;
     std::string CV_PfileName;

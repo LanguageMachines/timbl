@@ -38,6 +38,8 @@ namespace Timbl {
     friend std::ostream& operator<< ( std::ostream&, const BestRec * );
   public:
     BestRec();
+    BestRec( const BestRec& ) = delete; // forbid copies
+    BestRec& operator=( const BestRec& ) = delete; // forbid copies
     ~BestRec();
     size_t totalBests() const { return aggregateDist.totalSize(); };
     double bestDistance;
@@ -45,8 +47,6 @@ namespace Timbl {
     std::vector<ValueDistribution*> bestDistributions;
     std::vector<icu::UnicodeString> bestInstances;
   private:
-    BestRec( const BestRec& );
-    BestRec& operator=( const BestRec& );
   };
 
   class BestArray {

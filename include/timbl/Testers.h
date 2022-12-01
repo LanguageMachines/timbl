@@ -62,6 +62,8 @@ namespace Timbl{
   public:
     TesterClass( const std::vector<Feature*>&,
 		 const std::vector<size_t> & );
+    TesterClass( const TesterClass& ) = delete; // inhibit copies
+    TesterClass& operator=( const TesterClass& ) = delete; // inhibit copies
     virtual ~TesterClass(){};
     void init( const Instance&, size_t, size_t );
     virtual size_t test( std::vector<FeatureValue *>&,
@@ -78,8 +80,6 @@ namespace Timbl{
     const std::vector<size_t> &permutation;
     std::vector<double> distances;
   private:
-    TesterClass( const TesterClass& ); // inhibit copies
-    TesterClass& operator=( const TesterClass& ); // inhibit copies
   };
 
   class DistanceTester: public TesterClass {
@@ -93,10 +93,7 @@ namespace Timbl{
 		 size_t,
 		 double ) override;
   private:
-    DistanceTester( const DistanceTester& ); // inhibit copies
-    DistanceTester& operator=( const DistanceTester& ); // inhibit copies
     metricTestFunction **metricTest;
-
   };
 
   class SimilarityTester: public TesterClass {
@@ -110,8 +107,6 @@ namespace Timbl{
 			 double ) override = 0;
   protected:
   private:
-    SimilarityTester( const SimilarityTester & ); // inhibit copies
-    SimilarityTester& operator=( const SimilarityTester & ); // inhibit copies
   };
 
   class CosineTester: public SimilarityTester {
@@ -124,8 +119,6 @@ namespace Timbl{
 		 size_t,
 		 double ) override;
   private:
-    CosineTester( const CosineTester & ); // inhibit copies
-    CosineTester& operator=( const CosineTester & ); // inhibit copies
   };
 
   class DotProductTester: public SimilarityTester {
@@ -138,9 +131,6 @@ namespace Timbl{
 		 size_t,
 		 double ) override;
   private:
-    DotProductTester( const DotProductTester & ); // inhibit copies
-    DotProductTester& operator=( const DotProductTester & ); // inhibit copies
-
   };
 
   TesterClass* getTester( MetricType,

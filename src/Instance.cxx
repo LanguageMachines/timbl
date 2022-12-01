@@ -1799,7 +1799,10 @@ namespace Timbl {
   }
 
   Instance::Instance():
-    TV(NULL), sample_weight(0.0), occ(1) {
+    TV(NULL),
+    sample_weight(0.0),
+    occ(1)
+  {
   }
 
   Instance::~Instance(){

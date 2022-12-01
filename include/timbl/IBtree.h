@@ -75,6 +75,8 @@ namespace Timbl {
 
     IBtree();
     explicit IBtree( FeatureValue * );
+    IBtree( const IBtree& ) = delete; // forbid copies
+    IBtree& operator=( const IBtree& ) = delete; // forbid copies
     ~IBtree();
     IBtree *Reduce( const TargetValue *, unsigned long&, long );
 #ifdef IBSTATS
@@ -94,8 +96,6 @@ namespace Timbl {
     const ValueDistribution *exact_match( const Instance&  ) const;
   protected:
     const IBtree *search_node( FeatureValue * ) const;
-    IBtree( const IBtree& );
-    IBtree& operator=( const IBtree& );
   };
 
   typedef std::unordered_map<size_t, const IBtree*> FI_map;
@@ -104,8 +104,8 @@ namespace Timbl {
     friend class IG_InstanceBase;
     friend class TRIBL_InstanceBase;
     friend class TRIBL2_InstanceBase;
-    InstanceBase_base( const InstanceBase_base& );
-    InstanceBase_base& operator=( const InstanceBase_base& );
+    InstanceBase_base( const InstanceBase_base& ) = delete; // forbid copies
+    InstanceBase_base& operator=( const InstanceBase_base& ) = delete; // forbid copies
     friend std::ostream& operator<<( std::ostream &os,
 				     const InstanceBase_base& );
     friend std::ostream& operator<<( std::ostream &os,
@@ -241,8 +241,6 @@ namespace Timbl {
     const ValueDistribution *NextGraphTest( std::vector<FeatureValue *>&,
 				      size_t& ) override;
   private:
-    IB_InstanceBase( const IB_InstanceBase& ); // inhibit copy
-    IB_InstanceBase& operator=( const IB_InstanceBase& ); // inhibit copy
     size_t offSet;
     size_t effFeat;
     const std::vector<FeatureValue *> *testInst;
