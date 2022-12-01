@@ -341,26 +341,31 @@ namespace Timbl {
     friend class MBLClass;
   public:
     Feature_List():
-      feature_hash(0),
-      is_reference(false)
+      _eff_feats(0),
+      _num_of_num_feats(0),
+      _feature_hash(0),
+      _is_reference(false)
     {
     }
     explicit Feature_List( Hash::UnicodeHash *hash ):
-      feature_hash( hash ),
-      is_reference(false)
+      Feature_List()
     {
+      _feature_hash = hash;
     }
     Feature_List &operator=( const Feature_List& );
     ~Feature_List();
     void init( size_t );
-    Hash::UnicodeHash *hash() const { return feature_hash; };
+    Hash::UnicodeHash *hash() const { return _feature_hash; };
+    size_t effective_feats(){ return _eff_feats; };
     Feature *operator[]( size_t i ) const { return feats[i]; };
+    size_t _eff_feats;
+    size_t _num_of_num_feats;
     std::vector<Feature *> feats;
     std::vector<Feature *> perm_feats;
     std::vector<size_t> permutation;
   private:
-    Hash::UnicodeHash *feature_hash;
-    bool is_reference;
+    Hash::UnicodeHash *_feature_hash;
+    bool _is_reference;
   };
 
   class Instance {

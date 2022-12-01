@@ -126,7 +126,7 @@ namespace Timbl {
     bool get_IB_Info( std::istream&, bool&, int&, bool&, std::string& );
     size_t NumOfFeatures() const { return num_of_features; };
     size_t targetPos() const { return target_pos; };
-    size_t NumNumFeatures() const { return num_of_num_features; };
+    size_t NumNumFeatures() const { return features._num_of_num_feats; };
     size_t EffectiveFeatures() const { return effective_feats; };
     void IBInfo( std::ostream& os ) const;
     void MatrixInfo( std::ostream& ) const;
@@ -206,7 +206,6 @@ namespace Timbl {
     VerbosityFlags verbosity;
     mutable int err_count;
     size_t num_of_features;
-    size_t num_of_num_features;
     size_t target_pos;
     size_t effective_feats;
     int clip_factor;
@@ -243,6 +242,7 @@ namespace Timbl {
       }
     };
     void InvalidMessage() const ;
+
     void do_numeric_statistics( );
 
     void test_instance( const Instance& ,

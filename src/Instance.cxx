@@ -1779,7 +1779,7 @@ namespace Timbl {
       feats.resize(l.feats.size());
       perm_feats.resize(l.feats.size());
       permutation = l.permutation;
-      feature_hash = l.feature_hash; // shared ??
+      _feature_hash = l._feature_hash; // shared ??
       for ( unsigned int i=0; i < l.feats.size(); ++i ){
 	feats[i] = new Feature( *l.feats[i] );
       }
@@ -1791,23 +1791,23 @@ namespace Timbl {
 	  perm_feats[i] = 0;
 	}
       }
-      is_reference = true;
+      _is_reference = true;
     }
     return *this;
   }
 
   Feature_List::~Feature_List(){
-    if ( !is_reference ){
-      delete feature_hash;
+    if ( !_is_reference ){
+      delete _feature_hash;
     }
   }
 
   void Feature_List::init( size_t num_of_features ){
-    feature_hash = new Hash::UnicodeHash(); // all features share the same hash
+    _feature_hash = new Hash::UnicodeHash(); // all features share the same hash
     feats.resize(num_of_features,NULL);
     perm_feats.resize(num_of_features,NULL);
     for ( size_t i=0; i< num_of_features; ++i ){
-      feats[i] = new Feature( feature_hash );
+      feats[i] = new Feature( _feature_hash );
       perm_feats[i] = NULL;
     }
   }

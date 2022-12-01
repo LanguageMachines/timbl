@@ -232,7 +232,6 @@ namespace Timbl {
     verbosity(NO_VERB),
     err_count(0),
     num_of_features(0),
-    num_of_num_features(0),
     target_pos(std::numeric_limits<size_t>::max()),
     effective_feats(0),
     clip_factor(10),
@@ -309,7 +308,6 @@ namespace Timbl {
       need_all_weights = false;
       InstanceBase = m.InstanceBase->Copy();
       effective_feats = m.effective_feats;
-      num_of_num_features = m.num_of_num_features;
       DBEntropy = -1.0;
       ChopInput = 0;
       setInputFormat( m.input_format );
@@ -2247,19 +2245,21 @@ namespace Timbl {
     delete GlobalMetric;
     GlobalMetric = getMetricClass( globalMetricOption );
     effective_feats = num_of_features;
-    num_of_num_features = 0;
+    features._num_of_num_feats = 0;
+    features._eff_feats = num_of_features;
     // the user thinks about features running from 1 to Num
     // we know better, so shift the UserOptions one down.
     for ( size_t j = 0; j < num_of_features; ++j ){
       MetricType m = UserOptions[j+1];
       if ( m == Ignore ){
 	features[j]->Ignore( true );
-	effective_feats--;
+	--effective_feats;
+	--features._eff_feats;
       }
       else {
 	features[j]->setMetricType( m );
 	if ( features[j]->isNumerical() ){
-	  num_of_num_features++;
+	  ++features._num_of_num_feats;
 	}
       }
     }
