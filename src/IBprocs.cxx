@@ -45,7 +45,7 @@ namespace Timbl {
     bool result = true;
     InstanceBase->RemoveInstance( Inst );
     MBL_init = do_sloppy_loo; // must be only true if you are REALY sure
-    for ( size_t i=0; i < effective_feats && result; ++i ){
+    for ( size_t i=0; i < EffectiveFeatures() && result; ++i ){
       features.perm_feats[i]->clear_matrix();
       if ( !features.perm_feats[i]->decrement_value( Inst.FV[i],
 							 Inst.TV ) ){
@@ -63,7 +63,7 @@ namespace Timbl {
     bool result = true;
     InstanceBase->AddInstance( Inst );
     MBL_init = do_sloppy_loo; // must be only true if you are REALY sure
-    for ( size_t i=0; i < effective_feats && result; ++i ){
+    for ( size_t i=0; i < EffectiveFeatures() && result; ++i ){
       features.perm_feats[i]->clear_matrix();
       if ( !features.perm_feats[i]->increment_value( Inst.FV[i],
 							 Inst.TV ) ){
@@ -233,6 +233,7 @@ namespace Timbl {
 	    }
 	    bool excl = false;
 	    effective_feats = 0;
+	    features._eff_feats = 0;
 	    size_t i = 0;
 	    string::size_type pos = 0; // skip <
 	    while ( info_ok && pos != string::npos &&
@@ -240,6 +241,7 @@ namespace Timbl {
 	      i++;
 	      if ( !excl ){
 		effective_feats++;
+		++features._eff_feats;
 	      }
 	      string tmp = string_tok( perms, pos, ", !" );
 	      size_t index = TiCC::stringTo<size_t>( tmp );

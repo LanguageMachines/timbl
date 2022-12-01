@@ -802,7 +802,7 @@ namespace Timbl {
       writePermutation( *mylog );
     }
     for ( size_t j=0; j < num_of_features; ++j ){
-      if ( j < effective_feats ){
+      if ( j < EffectiveFeatures() ){
 	features.perm_feats[j] = features[features.permutation[j]];
       }
       else {
@@ -1062,7 +1062,7 @@ namespace Timbl {
   */
   void MBLClass::calculatePrestored(){
     if ( !is_copy ){
-      for ( size_t j = tribl_offset; j < effective_feats; ++j ) {
+      for ( size_t j = tribl_offset; j < EffectiveFeatures(); ++j ) {
 	if ( !features.perm_feats[j]->Ignore() &&
 	     features.perm_feats[j]->isStorableMetric() ){
 	  features.perm_feats[j]->store_matrix( mvd_threshold );
@@ -1123,7 +1123,7 @@ namespace Timbl {
     case TrainWords:
       // Lookup for TreeBuilding
       // First the Features
-      for ( size_t k = 0; k < effective_feats; ++k ){
+      for ( size_t k = 0; k < EffectiveFeatures(); ++k ){
 	size_t j = features.permutation[k];
 	CurrInst.FV[k] = features[j]->Lookup( ChopInput->getField(j) );
       } // k
@@ -1136,7 +1136,7 @@ namespace Timbl {
       // First the Target
       CurrInst.TV = targets.add_value( (*ChopInput)[num_of_features], occ );
       // Then the Features
-      for ( size_t l = 0; l < effective_feats; ++l ){
+      for ( size_t l = 0; l < EffectiveFeatures(); ++l ){
 	size_t j = features.permutation[l];
 	CurrInst.FV[l] = features[j]->add_value((*ChopInput)[j],
 						   CurrInst.TV,
@@ -1146,7 +1146,7 @@ namespace Timbl {
     case TestWords:
       // Lookup for Testing
       // This might fail for unknown values, then we create a dummy value
-      for ( size_t m = 0; m < effective_feats; ++m ){
+      for ( size_t m = 0; m < EffectiveFeatures(); ++m ){
 	size_t j = features.permutation[m];
 	const UnicodeString& fld =  ChopInput->getField(j);
 	CurrInst.FV[m] = features[j]->Lookup( fld );
@@ -1891,15 +1891,15 @@ namespace Timbl {
     const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV,
 							       &Inst.FV,
 							       ib_offset,
-							       effective_feats );
+							       EffectiveFeatures() );
     if ( !best_distrib ){
       // no use to do more work then
       return;
     }
-    tester->init( Inst, effective_feats, ib_offset );
+    tester->init( Inst, EffectiveFeatures(), ib_offset );
     auto lastpos = best_distrib->begin();
     Vfield *Bpnt = lastpos->second;
-    size_t EffFeat = effective_feats - ib_offset;
+    size_t EffFeat = EffectiveFeatures() - ib_offset;
     size_t CurPos = 0;
     while ( Bpnt ) {
       // call test() with a maximum threshold, to prevent stepping out early
@@ -1973,12 +1973,12 @@ namespace Timbl {
 				size_t ib_offset ){
     vector<FeatureValue *> CurrentFV(num_of_features);
     double Threshold = DBL_MAX;
-    size_t EffFeat = effective_feats - ib_offset;
+    size_t EffFeat = EffectiveFeatures() - ib_offset;
     const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV,
 							       &Inst.FV,
 							       ib_offset,
-							       effective_feats );
-    tester->init( Inst, effective_feats, ib_offset );
+							       EffectiveFeatures() );
+    tester->init( Inst, EffectiveFeatures(), ib_offset );
     size_t CurPos = 0;
     while ( best_distrib ){
       size_t EndPos = tester->test( CurrentFV,
@@ -2028,12 +2028,12 @@ namespace Timbl {
 				    InstanceBase_base *IB,
 				    size_t ib_offset ){
     vector<FeatureValue *> CurrentFV(num_of_features);
-    size_t EffFeat = effective_feats - ib_offset;
+    size_t EffFeat = EffectiveFeatures() - ib_offset;
     const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV,
 							       &Inst.FV,
 							       ib_offset,
-							       effective_feats );
-    tester->init( Inst, effective_feats, ib_offset );
+							       EffectiveFeatures() );
+    tester->init( Inst, EffectiveFeatures(), ib_offset );
     while ( best_distrib ){
       double dummy_t = -1.0;
       size_t dummy_p = 0;
@@ -2244,7 +2244,6 @@ namespace Timbl {
     CurrInst.Init( num_of_features );
     delete GlobalMetric;
     GlobalMetric = getMetricClass( globalMetricOption );
-    effective_feats = num_of_features;
     features._num_of_num_feats = 0;
     features._eff_feats = num_of_features;
     // the user thinks about features running from 1 to Num
@@ -2253,7 +2252,6 @@ namespace Timbl {
       MetricType m = UserOptions[j+1];
       if ( m == Ignore ){
 	features[j]->Ignore( true );
-	--effective_feats;
 	--features._eff_feats;
       }
       else {
@@ -2263,6 +2261,7 @@ namespace Timbl {
 	}
       }
     }
+    effective_feats = features._eff_feats;
     Options.FreezeTable();
     if ( Weighting > IG_w ||
 	 TreeOrder >= X2Order ){
