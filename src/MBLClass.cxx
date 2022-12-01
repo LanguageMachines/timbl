@@ -254,10 +254,6 @@ namespace Timbl {
     tester(0),
     doOcc(0)
   {
-    auto feature_hash = new Hash::UnicodeHash(); // all features share the same hash
-    features.set_hash( feature_hash );
-    auto target_hash = new Hash::UnicodeHash(); // targets has it's own hash
-    targets.set_hash( target_hash );
   }
 
   MBLClass &MBLClass::operator=( const MBLClass& m ){
@@ -306,20 +302,17 @@ namespace Timbl {
       do_diversify       = m.do_diversify;
       tester = 0;
       decay = 0;
-      delete targets.target_hash;
       targets  = m.targets;
-      delete features.feature_hash;
       features = m.features;
       err_count = 0;
       MBL_init = false;
       need_all_weights = false;
       InstanceBase = m.InstanceBase->Copy();
       effective_feats = m.effective_feats;
-      num_of_num_features    = m.num_of_num_features;
+      num_of_num_features = m.num_of_num_features;
       DBEntropy = -1.0;
       ChopInput = 0;
       setInputFormat( m.input_format );
-      //one extra to store the target!
       CurrInst.Init( num_of_features );
       myerr = m.myerr;
       mylog = m.mylog;
@@ -2248,6 +2241,10 @@ namespace Timbl {
       FatalError( "Initialize: TARGET_POS cannot exceed NUM_OF_FEATURES+1 " +
 		  TiCC::toString<size_t>( num_of_features+1 ) );
     }
+    auto feature_hash = new Hash::UnicodeHash(); // all features share the same hash
+    features.set_hash( feature_hash );
+    auto target_hash = new Hash::UnicodeHash(); // targets has it's own hash
+    targets.set_hash( target_hash );
     features.feats.resize(num_of_features,NULL);
     features.perm_feats.resize(num_of_features,NULL);
     for ( size_t i=0; i< num_of_features; ++i ){
