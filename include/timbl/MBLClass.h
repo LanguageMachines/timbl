@@ -27,7 +27,6 @@
 */
 #ifndef TIMBL_MBLCLASS_H
 #define TIMBL_MBLCLASS_H
-
 #include "timbl/Instance.h"
 #include "timbl/BestArray.h"
 #include "timbl/neighborSet.h"
@@ -127,7 +126,7 @@ namespace Timbl {
     size_t NumOfFeatures() const { return num_of_features; };
     size_t targetPos() const { return target_pos; };
     size_t NumNumFeatures() const { return features._num_of_num_feats; };
-    size_t EffectiveFeatures() const { return effective_feats; };
+    size_t EffectiveFeatures() const { return features._eff_feats; };
     void IBInfo( std::ostream& os ) const;
     void MatrixInfo( std::ostream& ) const;
     int RandomSeed() const { return random_seed; };
@@ -207,7 +206,6 @@ namespace Timbl {
     mutable int err_count;
     size_t num_of_features;
     size_t target_pos;
-    size_t effective_feats;
     int clip_factor;
     int Bin_Size;
     int progress;

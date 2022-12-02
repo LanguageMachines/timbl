@@ -1792,6 +1792,8 @@ namespace Timbl {
 	}
       }
       _is_reference = true;
+      _eff_feats = l._eff_feats;
+      _num_of_num_feats = l._num_of_num_feats;
     }
     return *this;
   }

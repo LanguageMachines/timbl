@@ -124,8 +124,8 @@ namespace Timbl {
       return InstBase->exact_match( I ); };
     virtual const ValueDistribution *InitGraphTest( std::vector<FeatureValue *>&,
 						    const std::vector<FeatureValue *> *,
-						    size_t,
-						    size_t );
+						    const size_t,
+						    const size_t );
     virtual const ValueDistribution *NextGraphTest( std::vector<FeatureValue *>&,
 					      size_t& );
     unsigned long int GetDistSize( ) const { return NumOfTails; };
@@ -236,10 +236,10 @@ namespace Timbl {
     IB_InstanceBase *clone() const override;
     const ValueDistribution *InitGraphTest( std::vector<FeatureValue *>&,
 					    const std::vector<FeatureValue *> *,
-					    size_t,
-					    size_t ) override;
+					    const size_t,
+					    const size_t ) override;
     const ValueDistribution *NextGraphTest( std::vector<FeatureValue *>&,
-				      size_t& ) override;
+					    size_t& ) override;
   private:
     size_t offSet;
     size_t effFeat;

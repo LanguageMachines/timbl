@@ -233,7 +233,6 @@ namespace Timbl {
     err_count(0),
     num_of_features(0),
     target_pos(std::numeric_limits<size_t>::max()),
-    effective_feats(0),
     clip_factor(10),
     Bin_Size(20),
     progress(10000),
@@ -307,7 +306,6 @@ namespace Timbl {
       MBL_init = false;
       need_all_weights = false;
       InstanceBase = m.InstanceBase->Copy();
-      effective_feats = m.effective_feats;
       DBEntropy = -1.0;
       ChopInput = 0;
       setInputFormat( m.input_format );
@@ -1102,7 +1100,7 @@ namespace Timbl {
     case LearnWords:
       // Add the target.
       CurrInst.TV = targets.add_value( ChopInput->getField( num_of_features ),
-					occ );
+				       occ );
       // Now add the Feature values.
       for ( size_t i = 0; i < num_of_features; ++i ){
 	// when learning, no need to bother about Permutation
@@ -2261,7 +2259,6 @@ namespace Timbl {
 	}
       }
     }
-    effective_feats = features._eff_feats;
     Options.FreezeTable();
     if ( Weighting > IG_w ||
 	 TreeOrder >= X2Order ){

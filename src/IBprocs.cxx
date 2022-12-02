@@ -232,7 +232,6 @@ namespace Timbl {
 	      perms = perms + splits[i]; // Maybe we could use splits directly?
 	    }
 	    bool excl = false;
-	    effective_feats = 0;
 	    features._eff_feats = 0;
 	    size_t i = 0;
 	    string::size_type pos = 0; // skip <
@@ -240,7 +239,6 @@ namespace Timbl {
 		    i < MaxFeatures ){
 	      i++;
 	      if ( !excl ){
-		effective_feats++;
 		++features._eff_feats;
 	      }
 	      string tmp = string_tok( perms, pos, ", !" );

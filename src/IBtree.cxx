@@ -1514,8 +1514,8 @@ namespace Timbl {
 
   const ValueDistribution *InstanceBase_base::InitGraphTest( vector<FeatureValue *>&,
 							     const vector<FeatureValue *> *,
-							     size_t,
-							     size_t ){
+							     const size_t,
+							     const size_t ){
     FatalError( "InitGraphTest" );
     return 0;
   }
@@ -1558,8 +1558,8 @@ namespace Timbl {
 
   const ValueDistribution *IB_InstanceBase::InitGraphTest( vector<FeatureValue *>& Path,
 							   const vector<FeatureValue *> *inst,
-							   size_t off,
-							   size_t eff ){
+							   const size_t off,
+							   const size_t eff ){
     const IBtree *pnt;
     const ValueDistribution *result = NULL;
     testInst = inst;
