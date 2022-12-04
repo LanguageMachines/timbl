@@ -1804,13 +1804,31 @@ namespace Timbl {
     }
   }
 
-  void Feature_List::init( size_t num_of_features ){
+  void Feature_List::init( size_t num_of_features,
+			   const vector<MetricType>& UserOptions ){
     _feature_hash = new Hash::UnicodeHash(); // all features share the same hash
     feats.resize(num_of_features,NULL);
     perm_feats.resize(num_of_features,NULL);
     for ( size_t i=0; i< num_of_features; ++i ){
       feats[i] = new Feature( _feature_hash );
       perm_feats[i] = NULL;
+    }
+    _eff_feats = num_of_features;
+    _num_of_num_feats = 0;
+    // the user thinks about features running from 1 to num_of_features+1
+    // we know better, so shift the UserOptions one down.
+    for ( size_t j = 0; j < num_of_features; ++j ){
+      MetricType m = UserOptions[j+1];
+      if ( m == Ignore ){
+	feats[j]->Ignore( true );
+	--_eff_feats;
+      }
+      else {
+	feats[j]->setMetricType( m );
+	if ( feats[j]->isNumerical() ){
+	  ++_num_of_num_feats;
+	}
+      }
     }
   }
 

@@ -2238,27 +2238,10 @@ namespace Timbl {
 		  TiCC::toString<size_t>( num_of_features+1 ) );
     }
     targets.init();
-    features.init( num_of_features );
+    features.init( num_of_features, UserOptions );
     CurrInst.Init( num_of_features );
     delete GlobalMetric;
     GlobalMetric = getMetricClass( globalMetricOption );
-    features._num_of_num_feats = 0;
-    features._eff_feats = num_of_features;
-    // the user thinks about features running from 1 to Num
-    // we know better, so shift the UserOptions one down.
-    for ( size_t j = 0; j < num_of_features; ++j ){
-      MetricType m = UserOptions[j+1];
-      if ( m == Ignore ){
-	features[j]->Ignore( true );
-	--features._eff_feats;
-      }
-      else {
-	features[j]->setMetricType( m );
-	if ( features[j]->isNumerical() ){
-	  ++features._num_of_num_feats;
-	}
-      }
-    }
     Options.FreezeTable();
     if ( Weighting > IG_w ||
 	 TreeOrder >= X2Order ){

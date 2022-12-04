@@ -354,7 +354,7 @@ namespace Timbl {
     }
     Feature_List &operator=( const Feature_List& );
     ~Feature_List();
-    void init( size_t );
+    void init( size_t, const std::vector<MetricType>& );
     Hash::UnicodeHash *hash() const { return _feature_hash; };
     size_t effective_feats(){ return _eff_feats; };
     Feature *operator[]( size_t i ) const { return feats[i]; };
