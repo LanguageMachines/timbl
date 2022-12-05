@@ -45,6 +45,7 @@ namespace Timbl {
   }
 
   void MsgClass::Error( const string& out_line ) const {
+    ++err_cnt;
     cerr << "Error:" << out_line << endl;
   }
 

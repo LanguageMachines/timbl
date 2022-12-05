@@ -1804,20 +1804,21 @@ namespace Timbl {
     }
   }
 
-  void Feature_List::init( size_t num_of_features,
-			   const vector<MetricType>& UserOptions ){
+  void Feature_List::init( size_t size,
+			   const vector<MetricType>& UserOptions )
+  {
+    _num_of_feats = size;
     _feature_hash = new Hash::UnicodeHash(); // all features share the same hash
-    feats.resize(num_of_features,NULL);
-    perm_feats.resize(num_of_features,NULL);
-    for ( size_t i=0; i< num_of_features; ++i ){
+    feats.resize(_num_of_feats,NULL);
+    perm_feats.resize(_num_of_feats,NULL);
+    for ( size_t i=0; i< _num_of_feats; ++i ){
       feats[i] = new Feature( _feature_hash );
-      perm_feats[i] = NULL;
     }
-    _eff_feats = num_of_features;
+    _eff_feats = _num_of_feats;
     _num_of_num_feats = 0;
     // the user thinks about features running from 1 to num_of_features+1
     // we know better, so shift the UserOptions one down.
-    for ( size_t j = 0; j < num_of_features; ++j ){
+    for ( size_t j = 0; j < _num_of_feats; ++j ){
       MetricType m = UserOptions[j+1];
       if ( m == Ignore ){
 	feats[j]->Ignore( true );
@@ -1840,6 +1841,36 @@ namespace Timbl {
 	os << ", ";
     }
     os << " >";
+  }
+
+  void Feature_List::calculate_permutation( const vector<double>& W ){
+    vector<double> WR = W;
+    size_t IgnoredFeatures = 0;
+    permutation.resize(_num_of_feats);
+    for ( size_t j=0; j < _num_of_feats; ++j ){
+      permutation[j] = j;
+      if ( feats[j]->Ignore() ){
+	WR[j] = -0.1;         // To be shure that they are placed AFTER
+	// those which are realy Zero
+	IgnoredFeatures++;
+      }
+    }
+    if ( IgnoredFeatures == _num_of_feats ){
+      Error( "All features seem to be ignored! Nothing to do" );
+      exit(1);
+    }
+    else {
+      for ( size_t k=0; k < _num_of_feats; ++k ){
+	size_t Max = 0;
+	for ( size_t m=1; m < _num_of_feats; ++m ){
+	  if ( WR[m] > WR[Max] ){
+	    Max = m;
+	  }
+	}
+	WR[Max] = -1;
+	permutation[k] = Max;
+      }
+    }
   }
 
   Instance::Instance():

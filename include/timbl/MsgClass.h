@@ -29,14 +29,17 @@
 #define TIMBL_MSGCLASS_H
 
 namespace Timbl {
-  class MsgClass{
+  class MsgClass {
   public:
-    MsgClass() {};
+    MsgClass():
+      err_cnt(0)
+    {};
     virtual ~MsgClass() {};
     virtual void Info( const std::string&  ) const;
     virtual void Warning( const std::string& ) const ;
     virtual void Error( const std::string& ) const ;
     virtual void FatalError( const std::string& ) const ;
+    mutable int err_cnt;
   };
 
 }

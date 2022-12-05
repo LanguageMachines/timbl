@@ -46,7 +46,7 @@ namespace Timbl {
   class Chopper;
   class neighborSet;
 
-  class MBLClass {
+  class MBLClass: public MsgClass {
   public:
     bool SetOption( const std::string& );
     xmlNode *settingsToXml() const;
@@ -59,9 +59,10 @@ namespace Timbl {
     bool MBLInit() const { return MBL_init; };
     void MBLInit( bool b ) { MBL_init = b; };
     bool ExpInvalid( bool b = true ) const {
-      if ( err_count > 0 ){
-	if ( b )
+      if ( err_cnt > 0 ){
+	if ( b ){
 	  InvalidMessage();
+	}
 	return true;
       }
       else
@@ -203,7 +204,6 @@ namespace Timbl {
     std::vector<MetricType> UserOptions;
     InputFormatType input_format;
     VerbosityFlags verbosity;
-    mutable int err_count;
     size_t num_of_features;
     size_t target_pos;
     int clip_factor;

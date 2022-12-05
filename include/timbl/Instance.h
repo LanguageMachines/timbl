@@ -337,7 +337,7 @@ namespace Timbl {
     bool is_reference;
   };
 
-  class Feature_List {
+  class Feature_List: public MsgClass {
     friend class MBLClass;
   public:
     Feature_List():
@@ -359,7 +359,9 @@ namespace Timbl {
     size_t effective_feats(){ return _eff_feats; };
     Feature *operator[]( size_t i ) const { return feats[i]; };
     void write_permutation( std::ostream & ) const;
+    void calculate_permutation( const std::vector<double>& );
     size_t _eff_feats;
+    size_t _num_of_feats;
     size_t _num_of_num_feats;
     std::vector<Feature *> feats;
     std::vector<Feature *> perm_feats;

@@ -159,7 +159,7 @@ namespace Timbl {
   }
 
   void MBLClass::InvalidMessage(void) const{
-    if ( err_count++ == 1 ){
+    if ( err_cnt++ == 1 ){
       Warning( "A preceding error prevents any operation on this "
 	       "Timbl Object\n"
 	       "other experiments might not be influenced" );
@@ -171,7 +171,7 @@ namespace Timbl {
 
   bool MBLClass::SetOption( const string& line ){
     bool result = false;
-    if ( !ExpInvalid() ){
+    if ( !ExpInvalid(true) ){
       //      Info( "set Option:" + line );
       enum SetOptRes opt_res = Options.SetOption( line );
       switch ( opt_res ){
@@ -196,6 +196,7 @@ namespace Timbl {
   }
 
   MBLClass::MBLClass( const string& name ):
+    MsgClass(),
     sock_os(0),
     sock_is_json(false),
     targets(NULL),
@@ -230,7 +231,6 @@ namespace Timbl {
     MaxFeatures(0),
     input_format(UnknownInputFormat),
     verbosity(NO_VERB),
-    err_count(0),
     num_of_features(0),
     target_pos(std::numeric_limits<size_t>::max()),
     clip_factor(10),
@@ -302,7 +302,6 @@ namespace Timbl {
       decay = 0;
       targets  = m.targets;
       features = m.features;
-      err_count = 0;
       MBL_init = false;
       need_all_weights = false;
       InstanceBase = m.InstanceBase->Copy();
@@ -394,7 +393,7 @@ namespace Timbl {
 	*myerr << "Error: " << out_line << endl;
       }
     }
-    err_count++;
+    ++err_cnt;
   }
 
   void MBLClass::FatalError( const string& out_line ) const {
@@ -503,35 +502,6 @@ namespace Timbl {
       os.precision(OldPrec);
     }
     return true;
-  }
-
-  void MBLClass::calculatePermutation( const vector<double>& W ){
-    vector<double> WR = W;
-    size_t IgnoredFeatures = 0;
-    features.permutation.resize(num_of_features);
-    for ( size_t j=0; j < num_of_features; ++j ){
-      features.permutation[j] = j;
-      if ( features[j]->Ignore() ){
-	WR[j] = -0.1;         // To be shure that they are placed AFTER
-	// those which are realy Zero
-	IgnoredFeatures++;
-      }
-    }
-    if ( IgnoredFeatures == num_of_features ){
-      Error( "All features seem to be ignored! Nothing to do" );
-    }
-    else {
-      for ( size_t k=0; k < num_of_features; ++k ){
-	size_t Max = 0;
-	for ( size_t m=1; m < num_of_features; ++m ){
-	  if ( WR[m] > WR[Max] ){
-	    Max = m;
-	  }
-	}
-	WR[Max] = -1;
-	features.permutation[k] = Max;
-      }
-    }
   }
 
   string MBLClass::extract_limited_m( size_t lim ){
@@ -793,10 +763,7 @@ namespace Timbl {
       }
       ++i;
     }
-    calculatePermutation( Order );
-    if ( !Verbosity(SILENT) ){
-      writePermutation( *mylog );
-    }
+    features.calculate_permutation( Order );
     for ( size_t j=0; j < num_of_features; ++j ){
       if ( j < EffectiveFeatures() ){
 	features.perm_feats[j] = features[features.permutation[j]];
@@ -804,6 +771,9 @@ namespace Timbl {
       else {
 	features.perm_feats[j] = NULL;
       }
+    }
+    if ( !Verbosity(SILENT) ){
+      writePermutation( *mylog );
     }
   }
 
@@ -1529,7 +1499,7 @@ namespace Timbl {
 
   bool MBLClass::recalculate_stats( Feature_List& feats,
 				    vector<FeatVal_Stat>& feat_status,
-				    bool YES ){
+				    bool check_change ){
     bool changed = false;
     for ( size_t g = 0; g < num_of_features; ++g ) {
       feat_status[g] = Unknown;
@@ -1559,7 +1529,7 @@ namespace Timbl {
 	feat_status[g] = Singleton;
       }
       delete tmpMetric;
-      if ( YES ){
+      if ( check_change ){
 	bool isRead;
 	if ( feats.feats[g]->metric &&
 	     feats.feats[g]->getMetricType() != TmpMetricType &&
