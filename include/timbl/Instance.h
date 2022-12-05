@@ -358,6 +358,7 @@ namespace Timbl {
     Hash::UnicodeHash *hash() const { return _feature_hash; };
     size_t effective_feats(){ return _eff_feats; };
     Feature *operator[]( size_t i ) const { return feats[i]; };
+    void write_permutation( std::ostream & ) const;
     size_t _eff_feats;
     size_t _num_of_num_feats;
     std::vector<Feature *> feats;

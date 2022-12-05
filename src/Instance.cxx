@@ -1832,6 +1832,16 @@ namespace Timbl {
     }
   }
 
+  void Feature_List::write_permutation( ostream &os ) const {
+    os << "< ";
+    for ( const auto& it : permutation ){
+      os << it + 1;
+      if ( &it != &permutation.back())
+	os << ", ";
+    }
+    os << " >";
+  }
+
   Instance::Instance():
     TV(NULL),
     sample_weight(0.0),

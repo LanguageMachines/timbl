@@ -622,11 +622,9 @@ namespace Timbl {
   void MBLClass::writePermutation( ostream& os ) const {
     os << "Feature Permutation based on "
        << ( Weighting==UserDefined_w?"weightfile":TiCC::toString(TreeOrder, true))
-       << " :" << endl << "< ";
-    for ( size_t j=0; j < num_of_features-1; ++j ){
-      os << features.permutation[j]+1 << ", ";
-    }
-    os << features.permutation[num_of_features-1]+1 << " >" << endl;
+       << " :" << endl;
+    features.write_permutation( os );
+    os << endl;
   }
 
   void MBLClass::time_stamp( const char *line, int number ) const {
@@ -1819,7 +1817,7 @@ namespace Timbl {
     for ( size_t j=OffSet; j< Size; ++j ){
       inst.FV[j] = RedFV[j-OffSet];
     }
-    size_t *InvPerm = new size_t[num_of_features];
+    vector<size_t> InvPerm(num_of_features,0);
     for ( size_t i=0; i< num_of_features; ++i ){
       InvPerm[features.permutation[i]] = i;
     }
@@ -1873,7 +1871,6 @@ namespace Timbl {
 	break;
       }
     }
-    delete [] InvPerm;
     return result;
   }
 
@@ -1963,7 +1960,7 @@ namespace Timbl {
     GlobalMetric = getMetricClass( globalMetricOption );
     delete tester;
     tester = getTester( globalMetricOption,
-			features.feats, features.permutation, mvd_threshold );
+			features, mvd_threshold );
   }
 
   void MBLClass::test_instance( const Instance& Inst,
