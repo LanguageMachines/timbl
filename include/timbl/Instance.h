@@ -342,6 +342,7 @@ namespace Timbl {
   public:
     Feature_List():
       _eff_feats(0),
+      _num_of_feats(0),
       _num_of_num_feats(0),
       _feature_hash(0),
       _is_reference(false)

@@ -1872,6 +1872,14 @@ namespace Timbl {
 	permutation[k] = Max;
       }
     }
+    for ( size_t j=0; j < _num_of_feats; ++j ){
+      if ( j < _eff_feats ){
+	perm_feats[j] = feats[permutation[j]];
+      }
+      else {
+	perm_feats[j] = NULL;
+      }
+    }
   }
 
   Instance::Instance():

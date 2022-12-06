@@ -124,7 +124,7 @@ namespace Timbl {
     IB_Stat IBStatus() const;
     bool get_ranges( const std::string& );
     bool get_IB_Info( std::istream&, bool&, int&, bool&, std::string& );
-    size_t NumOfFeatures() const { return num_of_features; };
+    size_t NumOfFeatures() const { return features._num_of_feats; };
     size_t targetPos() const { return target_pos; };
     size_t NumNumFeatures() const { return features._num_of_num_feats; };
     size_t EffectiveFeatures() const { return features._eff_feats; };
