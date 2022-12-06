@@ -1776,14 +1776,15 @@ namespace Timbl {
 
   Feature_List &Feature_List::operator=( const Feature_List& l ){
     if ( this != &l ){
-      feats.resize(l.feats.size());
-      perm_feats.resize(l.feats.size());
+      _num_of_feats = l._num_of_feats;
+      feats.resize(_num_of_feats);
+      perm_feats.resize(_num_of_feats);
       permutation = l.permutation;
       _feature_hash = l._feature_hash; // shared ??
-      for ( unsigned int i=0; i < l.feats.size(); ++i ){
+      for ( unsigned int i=0; i < _num_of_feats; ++i ){
 	feats[i] = new Feature( *l.feats[i] );
       }
-      for ( unsigned int i=0; i < l.feats.size(); ++i ){
+      for ( unsigned int i=0; i < _num_of_feats; ++i ){
 	if ( l.perm_feats[i] ) {
 	  perm_feats[i] = feats[permutation[i]];
 	}
