@@ -95,7 +95,7 @@ namespace Timbl {
     void writePermutation( std::ostream& ) const;
     void LearningInfo( std::ostream& );
     virtual ~MBLClass();
-    void Initialize( size_t = 0 );
+    void Initialize( size_t );
     bool PutInstanceBase( std::ostream& ) const;
     VerbosityFlags get_verbosity() const { return verbosity; };
     void set_verbosity( VerbosityFlags v ) { verbosity = v; };
@@ -123,7 +123,7 @@ namespace Timbl {
     WValueDistribution *getBestDistribution( unsigned int =0 );
     IB_Stat IBStatus() const;
     bool get_ranges( const std::string& );
-    bool get_IB_Info( std::istream&, bool&, int&, bool&, std::string& );
+    size_t get_IB_Info( std::istream&, bool&, int&, bool&, std::string& );
     size_t NumOfFeatures() const { return features._num_of_feats; };
     size_t targetPos() const { return target_pos; };
     size_t NumNumFeatures() const { return features._num_of_num_feats; };
@@ -204,7 +204,6 @@ namespace Timbl {
     std::vector<MetricType> UserOptions;
     InputFormatType input_format;
     VerbosityFlags verbosity;
-    size_t num_of_features;
     size_t target_pos;
     int clip_factor;
     int Bin_Size;

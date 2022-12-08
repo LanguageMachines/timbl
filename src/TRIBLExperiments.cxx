@@ -318,7 +318,8 @@ namespace Timbl {
     bool Hashed;
     int Version;
     string range_buf;
-    if ( !get_IB_Info( is, Pruned, Version, Hashed, range_buf ) ){
+    size_t numF = get_IB_Info( is, Pruned, Version, Hashed, range_buf );
+    if ( numF == 0 ){
       return false;
     }
     else if ( Pruned ){
@@ -327,7 +328,7 @@ namespace Timbl {
     }
     else {
       TreeOrder = DataFile;
-      Initialize();
+      Initialize( numF );
       if ( !get_ranges( range_buf ) ){
 	Warning( "couldn't retrieve ranges..." );
       }
@@ -370,7 +371,8 @@ namespace Timbl {
     bool Hashed;
     int Version;
     string range_buf;
-    if ( !get_IB_Info( is, Pruned, Version, Hashed, range_buf ) ){
+    size_t numF = get_IB_Info( is, Pruned, Version, Hashed, range_buf );
+    if ( numF == 0 ){
       return false;
     }
     else if ( Pruned ){
@@ -379,7 +381,7 @@ namespace Timbl {
     }
     else {
       TreeOrder = DataFile;
-      Initialize();
+      Initialize( numF );
       if ( !get_ranges( range_buf ) ){
 	Warning( "couldn't retrieve ranges..." );
       }

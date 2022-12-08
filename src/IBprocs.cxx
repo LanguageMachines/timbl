@@ -163,20 +163,21 @@ namespace Timbl {
     return "";
   }
 
-  bool MBLClass::get_IB_Info( istream& is,
-			      bool& Pruned,
-			      int& Version,
-			      bool& Hashed,
-			      string& range_buf ){
+  size_t MBLClass::get_IB_Info( istream& is,
+				bool& Pruned,
+				int& Version,
+				bool& Hashed,
+				string& range_buf ){
+    size_t result = 0;
     if ( ExpInvalid() ){
       Error( "Can't retrieve Instance-Base\n" );
-      return false;
+      return result;
     }
     if ( Options.TableFrozen() ||
-	 num_of_features != 0 ){
+	 NumOfFeatures() != 0 ){
       Warning( "unable to read an Instance Base while another"
 	       " experiment is already loaded" );
-      return false;
+      return result;
     }
 
     bool info_ok = true;
@@ -323,13 +324,12 @@ namespace Timbl {
     }
     Version = version;
     if ( info_ok ){
-      num_of_features = depth;
-      return true;
+      result = depth;
+      return result;
     }
     else {
-      num_of_features = 0;
       Error( "Can't retrieve Instance-Base\n" );
-      return false;
+      return 0;
     }
   }
 
@@ -403,7 +403,7 @@ namespace Timbl {
     // < 5, 2, 3! 1, 4 >
     bool excl = false;
     os << "< ";
-    for ( size_t j=0; j < num_of_features-1; ++j ){
+    for ( size_t j=0; j < NumOfFeatures()-1; ++j ){
       if ( !excl && features[features.permutation[j+1]]->Ignore() ){
 	excl = true;
 	os << features.permutation[j]+1 << "! ";
@@ -412,7 +412,7 @@ namespace Timbl {
 	os << features.permutation[j]+1 << ", ";
       }
     }
-    os << features.permutation[num_of_features-1]+1 << " >" << endl;
+    os << features.permutation[NumOfFeatures()-1]+1 << " >" << endl;
   }
 
   bool MBLClass::PutInstanceBase( ostream& os ) const {
@@ -430,7 +430,7 @@ namespace Timbl {
       writePermSpecial( os );
       os << "# Numeric: ";
       bool first = true;
-      for ( size_t i=0; i < num_of_features; ++i ){
+      for ( size_t i=0; i < NumOfFeatures(); ++i ){
 	if ( !features[i]->Ignore() &&
 	     features[i]->isNumerical() ){
 	  if ( !first ){
@@ -446,7 +446,7 @@ namespace Timbl {
       if ( NumNumFeatures() > 0 ){
 	os << "# Ranges: ";
 	first = true;
-	for ( size_t j=0; j < num_of_features; ++j ){
+	for ( size_t j=0; j < NumOfFeatures(); ++j ){
 	  if ( !features[j]->Ignore() &&
 	       features[j]->isNumerical() ){
 	    if ( !first ){

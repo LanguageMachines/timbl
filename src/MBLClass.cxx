@@ -231,7 +231,6 @@ namespace Timbl {
     MaxFeatures(0),
     input_format(UnknownInputFormat),
     verbosity(NO_VERB),
-    num_of_features(0),
     target_pos(std::numeric_limits<size_t>::max()),
     clip_factor(10),
     Bin_Size(20),
@@ -286,7 +285,6 @@ namespace Timbl {
       mvd_threshold      = m.mvd_threshold;
       num_of_neighbors   = m.num_of_neighbors;
       dynamic_neighbors  = m.dynamic_neighbors;
-      num_of_features    = m.num_of_features;
       target_pos         = m.target_pos;
       progress           = m.progress;
       Bin_Size           = m.Bin_Size;
@@ -308,7 +306,7 @@ namespace Timbl {
       DBEntropy = -1.0;
       ChopInput = 0;
       setInputFormat( m.input_format );
-      CurrInst.Init( num_of_features );
+      CurrInst.Init( NumOfFeatures() );
       myerr = m.myerr;
       mylog = m.mylog;
     }
@@ -2068,7 +2066,7 @@ namespace Timbl {
   }
 
   size_t MBLClass::examineData( const string& FileName ){
-    // Looks at the data files, counts num_of_features.
+    // Looks at the data files, counts number of features.
     // and sets input_format variables.
     //
     size_t NumF = 0;
@@ -2179,22 +2177,19 @@ namespace Timbl {
     return NumF;
   }
 
-  void MBLClass::Initialize( size_t n ){
-    if ( n > 0 ) {
-      num_of_features = n;
-    }
+  void MBLClass::Initialize( size_t numF ){
     // Allocate memory. Will be reused again and again ....
     //
     if ( target_pos == std::numeric_limits<size_t>::max() ){
-      target_pos = num_of_features; // the default
+      target_pos = numF; // the default
     }
-    else if ( target_pos > num_of_features ){
+    else if ( target_pos > numF ){
       FatalError( "Initialize: TARGET_POS cannot exceed NUM_OF_FEATURES+1 " +
-		  TiCC::toString<size_t>( num_of_features+1 ) );
+		  TiCC::toString<size_t>( numF+1 ) );
     }
     targets.init();
-    features.init( num_of_features, UserOptions );
-    CurrInst.Init( num_of_features );
+    features.init( numF, UserOptions );
+    CurrInst.Init( numF );
     delete GlobalMetric;
     GlobalMetric = getMetricClass( globalMetricOption );
     Options.FreezeTable();

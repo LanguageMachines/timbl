@@ -1817,7 +1817,7 @@ namespace Timbl {
     }
     _eff_feats = _num_of_feats;
     _num_of_num_feats = 0;
-    // the user thinks about features running from 1 to num_of_features+1
+    // the user thinks about features running from 1 to _num_of_feats+1
     // we know better, so shift the UserOptions one down.
     for ( size_t j = 0; j < _num_of_feats; ++j ){
       MetricType m = UserOptions[j+1];
