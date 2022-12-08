@@ -38,6 +38,7 @@
 #include "timbl/Common.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
+#include "timbl/Features.h"
 #include "timbl/Instance.h"
 #include "timbl/Statistics.h"
 #include "timbl/neighborSet.h"
