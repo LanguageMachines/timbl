@@ -35,8 +35,8 @@
 
 #include "timbl/Common.h"
 #include "timbl/Types.h"
-#include "timbl/Features.h"
 #include "timbl/Instance.h"
+#include "timbl/Features.h"
 #include "timbl/Metrics.h"
 #include "timbl/Testers.h"
 

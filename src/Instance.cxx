@@ -41,8 +41,8 @@
 #include "timbl/Common.h"
 #include "timbl/MsgClass.h"
 #include "timbl/Types.h"
-#include "timbl/Features.h"
 #include "timbl/Instance.h"
+#include "timbl/Features.h"
 #include "timbl/Matrices.h"
 #include "timbl/Metrics.h"
 
@@ -774,21 +774,6 @@ namespace Timbl {
       os << "*FV-NF*";
     }
     return os;
-  }
-
-  FeatureValue::FeatureValue( const UnicodeString& value,
-			      size_t hash_val ):
-    ValueClass( value, hash_val ), ValueClassProb( 0 ) {
-  }
-
-  FeatureValue::FeatureValue( const UnicodeString& s ):
-    ValueClass( s, 0 ),
-    ValueClassProb(0){
-    Frequency = 0;
-  }
-
-  FeatureValue::~FeatureValue( ){
-    delete ValueClassProb;
   }
 
   TargetValue::TargetValue( const UnicodeString& value,

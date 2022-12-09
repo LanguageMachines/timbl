@@ -47,6 +47,7 @@ namespace Hash {
 namespace Timbl {
 
   class TargetValue;
+  class FeatureValue;
 
   class Vfield{
     friend class ValueDistribution;
@@ -188,25 +189,6 @@ namespace Timbl {
   private:
     IDmaptype vc_map;
     size_t dimension;
-  };
-
-  class FeatureValue: public ValueClass {
-    friend class Feature;
-    friend class Feature_List;
-    friend struct D_D;
-  public:
-    explicit FeatureValue( const icu::UnicodeString& );
-    FeatureValue( const icu::UnicodeString&, size_t );
-    ~FeatureValue();
-    void ReconstructDistribution( const ValueDistribution& vd ) {
-      TargetDist.Merge( vd );
-      Frequency = TargetDist.totalSize();
-    };
-    bool isUnknown() const { return index == 0; };
-    SparseValueProbClass *valueClassProb() const { return ValueClassProb; };
-  private:
-    SparseValueProbClass *ValueClassProb;
-    ValueDistribution TargetDist;
   };
 
   class Targets: public MsgClass {

@@ -35,6 +35,7 @@
 #include "timbl/IBtree.h"
 #include "timbl/Common.h"
 #include "timbl/Types.h"
+#include "timbl/Instance.h"
 #include "timbl/MBLClass.h"
 
 using namespace std;

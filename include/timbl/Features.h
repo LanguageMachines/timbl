@@ -49,11 +49,30 @@ namespace Timbl {
   class ValueClass;
   class TargetValue;
   class Targets;
-  class FeatureValue;
   class metricClass;
 
   enum FeatVal_Stat { Unknown, Singleton, SingletonNumeric, NumericValue,
     NotNumeric };
+
+  class FeatureValue: public ValueClass {
+    friend class Feature;
+    friend class Feature_List;
+    friend struct D_D;
+  public:
+    explicit FeatureValue( const icu::UnicodeString& );
+    FeatureValue( const icu::UnicodeString&, size_t );
+    ~FeatureValue();
+    void ReconstructDistribution( const ValueDistribution& vd ) {
+      TargetDist.Merge( vd );
+      Frequency = TargetDist.totalSize();
+    };
+    bool isUnknown() const { return index == 0; };
+    SparseValueProbClass *valueClassProb() const { return ValueClassProb; };
+  private:
+    SparseValueProbClass *ValueClassProb;
+    ValueDistribution TargetDist;
+  };
+
 
   class Feature: public MsgClass {
     friend class MBLClass;

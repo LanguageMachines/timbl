@@ -35,6 +35,7 @@
 #include "timbl/Common.h"
 #include "timbl/Types.h"
 #include "timbl/IBtree.h"
+#include "timbl/Instance.h"
 #include "timbl/TimblExperiment.h"
 #include "ticcutils/Timer.h"
 #include "ticcutils/PrettyPrint.h"

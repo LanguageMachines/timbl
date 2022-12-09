@@ -34,8 +34,8 @@
 #include "timbl/Types.h"
 #include "timbl/Metrics.h"
 #include "timbl/Matrices.h"
-#include "timbl/Features.h"
 #include "timbl/Instance.h"
+#include "timbl/Features.h"
 #include "ticcutils/Unicode.h"
 #include "ticcutils/UniHash.h"
 
@@ -44,6 +44,23 @@ namespace Timbl {
   using namespace std;
   using namespace Common;
   using icu::UnicodeString;
+
+  FeatureValue::FeatureValue( const UnicodeString& value,
+			      size_t hash_val ):
+    ValueClass( value, hash_val ),
+    ValueClassProb( 0 )
+  {
+  }
+
+  FeatureValue::FeatureValue( const UnicodeString& s ):
+    ValueClass( s, 0 ),
+    ValueClassProb(0){
+    Frequency = 0;
+  }
+
+  FeatureValue::~FeatureValue( ){
+    delete ValueClassProb;
+  }
 
   Feature::Feature( Hash::UnicodeHash *T ):
     metric_matrix( 0 ),
