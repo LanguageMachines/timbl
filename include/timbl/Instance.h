@@ -28,12 +28,6 @@
 #ifndef TIMBL_INSTANCE_H
 #define TIMBL_INSTANCE_H
 
-#include <stdexcept>
-#include <list>
-#include <vector>
-#include <map>
-#include <unordered_map>
-#include "unicode/unistr.h"
 #include "ticcutils/Unicode.h"
 #include "timbl/Targets.h"
 #include "timbl/Features.h"

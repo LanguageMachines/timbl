@@ -28,8 +28,6 @@
 #ifndef TIMBL_TARGETS_H
 #define TIMBL_TARGETS_H
 
-#include <stdexcept>
-#include <list>
 #include <vector>
 #include <map>
 #include <unordered_map>

@@ -24,32 +24,15 @@
   or send mail to:
       lamasoftware (at ) science.ru.nl
 */
-#include <list>
-#include <vector>
-#include <set>
-#include <string>
+
 #include <iostream>
-#include <algorithm> // for sort()
-#include <numeric> // for accumulate()
-#include <iomanip>
-#include <cassert>
 
-#include "ticcutils/StringOps.h"
-#include "ticcutils/PrettyPrint.h"
-#include "ticcutils/UniHash.h"
-
-#include "timbl/Common.h"
 #include "timbl/Types.h"
-#include "timbl/Targets.h"
 #include "timbl/Instance.h"
 
 using namespace std;
-using namespace icu;
-
 
 namespace Timbl {
-  using namespace Common;
-  using TiCC::operator<<;
 
   Instance::Instance():
     TV(NULL),
@@ -63,13 +46,13 @@ namespace Timbl {
   }
 
   void Instance::clear(){
-    for ( unsigned int i=0; i < FV.size(); ++i ){
-      if ( FV[i] ){
-	if ( FV[i]->isUnknown() ){
-	  delete FV[i];
+    for ( auto& it : FV ){
+      if ( it ){
+	if ( it->isUnknown() ){
+	  delete it;
 	}
       }
-      FV[i] = 0;
+      it = 0;
     }
     TV = 0;
     sample_weight = 0.0;
@@ -80,7 +63,7 @@ namespace Timbl {
     FV.resize( len, 0 );
   }
 
-  ostream& operator<<(ostream& os, const Instance *I ){
+  ostream& operator<<( ostream& os, const Instance *I ){
     if ( I ){
       os << *I;
     }
@@ -90,9 +73,9 @@ namespace Timbl {
     return os;
   }
 
-  ostream& operator<<(ostream& os, const Instance& I ){
-    for ( unsigned int i=0; i < I.FV.size(); ++i ){
-      os << I.FV[i] << ", ";
+  ostream& operator<<( ostream& os, const Instance& I ){
+    for ( const auto& it : I.FV ){
+      os << it << ", ";
     }
     os << I.TV << " " << I.sample_weight;
     return os;

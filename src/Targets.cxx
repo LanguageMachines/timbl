@@ -24,12 +24,12 @@
   or send mail to:
       lamasoftware (at ) science.ru.nl
 */
-#include <list>
+
 #include <vector>
 #include <set>
 #include <string>
 #include <iostream>
-#include <algorithm> // for sort()
+#include <algorithm> // for find_if()
 #include <numeric> // for accumulate()
 #include <iomanip>
 #include <cassert>
@@ -146,7 +146,7 @@ namespace Timbl {
   void ValueDistribution::DistToStringWW( string& DistStr, int beam ) const {
     double minw = 0.0;
     if ( beam > 0 ){
-      std::set<double, dblCmp> freqs;
+      set<double, dblCmp> freqs;
       for ( const auto& it : distribution ){
 	Vfield *f = it.second;
 	freqs.insert( f->frequency );
@@ -166,7 +166,7 @@ namespace Timbl {
 					   int beam ) const {
     double minw = 0.0;
     if ( beam > 0 ){
-      std::set<double, dblCmp> wgths;
+      set<double, dblCmp> wgths;
       for ( const auto& it : distribution ){
 	Vfield *f = it.second;
 	wgths.insert( f->weight );
