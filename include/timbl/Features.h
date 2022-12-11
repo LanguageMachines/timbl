@@ -35,14 +35,12 @@
 #include <unordered_map>
 #include "unicode/unistr.h"
 #include "timbl/MsgClass.h"
+#include "timbl/Matrices.h"
 #include "ticcutils/Unicode.h"
 
 namespace Hash {
   class UnicodeHash;
 }
-
-template<typename T>
-class SparseSymetricMatrix;
 
 namespace Timbl {
 
@@ -51,8 +49,28 @@ namespace Timbl {
   class Targets;
   class metricClass;
 
-  enum FeatVal_Stat { Unknown, Singleton, SingletonNumeric, NumericValue,
-    NotNumeric };
+  class SparseValueProbClass {
+    friend std::ostream& operator<< ( std::ostream&, SparseValueProbClass * );
+  public:
+    typedef std::map< size_t, double > IDmaptype;
+    typedef IDmaptype::const_iterator IDiterator;
+    explicit SparseValueProbClass( size_t d ): dimension(d) {};
+    void Assign( const size_t i, const double d ) { vc_map[i] = d; };
+    void Clear() { vc_map.clear(); };
+    IDiterator begin() const { return vc_map.begin(); };
+    IDiterator end() const { return vc_map.end(); };
+  private:
+    IDmaptype vc_map;
+    size_t dimension;
+  };
+
+  enum FeatVal_Stat {
+    Unknown,
+    Singleton,
+    SingletonNumeric,
+    NumericValue,
+    NotNumeric
+  };
 
   class FeatureValue: public ValueClass {
     friend class Feature;

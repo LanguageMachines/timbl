@@ -37,9 +37,6 @@
 #include "timbl/MsgClass.h"
 #include "ticcutils/Unicode.h"
 
-template<typename T>
-class SparseSymetricMatrix;
-
 namespace Hash {
   class UnicodeHash;
 }
@@ -147,78 +144,6 @@ namespace Timbl {
     void DistToStringWW( std::string&, int ) const override;
     WValueDistribution *clone() const override {
       return new WValueDistribution; };
-  };
-
-  class ValueClass {
-  public:
-    ValueClass( const icu::UnicodeString& n, size_t i ):
-      name( n ), index( i ), Frequency( 1 ) {};
-    ValueClass( const ValueClass& ) = delete; // forbid copies
-    ValueClass& operator=( const ValueClass& ) = delete; // forbid copies
-    virtual ~ValueClass() {};
-    void ValFreq( size_t f ){ Frequency = f; };
-    void IncValFreq( int f ){ Frequency += f; };
-    size_t ValFreq( ) const { return Frequency; };
-    void incr_val_freq(){ Frequency++; };
-    void decr_val_freq(){ Frequency--; };
-    size_t Index() const { return index; };
-    const icu::UnicodeString& name_u() const { return name; };
-    const std::string Name() const { return TiCC::UnicodeToUTF8(name); };
-    friend std::ostream& operator<<( std::ostream& os, ValueClass const *vc );
-  protected:
-    const icu::UnicodeString& name;
-    size_t index;
-    size_t Frequency;
-  };
-
-  class TargetValue: public ValueClass {
-  public:
-    TargetValue( const icu::UnicodeString&, size_t );
-  };
-
-  class SparseValueProbClass {
-    friend std::ostream& operator<< ( std::ostream&, SparseValueProbClass * );
-  public:
-    typedef std::map< size_t, double > IDmaptype;
-    typedef IDmaptype::const_iterator IDiterator;
-    explicit SparseValueProbClass( size_t d ): dimension(d) {};
-    void Assign( const size_t i, const double d ) { vc_map[i] = d; };
-    void Clear() { vc_map.clear(); };
-    IDiterator begin() const { return vc_map.begin(); };
-    IDiterator end() const { return vc_map.end(); };
-  private:
-    IDmaptype vc_map;
-    size_t dimension;
-  };
-
-  class Targets: public MsgClass {
-    friend class MBLClass;
-    friend class WValueDistribution;
-    friend class ConfusionMatrix;
-  public:
-    explicit Targets( Hash::UnicodeHash *T ):
-      target_hash( T ),
-      is_reference(false)
-    {};
-    ~Targets();
-    Targets& operator=( const Targets& );
-    void init();
-    TargetValue *add_value( const icu::UnicodeString&, int freq = 1 );
-    TargetValue *add_value( size_t, int freq = 1 );
-    TargetValue *Lookup( const icu::UnicodeString& ) const;
-    TargetValue *ReverseLookup( size_t ) const;
-    bool decrement_value( TargetValue * );
-    bool increment_value( TargetValue * );
-    TargetValue *MajorityClass() const;
-    size_t EffectiveValues() const;
-    size_t TotalValues() const;
-    size_t num_of_values() const { return values_array.size(); };
-    Hash::UnicodeHash *hash() const { return target_hash; };
-  private:
-    Hash::UnicodeHash *target_hash;
-    std::vector<TargetValue *> values_array;
-    std::unordered_map< size_t, TargetValue *> reverse_values;
-    bool is_reference;
   };
 
   class Instance {

@@ -39,6 +39,7 @@
 #include "timbl/Options.h"
 #include "timbl/MsgClass.h"
 #include "timbl/Metrics.h"
+#include "timbl/Targets.h"
 #include "timbl/Instance.h"
 #include "timbl/Features.h"
 #include "timbl/GetOptClass.h"

@@ -34,6 +34,7 @@
 #include "timbl/Types.h"
 #include "timbl/Metrics.h"
 #include "timbl/Matrices.h"
+#include "timbl/Targets.h"
 #include "timbl/Instance.h"
 #include "timbl/Features.h"
 #include "ticcutils/Unicode.h"
