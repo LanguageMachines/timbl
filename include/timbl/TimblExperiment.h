@@ -30,6 +30,7 @@
 #define TIMBL_EXPERIMENT_H
 
 #include <sys/time.h>
+#include <iosfwd>
 #include <fstream>
 #include <set>
 #include "ticcutils/XMLtools.h"
@@ -56,7 +57,8 @@ namespace Timbl {
 
   class resultStore: public MsgClass {
   public:
-  resultStore(): rawDist(0),
+    resultStore():
+      rawDist(0),
       dist(0),
       disposable(false),
       isTop(false),

@@ -29,6 +29,7 @@
 #include <string>
 #include <map>
 #include <iosfwd>
+#include <fstream>
 #include <cstdlib> // for srand()
 #include <cassert>
 

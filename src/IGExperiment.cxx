@@ -27,6 +27,7 @@
 
 #include <string>
 #include <iosfwd>
+#include <fstream>
 #include <cassert>
 
 #include "timbl/Common.h"

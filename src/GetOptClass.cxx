@@ -25,23 +25,16 @@
       lamasoftware (at ) science.ru.nl
 */
 #include <string>
+#include <iosfwd>
 #include <fstream>
-#include <cstdio>
 #include <cstdlib>
-#include <cstdarg>
-#include <cstring>
-#include <ctime>
-#include <cctype>
-#include <algorithm>
 #include "ticcutils/CommandLine.h"
 #include "timbl/Common.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
 #include "timbl/MsgClass.h"
 #include "timbl/Metrics.h"
-#include "timbl/Targets.h"
 #include "timbl/Instance.h"
-#include "timbl/Features.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
 

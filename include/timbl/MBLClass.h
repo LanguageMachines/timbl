@@ -27,8 +27,7 @@
 */
 #ifndef TIMBL_MBLCLASS_H
 #define TIMBL_MBLCLASS_H
-#include "timbl/Features.h"
-#include "timbl/Targets.h"
+
 #include "timbl/Instance.h"
 #include "timbl/BestArray.h"
 #include "timbl/neighborSet.h"
