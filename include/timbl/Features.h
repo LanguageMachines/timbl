@@ -28,8 +28,6 @@
 #ifndef TIMBL_FEATURES_H
 #define TIMBL_FEATURES_H
 
-#include <stdexcept>
-#include <list>
 #include <vector>
 #include <map>
 #include <unordered_map>

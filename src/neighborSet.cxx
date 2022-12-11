@@ -25,16 +25,11 @@
       lamasoftware (at ) science.ru.nl
 */
 
-#include <cmath>
 #include <stdexcept>
-#include <vector>
 
 #include "timbl/Common.h"
-#include "timbl/MsgClass.h"
 #include "timbl/Types.h"
-#include "timbl/Targets.h"
 #include "timbl/Instance.h"
-#include "timbl/Features.h"
 #include "timbl/neighborSet.h"
 
 namespace Timbl {

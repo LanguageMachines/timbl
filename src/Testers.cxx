@@ -25,19 +25,12 @@
       lamasoftware (at ) science.ru.nl
 */
 #include <vector>
-#include <set>
 #include <string>
-#include <iostream>
-#include <stdexcept>
-#include <sstream>
-#include <cstdlib>
-#include <climits>
+#include <iosfwd>
 
 #include "timbl/Common.h"
 #include "timbl/Types.h"
-#include "timbl/Targets.h"
 #include "timbl/Instance.h"
-#include "timbl/Features.h"
 #include "timbl/Metrics.h"
 #include "timbl/Testers.h"
 

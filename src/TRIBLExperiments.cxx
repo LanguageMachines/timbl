@@ -28,29 +28,20 @@
 
 #include <string>
 #include <map>
-#include <fstream>
-#include <sstream>
-#include <iomanip>
+#include <iosfwd>
+#include <cstdlib> // for srand()
 #include <cassert>
-#include <cstdlib>
 
-#include "timbl/MsgClass.h"
 #include "timbl/Common.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
-#include "timbl/Targets.h"
 #include "timbl/Instance.h"
-#include "timbl/Features.h"
-#include "timbl/Statistics.h"
-#include "timbl/neighborSet.h"
-#include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
 #include "timbl/MBLClass.h"
 #include "timbl/TimblExperiment.h"
 
 namespace Timbl {
   using namespace std;
-  using namespace icu;
 
   void TRIBL_Experiment::InitInstanceBase(){
     srand( RandomSeed() );
@@ -191,7 +182,7 @@ namespace Timbl {
     return Res;
   }
 
-  bool TRIBL_Experiment::checkLine( const UnicodeString& line ){
+  bool TRIBL_Experiment::checkLine( const icu::UnicodeString& line ){
     if ( !TimblExperiment::checkLine( line ) ){
       return false;
     }
@@ -203,7 +194,7 @@ namespace Timbl {
     return true;
   }
 
-  bool TRIBL2_Experiment::checkLine( const UnicodeString& line ){
+  bool TRIBL2_Experiment::checkLine( const icu::UnicodeString& line ){
     if ( !TimblExperiment::checkLine( line ) ){
       return false;
     }

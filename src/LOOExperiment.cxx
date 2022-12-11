@@ -26,8 +26,7 @@
 */
 
 #include <string>
-#include <map>
-#include <fstream>
+#include <iosfwd>
 #include <cassert>
 
 #include <sys/time.h>
@@ -36,7 +35,6 @@
 #include "timbl/Common.h"
 #include "timbl/Types.h"
 #include "timbl/IBtree.h"
-#include "timbl/Targets.h"
 #include "timbl/Instance.h"
 #include "timbl/MBLClass.h"
 #include "timbl/TimblExperiment.h"
