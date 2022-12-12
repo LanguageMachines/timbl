@@ -366,7 +366,8 @@ namespace Timbl {
 				 bool expand ){
     assert( runningPhase == LearnWords );
     bool result = false;
-    if ( FileName != "" && ConfirmOptions() ){
+    if ( !FileName.empty()
+	 && ConfirmOptions() ){
       if ( !ExpInvalid() ){
 	if ( !expand &&
 	     ( Options.TableFrozen() ||
@@ -534,8 +535,8 @@ namespace Timbl {
     if ( is_synced ){
       CurrentDataFile = FileName; // assume magic!
     }
-    if ( CurrentDataFile == "" ) {
-      if ( FileName == "" ){
+    if ( CurrentDataFile.empty() ) {
+      if ( FileName.empty() ){
 	Warning( "unable to build an InstanceBase: No datafile defined yet" );
 	result = false;
       }
