@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Notify start to irc-gitlama
     outputs:
-      output1: ${{ steps.extract_branch.outputs.branch }}
+      branch: ${{ steps.extract_branch.outputs.branch }}
     steps:
       - name: Extract Branch name
         shell: bash
@@ -29,7 +29,7 @@ jobs:
           nickname: GitHub
           message: >
             ${{ github.actor }} started a build of
-            ${{ github.event.repository.name }}-
+            ${{ github.event.repository.name }}
             [${{ steps.extract_branch.outputs.branch }}]
 
   build:
@@ -110,7 +110,7 @@ jobs:
           nickname: GitHub-${{ runner.os }}-${{ steps.compiler.outputs.id }}
           message: >
             Timbl
-            [${{ needs.notification.outputs.output1.branch }}]
+            [${{ needs.notification.outputs.branch }}]
             build with ${{ matrix.compiler }} by ${{ github.actor }}
             on ${{ matrix.os }}: FAILED
       - name: Notify IRC of succes
@@ -122,6 +122,6 @@ jobs:
           nickname: GitHub-${{ runner.os }}-${{ steps.compiler.outputs.id }}
           message: >
             Timbl
-            [${{ needs.notification.outputs.output1.branch }}]
+            [${{ needs.notification.outputs.branch }}]
             build with ${{ matrix.compiler }} by ${{ github.actor }}
             on ${{ matrix.os }}: SUCCESS
