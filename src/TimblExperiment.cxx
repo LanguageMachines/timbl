@@ -1034,7 +1034,7 @@ namespace Timbl {
   }
 
   bool TimblExperiment::createPercFile( const string& fileName ) const {
-    if ( fileName != "" ) {
+    if ( !fileName.empty() ) {
       ofstream outfile( fileName, ios::out | ios::trunc);
       if (!outfile) {
 	Warning( "can't open: " + fileName );
