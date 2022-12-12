@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Extract Branch name
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHIB_OUTPUT
         id: extract_branch
       - name: IRC notification
         uses: Gottox/irc-message-action@v1
@@ -27,8 +27,10 @@ jobs:
           server: irc.uvt.nl
           channel: '#gitlama'
           nickname: GitHub
-          message: |-
-            ${{ github.actor }} started a build of ${{ github.event.repository.name }}-[${{ steps.extract_branch.outputs.branch }}]
+          message: >
+            ${{ github.actor }} started a build of
+            ${{ github.event.repository.name }}-
+            [${{ steps.extract_branch.outputs.branch }}]
 
   build:
     runs-on: ${{ matrix.os }}
@@ -85,7 +87,7 @@ jobs:
         id: compiler
         run: |
           id=$(echo ${{matrix.compiler}} | cut -d\+ -f1)
-          echo "::set-output name=id::$id"
+          echo "id=$id" >> $GITHUB_OUTPUT
       - name: Static Code-check
         run: cppcheck --enable=all --quiet --error-exitcode=0 .
       - name: make
@@ -106,8 +108,11 @@ jobs:
           server: irc.uvt.nl
           channel: '#gitlama'
           nickname: GitHub-${{ runner.os }}-${{ steps.compiler.outputs.id }}
-          message: |-
-            Timbl [${{ needs.notification.extract_branch.outputs.output1.branch }}] build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: FAILED
+          message: >
+            Timbl
+            [${{ needs.notification.outputs.output1.branch }}]
+            build with ${{ matrix.compiler }} by ${{ github.actor }}
+            on ${{ matrix.os }}: FAILED
       - name: Notify IRC of succes
         if: ${{ success() }}
         uses: Gottox/irc-message-action@v1
@@ -115,5 +120,8 @@ jobs:
           server: irc.uvt.nl
           channel: '#gitlama'
           nickname: GitHub-${{ runner.os }}-${{ steps.compiler.outputs.id }}
-          message: |-
-            Timbl [${{ needs.notification.extract_branch.outputs.output1.branch }}] build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: SUCCESS
+          message: >
+            Timbl
+            [${{ needs.notification.outputs.output1.branch }}]
+            build with ${{ matrix.compiler }} by ${{ github.actor }}
+            on ${{ matrix.os }}: SUCCESS

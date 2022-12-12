@@ -544,7 +544,7 @@ namespace Timbl {
 	result = false;
       }
     }
-    else if ( FileName != "" &&
+    else if ( !FileName.empty() &&
 	      CurrentDataFile != FileName ){
       Error( "Unable to Learn from file '" + FileName + "'\n"
 	     "while previously instantiated from file '" +
@@ -707,7 +707,7 @@ namespace Timbl {
       Warning( "unable to expand the InstanceBase: Not there" );
       result = false;
     }
-    else if ( FileName == "" ){
+    else if ( FileName.empty() ){
       Warning( "unable to expand the InstanceBase: No inputfile specified" );
       result = false;
     }
@@ -788,7 +788,7 @@ namespace Timbl {
       Warning( "unable to remove from InstanceBase: Not there" );
       result = false;
     }
-    else if ( FileName == "" ){
+    else if ( FileName.empty() ){
       Warning( "unable to remove from InstanceBase: No input specified" );
       result = false;
     }
@@ -896,7 +896,7 @@ namespace Timbl {
 	  Progress( 10000 );
 	}
       }
-      if ( exp_name != "" ){
+      if ( !exp_name.empty() ){
 	os  << "-" << exp_name << "-";
       }
       os << "Tested: ";
