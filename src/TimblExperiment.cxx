@@ -650,21 +650,19 @@ namespace Timbl {
       Warning( "unable to Increment, No InstanceBase available" );
       result = false;
     }
+    else if ( !Chop( InstanceString ) ){
+      Error( "Couldn't convert to Instance: "
+	     + TiCC::UnicodeToUTF8(InstanceString) );
+      result = false;    // No more input
+    }
     else {
-      if ( !Chop( InstanceString ) ){
-	Error( "Couldn't convert to Instance: "
-	       + TiCC::UnicodeToUTF8(InstanceString) );
-	result = false;    // No more input
-      }
-      else {
-	chopped_to_instance( TrainLearnWords );
-	MBL_init = false;
-	bool happy = InstanceBase->AddInstance( CurrInst );
-	if ( !happy ){
-	  Warning( "deviating exemplar weight in:\n" +
-		   TiCC::UnicodeToUTF8(InstanceString)
-		   + "\nIgnoring the new weight" );
-	}
+      chopped_to_instance( TrainLearnWords );
+      MBL_init = false;
+      bool happy = InstanceBase->AddInstance( CurrInst );
+      if ( !happy ){
+	Warning( "deviating exemplar weight in:\n" +
+		 TiCC::UnicodeToUTF8(InstanceString)
+		 + "\nIgnoring the new weight" );
       }
     }
     return result;

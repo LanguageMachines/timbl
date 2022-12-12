@@ -30,6 +30,7 @@ jobs:
 
   build:
     runs-on: ${{ matrix.os }}
+    needs: notification
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -104,7 +105,7 @@ jobs:
           channel: '#gitlama'
           nickname: GitHub-${{ runner.os }}-${{ steps.compiler.outputs.id }}
           message: |-
-            Timbl [${{ steps.extract_branch.outputs.branch }}] build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: FAILED
+            Timbl [${{ needs.notification.extract_branch.outputs.branch }}] build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: FAILED
       - name: Notify IRC of succes
         if: ${{ success() }}
         uses: Gottox/irc-message-action@v1
@@ -113,4 +114,4 @@ jobs:
           channel: '#gitlama'
           nickname: GitHub-${{ runner.os }}-${{ steps.compiler.outputs.id }}
           message: |-
-            Timbl [${{ steps.extract_branch.outputs.branch }}] build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: SUCCESS
+            Timbl [${{ needs.notification.extract_branch.outputs.branch }}] build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: SUCCESS
