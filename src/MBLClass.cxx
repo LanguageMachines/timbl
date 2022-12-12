@@ -24,6 +24,7 @@
   or send mail to:
       lamasoftware (at ) science.ru.nl
 */
+
 #include <vector>
 #include <set>
 #include <fstream>
@@ -33,7 +34,6 @@
 #include <iomanip>
 #include <typeinfo>
 
-#include <ctime>
 #include <cassert>
 
 #include "ticcutils/StringOps.h"

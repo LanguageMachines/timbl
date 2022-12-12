@@ -164,7 +164,7 @@ namespace Timbl {
       }
       break;
     default:
-      throw "wrong value in switch";
+      throw std::logic_error( "wrong value in switch" );
     }
     return result;
   }

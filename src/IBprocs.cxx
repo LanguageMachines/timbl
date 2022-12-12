@@ -24,14 +24,14 @@
   or send mail to:
       lamasoftware (at ) science.ru.nl
 */
-#include <iostream>
-#include <iomanip>
+
+#include <iosfwd>
 #include <string>
 #include <vector>
-#include <map>
 #include <cassert>
 
 #include "ticcutils/StringOps.h"
+
 #include "timbl/IBtree.h"
 #include "timbl/Common.h"
 #include "timbl/Types.h"

@@ -24,7 +24,7 @@
   or send mail to:
       lamasoftware (at ) science.ru.nl
 */
-#include <map>
+
 #include <string>
 #include "timbl/Common.h"
 #include "timbl/MsgClass.h"
@@ -35,14 +35,14 @@
 #include "timbl/BestArray.h"
 #include "timbl/Statistics.h"
 #include "timbl/MBLClass.h"
-#include "ticcutils/CommandLine.h"
 #include "timbl/GetOptClass.h"
+#include "ticcutils/CommandLine.h"
+#include "timbl/TimblAPI.h"
+#include "timbl/TimblExperiment.h"
+
 
 using namespace std;
 using namespace icu;
-
-#include "timbl/TimblAPI.h"
-#include "timbl/TimblExperiment.h"
 
 namespace Timbl {
 

@@ -24,10 +24,7 @@
   or send mail to:
       lamasoftware (at ) science.ru.nl
 */
-#include <exception>
-#include <stdexcept>
 #include <string>
-#include <sstream>
 
 #include "timbl/Common.h"
 #include "timbl/Types.h"

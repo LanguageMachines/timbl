@@ -27,8 +27,9 @@
 #include <string>
 #include <iosfwd>
 #include <fstream>
-#include <cstdlib>
+
 #include "ticcutils/CommandLine.h"
+
 #include "timbl/Common.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"

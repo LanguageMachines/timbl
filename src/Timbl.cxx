@@ -31,11 +31,6 @@
 #include <iosfwd>
 #include <string>
 #include <fstream>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <cctype>
 
 #include "config.h"
 #include "ticcutils/CommandLine.h"

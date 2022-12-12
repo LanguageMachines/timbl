@@ -28,10 +28,6 @@
 #include <vector>
 #include <iostream>
 #include <iomanip>
-#include <cmath>
-#include <cctype>
-#include <ctime>
-#include <cstdio>
 
 #include "ticcutils/StringOps.h"
 #include "ticcutils/UniHash.h"

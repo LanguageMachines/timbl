@@ -29,19 +29,9 @@
 #include <vector>
 #include <map>
 #include <fstream>
-#include <sstream>
 #include <iomanip>
-#include <typeinfo>
 
-#include <cmath>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <cfloat>
-#include <cctype>
 #include <cassert>
-#include <cstdarg>
 
 #include <sys/time.h>
 
@@ -59,12 +49,12 @@
 #include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
 #include "timbl/MBLClass.h"
-#include "ticcutils/CommandLine.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
 #include "ticcutils/XMLtools.h"
 #include "ticcutils/Timer.h"
 #include "ticcutils/PrettyPrint.h"
+#include "ticcutils/CommandLine.h"
 
 #ifdef HAVE_OPENMP
 #include <omp.h>

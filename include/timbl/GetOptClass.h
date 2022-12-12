@@ -31,9 +31,11 @@
 #include <list>
 #include <iosfwd>
 
+namespace TiCC {
+  class CL_Options;
+}
 namespace Timbl {
   class TimblExperiment;
-
   class GetOptClass: public MsgClass {
   public:
     explicit GetOptClass( const TiCC::CL_Options&  );
