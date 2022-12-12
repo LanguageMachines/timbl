@@ -88,8 +88,8 @@ namespace Timbl{
     void merge( const neighborSet& );
     double getDistance( size_t ) const;
     double bestDistance() const { return getDistance(0); };
-    const ValueDistribution *getDistribution( size_t ) const;
-    WValueDistribution *bestDistribution( const decayStruct * =0,
+    const ClassDistribution *getDistribution( size_t ) const;
+    WClassDistribution *bestDistribution( const decayStruct * =0,
 					  size_t =0 ) const ;
     double relativeWeight( const decayStruct *, size_t ) const;
     bool setShowDistance( bool b ) const {
@@ -105,9 +105,9 @@ namespace Timbl{
   private:
     mutable bool showDistance;
     mutable bool showDistribution;
-    void push_back( double, const ValueDistribution & );
+    void push_back( double, const ClassDistribution & );
     std::vector<double> distances;
-    std::vector<ValueDistribution *> distributions;
+    std::vector<ClassDistribution *> distributions;
   };
 
 }

@@ -83,10 +83,10 @@ namespace Timbl{
 		  const std::string& = "" );
     const TargetValue *Classify( const std::string& );
     const TargetValue *Classify( const std::string&,
-				 const ValueDistribution *& );
+				 const ClassDistribution *& );
     const TargetValue *Classify( const std::string&, double& );
     const TargetValue *Classify( const std::string&,
-				 const ValueDistribution *&,
+				 const ClassDistribution *&,
 				 double& );
     const neighborSet *classifyNS( const std::string& );
     bool classifyNS( const std::string&, neighborSet& );
@@ -156,5 +156,7 @@ namespace Timbl{
   bool string_to( const std::string&, Algorithm& );
   bool string_to( const std::string&, Weighting& );
 
+  typedef ClassDistribution ValueDistribution; // for backward compatability
+  typedef WClassDistribution WValueDistribution; // for backward compatability
 }
 #endif // TIMBL_API_H

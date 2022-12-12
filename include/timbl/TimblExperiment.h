@@ -73,10 +73,10 @@ namespace Timbl {
     ~resultStore();
     bool reset( int, normType, double, const Targets&  );
     void clear();
-    void addConstant( const ValueDistribution *, const TargetValue * );
-    void addTop( const ValueDistribution *, const TargetValue * );
-    void addDisposable( ValueDistribution *, const TargetValue * );
-    const WValueDistribution *getResultDist();
+    void addConstant( const ClassDistribution *, const TargetValue * );
+    void addTop( const ClassDistribution *, const TargetValue * );
+    void addDisposable( ClassDistribution *, const TargetValue * );
+    const WClassDistribution *getResultDist();
     std::string getResult();
     void prepare();
     void normalize();
@@ -97,8 +97,8 @@ namespace Timbl {
       }
     };
   private:
-    const ValueDistribution *rawDist;
-    WValueDistribution *dist;
+    const ClassDistribution *rawDist;
+    WClassDistribution *dist;
     bool disposable;
     bool isTop;
     int beam;
@@ -210,7 +210,7 @@ namespace Timbl {
 
     virtual AlgorithmType Algorithm() const = 0;
     const TargetValue *Classify( const std::string& Line,
-				 const ValueDistribution *& db,
+				 const ClassDistribution *& db,
 				 double& di ){
       const TargetValue *res = classifyString( Line, di );
       if ( res ){
@@ -220,7 +220,7 @@ namespace Timbl {
       return res;
     }
     const TargetValue *Classify_u( const icu::UnicodeString& Line,
-				   const ValueDistribution *& db,
+				   const ClassDistribution *& db,
 				   double& di ){
       const TargetValue *res = classifyUnicodeString( Line, di );
       if ( res ){
@@ -240,7 +240,7 @@ namespace Timbl {
     }
 
     const TargetValue *Classify( const std::string& Line,
-				 const ValueDistribution *& db ){
+				 const ClassDistribution *& db ){
       double dum_d;
       const TargetValue *res = classifyString( Line, dum_d );
       if ( res ){
@@ -250,7 +250,7 @@ namespace Timbl {
       return res;
     }
     const TargetValue *Classify_u( const icu::UnicodeString& Line,
-				   const ValueDistribution *& db ){
+				   const ClassDistribution *& db ){
       double dum_d;
       const TargetValue *res = classifyUnicodeString( Line, dum_d );
       if ( res ){

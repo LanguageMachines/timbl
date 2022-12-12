@@ -1742,8 +1742,8 @@ namespace Timbl {
     return false;
   }
 
-  const ValueDistribution *MBLClass::ExactMatch( const Instance& inst ) const {
-    const ValueDistribution *result = NULL;
+  const ClassDistribution *MBLClass::ExactMatch( const Instance& inst ) const {
+    const ClassDistribution *result = NULL;
     if ( !GlobalMetric->isSimilarityMetric() &&
 	 ( do_exact_match ||
 	   ( num_of_neighbors == 1 &&
@@ -1757,7 +1757,7 @@ namespace Timbl {
     return nSet.bestDistance();
   }
 
-  WValueDistribution *MBLClass::getBestDistribution( unsigned int k ){
+  WClassDistribution *MBLClass::getBestDistribution( unsigned int k ){
     return nSet.bestDistribution( decay, k );
   }
 
@@ -1839,7 +1839,7 @@ namespace Timbl {
 				   InstanceBase_base *IB,
 				   size_t ib_offset ){
     vector<FeatureValue *> CurrentFV(NumOfFeatures());
-    const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV,
+    const ClassDistribution *best_distrib = IB->InitGraphTest( CurrentFV,
 							       &Inst.FV,
 							       ib_offset,
 							       EffectiveFeatures() );
@@ -1860,7 +1860,7 @@ namespace Timbl {
       if ( EndPos != EffFeat ){
 	throw( logic_error( "Exemplar testing: test should not stop before last feature" ) );
       }
-      ValueDistribution ResultDist;
+      ClassDistribution ResultDist;
       ResultDist.SetFreq( Bpnt->Value(), Bpnt->Freq() );
       UnicodeString origI;
       if ( Verbosity(NEAR_N) ){
@@ -1925,7 +1925,7 @@ namespace Timbl {
     vector<FeatureValue *> CurrentFV(NumOfFeatures());
     double Threshold = DBL_MAX;
     size_t EffFeat = EffectiveFeatures() - ib_offset;
-    const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV,
+    const ClassDistribution *best_distrib = IB->InitGraphTest( CurrentFV,
 							       &Inst.FV,
 							       ib_offset,
 							       EffectiveFeatures() );
@@ -1980,7 +1980,7 @@ namespace Timbl {
 				    size_t ib_offset ){
     vector<FeatureValue *> CurrentFV(NumOfFeatures());
     size_t EffFeat = EffectiveFeatures() - ib_offset;
-    const ValueDistribution *best_distrib = IB->InitGraphTest( CurrentFV,
+    const ClassDistribution *best_distrib = IB->InitGraphTest( CurrentFV,
 							       &Inst.FV,
 							       ib_offset,
 							       EffectiveFeatures() );

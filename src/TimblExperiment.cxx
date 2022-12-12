@@ -115,7 +115,7 @@ namespace Timbl {
     resultCache.clear();
   }
 
-  const WValueDistribution *resultStore::getResultDist() {
+  const WClassDistribution *resultStore::getResultDist() {
     if ( rawDist && !dist ){
       prepare();
     }
@@ -145,14 +145,14 @@ namespace Timbl {
     return resultCache;
   }
 
-  void resultStore::addConstant( const ValueDistribution *vd,
+  void resultStore::addConstant( const ClassDistribution *vd,
 				 const TargetValue *best_result ) {
     rawDist = vd;
     best_target = best_result;
     disposable = false;
   }
 
-  void resultStore::addTop( const ValueDistribution *vd,
+  void resultStore::addTop( const ClassDistribution *vd,
 			    const TargetValue *best_result ) {
     rawDist = vd;
     best_target = best_result;
@@ -160,7 +160,7 @@ namespace Timbl {
     isTop = true;
   }
 
-  void resultStore::addDisposable( ValueDistribution *vd,
+  void resultStore::addDisposable( ClassDistribution *vd,
 				   const TargetValue *best_result ) {
     rawDist = vd;
     best_target = best_result;
@@ -176,7 +176,7 @@ namespace Timbl {
 	dist = rawDist->to_WVD_Copy();
       }
       else {
-	dist = dynamic_cast<WValueDistribution *>( const_cast<ValueDistribution *>(rawDist) );
+	dist = dynamic_cast<WClassDistribution *>( const_cast<ClassDistribution *>(rawDist) );
 	rawDist = 0;
       }
     }
@@ -1672,8 +1672,8 @@ namespace Timbl {
       Warning( "no normalisation possible because a BeamSize is specified\n"
 	       "output is NOT normalized!" );
     }
-    const ValueDistribution *ExResultDist = ExactMatch( Inst );
-    WValueDistribution *ResultDist = 0;
+    const ClassDistribution *ExResultDist = ExactMatch( Inst );
+    WClassDistribution *ResultDist = 0;
     nSet.clear();
     const TargetValue *Res;
     if ( ExResultDist ){
@@ -1703,7 +1703,7 @@ namespace Timbl {
       ++num_of_neighbors;
       testInstance( Inst, InstanceBase );
       bestArray.addToNeighborSet( nSet, num_of_neighbors );
-      WValueDistribution *ResultDist2 = getBestDistribution();
+      WClassDistribution *ResultDist2 = getBestDistribution();
       const TargetValue *Res2 = ResultDist2->BestTarget( Tie2, (RandomSeed() >= 0) );
       --num_of_neighbors;
       if ( !Tie2 ){

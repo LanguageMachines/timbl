@@ -397,7 +397,7 @@ namespace Timbl {
   }
 
   const TargetValue *TimblAPI::Classify( const string& s,
-					 const ValueDistribution *& db,
+					 const ClassDistribution *& db,
 					 double& di ){
     if ( Valid() ){
       return pimpl->Classify( s, db, di );
@@ -417,7 +417,7 @@ namespace Timbl {
   }
 
   const TargetValue *TimblAPI::Classify( const string& s,
-					 const ValueDistribution *& db ){
+					 const ClassDistribution *& db ){
     if ( Valid() ){
       return pimpl->Classify( s, db  );
     }

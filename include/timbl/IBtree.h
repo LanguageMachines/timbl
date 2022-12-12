@@ -51,8 +51,8 @@ namespace Timbl {
   class Feature_List;
   class Targets;
   class TargetValue;
-  class ValueDistribution;
-  class WValueDistribution;
+  class ClassDistribution;
+  class WClassDistribution;
 
   class IBtree {
     friend class InstanceBase_base;
@@ -69,7 +69,7 @@ namespace Timbl {
   private:
     FeatureValue *FValue;
     const TargetValue *TValue;
-    ValueDistribution *TDistribution;
+    ClassDistribution *TDistribution;
     IBtree *link;
     IBtree *next;
 
@@ -84,7 +84,7 @@ namespace Timbl {
 #else
     static inline IBtree *add_feat_val( FeatureValue *, IBtree **, unsigned long& );
 #endif
-    inline ValueDistribution *sum_distributions( bool );
+    inline ClassDistribution *sum_distributions( bool );
     inline IBtree *make_unique( const TargetValue *, unsigned long& );
     void cleanDistributions();
     void re_assign_defaults( bool, bool );
@@ -93,7 +93,7 @@ namespace Timbl {
     void countBranches( unsigned int,
 			std::vector<unsigned int>&,
 			std::vector<unsigned int>& );
-    const ValueDistribution *exact_match( const Instance&  ) const;
+    const ClassDistribution *exact_match( const Instance&  ) const;
   protected:
     const IBtree *search_node( FeatureValue * ) const;
   };
@@ -120,23 +120,23 @@ namespace Timbl {
     void summarizeNodes( std::vector<unsigned int>&,
 			 std::vector<unsigned int>& );
     virtual bool MergeSub( InstanceBase_base * );
-    const ValueDistribution *ExactMatch( const Instance& I ) const {
+    const ClassDistribution *ExactMatch( const Instance& I ) const {
       return InstBase->exact_match( I ); };
-    virtual const ValueDistribution *InitGraphTest( std::vector<FeatureValue *>&,
+    virtual const ClassDistribution *InitGraphTest( std::vector<FeatureValue *>&,
 						    const std::vector<FeatureValue *> *,
 						    const size_t,
 						    const size_t );
-    virtual const ValueDistribution *NextGraphTest( std::vector<FeatureValue *>&,
+    virtual const ClassDistribution *NextGraphTest( std::vector<FeatureValue *>&,
 					      size_t& );
     unsigned long int GetDistSize( ) const { return NumOfTails; };
-    virtual const ValueDistribution *IG_test( const Instance& , size_t&, bool&,
+    virtual const ClassDistribution *IG_test( const Instance& , size_t&, bool&,
 					      const TargetValue *& );
     virtual IB_InstanceBase *TRIBL_test( const Instance& , size_t,
 					 const TargetValue *&,
-					 const ValueDistribution *&,
+					 const ClassDistribution *&,
 					 size_t& );
     virtual IB_InstanceBase *TRIBL2_test( const Instance& ,
-					  const ValueDistribution *&,
+					  const ClassDistribution *&,
 					  size_t& );
     bool read_hash( std::istream&,
 		    Hash::UnicodeHash&,
@@ -163,7 +163,7 @@ namespace Timbl {
     virtual bool IsPruned() const { return false; };
     void CleanPartition(  bool );
     unsigned long int GetSizeInfo( unsigned long int&, double & ) const;
-    const ValueDistribution *TopDist() const { return TopDistribution; };
+    const ClassDistribution *TopDist() const { return TopDistribution; };
     bool HasDistributions() const;
     const TargetValue *TopTarget( bool & );
     bool PersistentD() const { return PersistentDistributions; };
@@ -180,8 +180,8 @@ namespace Timbl {
     bool Random;
     bool PersistentDistributions;
     int Version;
-    ValueDistribution *TopDistribution;
-    WValueDistribution *WTop;
+    ClassDistribution *TopDistribution;
+    WClassDistribution *WTop;
     const TargetValue *TopT;
     FI_map fast_index;
     bool tiedTop;
@@ -234,11 +234,11 @@ namespace Timbl {
 	{};
     IB_InstanceBase *Copy() const override;
     IB_InstanceBase *clone() const override;
-    const ValueDistribution *InitGraphTest( std::vector<FeatureValue *>&,
+    const ClassDistribution *InitGraphTest( std::vector<FeatureValue *>&,
 					    const std::vector<FeatureValue *> *,
 					    const size_t,
 					    const size_t ) override;
-    const ValueDistribution *NextGraphTest( std::vector<FeatureValue *>&,
+    const ClassDistribution *NextGraphTest( std::vector<FeatureValue *>&,
 					    size_t& ) override;
   private:
     size_t offSet;
@@ -256,7 +256,7 @@ namespace Timbl {
     void Prune( const TargetValue *, long = 0 ) override;
     void specialPrune( const TargetValue * );
     bool IsPruned() const override { return Pruned; };
-    const ValueDistribution *IG_test( const Instance& ,
+    const ClassDistribution *IG_test( const Instance& ,
 				      size_t&,
 				      bool&,
 				      const TargetValue *& ) override;
@@ -283,7 +283,7 @@ namespace Timbl {
     IB_InstanceBase *TRIBL_test( const Instance&,
 				 size_t,
 				 const TargetValue *&,
-				 const ValueDistribution *&,
+				 const ClassDistribution *&,
 				 size_t& ) override;
   private:
     IB_InstanceBase *IBPartition( IBtree * ) const;
@@ -300,7 +300,7 @@ namespace Timbl {
     TRIBL2_InstanceBase *clone() const override;
     TRIBL2_InstanceBase *Copy() const override;
     IB_InstanceBase *TRIBL2_test( const Instance& ,
-				  const ValueDistribution *&,
+				  const ClassDistribution *&,
 				  size_t& ) override;
   private:
     IB_InstanceBase *IBPartition( IBtree * ) const;

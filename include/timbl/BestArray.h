@@ -43,8 +43,8 @@ namespace Timbl {
     ~BestRec();
     size_t totalBests() const { return aggregateDist.totalSize(); };
     double bestDistance;
-    ValueDistribution aggregateDist;
-    std::vector<ValueDistribution*> bestDistributions;
+    ClassDistribution aggregateDist;
+    std::vector<ClassDistribution*> bestDistributions;
     std::vector<icu::UnicodeString> bestInstances;
   private:
   };
@@ -61,7 +61,7 @@ namespace Timbl {
     ~BestArray();
     void init( unsigned int, unsigned int, bool, bool, bool );
     double addResult( double,
-		      const ValueDistribution *,
+		      const ClassDistribution *,
 		      const icu::UnicodeString& );
     void initNeighborSet( neighborSet& ) const;
     void addToNeighborSet( neighborSet& , size_t ) const;

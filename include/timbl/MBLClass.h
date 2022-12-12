@@ -117,11 +117,11 @@ namespace Timbl {
 		       InstanceBase_base * = NULL,
 		       size_t = 0 );
     icu::UnicodeString get_org_input( ) const;
-    const ValueDistribution *ExactMatch( const Instance& ) const;
+    const ClassDistribution *ExactMatch( const Instance& ) const;
     void fillNeighborSet( neighborSet& ) const;
     void addToNeighborSet( neighborSet& ns, size_t n ) const;
     double getBestDistance() const;
-    WValueDistribution *getBestDistribution( unsigned int =0 );
+    WClassDistribution *getBestDistribution( unsigned int =0 );
     IB_Stat IBStatus() const;
     bool get_ranges( const std::string& );
     size_t get_IB_Info( std::istream&, bool&, int&, bool&, std::string& );

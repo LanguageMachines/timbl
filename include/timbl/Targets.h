@@ -70,7 +70,7 @@ namespace Timbl {
 
   class Targets: public MsgClass {
     friend class MBLClass;
-    friend class WValueDistribution;
+    friend class WClassDistribution;
     friend class ConfusionMatrix;
   public:
     explicit Targets( Hash::UnicodeHash *T ):
@@ -99,8 +99,8 @@ namespace Timbl {
   };
 
   class Vfield{
-    friend class ValueDistribution;
-    friend class WValueDistribution;
+    friend class ClassDistribution;
+    friend class WClassDistribution;
     friend std::ostream& operator<<( std::ostream&, const Vfield& );
     friend std::ostream& operator<<( std::ostream&, const Vfield * );
   public:
@@ -127,18 +127,18 @@ namespace Timbl {
   private:
   };
 
-  class WValueDistribution;
+  class WClassDistribution;
 
-  class ValueDistribution{
-    friend std::ostream& operator<<( std::ostream&, const ValueDistribution& );
-    friend std::ostream& operator<<( std::ostream&, const ValueDistribution * );
-    friend class WValueDistribution;
+  class ClassDistribution{
+    friend std::ostream& operator<<( std::ostream&, const ClassDistribution& );
+    friend std::ostream& operator<<( std::ostream&, const ClassDistribution * );
+    friend class WClassDistribution;
   public:
     typedef std::map<size_t, Vfield *> VDlist;
     typedef VDlist::const_iterator dist_iterator;
-    ValueDistribution( ): total_items(0) {};
-    ValueDistribution( const ValueDistribution& );
-    virtual ~ValueDistribution(){ clear(); };
+    ClassDistribution( ): total_items(0) {};
+    ClassDistribution( const ClassDistribution& );
+    virtual ~ClassDistribution(){ clear(); };
     size_t totalSize() const{ return total_items; };
     size_t size() const{ return distribution.size(); };
     bool empty() const{ return distribution.empty(); };
@@ -146,14 +146,14 @@ namespace Timbl {
     dist_iterator begin() const { return distribution.begin(); };
     dist_iterator end() const { return distribution.end(); };
     virtual const TargetValue* BestTarget( bool&, bool = false ) const;
-    void Merge( const ValueDistribution& );
+    void Merge( const ClassDistribution& );
     virtual void SetFreq( const TargetValue *, int, double=1.0 );
     virtual bool IncFreq( const TargetValue *, size_t, double=1.0 );
     void DecFreq( const TargetValue * );
-    static ValueDistribution *read_distribution( std::istream&,
+    static ClassDistribution *read_distribution( std::istream&,
 						 Targets&,
 						 bool );
-    static ValueDistribution *read_distribution_hashed( std::istream&,
+    static ClassDistribution *read_distribution_hashed( std::istream&,
 							Targets&,
 							bool );
     const std::string DistToString() const;
@@ -163,37 +163,37 @@ namespace Timbl {
     virtual const std::string Save() const;
     bool ZeroDist() const { return total_items == 0; };
     double Entropy() const;
-    ValueDistribution *to_VD_Copy( ) const;
-    virtual WValueDistribution *to_WVD_Copy() const;
+    ClassDistribution *to_VD_Copy( ) const;
+    virtual WClassDistribution *to_WVD_Copy() const;
   protected:
     virtual void DistToString( std::string&, double=0 ) const;
     virtual void DistToStringWW( std::string&, int ) const;
     const TargetValue* BestTargetN( bool &, bool = false ) const;
     const TargetValue* BestTargetW( bool &, bool = false ) const;
-    virtual ValueDistribution *clone( ) const {
-      return new ValueDistribution(); };
+    virtual ClassDistribution *clone( ) const {
+      return new ClassDistribution(); };
     size_t total_items;
     VDlist distribution;
   };
 
-  class WValueDistribution: public ValueDistribution {
+  class WClassDistribution: public ClassDistribution {
   public:
-    WValueDistribution(): ValueDistribution() {};
+    WClassDistribution(): ClassDistribution() {};
     const TargetValue* BestTarget( bool &, bool = false ) const override;
     void SetFreq( const TargetValue *, int, double ) override;
     bool IncFreq( const TargetValue *, size_t, double ) override;
-    WValueDistribution *to_WVD_Copy( ) const override;
+    WClassDistribution *to_WVD_Copy( ) const override;
     const std::string SaveHashed() const override;
     const std::string Save() const override;
     void Normalize();
     void Normalize_1( double, const Targets& );
     void Normalize_2();
-    void MergeW( const ValueDistribution&, double );
+    void MergeW( const ClassDistribution&, double );
   private:
     void DistToString( std::string&, double=0 ) const override;
     void DistToStringWW( std::string&, int ) const override;
-    WValueDistribution *clone() const override {
-      return new WValueDistribution; };
+    WClassDistribution *clone() const override {
+      return new WClassDistribution; };
   };
 
 }

@@ -86,7 +86,7 @@ namespace Timbl {
     }
   }
 
-  void neighborSet::push_back( double d, const ValueDistribution &dist ){
+  void neighborSet::push_back( double d, const ClassDistribution &dist ){
     distances.push_back( d );
     distributions.push_back( dist.to_VD_Copy() );
   }
@@ -176,20 +176,20 @@ namespace Timbl {
     return distances[n];
   }
 
-  const ValueDistribution *neighborSet::getDistribution( size_t n ) const {
+  const ClassDistribution *neighborSet::getDistribution( size_t n ) const {
     if ( size() <= n ){
       throw std::range_error( "getDistribution() parameter exceeds size of neighborSet" );
     }
     return distributions[n];
   }
 
-  WValueDistribution *neighborSet::bestDistribution( const decayStruct *d,
+  WClassDistribution *neighborSet::bestDistribution( const decayStruct *d,
 						     size_t max ) const {
-    // Analyse the set to find THE best ValueDistribution.
+    // Analyse the set to find THE best ClassDistribution.
     // For each neighbor, we loop over the number of bests in that
     // bin, and merge that distribution into the result
     //
-    WValueDistribution *result = new WValueDistribution();
+    WClassDistribution *result = new WClassDistribution();
     size_t stop = distributions.size();
     stop = ( max > 0 && max < stop ? max : stop );
     for ( size_t k = 0; k < stop; ++k ) {

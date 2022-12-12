@@ -105,7 +105,7 @@ namespace Timbl {
       Warning( "no normalisation possible because a BeamSize is specified\n"
 	       "output is NOT normalized!" );
     }
-    const ValueDistribution *ExResultDist = ExactMatch( Inst );
+    const ClassDistribution *ExResultDist = ExactMatch( Inst );
     if ( ExResultDist ){
       Distance = 0.0;
       Res = ExResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
@@ -114,7 +114,7 @@ namespace Timbl {
     }
     else {
       size_t level = 0;
-      const ValueDistribution *TrResultDist = 0;
+      const ClassDistribution *TrResultDist = 0;
       initExperiment();
       IB_InstanceBase *SubTree
 	= InstanceBase->TRIBL_test( Inst, TRIBL_offset(),
@@ -136,13 +136,13 @@ namespace Timbl {
       else {
 	testInstance( Inst, SubTree, TRIBL_offset() );
 	bestArray.initNeighborSet( nSet );
-	WValueDistribution *ResultDist = getBestDistribution();
+	WClassDistribution *ResultDist = getBestDistribution();
 	Res = ResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
 	if ( Tie ){
 	  ++num_of_neighbors;
 	  testInstance( Inst, SubTree, TRIBL_offset() );
 	  bestArray.addToNeighborSet( nSet, num_of_neighbors );
-	  WValueDistribution *ResultDist2 = getBestDistribution();
+	  WClassDistribution *ResultDist2 = getBestDistribution();
 	  bool Tie2 = false;
 	  const TargetValue *Res2 = ResultDist2->BestTarget( Tie2, (RandomSeed() >= 0) );
 	  --num_of_neighbors;
@@ -217,7 +217,7 @@ namespace Timbl {
 	       "output is NOT normalized!" );
     }
     bool Tie = false;
-    const ValueDistribution *ExResultDist = ExactMatch( Inst );
+    const ClassDistribution *ExResultDist = ExactMatch( Inst );
     if ( ExResultDist ){
       Distance = 0.0;
       Res = ExResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
@@ -226,19 +226,19 @@ namespace Timbl {
     }
     else {
       size_t level = 0;
-      const ValueDistribution *TrResultDist = 0;
+      const ClassDistribution *TrResultDist = 0;
       IB_InstanceBase *SubTree
 	= InstanceBase->TRIBL2_test( Inst, TrResultDist, level );
       if ( SubTree ){
 	testInstance( Inst, SubTree, level );
 	bestArray.initNeighborSet( nSet );
-	WValueDistribution *ResultDist1 = getBestDistribution();
+	WClassDistribution *ResultDist1 = getBestDistribution();
 	Res = ResultDist1->BestTarget( Tie, (RandomSeed() >= 0) );
 	if ( Tie ){
 	  ++num_of_neighbors;
 	  testInstance( Inst, SubTree, level );
 	  bestArray.addToNeighborSet( nSet, num_of_neighbors );
-	  WValueDistribution *ResultDist2 = getBestDistribution();
+	  WClassDistribution *ResultDist2 = getBestDistribution();
 	  bool Tie2 = false;
 	  const TargetValue *Res2 = ResultDist2->BestTarget( Tie2,
 							     (RandomSeed() >= 0) );

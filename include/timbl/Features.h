@@ -78,7 +78,7 @@ namespace Timbl {
     explicit FeatureValue( const icu::UnicodeString& );
     FeatureValue( const icu::UnicodeString&, size_t );
     ~FeatureValue();
-    void ReconstructDistribution( const ValueDistribution& vd ) {
+    void ReconstructDistribution( const ClassDistribution& vd ) {
       TargetDist.Merge( vd );
       Frequency = TargetDist.totalSize();
     };
@@ -86,7 +86,7 @@ namespace Timbl {
     SparseValueProbClass *valueClassProb() const { return ValueClassProb; };
   private:
     SparseValueProbClass *ValueClassProb;
-    ValueDistribution TargetDist;
+    ClassDistribution TargetDist;
   };
 
 

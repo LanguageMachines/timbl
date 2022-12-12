@@ -114,7 +114,7 @@ namespace Timbl {
   }
 
   double BestArray::addResult( double Distance,
-			       const ValueDistribution *Distr,
+			       const ClassDistribution *Distr,
 			       const UnicodeString& neighbor ){
     // We have the similarity in Distance, and a num_of_neighbors
     // dimensional array with best similarities.

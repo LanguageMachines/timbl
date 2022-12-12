@@ -297,7 +297,7 @@ namespace Timbl {
     return result;
   }
 
-  xmlNode *to_node( const ValueDistribution *d ){
+  xmlNode *to_node( const ClassDistribution *d ){
     xmlNode *result = TiCC::XmlNewNode( "distribution" );
     TiCC::XmlAddContent( result, d->DistToString() );
     return result;
@@ -518,7 +518,7 @@ namespace Timbl {
     if ( nxt == '{' ){
       try {
 	result->TDistribution
-	  = ValueDistribution::read_distribution( is, Targ, false );
+	  = ClassDistribution::read_distribution( is, Targ, false );
       }
       catch ( const exception& e ){
 	Warning( e.what() );
@@ -590,7 +590,7 @@ namespace Timbl {
       // OR we have Persistent Distributions
       try {
 	result->TDistribution
-	  = ValueDistribution::read_distribution_hashed( is, Targ, false );
+	  = ClassDistribution::read_distribution_hashed( is, Targ, false );
       }
       catch ( const exception& e ){
 	Warning( e.what() );
@@ -637,7 +637,7 @@ namespace Timbl {
 				  int expected_version ){
     if ( read_IB( is, feats, Targ, expected_version ) ){
       InstBase->redo_distributions();
-      ValueDistribution *Top
+      ClassDistribution *Top
 	= InstBase->sum_distributions( PersistentDistributions );
       delete Top; // still a bit silly but the Top Distribution is known
       // but we need to cleanup behind us also
@@ -662,7 +662,7 @@ namespace Timbl {
 				int expected_version ){
     if ( read_IB( is, feats, Targ, expected_version ) ){
       if ( PersistentDistributions ){
-	ValueDistribution *Top
+	ClassDistribution *Top
 	  = InstBase->sum_distributions( PersistentDistributions );
 	delete Top; // still a bit silly but the Top Distribution is known
 	// but we need to cleanup behind us also
@@ -699,7 +699,7 @@ namespace Timbl {
 	// in the right order in Targ
 	try {
 	  TopDistribution
-	    = ValueDistribution::read_distribution( is, Targs, true );
+	    = ClassDistribution::read_distribution( is, Targs, true );
 	}
 	catch ( const exception& e ){
 	  Warning( e.what() );
@@ -768,7 +768,7 @@ namespace Timbl {
 					 int expected_version ){
     if ( read_IB_hashed( is, feats, Targs, expected_version ) ){
       InstBase->redo_distributions();
-      ValueDistribution *Top
+      ClassDistribution *Top
 	= InstBase->sum_distributions( PersistentDistributions );
       delete Top; // still a bit silly but the Top Distribution is known
       // but we need to cleanup behind us also
@@ -785,7 +785,7 @@ namespace Timbl {
 				       int expected_version ){
     if ( read_IB_hashed( is, feats, Targs, expected_version ) ){
       if ( PersistentDistributions ){
-	ValueDistribution *Top
+	ClassDistribution *Top
 	  = InstBase->sum_distributions( PersistentDistributions );
 	delete Top; // still a bit silly but the Top Distribution is known
 	// but we need to cleanup behind us also
@@ -823,7 +823,7 @@ namespace Timbl {
 	// in the right order in Targ
 	try {
 	  TopDistribution
-	    = ValueDistribution::read_distribution_hashed( is, Targs, true );
+	    = ClassDistribution::read_distribution_hashed( is, Targs, true );
 	}
 	catch ( const string& what ){
 	  Warning( what );
@@ -858,10 +858,10 @@ namespace Timbl {
     }
   }
 
-  inline ValueDistribution *IBtree::sum_distributions( bool keep ){
+  inline ClassDistribution *IBtree::sum_distributions( bool keep ){
     // create a new distribution at this level by summing up the
     // distibutions of all branches.
-    ValueDistribution *result;
+    ClassDistribution *result;
     if ( !keep ){
       if ( TDistribution ){
 	if ( FValue ){
@@ -873,7 +873,7 @@ namespace Timbl {
 	}
       }
       else {
-	result = new ValueDistribution();
+	result = new ClassDistribution();
       }
       IBtree *pnt = this->next;
       while ( pnt ){
@@ -892,7 +892,7 @@ namespace Timbl {
 	result = TDistribution->to_VD_Copy();
       }
       else {
-	result = new ValueDistribution();
+	result = new ClassDistribution();
       }
       IBtree *pnt = this->next;
       while ( pnt ){
@@ -1002,7 +1002,7 @@ namespace Timbl {
     }
   }
 
-  const ValueDistribution *IBtree::exact_match( const Instance& Inst ) const {
+  const ClassDistribution *IBtree::exact_match( const Instance& Inst ) const {
     // Is there an exact match between the Instance and the IB
     // If so, return the best Distribution.
     const IBtree *pnt = this;
@@ -1044,7 +1044,7 @@ namespace Timbl {
     Random( Rand ),
     PersistentDistributions( persist ),
     Version( 4 ),
-    TopDistribution( new ValueDistribution ),
+    TopDistribution( new ClassDistribution ),
     WTop( 0 ),
     TopT( 0 ),
     tiedTop(false),
@@ -1253,7 +1253,7 @@ namespace Timbl {
       else {
 	InstBase->re_assign_defaults( Random, PersistentDistributions );
       }
-      ValueDistribution *Top
+      ClassDistribution *Top
 	= InstBase->sum_distributions( PersistentDistributions );
       delete Top; // still a bit silly but the Top Distribution is known
     }
@@ -1289,7 +1289,7 @@ namespace Timbl {
     IBtree *pnt = InstBase->link;
     // we have to fix the toptarget here, because the node
     // is build incremental
-    ValueDistribution dist;
+    ClassDistribution dist;
     while ( pnt ){
       if ( pnt->TDistribution ){
 	dist.Merge( *pnt->TDistribution );
@@ -1336,10 +1336,10 @@ namespace Timbl {
       *pnt = new IBtree();
       ++ibCount;
       if ( abs( Inst.ExemplarWeight() ) > Epsilon ){
-	(*pnt)->TDistribution = new WValueDistribution();
+	(*pnt)->TDistribution = new WClassDistribution();
       }
       else {
-	(*pnt)->TDistribution = new ValueDistribution;
+	(*pnt)->TDistribution = new ClassDistribution;
       }
       NumOfTails++;
     }
@@ -1512,7 +1512,7 @@ namespace Timbl {
     DefaultsValid = false;
   }
 
-  const ValueDistribution *InstanceBase_base::InitGraphTest( vector<FeatureValue *>&,
+  const ClassDistribution *InstanceBase_base::InitGraphTest( vector<FeatureValue *>&,
 							     const vector<FeatureValue *> *,
 							     const size_t,
 							     const size_t ){
@@ -1556,12 +1556,12 @@ namespace Timbl {
 
   //#define DEBUGTESTS
 
-  const ValueDistribution *IB_InstanceBase::InitGraphTest( vector<FeatureValue *>& Path,
+  const ClassDistribution *IB_InstanceBase::InitGraphTest( vector<FeatureValue *>& Path,
 							   const vector<FeatureValue *> *inst,
 							   const size_t off,
 							   const size_t eff ){
     const IBtree *pnt;
-    const ValueDistribution *result = NULL;
+    const ClassDistribution *result = NULL;
     testInst = inst;
     offSet = off;
     effFeat = eff;
@@ -1615,16 +1615,16 @@ namespace Timbl {
     return result;
   }
 
-  const ValueDistribution *InstanceBase_base::NextGraphTest( vector<FeatureValue *>&,
+  const ClassDistribution *InstanceBase_base::NextGraphTest( vector<FeatureValue *>&,
 							     size_t& ){
     FatalError( "NextGraphTest" );
     return 0;
   }
 
-  const ValueDistribution *IB_InstanceBase::NextGraphTest( vector<FeatureValue *>& Path,
+  const ClassDistribution *IB_InstanceBase::NextGraphTest( vector<FeatureValue *>& Path,
 							   size_t& pos ){
     const IBtree *pnt = NULL;
-    const ValueDistribution *result = NULL;
+    const ClassDistribution *result = NULL;
     bool goon = true;
     while ( !pnt && goon ){
       if ( RestartSearch[pos] == NULL ) {
@@ -1703,7 +1703,7 @@ namespace Timbl {
     return result;
   }
 
-  const ValueDistribution *InstanceBase_base::IG_test( const Instance& ,
+  const ClassDistribution *InstanceBase_base::IG_test( const Instance& ,
 						       size_t &,
 						       bool &,
 						       const TargetValue *& ){
@@ -1711,7 +1711,7 @@ namespace Timbl {
     return NULL;
   }
 
-  const ValueDistribution *IG_InstanceBase::IG_test( const Instance& Inst,
+  const ClassDistribution *IG_InstanceBase::IG_test( const Instance& Inst,
 						     size_t &end_level,
 						     bool &leaf,
 						     const TargetValue *&result ) {
@@ -1719,7 +1719,7 @@ namespace Timbl {
     // distribution of the last matching position in the Tree, it's position
     // in the Instance Base and the default TargetValue
     result = NULL;
-    ValueDistribution *Dist = NULL;
+    ClassDistribution *Dist = NULL;
     int pos = 0;
     leaf = false;
     const IBtree *pnt = fast_search_node( Inst.FV[pos] );
@@ -1751,14 +1751,14 @@ namespace Timbl {
   IB_InstanceBase *InstanceBase_base::TRIBL_test( const Instance& ,
 						  size_t,
 						  const TargetValue *&,
-						  const ValueDistribution *&,
+						  const ClassDistribution *&,
 						  size_t & ){
     FatalError( "TRIBL_test " );
     return NULL;
   }
 
   IB_InstanceBase *InstanceBase_base::TRIBL2_test( const Instance& ,
-						   const ValueDistribution *&,
+						   const ClassDistribution *&,
 						   size_t & ){
     FatalError( "TRIBL2_test " );
     return NULL;
@@ -1767,7 +1767,7 @@ namespace Timbl {
   IB_InstanceBase *TRIBL_InstanceBase::TRIBL_test( const Instance& Inst,
 						   size_t threshold,
 						   const TargetValue *&TV,
-						   const ValueDistribution *&dist,
+						   const ClassDistribution *&dist,
 						   size_t &level ) {
     // The Test function for the TRIBL algorithm, returns a pointer to the
     // Target at the last matching position in the Tree,
@@ -1820,7 +1820,7 @@ namespace Timbl {
   }
 
   IB_InstanceBase *TRIBL2_InstanceBase::TRIBL2_test( const Instance& Inst,
-						     const ValueDistribution *& dist,
+						     const ClassDistribution *& dist,
 						     size_t &level ){
     // The Test function for the TRIBL2 algorithm, returns a pointer to the
     // the subtree Instance Base necessary for IB1

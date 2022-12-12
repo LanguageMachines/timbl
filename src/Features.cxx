@@ -267,7 +267,7 @@ namespace Timbl {
       }
       dist = &fv->TargetDist;
     }
-    ValueDistribution *dist;
+    ClassDistribution *dist;
     double value;
   };
 

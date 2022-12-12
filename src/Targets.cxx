@@ -76,7 +76,7 @@ namespace Timbl {
     return (int)floor(randnum+0.5);
   }
 
-  void ValueDistribution::clear(){
+  void ClassDistribution::clear(){
     for ( const auto& d : distribution ){
       delete d.second;
     }
@@ -84,7 +84,7 @@ namespace Timbl {
     total_items = 0;
   }
 
-  double ValueDistribution::Confidence( const TargetValue *tv ) const {
+  double ClassDistribution::Confidence( const TargetValue *tv ) const {
     auto it = find_if( distribution.begin(), distribution.end(),
 		       [tv]( const std::pair<const long unsigned int, Timbl::Vfield*>& v ){
 			 return v.second->Value() == tv ; } );
@@ -94,7 +94,7 @@ namespace Timbl {
     return 0.0;
   }
 
-  void ValueDistribution::DistToString( string& DistStr, double minf ) const {
+  void ClassDistribution::DistToString( string& DistStr, double minf ) const {
     ostringstream oss;
     oss.setf(ios::showpoint);
     bool first = true;
@@ -113,7 +113,7 @@ namespace Timbl {
     DistStr = oss.str();
   }
 
-  void WValueDistribution::DistToString( string& DistStr, double minw ) const {
+  void WClassDistribution::DistToString( string& DistStr, double minw ) const {
     ostringstream oss;
     oss.setf(ios::showpoint);
     bool first = true;
@@ -143,7 +143,7 @@ namespace Timbl {
     }
   };
 
-  void ValueDistribution::DistToStringWW( string& DistStr, int beam ) const {
+  void ClassDistribution::DistToStringWW( string& DistStr, int beam ) const {
     double minw = 0.0;
     if ( beam > 0 ){
       set<double, dblCmp> freqs;
@@ -162,7 +162,7 @@ namespace Timbl {
     DistToString( DistStr, minw );
   }
 
-  void WValueDistribution::DistToStringWW( string& DistStr,
+  void WClassDistribution::DistToStringWW( string& DistStr,
 					   int beam ) const {
     double minw = 0.0;
     if ( beam > 0 ){
@@ -182,19 +182,19 @@ namespace Timbl {
     DistToString( DistStr, minw );
   }
 
-  const string ValueDistribution::DistToString() const {
+  const string ClassDistribution::DistToString() const {
     string result;
     DistToString( result );
     return result;
   }
 
-  const string ValueDistribution::DistToStringW( int beam ) const {
+  const string ClassDistribution::DistToStringW( int beam ) const {
     string result;
     DistToStringWW( result, beam );
     return result;
   }
 
-  double ValueDistribution::Entropy() const {
+  double ClassDistribution::Entropy() const {
     double entropy = 0.0;
     size_t TotalVals = total_items;
     if ( TotalVals > 0 ){
@@ -210,7 +210,7 @@ namespace Timbl {
     return fabs(entropy);
   }
 
-  void WValueDistribution::Normalize() {
+  void WClassDistribution::Normalize() {
     double sum = accumulate( distribution.begin(), distribution.end(),
 			     0.0,
 			     []( double r, const std::pair<const long unsigned int, Timbl::Vfield*>& v ){
@@ -220,7 +220,7 @@ namespace Timbl {
     }
   }
 
-  void WValueDistribution::Normalize_1( double factor,
+  void WClassDistribution::Normalize_1( double factor,
 					const Targets& targ ) {
     for ( const auto& val : targ.values_array ){
       // search for val, if not there: add entry with frequency factor;
@@ -238,15 +238,15 @@ namespace Timbl {
     Normalize();
   }
 
-  void WValueDistribution::Normalize_2( ) {
+  void WClassDistribution::Normalize_2( ) {
     for ( const auto& d : distribution ){
       d.second->SetWeight( log1p( d.second->Weight() ) );
     }
     Normalize();
   }
 
-  ValueDistribution *ValueDistribution::to_VD_Copy( ) const {
-    ValueDistribution *res = new ValueDistribution();
+  ClassDistribution *ClassDistribution::to_VD_Copy( ) const {
+    ClassDistribution *res = new ClassDistribution();
     for ( const auto& d : distribution ){
       size_t key = d.first;
       Vfield *vdf = d.second;
@@ -258,8 +258,8 @@ namespace Timbl {
     return res;
   }
 
-  WValueDistribution *ValueDistribution::to_WVD_Copy() const {
-    WValueDistribution *res = new WValueDistribution();
+  WClassDistribution *ClassDistribution::to_WVD_Copy() const {
+    WClassDistribution *res = new WClassDistribution();
     for ( const auto& d : distribution ){
       size_t key = d.first;
       Vfield *vdf = d.second;
@@ -271,8 +271,8 @@ namespace Timbl {
     return res;
   }
 
-  WValueDistribution *WValueDistribution::to_WVD_Copy( ) const {
-    WValueDistribution *result = new WValueDistribution();
+  WClassDistribution *WClassDistribution::to_WVD_Copy( ) const {
+    WClassDistribution *result = new WClassDistribution();
     for ( const auto& d : distribution ){
       size_t key = d.first;
       Vfield *vdf = d.second;
@@ -292,7 +292,7 @@ namespace Timbl {
   // First hashed variant:
   //
 
-  const string ValueDistribution::SaveHashed() const{
+  const string ClassDistribution::SaveHashed() const{
     ostringstream oss;
     oss << "{ ";
     bool first = true;
@@ -310,7 +310,7 @@ namespace Timbl {
     return oss.str();
   }
 
-  const string WValueDistribution::SaveHashed() const{
+  const string WClassDistribution::SaveHashed() const{
     ostringstream oss;
     bool first = true;
     oss << "{ ";
@@ -333,7 +333,7 @@ namespace Timbl {
   // non-hashed variant:
   //
 
-  const string ValueDistribution::Save() const{
+  const string ClassDistribution::Save() const{
     ostringstream oss;
     oss << "{ ";
     bool first = true;
@@ -351,7 +351,7 @@ namespace Timbl {
     return oss.str();
   }
 
-  const string WValueDistribution::Save() const{
+  const string WClassDistribution::Save() const{
     ostringstream oss;
     oss << "{ ";
     bool first = true;
@@ -370,7 +370,7 @@ namespace Timbl {
     return oss.str();
   }
 
-  void ValueDistribution::SetFreq( const TargetValue *val, const int freq,
+  void ClassDistribution::SetFreq( const TargetValue *val, const int freq,
 				   double ){
     // add entry with frequency freq;
     Vfield *temp = new Vfield( val, freq, freq );
@@ -378,7 +378,7 @@ namespace Timbl {
     total_items += freq;
   }
 
-  void WValueDistribution::SetFreq( const TargetValue *val, const int freq,
+  void WClassDistribution::SetFreq( const TargetValue *val, const int freq,
 				    double sw ){
     // add entry with frequency freq;
     // also sets the sample_weight
@@ -387,7 +387,7 @@ namespace Timbl {
     total_items += freq;
   }
 
-  bool ValueDistribution::IncFreq( const TargetValue *val,
+  bool ClassDistribution::IncFreq( const TargetValue *val,
 				   size_t occ,
 				   double ){
     // search for val, if not there: add entry with frequency 'occ';
@@ -404,7 +404,7 @@ namespace Timbl {
     return true;
   }
 
-  bool WValueDistribution::IncFreq( const TargetValue *val,
+  bool WClassDistribution::IncFreq( const TargetValue *val,
 				    size_t occ,
 				    double sw ){
     // search for val, if not there: add entry with frequency 'occ';
@@ -422,7 +422,7 @@ namespace Timbl {
     return fabs( distribution[id]->Weight() - sw ) > Epsilon;
   }
 
-  void ValueDistribution::DecFreq( const TargetValue *val ){
+  void ClassDistribution::DecFreq( const TargetValue *val ){
     // search for val, if not there, just forget
     // otherwise decrement the freqency
     auto const& it = distribution.find( val->Index() );
@@ -432,7 +432,7 @@ namespace Timbl {
     }
   }
 
-  void ValueDistribution::Merge( const ValueDistribution& VD ){
+  void ClassDistribution::Merge( const ClassDistribution& VD ){
     for ( const auto& it : VD.distribution ){
       size_t key = it.first;
       Vfield *vd = it.second;
@@ -449,7 +449,7 @@ namespace Timbl {
     total_items += VD.total_items;
   }
 
-  void WValueDistribution::MergeW( const ValueDistribution& VD,
+  void WClassDistribution::MergeW( const ClassDistribution& VD,
 				   double Weight ){
     for ( const auto& it : VD.distribution ){
       Vfield *vd = it.second;
@@ -465,7 +465,7 @@ namespace Timbl {
     total_items += VD.total_items;
   }
 
-  const TargetValue *ValueDistribution::BestTarget( bool& tie,
+  const TargetValue *ClassDistribution::BestTarget( bool& tie,
 						    bool do_rand ) const {
     // get the most frequent target from the distribution.
     // In case of a tie take the one which is GLOBALLY the most frequent,
@@ -534,7 +534,7 @@ namespace Timbl {
     return best;
   }
 
-  const TargetValue *WValueDistribution::BestTarget( bool& tie,
+  const TargetValue *WClassDistribution::BestTarget( bool& tie,
 						     bool do_rand ) const {
     // get the most frequent target from the distribution.
     // In case of a tie take the one which is GLOBALLY the most frequent,
@@ -599,14 +599,14 @@ namespace Timbl {
     return best;
   }
 
-  ostream& operator<<(ostream& os, const ValueDistribution& vd ) {
+  ostream& operator<<(ostream& os, const ClassDistribution& vd ) {
     string tmp;
     vd.DistToString( tmp );
     os << tmp;
     return os;
   }
 
-  ostream& operator<<(ostream& os, const ValueDistribution *vd ) {
+  ostream& operator<<(ostream& os, const ClassDistribution *vd ) {
     string tmp = "{null}";
     if ( vd ){
       vd->DistToString( tmp );
@@ -615,14 +615,14 @@ namespace Timbl {
     return os;
   }
 
-  ValueDistribution *ValueDistribution::read_distribution( istream &is,
+  ClassDistribution *ClassDistribution::read_distribution( istream &is,
 							   Targets& Targ,
 							   bool do_fr ){
     // read a distribution from stream is into Target
     // if do_f we also adjust the value of Frequency of the Target, which is
     // otherwise 1. Special case when reading the TopDistribution.
     //
-    ValueDistribution *result = 0;
+    ClassDistribution *result = 0;
     char nextCh;
     is >> nextCh;   // skip {
     if ( nextCh != '{' ){
@@ -650,7 +650,7 @@ namespace Timbl {
 	next = look_ahead(is);
 	if ( next == ',' ){
 	  if ( !result ) {
-	    result = new ValueDistribution();
+	    result = new ClassDistribution();
 	  }
 	  result->SetFreq( target, freq );
 	  is >> nextCh;
@@ -658,13 +658,13 @@ namespace Timbl {
 	}
 	else if ( next == '}' ){
 	  if ( !result ){
-	    result = new ValueDistribution();
+	    result = new ClassDistribution();
 	  }
 	  result->SetFreq( target, freq );
 	}
 	else if ( isdigit(next) ){
 	  if ( !result ){
-	    result = new WValueDistribution();
+	    result = new WClassDistribution();
 	  }
 	  double sw;
 	  is >> sw;
@@ -688,11 +688,11 @@ namespace Timbl {
   }
 
 
-  ValueDistribution *ValueDistribution::read_distribution_hashed( istream &is,
+  ClassDistribution *ClassDistribution::read_distribution_hashed( istream &is,
 								  Targets& Targ,
 								  bool do_fr ){
 
-    ValueDistribution *result = 0;
+    ClassDistribution *result = 0;
     // read a distribution from stream is into Target
     // if do_f we also adjust the value of Frequency of the Target, which is
     // otherwise 1. Special case when reading the TopDistribution.
@@ -724,7 +724,7 @@ namespace Timbl {
 	next = look_ahead(is);
 	if ( next == ',' ){
 	  if ( !result ){
-	    result = new ValueDistribution();
+	    result = new ClassDistribution();
 	  }
 	  result->SetFreq( target, freq );
 	  is >> nextCh;
@@ -732,7 +732,7 @@ namespace Timbl {
 	}
 	else if ( next == '}' ){
 	  if ( !result ){
-	    result = new ValueDistribution();
+	    result = new ClassDistribution();
 	  }
 	  result->SetFreq( target, freq );
 	}
@@ -740,7 +740,7 @@ namespace Timbl {
 	  double sw;
 	  is >> sw;
 	  if ( !result ){
-	    result = new WValueDistribution();
+	    result = new WClassDistribution();
 	  }
 	  result->SetFreq( target, freq, sw );
 	  next = look_ahead(is);

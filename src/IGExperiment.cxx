@@ -374,7 +374,7 @@ namespace Timbl {
 	       "output is NOT normalized!" );
     }
     const TargetValue *TV = NULL;
-    const ValueDistribution *ResultDist;
+    const ClassDistribution *ResultDist;
     ResultDist = InstanceBase->IG_test( Inst, match_depth, last_leaf, TV );
     if ( match_depth == 0 ){
       // when level 0, ResultDist == TopDistribution
