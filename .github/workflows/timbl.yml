@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Notify start to irc-gitlama
     outputs:
-      output1: ${{ steps.extract_branch.outputs.name }}
+      output1: ${{ steps.extract_branch.outputs.branch }}
     steps:
       - name: Extract Branch name
         shell: bash
