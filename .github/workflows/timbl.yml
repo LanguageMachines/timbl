@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Extract Branch name
         shell: bash
-        run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHIB_OUTPUT
+        run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
         id: extract_branch
       - name: IRC notification
         uses: Gottox/irc-message-action@v1
