@@ -32,7 +32,6 @@
 #include <iomanip>
 
 #include <cassert>
-
 #include <sys/time.h>
 
 #include "config.h"
