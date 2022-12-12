@@ -31,7 +31,6 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
-#include "unicode/unistr.h"
 #include "timbl/MsgClass.h"
 #include "timbl/Matrices.h"
 #include "ticcutils/Unicode.h"
