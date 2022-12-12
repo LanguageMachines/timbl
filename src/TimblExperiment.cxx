@@ -1483,24 +1483,22 @@ namespace Timbl {
 		   + " vs. " + TiCC::toString<size_t>(NumOfFeatures()) + ")" );
 	}
       }
+      else if ( Initialized ){
+	result = true;
+      }
+      else if ( IBStatus() == Invalid ){
+	Warning( "no Instance Base is available yet" );
+      }
+      else if ( !setInputFormat( IF ) ){
+	Error( "Couldn't set input format to " + TiCC::toString( IF ) );
+      }
       else {
-	if ( Initialized ){
-	  result = true;
+	if ( Verbosity(NEAR_N) ){
+	  Do_Exact( false );
 	}
-	else if ( IBStatus() == Invalid ){
-	  Warning( "no Instance Base is available yet" );
-	}
-	else if ( !setInputFormat( IF ) ){
-	  Error( "Couldn't set input format to " + TiCC::toString( IF ) );
-	}
-	else {
-	  if ( Verbosity(NEAR_N) ){
-	    Do_Exact( false );
-	  }
-	  initExperiment();
-	  Initialized = true;
-	  result = true;
-	}
+	initExperiment();
+	Initialized = true;
+	result = true;
       }
     }
     return result;
