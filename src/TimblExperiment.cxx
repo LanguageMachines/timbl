@@ -204,8 +204,6 @@ namespace Timbl {
     Initialized( false ),
     OptParams( NULL ),
     algorithm( Alg ),
-    CurrentDataFile( "" ),
-    WFileName( "" ),
     ibCount( 0 ),
     confusionInfo( 0 ),
     match_depth(-1),
@@ -257,7 +255,7 @@ namespace Timbl {
       result->OptParams = OptParams->Clone( 0 );
     }
     result->WFileName = WFileName;
-    result->CurrentDataFile = "";
+    result->CurrentDataFile.clear();
     result->InstanceBase->CleanPartition( false );
     result->InstanceBase = 0;
     result->is_synced = true;
@@ -950,7 +948,7 @@ namespace Timbl {
 	  Progress( 10000 );
 	}
       }
-      if ( exp_name != "" ){
+      if ( !exp_name.empty() ){
 	os  << "-" << exp_name << "-";
       }
       os << "Learning:  ";
