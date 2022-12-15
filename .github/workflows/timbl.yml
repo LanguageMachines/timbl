@@ -6,6 +6,7 @@ on:
     paths:
       - 'src/**'
       - 'include/**'
+      - '.github/**'
 
   pull_request:
     branches: [master]
@@ -92,7 +93,7 @@ jobs:
         id: compiler
         run: |
           id=$(echo ${{matrix.compiler}} | cut -d\+ -f1)
-          echo "id=$id" >> $GITHUB_OUTPUT
+          echo "id=$id" >> $GITHUB_ENV
       - name: Static Code-check
         run: cppcheck --enable=all --quiet --error-exitcode=0 .
       - name: make
@@ -108,25 +109,17 @@ jobs:
         run: cat src/test-suite.log
       - name: Notify IRC of failure
         if: ${{ failure() }}
-        uses: Gottox/irc-message-action@v1
+        uses: Gottox/irc-message-action@v2
         with:
           server: irc.uvt.nl
           channel: '#gitlama'
-          nickname: GitHub-${{ runner.os }}-${{ steps.compiler.outputs.id }}
-          message: >
-            Timbl
-            [${{ needs.notification.outputs.branch }}]
-            build with ${{ matrix.compiler }} by ${{ github.actor }}
-            on ${{ matrix.os }}: FAILED
+          nickname: GH-${{ runner.os }}-${{ env.id }}
+          message: "timbl [${{ needs.notification.outputs.branch }}] build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: \u00034FAIL\u0003"
       - name: Notify IRC of succes
         if: ${{ success() }}
-        uses: Gottox/irc-message-action@v1
+        uses: Gottox/irc-message-action@v2
         with:
           server: irc.uvt.nl
           channel: '#gitlama'
-          nickname: GitHub-${{ runner.os }}-${{ steps.compiler.outputs.id }}
-          message: >
-            Timbl
-            [${{ needs.notification.outputs.branch }}]
-            build with ${{ matrix.compiler }} by ${{ github.actor }}
-            on ${{ matrix.os }}: SUCCESS
+          nickname: GH-${{ runner.os }}-${{ env.id }}
+          message: "timbl [${{ needs.notification.outputs.branch }}] build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: \u00033SUCCESS\u0003"
