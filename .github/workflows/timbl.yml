@@ -14,24 +14,37 @@ jobs:
   notification:
     runs-on: ubuntu-latest
     name: Notify start to irc-gitlama
+    outputs:
+      branch: ${{ steps.extract_branch.outputs.branch }}
     steps:
+      - name: Extract Branch name
+        shell: bash
+        run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
+        id: extract_branch
       - name: IRC notification
-        uses: Gottox/irc-message-action@v1
+        uses: Gottox/irc-message-action@v2
         with:
           server: irc.uvt.nl
           channel: '#gitlama'
           nickname: GitHub
           message: |-
-            ${{ github.actor }} started a build of ${{ github.event.repository.name }}
-
+            ${{ github.actor }} started a build of
+            ${{ github.event.repository.name }}
+            [${{ steps.extract_branch.outputs.branch }}]
   build:
     runs-on: ${{ matrix.os }}
+    needs: notification
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
         compiler: [g++, clang++]
 
     steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+
       - uses: actions/checkout@v2
       - name: Install Build Environment
         run: |
@@ -78,7 +91,7 @@ jobs:
         id: compiler
         run: |
           id=$(echo ${{matrix.compiler}} | cut -d\+ -f1)
-          echo "::set-output name=id::$id"
+          echo "id::$id" >> $GITHUB_ENV
       - name: Static Code-check
         run: cppcheck --enable=all --quiet --error-exitcode=0 .
       - name: make
@@ -94,19 +107,17 @@ jobs:
         run: cat src/test-suite.log
       - name: Notify IRC of failure
         if: ${{ failure() }}
-        uses: Gottox/irc-message-action@v1
+        uses: Gottox/irc-message-action@v2
         with:
           server: irc.uvt.nl
           channel: '#gitlama'
-          nickname: GitHub-${{ runner.os }}-${{ steps.compiler.outputs.id }}
-          message: |-
-            Timbl build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: FAILED
+          nickname: GitHub-${{ runner.os }}-${{ env.id }}
+          message: "timbl [${{ needs.notification.outputs.branch }}] build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: \u00034FAIL\u0003"
       - name: Notify IRC of succes
         if: ${{ success() }}
-        uses: Gottox/irc-message-action@v1
+        uses: Gottox/irc-message-action@v2
         with:
           server: irc.uvt.nl
           channel: '#gitlama'
-          nickname: GitHub-${{ runner.os }}-${{ steps.compiler.outputs.id }}
-          message: |-
-            Timbl build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: SUCCESS
+          nickname: GitHub-${{ runner.os }}-${{ env.id }}
+          message: "timbl [${{ needs.notification.outputs.branch }}] build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: \u00033SUCCESS\u0003"
