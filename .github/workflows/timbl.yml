@@ -28,7 +28,7 @@ jobs:
           server: irc.uvt.nl
           channel: '#gitlama'
           nickname: GitHub
-          message: |-
+          message: >
             ${{ github.actor }} started a build of
             ${{ github.event.repository.name }}
             [${{ steps.extract_branch.outputs.branch }}]
