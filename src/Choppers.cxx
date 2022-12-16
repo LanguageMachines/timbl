@@ -451,7 +451,7 @@ namespace Timbl{
   }
 
   UnicodeString Columns_Chopper::getString() const {
-    UnicodeString res = TiCC::u_join( choppedInput );
+    UnicodeString res = TiCC::join( choppedInput );
     return res;
   }
 
