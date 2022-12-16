@@ -6,6 +6,7 @@ on:
     paths:
       - 'src/**'
       - 'include/**'
+      - '.github/workflows/**'
 
   pull_request:
     branches: [master]
@@ -111,7 +112,7 @@ jobs:
         with:
           server: irc.uvt.nl
           channel: '#gitlama'
-          nickname: GitHub-${{ runner.os }}-${{ env.id }}
+          nickname: GH-${{ runner.os }}-${{ env.id }}
           message: "timbl [${{ needs.notification.outputs.branch }}] build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: \u00034FAIL\u0003"
       - name: Notify IRC of succes
         if: ${{ success() }}
@@ -119,5 +120,5 @@ jobs:
         with:
           server: irc.uvt.nl
           channel: '#gitlama'
-          nickname: GitHub-${{ runner.os }}-${{ env.id }}
+          nickname: GH-${{ runner.os }}-${{ env.id }}
           message: "timbl [${{ needs.notification.outputs.branch }}] build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: \u00033SUCCESS\u0003"
