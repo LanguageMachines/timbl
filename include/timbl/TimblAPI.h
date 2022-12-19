@@ -101,6 +101,8 @@ namespace Timbl{
     const Target *myTargets() const;
     bool Classify( const std::string&,
 		   std::string& );
+    bool Classify_u( const icu::UnicodeString&,
+		     icu::UnicodeString& );
     bool Classify( const std::string&,
 		   std::string&,
 		   double& );

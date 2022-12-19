@@ -190,9 +190,14 @@ namespace Timbl {
     bool Classify( const std::string& , std::string&, std::string&, double& );
     bool Classify( const std::string& , std::string&, double& );
     bool Classify( const std::string& , std::string& );
+    bool Classify( const icu::UnicodeString& , icu::UnicodeString& );
     bool Classify( const std::string&,
 		   icu::UnicodeString&,
 		   std::string&,
+		   double& );
+    bool Classify( const icu::UnicodeString&,
+		   icu::UnicodeString&,
+		   icu::UnicodeString&,
 		   double& );
     bool Classify( const std::string&,
 		   icu::UnicodeString&,

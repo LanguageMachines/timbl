@@ -515,6 +515,11 @@ namespace Timbl {
     return Valid() && pimpl->Classify( s, cls );
   }
 
+  bool TimblAPI::Classify_u( const icu::UnicodeString& s,
+			     icu::UnicodeString& cls ){
+    return Valid() && pimpl->Classify( s, cls );
+  }
+
   bool TimblAPI::Classify( const string& s, string& cls, double &f ) {
     return Valid() && pimpl->Classify( s, cls, f );
   }
