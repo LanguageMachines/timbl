@@ -88,6 +88,13 @@ namespace Timbl{
     const TargetValue *Classify( const std::string&,
 				 const ValueDistribution *&,
 				 double& );
+    const TargetValue *Classify_u( const icu::UnicodeString& );
+    const TargetValue *Classify_u( const icu::UnicodeString&,
+				   const ValueDistribution *& );
+    const TargetValue *Classify_u( const icu::UnicodeString&, double& );
+    const TargetValue *Classify_u( const icu::UnicodeString&,
+				   const ValueDistribution *&,
+				   double& );
     const neighborSet *classifyNS( const std::string& );
     bool classifyNS( const std::string&, neighborSet& );
     const Instance *lastHandledInstance() const;

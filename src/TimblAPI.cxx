@@ -409,9 +409,29 @@ namespace Timbl {
     return NULL;
   }
 
+  const TargetValue *TimblAPI::Classify_u( const icu::UnicodeString& s,
+					   const ValueDistribution *& db,
+					   double& di ){
+    if ( Valid() ){
+      return pimpl->Classify_u( s, db, di );
+    }
+    else {
+      db = NULL;
+      di = DBL_MAX;
+    }
+    return NULL;
+  }
+
   const TargetValue *TimblAPI::Classify( const string& s ){
     if ( Valid() ){
       return pimpl->Classify( s );
+    }
+    return NULL;
+  }
+
+  const TargetValue *TimblAPI::Classify_u( const icu::UnicodeString& s ){
+    if ( Valid() ){
+      return pimpl->Classify_u( s );
     }
     return NULL;
   }
@@ -427,10 +447,32 @@ namespace Timbl {
     return NULL;
   }
 
+  const TargetValue *TimblAPI::Classify_u( const icu::UnicodeString& s,
+					   const ValueDistribution *& db ){
+    if ( Valid() ){
+      return pimpl->Classify_u( s, db  );
+    }
+    else {
+      db = NULL;
+    }
+    return NULL;
+  }
+
   const TargetValue *TimblAPI::Classify( const string& s,
 					 double& di ){
     if ( Valid() ){
       return pimpl->Classify( s, di );
+    }
+    else {
+      di = DBL_MAX;
+    }
+    return NULL;
+  }
+
+  const TargetValue *TimblAPI::Classify_u( const icu::UnicodeString& s,
+					   double& di ){
+    if ( Valid() ){
+      return pimpl->Classify_u( s, di );
     }
     else {
       di = DBL_MAX;
