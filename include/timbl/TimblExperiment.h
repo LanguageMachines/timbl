@@ -212,7 +212,8 @@ namespace Timbl {
     const TargetValue *Classify( const std::string& Line,
 				 const ClassDistribution *& db,
 				 double& di ){
-      const TargetValue *res = classifyString( Line, di );
+      icu::UnicodeString u_inst = TiCC::UnicodeFromUTF8( Line );
+      const TargetValue *res = classifyString( u_inst, di );
       if ( res ){
 	normalizeResult();
 	db = bestResult.getResultDist();
@@ -222,7 +223,7 @@ namespace Timbl {
     const TargetValue *Classify_u( const icu::UnicodeString& Line,
 				   const ClassDistribution *& db,
 				   double& di ){
-      const TargetValue *res = classifyUnicodeString( Line, di );
+      const TargetValue *res = classifyString( Line, di );
       if ( res ){
 	normalizeResult();
 	db = bestResult.getResultDist();
@@ -232,27 +233,31 @@ namespace Timbl {
 
     const TargetValue *Classify( const std::string& Line ){
       double dum_d;
-      return classifyString( Line, dum_d  );
-    }
-    const TargetValue *Classify_u( const icu::UnicodeString& Line ){
-      double dum_d;
-      return classifyUnicodeString( Line, dum_d  );
+      icu::UnicodeString u_inst = TiCC::UnicodeFromUTF8( Line );
+      return classifyString( u_inst, dum_d  );
     }
 
-    const TargetValue *Classify( const std::string& Line,
+    const TargetValue *Classify_u( const icu::UnicodeString& Line ){
+      double dum_d;
+      return classifyString( Line, dum_d  );
+    }
+
+    const TargetValue *Classify( const std::string& inst,
 				 const ClassDistribution *& db ){
       double dum_d;
-      const TargetValue *res = classifyString( Line, dum_d );
+      icu::UnicodeString u_inst = TiCC::UnicodeFromUTF8( inst );
+      const TargetValue *res = classifyString( u_inst, dum_d );
       if ( res ){
 	normalizeResult();
 	db = bestResult.getResultDist();
       }
       return res;
     }
+
     const TargetValue *Classify_u( const icu::UnicodeString& Line,
 				   const ClassDistribution *& db ){
       double dum_d;
-      const TargetValue *res = classifyUnicodeString( Line, dum_d );
+      const TargetValue *res = classifyString( Line, dum_d );
       if ( res ){
 	normalizeResult();
 	db = bestResult.getResultDist();
@@ -262,11 +267,12 @@ namespace Timbl {
 
     const TargetValue *Classify( const std::string& Line,
 				 double& di ){
-      return classifyString( Line, di );
+      icu::UnicodeString u_inst = TiCC::UnicodeFromUTF8( Line );
+      return classifyString( u_inst, di );
     }
     const TargetValue *Classify_u( const icu::UnicodeString& Line,
 				   double& di ){
-      return classifyUnicodeString( Line, di );
+      return classifyString( Line, di );
     }
 
     const neighborSet *NB_Classify( const std::string& );
@@ -335,9 +341,8 @@ namespace Timbl {
     TimblExperiment( const TimblExperiment& );
     int estimate;
     int numOfThreads;
-    const TargetValue *classifyString( const std::string& , double& );
-    const TargetValue *classifyUnicodeString( const icu::UnicodeString&,
-					      double& );
+    const TargetValue *classifyString( const icu::UnicodeString&,
+				       double& );
   };
 
   class IB1_Experiment: public TimblExperiment {

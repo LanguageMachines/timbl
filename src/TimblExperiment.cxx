@@ -1524,7 +1524,8 @@ namespace Timbl {
   json TimblExperiment::classify_to_JSON( const string& inst ) {
     json result;
     double distance = 0.0;
-    const TargetValue *targ = classifyString( inst, distance );
+    UnicodeString u_inst = TiCC::UnicodeFromUTF8( inst );
+    const TargetValue *targ = classifyString( u_inst, distance );
     if ( targ ){
       string cat = targ->Name();
       normalizeResult();
@@ -1576,13 +1577,14 @@ namespace Timbl {
     return result;
   }
 
-  bool TimblExperiment::Classify( const string& Line,
+  bool TimblExperiment::Classify( const string& line,
 				  string& Result,
 				  string& Dist,
 				  double& Distance ){
     Result.clear();
     Dist.clear();
-    const TargetValue *targ = classifyString( Line, Distance );
+    UnicodeString u_inst = TiCC::UnicodeFromUTF8( line );
+    const TargetValue *targ = classifyString( u_inst, Distance );
     if ( targ ){
       Result = targ->Name();
       normalizeResult();
@@ -1592,13 +1594,14 @@ namespace Timbl {
     return false;
   }
 
-  bool TimblExperiment::Classify( const string& Line,
+  bool TimblExperiment::Classify( const string& line,
 				  UnicodeString& Result,
 				  string& Dist,
 				  double& Distance ){
     Result.remove();
     Dist.clear();
-    const TargetValue *targ = classifyString( Line, Distance );
+    UnicodeString u_inst = TiCC::UnicodeFromUTF8( line );
+    const TargetValue *targ = classifyString( u_inst, Distance );
     if ( targ ){
       Result = targ->name_u();
       normalizeResult();
@@ -1727,8 +1730,8 @@ namespace Timbl {
     return Res;
   }
 
-  const TargetValue *TimblExperiment::classifyUnicodeString( const UnicodeString& Line,
-							     double& Distance ){
+  const TargetValue *TimblExperiment::classifyString( const UnicodeString& Line,
+						      double& Distance ){
     Distance = -1.0;
     const TargetValue *BestT = NULL;
     if ( checkLine( Line ) &&
@@ -1738,12 +1741,6 @@ namespace Timbl {
       BestT = LocalClassify( CurrInst, Distance, exact );
     }
     return BestT;
-  }
-
-  const TargetValue *TimblExperiment::classifyString( const string& line,
-						      double& distance ){
-    UnicodeString us = TiCC::UnicodeFromUTF8( line );
-    return classifyUnicodeString( us, distance );
   }
 
   const neighborSet *TimblExperiment::NB_Classify( const string& _line ){
