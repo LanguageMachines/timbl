@@ -400,7 +400,7 @@ namespace Timbl {
 					 const ValueDistribution *& db,
 					 double& di ){
     if ( Valid() ){
-      return pimpl->Classify( s, db, di );
+      return pimpl->Classify( TiCC::UnicodeFromUTF8(s), db, di );
     }
     else {
       db = NULL;
@@ -413,7 +413,7 @@ namespace Timbl {
 					 const ValueDistribution *& db,
 					 double& di ){
     if ( Valid() ){
-      return pimpl->Classify_u( s, db, di );
+      return pimpl->Classify( s, db, di );
     }
     else {
       db = NULL;
@@ -424,19 +424,30 @@ namespace Timbl {
 
   const TargetValue *TimblAPI::Classify( const string& s ){
     if ( Valid() ){
-      return pimpl->Classify( s );
+      return pimpl->Classify( TiCC::UnicodeFromUTF8(s) );
     }
     return NULL;
   }
 
   const TargetValue *TimblAPI::Classify( const icu::UnicodeString& s ){
     if ( Valid() ){
-      return pimpl->Classify_u( s );
+      return pimpl->Classify( s );
     }
     return NULL;
   }
 
   const TargetValue *TimblAPI::Classify( const string& s,
+					 const ValueDistribution *& db ){
+    if ( Valid() ){
+      return pimpl->Classify( TiCC::UnicodeFromUTF8(s), db  );
+    }
+    else {
+      db = NULL;
+    }
+    return NULL;
+  }
+
+  const TargetValue *TimblAPI::Classify( const icu::UnicodeString& s,
 					 const ValueDistribution *& db ){
     if ( Valid() ){
       return pimpl->Classify( s, db  );
@@ -447,21 +458,10 @@ namespace Timbl {
     return NULL;
   }
 
-  const TargetValue *TimblAPI::Classify( const icu::UnicodeString& s,
-					 const ValueDistribution *& db ){
-    if ( Valid() ){
-      return pimpl->Classify_u( s, db  );
-    }
-    else {
-      db = NULL;
-    }
-    return NULL;
-  }
-
   const TargetValue *TimblAPI::Classify( const string& s,
 					 double& di ){
     if ( Valid() ){
-      return pimpl->Classify( s, di );
+      return pimpl->Classify( TiCC::UnicodeFromUTF8(s), di );
     }
     else {
       di = DBL_MAX;
@@ -472,7 +472,7 @@ namespace Timbl {
   const TargetValue *TimblAPI::Classify( const icu::UnicodeString& s,
 					 double& di ){
     if ( Valid() ){
-      return pimpl->Classify_u( s, di );
+      return pimpl->Classify( s, di );
     }
     else {
       di = DBL_MAX;
@@ -512,7 +512,9 @@ namespace Timbl {
   }
 
   bool TimblAPI::Classify( const string& s, string& cls ){
-    return Valid() && pimpl->Classify( s, cls );
+    string dummy;
+    double f;
+    return Valid() && pimpl->Classify( s, cls, dummy, f );
   }
 
   bool TimblAPI::Classify( const icu::UnicodeString& s,
@@ -521,24 +523,11 @@ namespace Timbl {
   }
 
   bool TimblAPI::Classify( const string& s, string& cls, double &f ) {
-    return Valid() && pimpl->Classify( s, cls, f );
+    string dummy;
+    return Valid() && pimpl->Classify( s, cls, dummy, f );
   }
 
   bool TimblAPI::Classify( const string& s, string& cls,
-			   string& dist, double &f ){
-    return Valid() && pimpl->Classify( s, cls, dist, f );
-  }
-
-  bool TimblAPI::Classify( const string& s, UnicodeString& cls ){
-    return Valid() && pimpl->Classify( s, cls );
-  }
-
-  bool TimblAPI::Classify( const string& s, UnicodeString& cls, double &f ) {
-    return Valid() && pimpl->Classify( s, cls, f );
-  }
-
-  bool TimblAPI::Classify( const string& s,
-			   UnicodeString& cls,
 			   string& dist, double &f ){
     return Valid() && pimpl->Classify( s, cls, dist, f );
   }
@@ -780,7 +769,6 @@ namespace Timbl {
   }
 
   string TimblAPI::VersionInfo( bool full ){
-    // obsolete
     return Common::VersionInfo( full );
   }
 

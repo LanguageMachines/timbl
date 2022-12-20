@@ -84,47 +84,41 @@ namespace Timbl{
     const TargetValue *Classify( const std::string& );
     const TargetValue *Classify( const std::string&,
 				 const ValueDistribution *& );
-    const TargetValue *Classify( const std::string&, double& );
+    const TargetValue *Classify( const std::string&,
+				 double& );
     const TargetValue *Classify( const std::string&,
 				 const ValueDistribution *&,
 				 double& );
     const TargetValue *Classify( const icu::UnicodeString& );
     const TargetValue *Classify( const icu::UnicodeString&,
-				   const ValueDistribution *& );
-    const TargetValue *Classify( const icu::UnicodeString&, double& );
+				 const ValueDistribution *& );
     const TargetValue *Classify( const icu::UnicodeString&,
-				   const ValueDistribution *&,
-				   double& );
+				 double& );
+    const TargetValue *Classify( const icu::UnicodeString&,
+				 const ValueDistribution *&,
+				 double& );
     const neighborSet *classifyNS( const std::string& );
-    bool classifyNS( const std::string&, neighborSet& );
+    bool classifyNS( const std::string&,
+		     neighborSet& );
     const Instance *lastHandledInstance() const;
     const Target *myTargets() const;
     bool Classify( const std::string&,
 		   std::string& );
+    bool Classify( const std::string&,
+		   std::string&,
+		   double& );
+    bool Classify( const std::string&,
+		   std::string&,
+		   std::string&,
+		   double& );
     bool Classify( const icu::UnicodeString&,
-		     icu::UnicodeString& );
-    bool Classify( const std::string&,
-		   std::string&,
-		   double& );
-    bool Classify( const std::string&,
-		   std::string&,
-		   std::string&,
-		   double& );
-    bool Classify( const std::string&,
 		   icu::UnicodeString& );
-    bool Classify( const std::string&,
-		   icu::UnicodeString&,
-		   double& );
-    bool Classify( const std::string&,
-		   icu::UnicodeString&,
-		   std::string&,
-		   double& );
     bool ShowBestNeighbors( std::ostream& ) const;
     size_t matchDepth() const;
     double confidence() const;
     bool matchedAtLeaf() const;
     std::string ExpName() const;
-    static std::string VersionInfo( bool = false ); //obsolete
+    static std::string VersionInfo( bool = false );
     bool SaveWeights( const std::string& = "" );
     bool GetWeights( const std::string& = "", Weighting = UNKNOWN_W  );
     double GetAccuracy();
