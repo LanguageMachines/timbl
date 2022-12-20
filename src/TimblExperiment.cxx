@@ -1537,10 +1537,11 @@ namespace Timbl {
     return true;
   }
 
-  json TimblExperiment::classify_to_JSON( const UnicodeString& inst ) {
+  json TimblExperiment::classify_to_JSON( const string& inst ) {
     json result;
     double distance = 0.0;
-    const TargetValue *targ = classifyString( inst, distance );
+    const TargetValue *targ = classifyString( TiCC::UnicodeFromUTF8(inst),
+					      distance );
     if ( targ ){
       string cat = targ->Name();
       normalizeResult();
@@ -1577,7 +1578,7 @@ namespace Timbl {
     return result;
   }
 
-  json TimblExperiment::classify_to_JSON( const vector<UnicodeString>& instances ) {
+  json TimblExperiment::classify_to_JSON( const vector<string>& instances ) {
     json result = json::array();
     for ( const auto& i : instances ){
       json tmp = classify_to_JSON( i );
