@@ -709,7 +709,7 @@ namespace Timbl {
       if ( freq > 0 ){
 	double tmp = -1;
 	if ( !TiCC::stringTo( fv->name(), tmp ) ){
-	  Warning( "a Non Numeric value '" + fv->s_name() +
+	  Warning( "a Non Numeric value '" + fv->name_string() +
 		   "' in Numeric Feature!" );
 	  return NotNumeric;
 	}

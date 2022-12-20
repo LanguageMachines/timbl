@@ -1527,7 +1527,7 @@ namespace Timbl {
     const TargetValue *targ = classifyString( TiCC::UnicodeFromUTF8(inst),
 					      distance );
     if ( targ ){
-      string cat = targ->s_name();
+      string cat = targ->name_string();
       normalizeResult();
       result["category"] = cat;
       if ( Verbosity(NEAR_N) ){
@@ -1586,7 +1586,7 @@ namespace Timbl {
      const TargetValue *targ = classifyString( TiCC::UnicodeFromUTF8(Line),
 					       Distance );
      if ( targ ){
-       Result = targ->s_name();
+       Result = targ->name_string();
        normalizeResult();
        Dist = bestResult.getResult();
        return true;

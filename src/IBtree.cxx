@@ -283,13 +283,13 @@ namespace Timbl {
 
   xmlNode *to_node( const FeatureValue *fv ){
     xmlNode *result = TiCC::XmlNewNode( "feature" );
-    TiCC::XmlAddContent( result, fv->s_name() );
+    TiCC::XmlAddContent( result, fv->name_string() );
     return result;
   }
 
   xmlNode *to_node( const TargetValue *tv ){
     xmlNode *result = TiCC::XmlNewNode( "target" );
-    TiCC::XmlAddContent( result, tv->s_name() );
+    TiCC::XmlAddContent( result, tv->name_string() );
     return result;
   }
 

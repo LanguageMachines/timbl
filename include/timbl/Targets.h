@@ -55,7 +55,11 @@ namespace Timbl {
     void decr_val_freq(){ --_frequency; };
     size_t Index() const { return _index; };
     const icu::UnicodeString& name() const { return _name; };
-    const std::string s_name() const { return TiCC::UnicodeToUTF8(_name); };
+    const std::string name_string() const { return TiCC::UnicodeToUTF8(_name);};
+    // temporary for backward compatability
+    const icu::UnicodeString& name_u() const { return _name; }; // HACK
+    const std::string Name() const { return TiCC::UnicodeToUTF8(_name); }; // HACK
+    // REMOVE ^^^^
     friend std::ostream& operator<<( std::ostream& os, ValueClass const *vc );
   protected:
     const icu::UnicodeString& _name;
