@@ -480,7 +480,7 @@ namespace Timbl {
     return NULL;
   }
 
-  const neighborSet *TimblAPI::classifyNS( const string& s ){
+  const neighborSet *TimblAPI::classifyNS( const icu::UnicodeString& s ){
     const neighborSet *ns = 0;
     if ( Valid() ){
       ns = pimpl->NB_Classify( s );
@@ -488,7 +488,8 @@ namespace Timbl {
     return ns;
   }
 
-  bool TimblAPI::classifyNS( const string& s, neighborSet& ns ){
+  bool TimblAPI::classifyNS( const icu::UnicodeString& s,
+			     neighborSet& ns ){
     const neighborSet *b = classifyNS( s );
     if ( b != 0 ){
       ns = *b;

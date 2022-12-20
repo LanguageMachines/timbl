@@ -97,9 +97,13 @@ namespace Timbl{
     const TargetValue *Classify( const icu::UnicodeString&,
 				 const ValueDistribution *&,
 				 double& );
-    const neighborSet *classifyNS( const std::string& );
-    bool classifyNS( const std::string&,
+    const neighborSet *classifyNS( const icu::UnicodeString& );
+    bool classifyNS( const icu::UnicodeString&,
 		     neighborSet& );
+    bool classifyNS( const std::string& in,
+		     neighborSet& st ){
+      return classifyNS( TiCC::UnicodeFromUTF8(in), st );
+    }
     const Instance *lastHandledInstance() const;
     const Target *myTargets() const;
     bool Classify( const std::string&,

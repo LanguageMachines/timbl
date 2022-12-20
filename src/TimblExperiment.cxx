@@ -1737,11 +1737,10 @@ namespace Timbl {
     return BestT;
   }
 
-  const neighborSet *TimblExperiment::NB_Classify( const string& _line ){
+  const neighborSet *TimblExperiment::NB_Classify( const UnicodeString& line ){
     initExperiment();
-    UnicodeString Line = TiCC::UnicodeFromUTF8(_line);
-    if ( checkLine( Line ) &&
-	 chopLine( Line ) ){
+    if ( checkLine( line ) &&
+	 chopLine( line ) ){
       chopped_to_instance( TestWords );
       return LocalClassify( CurrInst );
     }

@@ -233,7 +233,7 @@ namespace Timbl {
       return classifyString( Line, di );
     }
 
-    const neighborSet *NB_Classify( const std::string& );
+    const neighborSet *NB_Classify( const icu::UnicodeString& );
 
     virtual void initExperiment( bool = false );
 
