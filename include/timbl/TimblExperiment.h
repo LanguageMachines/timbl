@@ -197,14 +197,14 @@ namespace Timbl {
     double confidence() const { return bestResult.confidence(); };
     bool matchedAtLeaf() const { return last_leaf; };
 
-    nlohmann::json classify_to_JSON( const std::string& );
-    nlohmann::json classify_to_JSON( const std::vector<std::string>& );
+    nlohmann::json classify_to_JSON( const icu::UnicodeString& );
+    nlohmann::json classify_to_JSON( const std::vector<icu::UnicodeString>& );
 
     virtual AlgorithmType Algorithm() const = 0;
     const TargetValue *Classify( const icu::UnicodeString& Line,
 				 const ValueDistribution *& db,
 				 double& di ){
-      const TargetValue *res = classifyUnicodeString( Line, di );
+      const TargetValue *res = classifyString( Line, di );
       if ( res ){
 	normalizeResult();
 	db = bestResult.getResultDist();
@@ -214,13 +214,13 @@ namespace Timbl {
 
     const TargetValue *Classify( const icu::UnicodeString& Line ){
       double dum_d;
-      return classifyUnicodeString( Line, dum_d  );
+      return classifyString( Line, dum_d  );
     }
 
     const TargetValue *Classify( const icu::UnicodeString& Line,
 				 const ValueDistribution *& db ){
       double dum_d;
-      const TargetValue *res = classifyUnicodeString( Line, dum_d );
+      const TargetValue *res = classifyString( Line, dum_d );
       if ( res ){
 	normalizeResult();
 	db = bestResult.getResultDist();
@@ -230,7 +230,7 @@ namespace Timbl {
 
     const TargetValue *Classify( const icu::UnicodeString& Line,
 				 double& di ){
-      return classifyUnicodeString( Line, di );
+      return classifyString( Line, di );
     }
 
     const neighborSet *NB_Classify( const std::string& );
@@ -299,9 +299,8 @@ namespace Timbl {
     TimblExperiment( const TimblExperiment& );
     int estimate;
     int numOfThreads;
-    const TargetValue *classifyString( const std::string& , double& );
-    const TargetValue *classifyUnicodeString( const icu::UnicodeString&,
-					      double& );
+    const TargetValue *classifyString( const icu::UnicodeString&,
+				       double& );
   };
 
   class IB1_Experiment: public TimblExperiment {
