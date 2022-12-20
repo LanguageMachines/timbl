@@ -162,7 +162,7 @@ namespace Timbl{
   bool string_to( const std::string&, Algorithm& );
   bool string_to( const std::string&, Weighting& );
 
-  typedef ClassDistribution ClassDistribution; // for backward compatability
-  typedef WClassDistribution WClassDistribution; // for backward compatability
+  typedef ClassDistribution ValueDistribution; // for backward compatability
+  typedef WClassDistribution WValueDistribution; // for backward compatability
 }
 #endif // TIMBL_API_H
