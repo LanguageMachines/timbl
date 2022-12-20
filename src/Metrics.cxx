@@ -132,7 +132,7 @@ namespace Timbl{
       }
       icu::StringCharacterIterator it2(string2);
       while ( it2.hasNext() ){
-	string1_unigrams.insert(it2.current32());
+	string2_unigrams.insert(it2.current32());
 	it2.next32();
       }
 
