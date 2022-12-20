@@ -88,11 +88,11 @@ namespace Timbl{
     const TargetValue *Classify( const std::string&,
 				 const ValueDistribution *&,
 				 double& );
-    const TargetValue *Classify_u( const icu::UnicodeString& );
-    const TargetValue *Classify_u( const icu::UnicodeString&,
+    const TargetValue *Classify( const icu::UnicodeString& );
+    const TargetValue *Classify( const icu::UnicodeString&,
 				   const ValueDistribution *& );
-    const TargetValue *Classify_u( const icu::UnicodeString&, double& );
-    const TargetValue *Classify_u( const icu::UnicodeString&,
+    const TargetValue *Classify( const icu::UnicodeString&, double& );
+    const TargetValue *Classify( const icu::UnicodeString&,
 				   const ValueDistribution *&,
 				   double& );
     const neighborSet *classifyNS( const std::string& );
@@ -101,7 +101,7 @@ namespace Timbl{
     const Target *myTargets() const;
     bool Classify( const std::string&,
 		   std::string& );
-    bool Classify_u( const icu::UnicodeString&,
+    bool Classify( const icu::UnicodeString&,
 		     icu::UnicodeString& );
     bool Classify( const std::string&,
 		   std::string&,

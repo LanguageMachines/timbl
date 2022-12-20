@@ -36,7 +36,7 @@ int main(){
   My_Experiment.Learn( "dimin.train" );
   const ValueDistribution *vd;
   const TargetValue *tv
-    = My_Experiment.Classify( "-,=,O,m,+,h,K,=,-,n,I,N,K", vd );
+    = My_Experiment.Classify( std::string("-,=,O,m,+,h,K,=,-,n,I,N,K"), vd );
   cout << "resulting target: " << tv << endl;
   cout << "resulting Distribution: " << vd << endl;
   ValueDistribution::dist_iterator it=vd->begin();

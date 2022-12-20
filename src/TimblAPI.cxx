@@ -409,9 +409,9 @@ namespace Timbl {
     return NULL;
   }
 
-  const TargetValue *TimblAPI::Classify_u( const icu::UnicodeString& s,
-					   const ValueDistribution *& db,
-					   double& di ){
+  const TargetValue *TimblAPI::Classify( const icu::UnicodeString& s,
+					 const ValueDistribution *& db,
+					 double& di ){
     if ( Valid() ){
       return pimpl->Classify_u( s, db, di );
     }
@@ -429,7 +429,7 @@ namespace Timbl {
     return NULL;
   }
 
-  const TargetValue *TimblAPI::Classify_u( const icu::UnicodeString& s ){
+  const TargetValue *TimblAPI::Classify( const icu::UnicodeString& s ){
     if ( Valid() ){
       return pimpl->Classify_u( s );
     }
@@ -447,8 +447,8 @@ namespace Timbl {
     return NULL;
   }
 
-  const TargetValue *TimblAPI::Classify_u( const icu::UnicodeString& s,
-					   const ValueDistribution *& db ){
+  const TargetValue *TimblAPI::Classify( const icu::UnicodeString& s,
+					 const ValueDistribution *& db ){
     if ( Valid() ){
       return pimpl->Classify_u( s, db  );
     }
@@ -469,8 +469,8 @@ namespace Timbl {
     return NULL;
   }
 
-  const TargetValue *TimblAPI::Classify_u( const icu::UnicodeString& s,
-					   double& di ){
+  const TargetValue *TimblAPI::Classify( const icu::UnicodeString& s,
+					 double& di ){
     if ( Valid() ){
       return pimpl->Classify_u( s, di );
     }
@@ -515,8 +515,8 @@ namespace Timbl {
     return Valid() && pimpl->Classify( s, cls );
   }
 
-  bool TimblAPI::Classify_u( const icu::UnicodeString& s,
-			     icu::UnicodeString& cls ){
+  bool TimblAPI::Classify( const icu::UnicodeString& s,
+			   icu::UnicodeString& cls ){
     return Valid() && pimpl->Classify( s, cls );
   }
 
