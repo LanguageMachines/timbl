@@ -128,10 +128,12 @@ namespace Timbl{
       icu::StringCharacterIterator it1(string1);
       while ( it1.hasNext() ){
 	string1_unigrams.insert(it1.current32());
+	it1.next32();
       }
       icu::StringCharacterIterator it2(string2);
       while ( it2.hasNext() ){
 	string1_unigrams.insert(it2.current32());
+	it2.next32();
       }
 
       for ( const auto& ug : string2_unigrams ){
