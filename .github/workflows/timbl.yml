@@ -6,7 +6,7 @@ on:
     paths:
       - 'src/**'
       - 'include/**'
-      - '.github/**'
+      - '.github/workflows/**'
 
   pull_request:
     branches: [master]

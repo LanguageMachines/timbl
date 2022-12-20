@@ -1524,8 +1524,8 @@ namespace Timbl {
   json TimblExperiment::classify_to_JSON( const string& inst ) {
     json result;
     double distance = 0.0;
-    UnicodeString u_inst = TiCC::UnicodeFromUTF8( inst );
-    const TargetValue *targ = classifyString( u_inst, distance );
+    const TargetValue *targ = classifyString( TiCC::UnicodeFromUTF8(inst),
+					      distance );
     if ( targ ){
       string cat = targ->Name();
       normalizeResult();
@@ -1562,7 +1562,7 @@ namespace Timbl {
     return result;
   }
 
-  json TimblExperiment::classify_to_JSON( const std::vector<std::string>& instances ) {
+  json TimblExperiment::classify_to_JSON( const vector<string>& instances ) {
     json result = json::array();
     for ( const auto& i : instances ){
       json tmp = classify_to_JSON( i );
@@ -1577,64 +1577,42 @@ namespace Timbl {
     return result;
   }
 
-  bool TimblExperiment::Classify( const string& line,
-				  string& Result,
-				  string& Dist,
-				  double& Distance ){
-    Result.clear();
-    Dist.clear();
-    UnicodeString u_inst = TiCC::UnicodeFromUTF8( line );
-    const TargetValue *targ = classifyString( u_inst, Distance );
-    if ( targ ){
-      Result = targ->Name();
-      normalizeResult();
-      Dist = bestResult.getResult();
-      return true;
-    }
-    return false;
-  }
+  bool TimblExperiment::Classify( const string& Line,
+   				  string& Result,
+   				  string& Dist,
+   				  double& Distance ){
+     Result.clear();
+     Dist.clear();
+     const TargetValue *targ = classifyString( TiCC::UnicodeFromUTF8(Line),
+					       Distance );
+     if ( targ ){
+       Result = TiCC::UnicodeToUTF8(targ->name_u());
+       normalizeResult();
+       Dist = bestResult.getResult();
+       return true;
+     }
+     return false;
+   }
 
-  bool TimblExperiment::Classify( const string& line,
+  bool TimblExperiment::Classify( const UnicodeString& Line,
 				  UnicodeString& Result,
-				  string& Dist,
+				  UnicodeString& Dist,
 				  double& Distance ){
     Result.remove();
-    Dist.clear();
-    UnicodeString u_inst = TiCC::UnicodeFromUTF8( line );
-    const TargetValue *targ = classifyString( u_inst, Distance );
+    Dist.remove();
+    const TargetValue *targ = classifyString( Line, Distance );
     if ( targ ){
       Result = targ->name_u();
       normalizeResult();
-      Dist = bestResult.getResult();
+      Dist = TiCC::UnicodeFromUTF8(bestResult.getResult());
       return true;
     }
     return false;
   }
 
-  bool TimblExperiment::Classify( const string& Line,
-				  string& Result,
-				  double& Distance ){
-    string dist;
-    return Classify( Line, Result, dist, Distance );
-  }
-
-  bool TimblExperiment::Classify( const string& Line,
-				  UnicodeString& Result,
-				  double& Distance ){
-    string dist;
-    return Classify( Line, Result, dist, Distance );
-  }
-
-  bool TimblExperiment::Classify( const string& Line,
-				  string& Result ) {
-    string dist;
-    double dummy;
-    return Classify( Line, Result, dist, dummy );
-  }
-
-  bool TimblExperiment::Classify( const string& Line,
+  bool TimblExperiment::Classify( const UnicodeString& Line,
 				  UnicodeString& Result ) {
-    string dist;
+    UnicodeString dist;
     double dummy;
     return Classify( Line, Result, dist, dummy );
   }
@@ -1743,11 +1721,10 @@ namespace Timbl {
     return BestT;
   }
 
-  const neighborSet *TimblExperiment::NB_Classify( const string& _line ){
+  const neighborSet *TimblExperiment::NB_Classify( const UnicodeString& line ){
     initExperiment();
-    UnicodeString Line = TiCC::UnicodeFromUTF8(_line);
-    if ( checkLine( Line ) &&
-	 chopLine( Line ) ){
+    if ( checkLine( line ) &&
+	 chopLine( line ) ){
       chopped_to_instance( TestWords );
       return LocalClassify( CurrInst );
     }

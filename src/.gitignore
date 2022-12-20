@@ -1,0 +1,10 @@
+*~
+*.o
+*.lo
+*.la
+.deps
+.libs
+timbl
+simpletest*
+*.out
+*.log

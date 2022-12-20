@@ -83,12 +83,26 @@ namespace Timbl{
     const TargetValue *Classify( const std::string& );
     const TargetValue *Classify( const std::string&,
 				 const ClassDistribution *& );
-    const TargetValue *Classify( const std::string&, double& );
+    const TargetValue *Classify( const std::string&,
+				 double& );
     const TargetValue *Classify( const std::string&,
 				 const ClassDistribution *&,
 				 double& );
-    const neighborSet *classifyNS( const std::string& );
-    bool classifyNS( const std::string&, neighborSet& );
+    const TargetValue *Classify( const icu::UnicodeString& );
+    const TargetValue *Classify( const icu::UnicodeString&,
+				 const ClassDistribution *& );
+    const TargetValue *Classify( const icu::UnicodeString&,
+				 double& );
+    const TargetValue *Classify( const icu::UnicodeString&,
+				 const ClassDistribution *&,
+				 double& );
+    const neighborSet *classifyNS( const icu::UnicodeString& );
+    bool classifyNS( const icu::UnicodeString&,
+		     neighborSet& );
+    bool classifyNS( const std::string& in,
+		     neighborSet& st ){
+      return classifyNS( TiCC::UnicodeFromUTF8(in), st );
+    }
     const Instance *lastHandledInstance() const;
     const Targets& myTargets() const;
     bool Classify( const std::string&,
@@ -100,21 +114,14 @@ namespace Timbl{
 		   std::string&,
 		   std::string&,
 		   double& );
-    bool Classify( const std::string&,
+    bool Classify( const icu::UnicodeString&,
 		   icu::UnicodeString& );
-    bool Classify( const std::string&,
-		   icu::UnicodeString&,
-		   double& );
-    bool Classify( const std::string&,
-		   icu::UnicodeString&,
-		   std::string&,
-		   double& );
     bool ShowBestNeighbors( std::ostream& ) const;
     size_t matchDepth() const;
     double confidence() const;
     bool matchedAtLeaf() const;
     std::string ExpName() const;
-    static std::string VersionInfo( bool = false ); //obsolete
+    static std::string VersionInfo( bool = false );
     bool SaveWeights( const std::string& = "" );
     bool GetWeights( const std::string& = "", Weighting = UNKNOWN_W  );
     double GetAccuracy();
@@ -155,7 +162,7 @@ namespace Timbl{
   bool string_to( const std::string&, Algorithm& );
   bool string_to( const std::string&, Weighting& );
 
-  typedef ClassDistribution ValueDistribution; // for backward compatability
-  typedef WClassDistribution WValueDistribution; // for backward compatability
+  typedef ClassDistribution ClassDistribution; // for backward compatability
+  typedef WClassDistribution WClassDistribution; // for backward compatability
 }
 #endif // TIMBL_API_H

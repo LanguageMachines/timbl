@@ -24,7 +24,7 @@
   or send mail to:
       lamasoftware (at ) science.ru.nl
 */
-
+#include <map>
 #include <string>
 #include "timbl/Common.h"
 #include "timbl/MsgClass.h"
@@ -35,14 +35,14 @@
 #include "timbl/BestArray.h"
 #include "timbl/Statistics.h"
 #include "timbl/MBLClass.h"
-#include "timbl/GetOptClass.h"
 #include "ticcutils/CommandLine.h"
-#include "timbl/TimblAPI.h"
-#include "timbl/TimblExperiment.h"
-
+#include "timbl/GetOptClass.h"
 
 using namespace std;
 using namespace icu;
+
+#include "timbl/TimblAPI.h"
+#include "timbl/TimblExperiment.h"
 
 namespace Timbl {
 
@@ -400,6 +400,19 @@ namespace Timbl {
 					 const ClassDistribution *& db,
 					 double& di ){
     if ( Valid() ){
+      return pimpl->Classify( TiCC::UnicodeFromUTF8(s), db, di );
+    }
+    else {
+      db = NULL;
+      di = DBL_MAX;
+    }
+    return NULL;
+  }
+
+  const TargetValue *TimblAPI::Classify( const icu::UnicodeString& s,
+					 const ClassDistribution *& db,
+					 double& di ){
+    if ( Valid() ){
       return pimpl->Classify( s, db, di );
     }
     else {
@@ -411,12 +424,30 @@ namespace Timbl {
 
   const TargetValue *TimblAPI::Classify( const string& s ){
     if ( Valid() ){
+      return pimpl->Classify( TiCC::UnicodeFromUTF8(s) );
+    }
+    return NULL;
+  }
+
+  const TargetValue *TimblAPI::Classify( const icu::UnicodeString& s ){
+    if ( Valid() ){
       return pimpl->Classify( s );
     }
     return NULL;
   }
 
   const TargetValue *TimblAPI::Classify( const string& s,
+					 const ClassDistribution *& db ){
+    if ( Valid() ){
+      return pimpl->Classify( TiCC::UnicodeFromUTF8(s), db  );
+    }
+    else {
+      db = NULL;
+    }
+    return NULL;
+  }
+
+  const TargetValue *TimblAPI::Classify( const icu::UnicodeString& s,
 					 const ClassDistribution *& db ){
     if ( Valid() ){
       return pimpl->Classify( s, db  );
@@ -430,6 +461,17 @@ namespace Timbl {
   const TargetValue *TimblAPI::Classify( const string& s,
 					 double& di ){
     if ( Valid() ){
+      return pimpl->Classify( TiCC::UnicodeFromUTF8(s), di );
+    }
+    else {
+      di = DBL_MAX;
+    }
+    return NULL;
+  }
+
+  const TargetValue *TimblAPI::Classify( const icu::UnicodeString& s,
+					 double& di ){
+    if ( Valid() ){
       return pimpl->Classify( s, di );
     }
     else {
@@ -438,7 +480,7 @@ namespace Timbl {
     return NULL;
   }
 
-  const neighborSet *TimblAPI::classifyNS( const string& s ){
+  const neighborSet *TimblAPI::classifyNS( const icu::UnicodeString& s ){
     const neighborSet *ns = 0;
     if ( Valid() ){
       ns = pimpl->NB_Classify( s );
@@ -446,7 +488,8 @@ namespace Timbl {
     return ns;
   }
 
-  bool TimblAPI::classifyNS( const string& s, neighborSet& ns ){
+  bool TimblAPI::classifyNS( const icu::UnicodeString& s,
+			     neighborSet& ns ){
     const neighborSet *b = classifyNS( s );
     if ( b != 0 ){
       ns = *b;
@@ -470,28 +513,22 @@ namespace Timbl {
   }
 
   bool TimblAPI::Classify( const string& s, string& cls ){
+    string dummy;
+    double f;
+    return Valid() && pimpl->Classify( s, cls, dummy, f );
+  }
+
+  bool TimblAPI::Classify( const icu::UnicodeString& s,
+			   icu::UnicodeString& cls ){
     return Valid() && pimpl->Classify( s, cls );
   }
 
   bool TimblAPI::Classify( const string& s, string& cls, double &f ) {
-    return Valid() && pimpl->Classify( s, cls, f );
+    string dummy;
+    return Valid() && pimpl->Classify( s, cls, dummy, f );
   }
 
   bool TimblAPI::Classify( const string& s, string& cls,
-			   string& dist, double &f ){
-    return Valid() && pimpl->Classify( s, cls, dist, f );
-  }
-
-  bool TimblAPI::Classify( const string& s, UnicodeString& cls ){
-    return Valid() && pimpl->Classify( s, cls );
-  }
-
-  bool TimblAPI::Classify( const string& s, UnicodeString& cls, double &f ) {
-    return Valid() && pimpl->Classify( s, cls, f );
-  }
-
-  bool TimblAPI::Classify( const string& s,
-			   UnicodeString& cls,
 			   string& dist, double &f ){
     return Valid() && pimpl->Classify( s, cls, dist, f );
   }
@@ -733,7 +770,6 @@ namespace Timbl {
   }
 
   string TimblAPI::VersionInfo( bool full ){
-    // obsolete
     return Common::VersionInfo( full );
   }
 

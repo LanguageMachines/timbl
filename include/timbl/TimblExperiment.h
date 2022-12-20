@@ -190,17 +190,11 @@ namespace Timbl {
     const std::string& ExpName() const { return exp_name; };
     void setExpName( const std::string& s ) { exp_name = s; };
     bool Classify( const std::string& , std::string&, std::string&, double& );
-    bool Classify( const std::string& , std::string&, double& );
-    bool Classify( const std::string& , std::string& );
-    bool Classify( const std::string&,
+    bool Classify( const icu::UnicodeString& , icu::UnicodeString& );
+    bool Classify( const icu::UnicodeString&,
 		   icu::UnicodeString&,
-		   std::string&,
-		   double& );
-    bool Classify( const std::string&,
 		   icu::UnicodeString&,
 		   double& );
-    bool Classify( const std::string&,
-		   icu::UnicodeString& );
     size_t matchDepth() const { return match_depth; };
     double confidence() const { return bestResult.confidence(); };
     bool matchedAtLeaf() const { return last_leaf; };
@@ -209,20 +203,9 @@ namespace Timbl {
     nlohmann::json classify_to_JSON( const std::vector<std::string>& );
 
     virtual AlgorithmType Algorithm() const = 0;
-    const TargetValue *Classify( const std::string& Line,
+    const TargetValue *Classify( const icu::UnicodeString& Line,
 				 const ClassDistribution *& db,
 				 double& di ){
-      icu::UnicodeString u_inst = TiCC::UnicodeFromUTF8( Line );
-      const TargetValue *res = classifyString( u_inst, di );
-      if ( res ){
-	normalizeResult();
-	db = bestResult.getResultDist();
-      }
-      return res;
-    }
-    const TargetValue *Classify_u( const icu::UnicodeString& Line,
-				   const ClassDistribution *& db,
-				   double& di ){
       const TargetValue *res = classifyString( Line, di );
       if ( res ){
 	normalizeResult();
@@ -230,23 +213,15 @@ namespace Timbl {
       }
       return res;
     }
-
-    const TargetValue *Classify( const std::string& Line ){
-      double dum_d;
-      icu::UnicodeString u_inst = TiCC::UnicodeFromUTF8( Line );
-      return classifyString( u_inst, dum_d  );
-    }
-
-    const TargetValue *Classify_u( const icu::UnicodeString& Line ){
+    const TargetValue *Classify( const icu::UnicodeString& Line ){
       double dum_d;
       return classifyString( Line, dum_d  );
     }
 
-    const TargetValue *Classify( const std::string& inst,
+    const TargetValue *Classify( const icu::UnicodeString& Line,
 				 const ClassDistribution *& db ){
       double dum_d;
-      icu::UnicodeString u_inst = TiCC::UnicodeFromUTF8( inst );
-      const TargetValue *res = classifyString( u_inst, dum_d );
+      const TargetValue *res = classifyString( Line, dum_d  );
       if ( res ){
 	normalizeResult();
 	db = bestResult.getResultDist();
@@ -254,28 +229,12 @@ namespace Timbl {
       return res;
     }
 
-    const TargetValue *Classify_u( const icu::UnicodeString& Line,
-				   const ClassDistribution *& db ){
-      double dum_d;
-      const TargetValue *res = classifyString( Line, dum_d );
-      if ( res ){
-	normalizeResult();
-	db = bestResult.getResultDist();
-      }
-      return res;
-    }
-
-    const TargetValue *Classify( const std::string& Line,
+    const TargetValue *Classify( const icu::UnicodeString& Line,
 				 double& di ){
-      icu::UnicodeString u_inst = TiCC::UnicodeFromUTF8( Line );
-      return classifyString( u_inst, di );
-    }
-    const TargetValue *Classify_u( const icu::UnicodeString& Line,
-				   double& di ){
       return classifyString( Line, di );
     }
 
-    const neighborSet *NB_Classify( const std::string& );
+    const neighborSet *NB_Classify( const icu::UnicodeString& );
 
     virtual void initExperiment( bool = false );
 

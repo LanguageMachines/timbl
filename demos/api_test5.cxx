@@ -37,7 +37,7 @@ int main(){
                                           "test5" );
   My_Experiment->Learn( "dimin.train" );
   {
-    string line =  "=,=,=,=,+,k,e,=,-,r,@,l,T";
+    icu::UnicodeString line =  "=,=,=,=,+,k,e,=,-,r,@,l,T";
     const neighborSet *neighbours1 = My_Experiment->classifyNS( line );
     if ( neighbours1 ){
       cout << "Classify OK on " << line << endl;
