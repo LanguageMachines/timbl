@@ -275,14 +275,14 @@ namespace Timbl {
     size_t TotalVals = TotalValues();
     entropy = 0.0;
     vector<D_D*> ddv;
-    ddv.reserve( values_array.size() );
+    size_t dd_len = values_array.size();
+    ddv.reserve( dd_len );
     for ( const auto& FV : values_array ){
       if ( FV->ValFreq() > 0 ){
 	ddv.push_back( new D_D( FV ) );
       }
     }
     sort( ddv.begin(), ddv.end(), dd_less );
-    size_t dd_len = ddv.size();
     int num_per_bin = (int)floor( (double)dd_len / BinSize);
     size_t rest = dd_len - num_per_bin * BinSize;
     if ( rest ){
@@ -290,8 +290,8 @@ namespace Timbl {
     }
     int jj = 0;
     int cnt = 0;
-    for ( size_t m = 0; m < dd_len; ++m ){
-      FVBin[jj]->TargetDist.Merge( *ddv[m]->dist );
+    for ( const auto& it: ddv ){
+      FVBin[jj]->TargetDist.Merge( *it->dist );
       if ( ++cnt >= num_per_bin ){
 	++jj;
 	if ( --rest == 0 ){
@@ -300,8 +300,8 @@ namespace Timbl {
 	cnt = 0;
       }
     }
-    for ( size_t j=0; j < dd_len; ++j ){
-      delete ddv[j];
+    for ( auto const& it: ddv ){
+      delete it;
     }
     for ( size_t k=0; k < BinSize; k++ ){
       FeatureValue *pnt = FVBin[k];
@@ -377,8 +377,8 @@ namespace Timbl {
       }
       SharedVarianceStatistics( Targs, cnt );
     }
-    for ( int i=0; i < BinSize; ++i ){
-      delete FVBin[i];
+    for ( const auto& it : FVBin ){
+      delete it;
     }
   }
 
