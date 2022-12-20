@@ -1046,24 +1046,16 @@ namespace Timbl {
     tiedTop(false),
     InstBase( 0 ),
     LastInstBasePos( 0 ),
-    RestartSearch( new const IBtree *[depth] ),
-    SkipSearch( new const IBtree *[depth] ),
-    InstPath( new const IBtree *[depth] ),
     ibCount( cnt ),
     Depth( depth ),
     NumOfTails( 0 )
-    {}
+    {
+      InstPath.resize(depth,0);
+      RestartSearch.resize(depth,0);
+      SkipSearch.resize(depth,0);
+    }
 
   InstanceBase_base::~InstanceBase_base(){
-    if ( InstPath ){
-      delete [] InstPath;
-    }
-    if ( SkipSearch ){
-      delete [] SkipSearch;
-    }
-    if ( RestartSearch ){
-      delete [] RestartSearch;
-    }
     // the Instance can become very large, with even millions of 'next' pointers
     // so recursive deletion will use a lot of stack
     // therefore we choose to iterate the first level(s).

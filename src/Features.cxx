@@ -79,12 +79,8 @@ namespace Timbl {
     shared_variance(0.0),
     standard_deviation(0.0),
     matrix_clip_freq(10),
-    n_dot_j( 0 ),
-    n_i_dot( 0 ),
     n_min (0.0),
     n_max (0.0),
-    SaveSize(0),
-    SaveNum(0),
     weight(0.0),
     is_reference(false)
   {}
@@ -115,8 +111,6 @@ namespace Timbl {
       n_i_dot = in.n_i_dot;
       n_min = in.n_min;
       n_max = in.n_max;
-      SaveSize = in.SaveSize;
-      SaveNum = in.SaveNum;
       weight = in.weight;
       values_array = in.values_array;
       reverse_values = in.reverse_values;
@@ -438,29 +432,14 @@ namespace Timbl {
     chi_square = 0.0;
     long int n_dot_dot = 0;
     size_t Size = Targs.num_of_values();
-    if ( !n_dot_j ) {
-      n_dot_j = new long int[Size];
-      n_i_dot = new long int[Num_Vals];
-      SaveSize = Size;
-      SaveNum = Num_Vals;
-    }
-    else {
-      if ( SaveSize < Size ){
-	delete [] n_dot_j;
-	n_dot_j = new long int[Size];
-	SaveSize = Size;
-      }
-      if ( SaveNum < Num_Vals ){
-	delete [] n_i_dot;
-	n_i_dot = new long int[Num_Vals];
-	SaveNum = Num_Vals;
-      }
-    }
+    n_dot_j.resize(Size,0);
+    n_i_dot.resize(Num_Vals,0);
     for ( size_t j = 0; j < Size; ++j ){
+      // ALL values should be zeroed
       n_dot_j[j] = 0;
     }
     for ( size_t i = 0; i < Num_Vals; ++i ){
-      n_i_dot[i] = 0;
+      n_i_dot[i] = 0;      // ALL values should be zeroed
       FeatureValue *fv = FVA[i];
       for ( const auto& tit : fv->TargetDist ){
 	n_dot_j[tit.second->Index()-1] += tit.second->Freq();
@@ -507,30 +486,15 @@ namespace Timbl {
     long int n_dot_dot = 0;
     size_t Size = Targs.num_of_values();
     size_t Num_Vals = values_array.size();
-    if ( !n_dot_j ) {
-      n_dot_j = new long int[Size];
-      n_i_dot = new long int[Num_Vals];
-      SaveSize = Size;
-      SaveNum = Num_Vals;
-    }
-    else {
-      if ( SaveSize < Size ){
-	delete [] n_dot_j;
-	n_dot_j = new long int[Size];
-	SaveSize = Size;
-      }
-      if ( SaveNum < Num_Vals ){
-	delete [] n_i_dot;
-	n_i_dot = new long int[Num_Vals];
-	SaveNum = Num_Vals;
-      }
-    }
+    n_dot_j.resize(Size,0);
+    n_i_dot.resize(Num_Vals,0);
     for ( size_t j = 0; j < Size; ++j ){
+      // ALL values should be zeroed
       n_dot_j[j] = 0;
     }
     int i = 0;
     for ( const auto& fv : values_array ){
-      n_i_dot[i] = 0;
+      n_i_dot[i] = 0;       // ALL values should be zeroed
       for ( const auto& t_it : fv->TargetDist ){
 	long int fr = t_it.second->Freq();
 	n_dot_j[t_it.second->Index()-1] += fr;
@@ -706,10 +670,6 @@ namespace Timbl {
   }
   Feature::~Feature(){
     if ( !is_reference ){
-      if ( n_dot_j ) {
-	delete [] n_dot_j;
-	delete [] n_i_dot;
-      }
       delete_matrix();
       delete metric;
       for ( const auto& it : values_array ){

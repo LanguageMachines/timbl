@@ -187,9 +187,9 @@ namespace Timbl {
     bool tiedTop;
     IBtree *InstBase;
     IBtree *LastInstBasePos;
-    const IBtree **RestartSearch;
-    const IBtree **SkipSearch;
-    const IBtree **InstPath;
+    std::vector<const IBtree *> RestartSearch;
+    std::vector<const IBtree *> SkipSearch;
+    std::vector<const IBtree *> InstPath;
     unsigned long int& ibCount;
 
     size_t Depth;

@@ -164,8 +164,8 @@ namespace Timbl {
     double shared_variance;
     double standard_deviation;
     size_t matrix_clip_freq;
-    long int *n_dot_j;
-    long int* n_i_dot;
+    std::vector<long int> n_dot_j;
+    std::vector<long int> n_i_dot;
     double n_min;
     double n_max;
     size_t SaveSize;

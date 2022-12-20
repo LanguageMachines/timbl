@@ -1758,7 +1758,7 @@ namespace Timbl {
     os << endl;
     os << "Deviant Feature Metrics:";
     int cnt = 0;
-    size_t *InvPerm = new size_t[NumOfFeatures()];
+    vector<size_t> InvPerm( NumOfFeatures() );
     for ( size_t i = 0; i < NumOfFeatures(); ++i ){
       InvPerm[features.permutation[i]] = i;
     }
@@ -1786,7 +1786,6 @@ namespace Timbl {
 	}
       }
     }
-    delete [] InvPerm;
     if ( cnt ){
       os << endl;
     }
