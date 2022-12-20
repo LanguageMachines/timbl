@@ -44,23 +44,23 @@ namespace Timbl {
   class ValueClass {
   public:
     ValueClass( const icu::UnicodeString& n, size_t i ):
-      name( n ), index( i ), Frequency( 1 ) {};
+      _name( n ), _index( i ), _frequency( 1 ) {};
     ValueClass( const ValueClass& ) = delete; // forbid copies
     ValueClass& operator=( const ValueClass& ) = delete; // forbid copies
     virtual ~ValueClass() {};
-    void ValFreq( size_t f ){ Frequency = f; };
-    void IncValFreq( int f ){ Frequency += f; };
-    size_t ValFreq( ) const { return Frequency; };
-    void incr_val_freq(){ Frequency++; };
-    void decr_val_freq(){ Frequency--; };
-    size_t Index() const { return index; };
-    const icu::UnicodeString& name_u() const { return name; };
-    const std::string Name() const { return TiCC::UnicodeToUTF8(name); };
+    void ValFreq( size_t f ){ _frequency = f; };
+    void IncValFreq( int f ){ _frequency += f; };
+    size_t ValFreq( ) const { return _frequency; };
+    void incr_val_freq(){ ++_frequency; };
+    void decr_val_freq(){ --_frequency; };
+    size_t Index() const { return _index; };
+    const icu::UnicodeString& name() const { return _name; };
+    const std::string s_name() const { return TiCC::UnicodeToUTF8(_name); };
     friend std::ostream& operator<<( std::ostream& os, ValueClass const *vc );
   protected:
-    const icu::UnicodeString& name;
-    size_t index;
-    size_t Frequency;
+    const icu::UnicodeString& _name;
+    size_t _index;
+    size_t _frequency;
   };
 
   class TargetValue: public ValueClass {

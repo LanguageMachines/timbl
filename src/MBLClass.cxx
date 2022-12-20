@@ -1786,18 +1786,18 @@ namespace Timbl {
 	  result += "-*-,";
 	}
 	else {
-	  result += inst.FV[InvPerm[j]]->name_u() + ",";
+	  result += inst.FV[InvPerm[j]]->name() + ",";
 	}
 	break;
       case Sparse:
-	if ( inst.FV[InvPerm[j]]->name_u() != DefaultSparseString ){
+	if ( inst.FV[InvPerm[j]]->name() != DefaultSparseString ){
 	  result += "(" + TiCC::toUnicodeString<size_t>(j+1) + ","
-	    + CodeToStr( inst.FV[InvPerm[j]]->name_u() )
+	    + CodeToStr( inst.FV[InvPerm[j]]->name() )
 	    + ")";
 	}
 	break;
       case SparseBin:
-	if ( inst.FV[InvPerm[j]]->name_u()[0] == '1' ){
+	if ( inst.FV[InvPerm[j]]->name()[0] == '1' ){
 	  result += TiCC::toUnicodeString<size_t>( j+1 ) + ",";
 	}
 	break;
@@ -1806,7 +1806,7 @@ namespace Timbl {
 	  result += "-*- ";
 	}
 	else {
-	  result += inst.FV[InvPerm[j]]->name_u() + " ";
+	  result += inst.FV[InvPerm[j]]->name() + " ";
 	}
 	break;
       case Tabbed:
@@ -1814,7 +1814,7 @@ namespace Timbl {
 	  result += "-*- ";
 	}
 	else {
-	  result += inst.FV[InvPerm[j]]->name_u() + "\t";
+	  result += inst.FV[InvPerm[j]]->name() + "\t";
 	}
 	break;
       default:
@@ -1822,7 +1822,7 @@ namespace Timbl {
 	  result += UnicodeString( F_length, '*', F_length );
 	}
 	else {
-	  result += inst.FV[InvPerm[j]]->name_u();
+	  result += inst.FV[InvPerm[j]]->name();
 	}
 	break;
       }

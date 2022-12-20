@@ -55,7 +55,7 @@ namespace Timbl {
   FeatureValue::FeatureValue( const UnicodeString& s ):
     ValueClass( s, 0 ),
     ValueClassProb(0){
-    Frequency = 0;
+    _frequency = 0;
   }
 
   FeatureValue::~FeatureValue( ){
@@ -255,7 +255,7 @@ namespace Timbl {
   struct D_D {
     D_D(): dist(0), value(0.0) {};
     explicit D_D( FeatureValue *fv ): value(0.0) {
-      if ( !TiCC::stringTo( fv->Name(), value ) ){
+      if ( !TiCC::stringTo( fv->name(), value ) ){
 	throw( logic_error("called DD with an non-numeric value" ) );
       }
       dist = &fv->TargetDist;
@@ -708,8 +708,8 @@ namespace Timbl {
       size_t freq = fv->ValFreq();
       if ( freq > 0 ){
 	double tmp = -1;
-	if ( !TiCC::stringTo( fv->Name(), tmp ) ){
-	  Warning( "a Non Numeric value '" + fv->Name() +
+	if ( !TiCC::stringTo( fv->name(), tmp ) ){
+	  Warning( "a Non Numeric value '" + fv->s_name() +
 		   "' in Numeric Feature!" );
 	  return NotNumeric;
 	}
@@ -755,7 +755,7 @@ namespace Timbl {
     vector<double> store( values_array.size() );
     for ( unsigned int i=0; i < values_array.size(); ++i ){
       FeatureValue *FV = values_array[i];
-      double val = TiCC::stringTo<double>( FV->Name() );
+      double val = TiCC::stringTo<double>( FV->name() );
       store[i] = val;
       sum += val;
     }

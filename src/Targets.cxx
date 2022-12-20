@@ -764,7 +764,7 @@ namespace Timbl {
 
   ostream& operator<<( std::ostream& os, ValueClass const *vc ){
     if ( vc ){
-      os << vc->Name();
+      os << vc->name();
     }
     else {
       os << "*FV-NF*";

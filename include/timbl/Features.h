@@ -79,9 +79,9 @@ namespace Timbl {
     ~FeatureValue();
     void ReconstructDistribution( const ClassDistribution& vd ) {
       TargetDist.Merge( vd );
-      Frequency = TargetDist.totalSize();
+      _frequency = TargetDist.totalSize();
     };
-    bool isUnknown() const { return index == 0; };
+    bool isUnknown() const { return _index == 0; };
     SparseValueProbClass *valueClassProb() const { return ValueClassProb; };
   private:
     SparseValueProbClass *ValueClassProb;

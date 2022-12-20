@@ -336,7 +336,7 @@ namespace Timbl{
 
   inline bool FV_to_real( FeatureValue *FV, double &result ){
     if ( FV ){
-      if ( TiCC::stringTo<double>( FV->name_u(), result ) ){
+      if ( TiCC::stringTo<double>( FV->name(), result ) ){
 	return true;
       }
     }
@@ -389,7 +389,7 @@ namespace Timbl{
 				      size_t, double) const {
     double result = 0.0;
     if ( G != F ){
-      result = lv_distance( F->Name(), G->Name() );
+      result = lv_distance( F->s_name(), G->s_name() );
     }
     return result;
   }
@@ -398,7 +398,7 @@ namespace Timbl{
 			       size_t, double ) const {
     double result = 0.0;
     if ( G != F ){
-      result = dc_distance( F->Name(), G->Name() );
+      result = dc_distance( F->s_name(), G->s_name() );
     }
     return result;
   }

@@ -1085,7 +1085,7 @@ namespace Timbl {
 				      const string& dString,
 				      const TargetValue *Best,
 				      const double Distance ) {
-    outfile << get_org_input() << CodeToStr(Best->name_u());
+    outfile << get_org_input() << CodeToStr(Best->name());
     if ( Verbosity(CONFIDENCE) ){
       outfile << " [" << confidence << "]";
     }
@@ -1527,7 +1527,7 @@ namespace Timbl {
     const TargetValue *targ = classifyString( TiCC::UnicodeFromUTF8(inst),
 					      distance );
     if ( targ ){
-      string cat = targ->Name();
+      string cat = targ->s_name();
       normalizeResult();
       result["category"] = cat;
       if ( Verbosity(NEAR_N) ){
@@ -1586,7 +1586,7 @@ namespace Timbl {
      const TargetValue *targ = classifyString( TiCC::UnicodeFromUTF8(Line),
 					       Distance );
      if ( targ ){
-       Result = TiCC::UnicodeToUTF8(targ->name_u());
+       Result = targ->s_name();
        normalizeResult();
        Dist = bestResult.getResult();
        return true;
@@ -1602,7 +1602,7 @@ namespace Timbl {
     Dist.remove();
     const TargetValue *targ = classifyString( Line, Distance );
     if ( targ ){
-      Result = targ->name_u();
+      Result = targ->name();
       normalizeResult();
       Dist = TiCC::UnicodeFromUTF8(bestResult.getResult());
       return true;
