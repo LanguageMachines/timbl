@@ -148,8 +148,8 @@ namespace Timbl {
 	  //
 	  best->bestDistance = Distance;
 	  if ( _storeInstances ){
-	    for ( unsigned int j = 0; j < best->bestInstances.size(); ++j ){
-	      delete best->bestDistributions[j];
+	    for ( const auto& it : best->bestDistributions ){
+	      delete it;
 	    }
 	    best->bestInstances.clear();
 	    best->bestDistributions.clear();
@@ -172,8 +172,8 @@ namespace Timbl {
 	  //
 	  keep->bestDistance = Distance;
 	  if ( _storeInstances ){
-	    for ( unsigned int j = 0; j < keep->bestInstances.size(); ++j ){
-	      delete keep->bestDistributions[j];
+	    for ( const auto& it :keep->bestDistributions ){
+	      delete it;
 	    }
 	    keep->bestInstances.clear();
 	    keep->bestDistributions.clear();
