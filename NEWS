@@ -1,3 +1,16 @@
+6.8 2023-01-02
+[Ko van der Sloot]
+* major code refactoring
+  - BREAKS API and ABI
+  - library bumped
+  - getting rid of a lot of pointers and C-style arrays
+  - removed C-style casts
+  - Unicode is the default now for most functions. Some 'string' functions
+    are still available in the API.
+  - In general modernizing to C++11
+  - weeded out CppCheck warnings
+* improved GitHub action
+
 6.7 2022-07-22
 [Maarten van Gompel]
 * updated metadata (codemeta.json) following new (proposed) CLARIAH requirements (CLARIAH/clariah-plus#38)
