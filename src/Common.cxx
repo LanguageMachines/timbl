@@ -24,9 +24,9 @@
   or send mail to:
       lamasoftware (at ) science.ru.nl
 */
-#include <sstream>
-#include <cstdlib>
+
 #include "timbl/Common.h"
+
 #include "config.h"
 
 using namespace std;

@@ -29,20 +29,9 @@
 #include <vector>
 #include <map>
 #include <fstream>
-#include <sstream>
 #include <iomanip>
-#include <typeinfo>
 
-#include <cmath>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <cfloat>
-#include <cctype>
 #include <cassert>
-#include <cstdarg>
-
 #include <sys/time.h>
 
 #include "config.h"
@@ -59,12 +48,12 @@
 #include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
 #include "timbl/MBLClass.h"
-#include "ticcutils/CommandLine.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
 #include "ticcutils/XMLtools.h"
 #include "ticcutils/Timer.h"
 #include "ticcutils/PrettyPrint.h"
+#include "ticcutils/CommandLine.h"
 
 #ifdef HAVE_OPENMP
 #include <omp.h>
@@ -75,6 +64,7 @@ using namespace icu;
 using namespace nlohmann;
 
 namespace Timbl {
+  using TiCC::operator<<;
 
   const string timbl_short_opts = "a:b:B:c:C:d:De:f:F:G::hHi:I:k:l:L:m:M:n:N:o:O:p:P:q:QR:s::t:T:u:U:v:Vw:W:xX:Z%";
   const string timbl_long_opts = ",Beam:,clones:,Diversify,occurrences:,sloppy::,silly::,Threshold:,Treeorder:,matrixin:,matrixout:,version,help,limit:";
@@ -86,12 +76,12 @@ namespace Timbl {
   }
 
   bool resultStore::reset( int _beam, normType _norm,
-			   double _factor, const Target *_targets ) {
+			   double _factor, const Targets& _targets ) {
     clear();
     beam = _beam;
     norm = _norm;
     factor = _factor;
-    targets = _targets;
+    targets = &_targets;
     bool result = true;
     if ( norm != noNorm &&
 	 beam != 0 ){
@@ -114,7 +104,7 @@ namespace Timbl {
     resultCache.clear();
   }
 
-  const WValueDistribution *resultStore::getResultDist() {
+  const WClassDistribution *resultStore::getResultDist() {
     if ( rawDist && !dist ){
       prepare();
     }
@@ -144,14 +134,14 @@ namespace Timbl {
     return resultCache;
   }
 
-  void resultStore::addConstant( const ValueDistribution *vd,
+  void resultStore::addConstant( const ClassDistribution *vd,
 				 const TargetValue *best_result ) {
     rawDist = vd;
     best_target = best_result;
     disposable = false;
   }
 
-  void resultStore::addTop( const ValueDistribution *vd,
+  void resultStore::addTop( const ClassDistribution *vd,
 			    const TargetValue *best_result ) {
     rawDist = vd;
     best_target = best_result;
@@ -159,7 +149,7 @@ namespace Timbl {
     isTop = true;
   }
 
-  void resultStore::addDisposable( ValueDistribution *vd,
+  void resultStore::addDisposable( ClassDistribution *vd,
 				   const TargetValue *best_result ) {
     rawDist = vd;
     best_target = best_result;
@@ -175,7 +165,7 @@ namespace Timbl {
 	dist = rawDist->to_WVD_Copy();
       }
       else {
-	dist = dynamic_cast<WValueDistribution *>( const_cast<ValueDistribution *>(rawDist) );
+	dist = dynamic_cast<WClassDistribution *>( const_cast<ClassDistribution *>(rawDist) );
 	rawDist = 0;
       }
     }
@@ -190,7 +180,7 @@ namespace Timbl {
 	dist->Normalize();
 	break;
       case addFactorNorm:
-	dist->Normalize_1( factor, targets );
+	dist->Normalize_1( factor, *targets );
 	break;
       case logProbNorm:
 	dist->Normalize_2();
@@ -214,8 +204,6 @@ namespace Timbl {
     Initialized( false ),
     OptParams( NULL ),
     algorithm( Alg ),
-    CurrentDataFile( "" ),
-    WFileName( "" ),
     ibCount( 0 ),
     confusionInfo( 0 ),
     match_depth(-1),
@@ -267,7 +255,7 @@ namespace Timbl {
       result->OptParams = OptParams->Clone( 0 );
     }
     result->WFileName = WFileName;
-    result->CurrentDataFile = "";
+    result->CurrentDataFile.clear();
     result->InstanceBase->CleanPartition( false );
     result->InstanceBase = 0;
     result->is_synced = true;
@@ -282,7 +270,7 @@ namespace Timbl {
 	delete confusionInfo;
 	confusionInfo = 0;
 	if ( Verbosity(ADVANCED_STATS) ){
-	  confusionInfo = new ConfusionMatrix( Targets->num_of_values() );
+	  confusionInfo = new ConfusionMatrix( targets.num_of_values() );
 	}
 	initDecay();
 	calculate_fv_entropy( true );
@@ -295,8 +283,8 @@ namespace Timbl {
 	    //
 	    // invalidate MVDM matrices, they might be changing in size
 	    for ( size_t j=0; j < NumOfFeatures(); ++j ){
-	      if ( !Features[j]->Ignore() ){
-		Features[j]->clear_matrix();
+	      if ( !features[j]->Ignore() ){
+		features[j]->clear_matrix();
 	      }
 	    }
 	  }
@@ -376,7 +364,8 @@ namespace Timbl {
 				 bool expand ){
     assert( runningPhase == LearnWords );
     bool result = false;
-    if ( FileName != "" && ConfirmOptions() ){
+    if ( !FileName.empty()
+	 && ConfirmOptions() ){
       if ( !ExpInvalid() ){
 	if ( !expand &&
 	     ( Options.TableFrozen() ||
@@ -473,7 +462,7 @@ namespace Timbl {
 		if ( !Verbosity(SILENT) ){
 		  Info( "Preparation took " + prepT.toString() );
 		}
-		if ( warnOnSingleTarget && Targets->EffectiveValues() <=1 ){
+		if ( warnOnSingleTarget && targets.EffectiveValues() <=1 ){
 		  Warning( "Training file contains only 1 class." );
 		}
 		result = true;
@@ -494,7 +483,6 @@ namespace Timbl {
   }
 
   ostream& operator<< ( ostream& os, const fileIndex& fi ){
-    using TiCC::operator<<;
     for ( const auto& it : fi ){
       os << "<";
       os << it.first << "," << it.second;
@@ -545,8 +533,8 @@ namespace Timbl {
     if ( is_synced ){
       CurrentDataFile = FileName; // assume magic!
     }
-    if ( CurrentDataFile == "" ) {
-      if ( FileName == "" ){
+    if ( CurrentDataFile.empty() ) {
+      if ( FileName.empty() ){
 	Warning( "unable to build an InstanceBase: No datafile defined yet" );
 	result = false;
       }
@@ -554,7 +542,7 @@ namespace Timbl {
 	result = false;
       }
     }
-    else if ( FileName != "" &&
+    else if ( !FileName.empty() &&
 	      CurrentDataFile != FileName ){
       Error( "Unable to Learn from file '" + FileName + "'\n"
 	     "while previously instantiated from file '" +
@@ -644,7 +632,7 @@ namespace Timbl {
 				  const bool init ):
     TimblExperiment( IB1_a, s ){
     if ( init ) {
-      InitClass( N );
+      init_options_table(N);
     }
     TreeOrder = GRoverFeature;
   }
@@ -661,21 +649,19 @@ namespace Timbl {
       Warning( "unable to Increment, No InstanceBase available" );
       result = false;
     }
+    else if ( !Chop( InstanceString ) ){
+      Error( "Couldn't convert to Instance: "
+	     + TiCC::UnicodeToUTF8(InstanceString) );
+      result = false;    // No more input
+    }
     else {
-      if ( !Chop( InstanceString ) ){
-	Error( "Couldn't convert to Instance: "
-	       + TiCC::UnicodeToUTF8(InstanceString) );
-	result = false;    // No more input
-      }
-      else {
-	chopped_to_instance( TrainLearnWords );
-	MBL_init = false;
-	bool happy = InstanceBase->AddInstance( CurrInst );
-	if ( !happy ){
-	  Warning( "deviating exemplar weight in:\n" +
-		   TiCC::UnicodeToUTF8(InstanceString)
-		   + "\nIgnoring the new weight" );
-	}
+      chopped_to_instance( TrainLearnWords );
+      MBL_init = false;
+      bool happy = InstanceBase->AddInstance( CurrInst );
+      if ( !happy ){
+	Warning( "deviating exemplar weight in:\n" +
+		 TiCC::UnicodeToUTF8(InstanceString)
+		 + "\nIgnoring the new weight" );
       }
     }
     return result;
@@ -719,7 +705,7 @@ namespace Timbl {
       Warning( "unable to expand the InstanceBase: Not there" );
       result = false;
     }
-    else if ( FileName == "" ){
+    else if ( FileName.empty() ){
       Warning( "unable to expand the InstanceBase: No inputfile specified" );
       result = false;
     }
@@ -800,7 +786,7 @@ namespace Timbl {
       Warning( "unable to remove from InstanceBase: Not there" );
       result = false;
     }
-    else if ( FileName == "" ){
+    else if ( FileName.empty() ){
       Warning( "unable to remove from InstanceBase: No input specified" );
       result = false;
     }
@@ -908,7 +894,7 @@ namespace Timbl {
 	  Progress( 10000 );
 	}
       }
-      if ( exp_name != "" ){
+      if ( !exp_name.empty() ){
 	os  << "-" << exp_name << "-";
       }
       os << "Tested: ";
@@ -962,7 +948,7 @@ namespace Timbl {
 	  Progress( 10000 );
 	}
       }
-      if ( exp_name != "" ){
+      if ( !exp_name.empty() ){
 	os  << "-" << exp_name << "-";
       }
       os << "Learning:  ";
@@ -1010,7 +996,7 @@ namespace Timbl {
   bool TimblExperiment::showStatistics( ostream& os ) const {
     os << endl;
     if ( confusionInfo ){
-      confusionInfo->FScore( os, Targets, Verbosity(CLASS_STATS) );
+      confusionInfo->FScore( os, targets, Verbosity(CLASS_STATS) );
     }
     os << "overall accuracy:        "
        << stats.testedCorrect()/(double) stats.dataLines()
@@ -1042,13 +1028,13 @@ namespace Timbl {
     }
     if ( confusionInfo && Verbosity(CONF_MATRIX) ){
       os << endl;
-      confusionInfo->Print( os, Targets );
+      confusionInfo->Print( os, targets );
     }
     return true;
   }
 
   bool TimblExperiment::createPercFile( const string& fileName ) const {
-    if ( fileName != "" ) {
+    if ( !fileName.empty() ) {
       ofstream outfile( fileName, ios::out | ios::trunc);
       if (!outfile) {
 	Warning( "can't open: " + fileName );
@@ -1099,7 +1085,7 @@ namespace Timbl {
 				      const string& dString,
 				      const TargetValue *Best,
 				      const double Distance ) {
-    outfile << get_org_input() << CodeToStr(Best->name_u());
+    outfile << get_org_input() << CodeToStr(Best->name());
     if ( Verbosity(CONFIDENCE) ){
       outfile << " [" << confidence << "]";
     }
@@ -1496,24 +1482,22 @@ namespace Timbl {
 		   + " vs. " + TiCC::toString<size_t>(NumOfFeatures()) + ")" );
 	}
       }
+      else if ( Initialized ){
+	result = true;
+      }
+      else if ( IBStatus() == Invalid ){
+	Warning( "no Instance Base is available yet" );
+      }
+      else if ( !setInputFormat( IF ) ){
+	Error( "Couldn't set input format to " + TiCC::toString( IF ) );
+      }
       else {
-	if ( Initialized ){
-	  result = true;
+	if ( Verbosity(NEAR_N) ){
+	  Do_Exact( false );
 	}
-	else if ( IBStatus() == Invalid ){
-	  Warning( "no Instance Base is available yet" );
-	}
-	else if ( !setInputFormat( IF ) ){
-	  Error( "Couldn't set input format to " + TiCC::toString( IF ) );
-	}
-	else {
-	  if ( Verbosity(NEAR_N) ){
-	    Do_Exact( false );
-	  }
-	  initExperiment();
-	  Initialized = true;
-	  result = true;
-	}
+	initExperiment();
+	Initialized = true;
+	result = true;
       }
     }
     return result;
@@ -1543,7 +1527,7 @@ namespace Timbl {
     const TargetValue *targ = classifyString( TiCC::UnicodeFromUTF8(inst),
 					      distance );
     if ( targ ){
-      string cat = targ->Name();
+      string cat = targ->name_string();
       normalizeResult();
       result["category"] = cat;
       if ( Verbosity(NEAR_N) ){
@@ -1602,7 +1586,7 @@ namespace Timbl {
      const TargetValue *targ = classifyString( TiCC::UnicodeFromUTF8(Line),
 					       Distance );
      if ( targ ){
-       Result = TiCC::UnicodeToUTF8(targ->name_u());
+       Result = targ->name_string();
        normalizeResult();
        Dist = bestResult.getResult();
        return true;
@@ -1618,7 +1602,7 @@ namespace Timbl {
     Dist.remove();
     const TargetValue *targ = classifyString( Line, Distance );
     if ( targ ){
-      Result = targ->name_u();
+      Result = targ->name();
       normalizeResult();
       Dist = TiCC::UnicodeFromUTF8(bestResult.getResult());
       return true;
@@ -1649,12 +1633,12 @@ namespace Timbl {
     bool recurse = true;
     bool Tie = false;
     exact = false;
-    if ( !bestResult.reset( beamSize, normalisation, norm_factor, Targets ) ){
+    if ( !bestResult.reset( beamSize, normalisation, norm_factor, targets ) ){
       Warning( "no normalisation possible because a BeamSize is specified\n"
 	       "output is NOT normalized!" );
     }
-    const ValueDistribution *ExResultDist = ExactMatch( Inst );
-    WValueDistribution *ResultDist = 0;
+    const ClassDistribution *ExResultDist = ExactMatch( Inst );
+    WClassDistribution *ResultDist = 0;
     nSet.clear();
     const TargetValue *Res;
     if ( ExResultDist ){
@@ -1684,7 +1668,7 @@ namespace Timbl {
       ++num_of_neighbors;
       testInstance( Inst, InstanceBase );
       bestArray.addToNeighborSet( nSet, num_of_neighbors );
-      WValueDistribution *ResultDist2 = getBestDistribution();
+      WClassDistribution *ResultDist2 = getBestDistribution();
       const TargetValue *Res2 = ResultDist2->BestTarget( Tie2, (RandomSeed() >= 0) );
       --num_of_neighbors;
       if ( !Tie2 ){
@@ -1758,7 +1742,7 @@ namespace Timbl {
   double TimblExperiment::sum_remaining_weights( size_t level ) const {
     double result = 0.0;
     for ( size_t i = level; i < EffectiveFeatures(); ++i ){
-      result += PermFeatures[i]->Weight();
+      result += features.perm_feats[i]->Weight();
     }
     return result;
   }
@@ -1774,20 +1758,20 @@ namespace Timbl {
     os << endl;
     os << "Deviant Feature Metrics:";
     int cnt = 0;
-    size_t *InvPerm = new size_t[NumOfFeatures()];
+    vector<size_t> InvPerm( NumOfFeatures() );
     for ( size_t i = 0; i < NumOfFeatures(); ++i ){
-      InvPerm[permutation[i]] = i;
+      InvPerm[features.permutation[i]] = i;
     }
     for ( size_t i = 0; i < NumOfFeatures(); ++i ){
-      if ( !Features[i]->Ignore() &&
+      if ( !features[i]->Ignore() &&
 	   InvPerm[i]+1 > TRIBL_offset() ){
-	MetricType mt =  Features[i]->getMetricType();
+	MetricType mt =  features[i]->getMetricType();
 	if ( mt != globalMetricOption ){
 	  ++cnt;
 	  os << endl << "   Feature[" << i+1 << "] : " << TiCC::toString( mt, true );
-	  if ( Features[i]->isStorableMetric() ){
+	  if ( features[i]->isStorableMetric() ){
 	    bool readM = false;
-	    if ( Features[i]->matrixPresent( readM ) ){
+	    if ( features[i]->matrixPresent( readM ) ){
 	      if ( readM ){
 		os << " (User Defined)";
 	      }
@@ -1802,7 +1786,6 @@ namespace Timbl {
 	}
       }
     }
-    delete [] InvPerm;
     if ( cnt ){
       os << endl;
     }
@@ -1832,7 +1815,7 @@ namespace Timbl {
   void TimblExperiment::show_ignore_info( ostream& os ) const{
     bool first = true;
     for ( size_t i=0; i< NumOfFeatures(); ++i ){
-      if ( Features[i]->Ignore() ){
+      if ( features[i]->Ignore() ){
 	if ( first ){
 	  first = false;
 	  os << "Ignored features : { ";
@@ -2461,7 +2444,8 @@ namespace Timbl {
     bool Hashed;
     int Version;
     string range_buf;
-    if ( !get_IB_Info( is, Pruned, Version, Hashed, range_buf ) ){
+    size_t numF = get_IB_Info( is, Pruned, Version, Hashed, range_buf );
+    if ( numF == 0 ){
       return false;
     }
     else if ( Pruned ){
@@ -2470,7 +2454,7 @@ namespace Timbl {
     }
     else {
       TreeOrder = DataFile;
-      Initialize();
+      Initialize( numF );
       if ( !get_ranges( range_buf ) ){
 	Warning( "couldn't retrieve ranges..." );
       }
@@ -2478,27 +2462,27 @@ namespace Timbl {
 	srand( RandomSeed() );
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
-	  Features[i]->SetWeight( 1.0 );
-	  if ( Features[permutation[i]]->Ignore() ){
-	    PermFeatures[i] = NULL;
+	  features[i]->SetWeight( 1.0 );
+	  if ( features[features.permutation[i]]->Ignore() ){
+	    features.perm_feats[i] = NULL;
 	  }
 	  else {
-	    PermFeatures[pos++] = Features[permutation[i]];
+	    features.perm_feats[pos++] = features[features.permutation[i]];
 	  }
 	}
 	InstanceBase = new IB_InstanceBase( EffectiveFeatures(),
 					    ibCount,
 					    (RandomSeed()>=0) );
 	if ( Hashed ){
-	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
-					 *Targets->hash(),
-					 *Features[0]->hash(),
-					 Version );
+	  result = InstanceBase->ReadIB_hashed( is,
+						features,
+						targets,
+						Version );
 	}
 	else {
-	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
+	  result = InstanceBase->ReadIB( is,
+					 features,
+					 targets,
 					 Version );
 	}
       }
@@ -2564,7 +2548,7 @@ namespace Timbl {
     else {
       initExperiment();
       for ( size_t i=0; i< NumOfFeatures(); ++i ){
-	res.push_back( Features[i]->Weight() );
+	res.push_back( features[i]->Weight() );
       }
     }
     return true;
@@ -2697,6 +2681,5 @@ namespace Timbl {
     }
     return result;
   }
-
 
 }

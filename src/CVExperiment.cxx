@@ -35,9 +35,9 @@
 
 #include <sys/time.h>
 
-#include "timbl/MsgClass.h"
 #include "timbl/Common.h"
 #include "timbl/Types.h"
+#include "timbl/Instance.h"
 #include "timbl/TimblExperiment.h"
 
 namespace Timbl {

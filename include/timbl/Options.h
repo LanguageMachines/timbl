@@ -29,12 +29,12 @@
 #define TIMBL_OPTIONS_H
 
 #include <vector>
+#include <map>
 #include <climits>
 #include <cstdio>
 #include "ticcutils/StringOps.h"
 
 namespace Timbl {
-  const int MAX_TABLE_SIZE =  50;
 
   class OptionClass {
     friend class OptionTableClass;
@@ -52,23 +52,25 @@ namespace Timbl {
   };
 
   template <class Type>
-    class OptionClassT: public OptionClass {
-    public:
+  class OptionClassT: public OptionClass {
+  public:
     OptionClassT( const std::string& n, Type *tp, Type t ):OptionClass(n),
-      Content(tp) { *Content = t; };
-    virtual bool set_option( const std::string& line ){
+							   Content(tp) { *Content = t; };
+    virtual bool set_option( const std::string& line ) override {
       Type T;
       bool result = TiCC::stringTo<Type>( line, T );
-      if ( result ) *Content = T;
+      if ( result ) {
+	*Content = T;
+      }
       return result;
     };
-    virtual std::ostream& show_opt( std::ostream &os ) const {
+    virtual std::ostream& show_opt( std::ostream &os ) const override {
       os.width(20);
       os.setf( std::ios::left, std::ios::adjustfield );
       os << Name << " : " << TiCC::toString<Type>(*Content);
       return os;
     };
-    virtual std::ostream& show_full( std::ostream &os ) const {
+    virtual std::ostream& show_full( std::ostream &os ) const override {
       return show_opt( os );
     };
     private:
@@ -89,7 +91,7 @@ namespace Timbl {
   }
 
   template <>
-    inline std::ostream& OptionClassT<bool>::show_full( std::ostream &os ) const {
+    inline std::ostream& OptionClassT<bool>::show_full( std::ostream &os ) const{
     os.width(20);
     os.setf( std::ios::left, std::ios::adjustfield );
     os.setf( std::ios::boolalpha );
@@ -115,8 +117,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     InputFormatType i = UnknownInputFormat;
-    for ( ++i; i < MaxInputFormat-1; ++i )
+    for ( ++i; i < MaxInputFormat-1; ++i ){
       os << TiCC::toString<InputFormatType>(i) << ", ";
+    }
     os << TiCC::toString<InputFormatType>(i) << "}, [ "
        << TiCC::toString<InputFormatType>(*Content) << "]";
     return os;
@@ -131,8 +134,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     MetricType i = UnknownMetric;
-    for ( ++i; i < MaxMetric-1; ++i )
+    for ( ++i; i < MaxMetric-1; ++i ){
       os << TiCC::toString<MetricType>(i) << ", ";
+    }
     os << TiCC::toString<MetricType>(i) << "}, [ "
        << TiCC::toString<MetricType>(*Content) << "]";
     return os;
@@ -146,8 +150,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     AlgorithmType i = Unknown_a;
-    for ( ++i; i < Max_a-1; ++i )
+    for ( ++i; i < Max_a-1; ++i ){
       os << TiCC::toString<AlgorithmType>(i) << ", ";
+    }
     os << TiCC::toString<AlgorithmType>(i) << "}, [ "
        << TiCC::toString<AlgorithmType>(*Content) << "]";
     return os;
@@ -161,8 +166,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     DecayType i = UnknownDecay;
-    for ( ++i; i < MaxDecay-1; ++i )
+    for ( ++i; i < MaxDecay-1; ++i ){
       os << TiCC::toString<DecayType>(i) << ", ";
+    }
     os << TiCC::toString<DecayType>(i) << "}, [ "
        << TiCC::toString<DecayType>(*Content) << "]";
     return os;
@@ -176,8 +182,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     SmoothingType i = UnknownSmoothing;
-    for ( ++i; i < MaxSmoothing-1; ++i )
+    for ( ++i; i < MaxSmoothing-1; ++i ){
       os << TiCC::toString<SmoothingType>(i) << ", ";
+    }
     os << TiCC::toString<SmoothingType>(i) << "}, [ "
        << TiCC::toString<SmoothingType>(*Content) << "]";
     return os;
@@ -191,8 +198,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     WeightType i = Unknown_w;
-    for ( ++i; i < Max_w-1; ++i )
+    for ( ++i; i < Max_w-1; ++i ){
       os << TiCC::toString<WeightType>(i) << ", ";
+    }
     os << TiCC::toString<WeightType>(i) << "}, [ "
        << TiCC::toString<WeightType>(*Content) << "]";
     return os;
@@ -206,8 +214,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     OrdeningType i = UnknownOrdening;
-    for ( ++i; i < MaxOrdening-1; ++i )
+    for ( ++i; i < MaxOrdening-1; ++i ){
       os << TiCC::toString<OrdeningType>(i) << ", ";
+    }
     os << TiCC::toString<OrdeningType>(i) << "}, [ "
        << TiCC::toString<OrdeningType>(*Content) << "]";
     return os;
@@ -221,8 +230,9 @@ namespace Timbl {
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : {";
     normType i = unknownNorm;
-    for ( ++i; i < maxNorm-1; ++i )
+    for ( ++i; i < maxNorm-1; ++i ){
       os << TiCC::toString<normType>(i) << ", ";
+    }
     os << TiCC::toString<normType>(i) << "}, [ "
        << TiCC::toString<normType>(*Content) << "]";
     return os;
@@ -232,16 +242,16 @@ namespace Timbl {
   // Array of options types
   //
   template <class Type>
-    class OptionArrayClass: public OptionClass {
-    public:
+  class OptionArrayClass: public OptionClass {
+  public:
     OptionArrayClass( const std::string& n,
 		      std::vector<Type>& ta,
 		      const size_t size ):
       OptionClass( n ), TA(ta), Size(size ){};
-    protected:
+  protected:
     std::vector<Type>& TA;
     size_t Size;
-    private:
+  private:
     OptionArrayClass(const OptionArrayClass&);
     OptionArrayClass& operator = (const OptionArrayClass&);
   };
@@ -253,13 +263,12 @@ namespace Timbl {
 		       std::vector<MetricType>& mp,
 		       MetricType& m,
 		       size_t s ):
-    OptionArrayClass<MetricType>( n, mp, s ), def(m){
-      for ( size_t i=0; i < s; i++ )
-	TA[i] = m;
+      OptionArrayClass<MetricType>( n, mp, s ), def(m){
+      TA.resize(s,m);
     };
-    bool set_option( const std::string& line );
-    std::ostream& show_opt( std::ostream &os ) const;
-    std::ostream& show_full( std::ostream &os ) const;
+    bool set_option( const std::string& line ) override;
+    std::ostream& show_opt( std::ostream &os ) const override;
+    std::ostream& show_full( std::ostream &os ) const override;
   private:
     const MetricType& def;
   };
@@ -271,8 +280,9 @@ namespace Timbl {
     bool result = TiCC::split_at( line, res, "=" ) == 2 &&
       TiCC::stringTo<MetricType>( res[1], m ) &&
       TiCC::stringTo<size_t>( res[0], i, 0, Size );
-    if ( result )
+    if ( result ){
       TA[i] = m;
+    }
     return result;
   }
 
@@ -280,9 +290,11 @@ namespace Timbl {
     os.width(20);
     os.setf( std::ios::left, std::ios::adjustfield );
     os << Name << " : ";
-    for ( size_t i=0; i < Size; i++ )
-      if ( TA[i] != def )
+    for ( size_t i=0; i < Size; i++ ){
+      if ( TA[i] != def ){
 	os << i << ":" << TiCC::toString<MetricType>(TA[i]) << ", ";
+      }
+    }
     return os;
   }
 
@@ -293,10 +305,12 @@ namespace Timbl {
     bool first = true;
     for ( size_t i=0; i < Size; i++ ){
       if ( TA[i] != def ){
-	if ( !first )
+	if ( !first ){
 	  os << ",";
-	else
+	}
+	else {
 	  first = false;
+	}
 	os << i << ":" << TiCC::toString<MetricType>(TA[i]);
       }
     }
@@ -315,20 +329,22 @@ namespace Timbl {
       Content( tp), minVal( Min ), maxVal( Max )
       { *Content = t; };
 
-    virtual bool set_option( const std::string& line ){
+    virtual bool set_option( const std::string& line ) override {
       Type T;
       bool result = TiCC::stringTo<Type>( line, T, minVal, maxVal );
-      if ( result ) *Content = T;
+      if ( result ) {
+	*Content = T;
+      }
       return result;
     };
-    virtual std::ostream& show_opt( std::ostream &os ) const {
+    virtual std::ostream& show_opt( std::ostream &os ) const override {
       os.width(20);
       os.setf( std::ios::showpoint );
       os.setf( std::ios::left, std::ios::adjustfield );
       os << Name << " : " << *Content;
       return os;
     };
-    virtual std::ostream& show_full( std::ostream &os ) const {
+    virtual std::ostream& show_full( std::ostream &os ) const override {
       os.width(20);
       os.setf( std::ios::showpoint );
       os.setf( std::ios::left, std::ios::adjustfield );
@@ -351,44 +367,76 @@ namespace Timbl {
 
   enum SetOptRes { Opt_OK, Opt_Frozen, Opt_Unknown, Opt_Ill_Val};
 
+  struct ci_less
+  {
+    // case-independent (ci) compare_less binary function
+    struct nocase_compare
+    {
+      bool operator() (const unsigned char& c1, const unsigned char& c2) const {
+          return tolower (c1) < tolower (c2);
+      }
+    };
+    bool operator() (const std::string & s1, const std::string & s2) const {
+      return std::lexicographical_compare
+        (s1.begin(), s1.end(),   // source range
+	 s2.begin(), s2.end(),   // dest range
+	 nocase_compare());      // comparison
+    }
+  };
+
   class OptionTableClass {
   public:
-    bool Add( OptionClass *opt ){
-      Table[table_size++] = opt;
-      return table_size < MAX_TABLE_SIZE;
+    OptionTableClass():
+      table_frozen(false){};
+    OptionTableClass( const OptionTableClass& ) = delete; // forbid copies
+    OptionTableClass& operator=( const OptionTableClass& ) = delete; // forbid copies
+    ~OptionTableClass(){
+      for ( const auto& it : global_table ){
+	delete it.second;
+      }
+      for ( const auto& it : runtime_table ){
+	delete it.second;
+      }
     };
-    void SetFreezeMark(void){ table_start = table_size; };
-    void FreezeTable(void){ table_frozen = true; };
+    bool Add( OptionClass *opt ){
+      //      std::cerr << "Table add: " << opt->Name << std::endl;
+      runtime_table[opt->Name] = opt;
+      return true;
+    };
+    void FreezeTable(void);
     bool TableFrozen(void){ return table_frozen; };
     SetOptRes SetOption( const std::string& );
     void Show_Settings( std::ostream& ) const;
     void Show_Options( std::ostream& ) const;
-    OptionTableClass():
-      table_start(0), table_size(0), table_frozen(false),Table(0){
-      Table = new OptionClass *[MAX_TABLE_SIZE]; };
-    ~OptionTableClass(){
-      for ( int i=0; i < table_size; i++ )
-	delete Table[i];
-      delete [] Table;
-    };
   private:
-    int table_start;
-    int table_size;
     bool table_frozen;
-    OptionClass **Table;
+    std::map<std::string,OptionClass *,ci_less> runtime_table;
+    std::map<std::string,OptionClass *,ci_less> global_table;
     inline OptionClass *look_up( const std::string&, bool & );
-    OptionTableClass( const OptionTableClass& );
-    OptionTableClass& operator=( const OptionTableClass& );
   };
 
+  inline void OptionTableClass::FreezeTable(void){
+    global_table = runtime_table;
+    runtime_table.clear();
+    table_frozen = true;
+  }
+
   inline void OptionTableClass::Show_Settings( std::ostream& os ) const{
-    for ( int i=0; i <table_size; i++)
-      Table[i]->show_opt( os ) << std::endl;
+    for ( const auto& it: global_table ){
+      it.second->show_opt( os ) << std::endl;
+    }
+    for ( const auto& it: runtime_table ){
+      it.second->show_opt( os ) << std::endl;
+    }
   }
 
   inline void OptionTableClass::Show_Options( std::ostream& os ) const {
-    for ( int i=0; i <table_size; i++)
-      Table[i]->show_full( os ) << std::endl;
+    for ( const auto& it: global_table ){
+      it.second->show_full( os ) << std::endl;
+    }
+    for ( const auto& it: runtime_table ){
+      it.second->show_full( os ) << std::endl;
+    }
   }
 
   inline void split_line( const std::string& line,
@@ -409,11 +457,21 @@ namespace Timbl {
 
   inline OptionClass *OptionTableClass::look_up( const std::string& option_name,
 						 bool &runtime ){
-    for ( int i=0; i < table_size; i++ )
-      if ( compare_nocase( option_name, Table[i]->Name ) ){
-	runtime = (i >= table_start || !table_frozen );
-	return Table[i];
+    //    std::cerr << "lookup: " << option_name << std::endl;
+    const auto itr = runtime_table.find( option_name );
+    if ( itr != runtime_table.end() ){
+      runtime = true;
+      //      std::cerr << "FOUND: runtime= " << option_name << std::endl;
+      return itr->second;
+    }
+    else {
+      const auto itg = global_table.find( option_name );
+      if ( itg != global_table.end() ){
+	runtime = table_frozen;
+	//	std::cerr << "FOUND global= " << option_name << std::endl;
+	return itg->second;
       }
+    }
     return NULL;
   }
 
@@ -425,14 +483,16 @@ namespace Timbl {
     split_line( line, option_name, value );
     OptionClass *option = look_up( option_name, runtime );
     if ( option ){
-      if ( !runtime )
+      if ( !runtime ){
 	result = Opt_Frozen; // may not be changed at this stage
-      else
-	if ( !option->set_option( value ) )
-	  result = Opt_Ill_Val; // illegal value
+      }
+      else if ( !option->set_option( value ) ){
+	result = Opt_Ill_Val; // illegal value
+      }
     }
-    else
+    else {
       result = Opt_Unknown; // What the hell ???
+    }
     return result;
   }
 

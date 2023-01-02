@@ -34,12 +34,12 @@ using namespace Timbl;
 int main(){
   TimblAPI My_Experiment( "-a IB1 +vDI+DB -G 0 -k3", "test6" );
   My_Experiment.Learn( "dimin.train" );
-  const ValueDistribution *vd;
+  const ClassDistribution *vd;
   const TargetValue *tv
     = My_Experiment.Classify( std::string("-,=,O,m,+,h,K,=,-,n,I,N,K"), vd );
   cout << "resulting target: " << tv << endl;
   cout << "resulting Distribution: " << vd << endl;
-  ValueDistribution::dist_iterator it=vd->begin();
+  ClassDistribution::dist_iterator it=vd->begin();
   while ( it != vd->end() ){
     cout << it->second << " OR ";
     cout << it->second->Value() << " " << it->second->Weight() << endl;
@@ -48,7 +48,7 @@ int main(){
 
   cout << "the same with neighborSets" << endl;
   const neighborSet *nb = My_Experiment.classifyNS( "-,=,O,m,+,h,K,=,-,n,I,N,K" );
-  WValueDistribution *vd2 = nb->bestDistribution();
+  WClassDistribution *vd2 = nb->bestDistribution();
   vd2->Normalize();
   cout << "default answer " << vd2 << endl;
   decayStruct *dc = new  expDecay(0.3);

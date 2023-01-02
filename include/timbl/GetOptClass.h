@@ -31,12 +31,15 @@
 #include <list>
 #include <iosfwd>
 
+namespace TiCC {
+  class CL_Options;
+}
 namespace Timbl {
   class TimblExperiment;
-
   class GetOptClass: public MsgClass {
   public:
     explicit GetOptClass( const TiCC::CL_Options&  );
+    GetOptClass& operator=( const GetOptClass& ) = delete; // forbid copies
     virtual ~GetOptClass();
     GetOptClass *Clone( std::ostream * = 0 ) const;
     bool parse_options( const TiCC::CL_Options&, const int=0 );
@@ -46,6 +49,7 @@ namespace Timbl {
     int MaxFeatures() const { return MaxFeats; };
     VerbosityFlags getVerbosity() { return myVerbosity; };
   private:
+    GetOptClass( const GetOptClass& );
     AlgorithmType local_algo;
     MetricType local_metric;
     OrdeningType local_order;
@@ -93,14 +97,12 @@ namespace Timbl {
     std::string inPath;
     std::string outPath;
     int occIn;
-    void Error( const std::string& ) const;
+    void Error( const std::string& ) const override;
     inline bool parse_range( std::string&,
 			     std::string::iterator&,
 			     MetricType );
     inline bool parse_metrics( const std::string&,
 			       MetricType& );
-    GetOptClass( const GetOptClass& );
-    GetOptClass& operator=( const GetOptClass& );
   };
 
 }

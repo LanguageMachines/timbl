@@ -25,13 +25,8 @@
       lamasoftware (at ) science.ru.nl
 */
 #include <vector>
-#include <set>
 #include <string>
-#include <iostream>
-#include <stdexcept>
-#include <sstream>
-#include <cstdlib>
-#include <climits>
+#include <iosfwd>
 
 #include "timbl/Common.h"
 #include "timbl/Types.h"
@@ -83,34 +78,33 @@ namespace Timbl{
   }
 
   TesterClass* getTester( MetricType m,
-			  const std::vector<Feature*>& features,
-			  const std::vector<size_t>& permutation,
+			  const Feature_List& features,
 			  int mvdThreshold ){
     if ( m == Cosine ){
-      return new CosineTester( features, permutation );
+      return new CosineTester( features );
     }
     else if ( m == DotProduct ){
-      return new DotProductTester( features, permutation );
+      return new DotProductTester( features );
     }
     else {
-      return new DistanceTester( features, permutation, mvdThreshold );
+      return new DistanceTester( features, mvdThreshold );
     }
   }
 
-  TesterClass::TesterClass( const vector<Feature*>& feat,
-			    const vector<size_t>& perm ):
-    _size(feat.size()),
+  TesterClass::TesterClass( const Feature_List& features ):
+    _size(features.feats.size()),
     effSize(_size),
     offSet(0),
     FV(0),
-    features(feat),
-    permutation(perm) {
+    features(features.feats),
+    permutation(features.permutation)
+  {
     permFeatures.resize(_size,0);
 #ifdef DBGTEST
     cerr << "created TesterClass(" << _size << ")" << endl;
 #endif
     for ( size_t j=0; j < _size; ++j ){
-      permFeatures[j] = feat[perm[j]];
+      permFeatures[j] = features.feats[features.permutation[j]];
     }
     distances.resize(_size+1, 0.0);
   }
@@ -127,24 +121,21 @@ namespace Timbl{
   }
 
   DistanceTester::~DistanceTester(){
-    for ( size_t i=0; i < _size; ++i ){
-      delete metricTest[i];
+    for ( const auto& it : metricTest ){
+      delete it;
     }
-    delete [] metricTest;
   }
 
-  DistanceTester::DistanceTester( const vector<Feature*>& feat,
-				  const vector<size_t>& perm,
+  DistanceTester::DistanceTester( const Feature_List& features,
 				  int mvdmThreshold ):
-    TesterClass( feat, perm ){
+    TesterClass( features ){
 #ifdef DBGTEST
     cerr << "create a tester with threshold = " << mvdmThreshold << endl;
 #endif
-    metricTest = new metricTestFunction*[_size];
+    metricTest.resize(_size,0);
     for ( size_t i=0; i < _size; ++i ){
-      metricTest[i] = 0;
 #ifdef DBGTEST
-      cerr << "set metric[" << i+1 << "]=" << TiCC::toString(features[i]->getMetricType()) << endl;
+      cerr << "set metric[" << i+1 << "]=" << TiCC::toString(features.feats[i]->getMetricType()) << endl;
 #endif
       if ( features[i]->Ignore() )
 	continue;
@@ -197,7 +188,7 @@ namespace Timbl{
 
   inline bool FV_to_real( FeatureValue *FV, double &result ){
     if ( FV ){
-      if ( TiCC::stringTo<double>( FV->name_u(), result ) ){
+      if ( TiCC::stringTo<double>( FV->name(), result ) ){
 	return true;
       }
     }
@@ -278,7 +269,7 @@ namespace Timbl{
   }
 
   double DotProductTester::getDistance( size_t pos ) const{
-#ifdef DBGTEST
+#ifdef DBGTEST_DOT
     cerr << "getDistance, maxSim = " << std::numeric_limits<int>::max() << endl;
     cerr << " distances[" << pos << "]= " <<  distances[pos] << endl;
 #endif

@@ -33,7 +33,6 @@
 #include <vector>
 #include "ticcutils/CommandLine.h"
 #include "timbl/Common.h"
-#include "timbl/MsgClass.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
 #include "timbl/neighborSet.h"
@@ -83,19 +82,19 @@ namespace Timbl{
 		  const std::string& = "" );
     const TargetValue *Classify( const std::string& );
     const TargetValue *Classify( const std::string&,
-				 const ValueDistribution *& );
+				 const ClassDistribution *& );
     const TargetValue *Classify( const std::string&,
 				 double& );
     const TargetValue *Classify( const std::string&,
-				 const ValueDistribution *&,
+				 const ClassDistribution *&,
 				 double& );
     const TargetValue *Classify( const icu::UnicodeString& );
     const TargetValue *Classify( const icu::UnicodeString&,
-				 const ValueDistribution *& );
+				 const ClassDistribution *& );
     const TargetValue *Classify( const icu::UnicodeString&,
 				 double& );
     const TargetValue *Classify( const icu::UnicodeString&,
-				 const ValueDistribution *&,
+				 const ClassDistribution *&,
 				 double& );
     const neighborSet *classifyNS( const icu::UnicodeString& );
     bool classifyNS( const icu::UnicodeString&,
@@ -105,7 +104,7 @@ namespace Timbl{
       return classifyNS( TiCC::UnicodeFromUTF8(in), st );
     }
     const Instance *lastHandledInstance() const;
-    const Target *myTargets() const;
+    const Targets& myTargets() const;
     bool Classify( const std::string&,
 		   std::string& );
     bool Classify( const std::string&,
@@ -153,7 +152,7 @@ namespace Timbl{
     bool initExperiment();
   private:
     TimblAPI();
-    TimblAPI& operator=( const TimblAPI& ); // so nobody may use them
+    TimblAPI& operator=( const TimblAPI& ); // forbid copies
     TimblExperiment *pimpl;
     bool i_am_fine;
   };
@@ -163,5 +162,7 @@ namespace Timbl{
   bool string_to( const std::string&, Algorithm& );
   bool string_to( const std::string&, Weighting& );
 
+  typedef ClassDistribution ValueDistribution; // for backward compatability
+  typedef WClassDistribution WValueDistribution; // for backward compatability
 }
 #endif // TIMBL_API_H

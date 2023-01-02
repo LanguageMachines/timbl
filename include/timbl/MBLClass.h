@@ -47,7 +47,7 @@ namespace Timbl {
   class Chopper;
   class neighborSet;
 
-  class MBLClass {
+  class MBLClass: public MsgClass {
   public:
     bool SetOption( const std::string& );
     xmlNode *settingsToXml() const;
@@ -60,9 +60,10 @@ namespace Timbl {
     bool MBLInit() const { return MBL_init; };
     void MBLInit( bool b ) { MBL_init = b; };
     bool ExpInvalid( bool b = true ) const {
-      if ( err_count > 0 ){
-	if ( b )
+      if ( err_cnt > 0 ){
+	if ( b ){
 	  InvalidMessage();
+	}
 	return true;
       }
       else
@@ -77,6 +78,7 @@ namespace Timbl {
     int getOcc() const { return doOcc; };
   protected:
     explicit MBLClass( const std::string& = "" );
+    void init_options_table( size_t );
     MBLClass& operator=( const MBLClass& );
     enum PhaseValue { TrainWords, LearnWords, TestWords, TrainLearnWords };
     friend std::ostream& operator<< ( std::ostream&, const PhaseValue& );
@@ -94,8 +96,7 @@ namespace Timbl {
     void writePermutation( std::ostream& ) const;
     void LearningInfo( std::ostream& );
     virtual ~MBLClass();
-    void InitClass( const size_t );
-    void Initialize( size_t = 0 );
+    void Initialize( size_t );
     bool PutInstanceBase( std::ostream& ) const;
     VerbosityFlags get_verbosity() const { return verbosity; };
     void set_verbosity( VerbosityFlags v ) { verbosity = v; };
@@ -104,7 +105,7 @@ namespace Timbl {
     bool HideInstance( const Instance& );
     bool UnHideInstance( const Instance&  );
     icu::UnicodeString formatInstance( const std::vector<FeatureValue *>&,
-				       std::vector<FeatureValue *>&,
+				       const std::vector<FeatureValue *>&,
 				       size_t,	size_t ) const;
     bool setInputFormat( const InputFormatType );
     size_t countFeatures( const icu::UnicodeString&,
@@ -116,18 +117,18 @@ namespace Timbl {
 		       InstanceBase_base * = NULL,
 		       size_t = 0 );
     icu::UnicodeString get_org_input( ) const;
-    const ValueDistribution *ExactMatch( const Instance& ) const;
+    const ClassDistribution *ExactMatch( const Instance& ) const;
     void fillNeighborSet( neighborSet& ) const;
     void addToNeighborSet( neighborSet& ns, size_t n ) const;
     double getBestDistance() const;
-    WValueDistribution *getBestDistribution( unsigned int =0 );
+    WClassDistribution *getBestDistribution( unsigned int =0 );
     IB_Stat IBStatus() const;
     bool get_ranges( const std::string& );
-    bool get_IB_Info( std::istream&, bool&, int&, bool&, std::string& );
-    size_t NumOfFeatures() const { return num_of_features; };
+    size_t get_IB_Info( std::istream&, bool&, int&, bool&, std::string& );
+    size_t NumOfFeatures() const { return features._num_of_feats; };
     size_t targetPos() const { return target_pos; };
-    size_t NumNumFeatures() const { return num_of_num_features; };
-    size_t EffectiveFeatures() const { return effective_feats; };
+    size_t NumNumFeatures() const { return features._num_of_num_feats; };
+    size_t EffectiveFeatures() const { return features._eff_feats; };
     void IBInfo( std::ostream& os ) const;
     void MatrixInfo( std::ostream& ) const;
     int RandomSeed() const { return random_seed; };
@@ -139,10 +140,8 @@ namespace Timbl {
     int Progress() const { return progress; };
     void Progress( int p ){ progress =  p; };
     std::string extract_limited_m( size_t );
-    Target *Targets;
-    std::vector<Feature *> Features;
-    std::vector<Feature *> PermFeatures;
-    std::vector<size_t> permutation;
+    Targets targets;
+    Feature_List features;
     InstanceBase_base *InstanceBase;
     std::ostream *mylog;
     std::ostream *myerr;
@@ -165,6 +164,9 @@ namespace Timbl {
     void set_order(void);
     void calculatePermutation( const std::vector<double>& );
     void  calculate_fv_entropy( bool );
+    bool recalculate_stats( Feature_List&,
+			    std::vector<FeatVal_Stat>&,
+			    bool );
     OptionTableClass Options;
     PhaseValue runningPhase;
     WeightType Weighting;
@@ -173,8 +175,6 @@ namespace Timbl {
     size_t num_of_neighbors;
     bool dynamic_neighbors;
     DecayType decay_flag;
-    Hash::UnicodeHash *TargetStrings;
-    Hash::UnicodeHash *FeatureStrings;
     std::string exp_name;
     Instance CurrInst;
     BestArray bestArray;
@@ -205,11 +205,7 @@ namespace Timbl {
     std::vector<MetricType> UserOptions;
     InputFormatType input_format;
     VerbosityFlags verbosity;
-    mutable int err_count;
-    size_t num_of_features;
-    size_t num_of_num_features;
     size_t target_pos;
-    size_t effective_feats;
     int clip_factor;
     int Bin_Size;
     int progress;
@@ -243,9 +239,8 @@ namespace Timbl {
 	return false;
       }
     };
-    void fill_table();
     void InvalidMessage() const ;
-    double calculate_db_entropy( Target * );
+
     void do_numeric_statistics( );
 
     void test_instance( const Instance& ,

@@ -24,13 +24,9 @@
   or send mail to:
       lamasoftware (at ) science.ru.nl
 */
-#include <exception>
-#include <stdexcept>
 #include <string>
-#include <sstream>
 
 #include "timbl/Common.h"
-#include "timbl/MsgClass.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
 #include "timbl/neighborSet.h"
@@ -115,7 +111,7 @@ namespace Timbl {
   }
 
   double BestArray::addResult( double Distance,
-			       const ValueDistribution *Distr,
+			       const ClassDistribution *Distr,
 			       const UnicodeString& neighbor ){
     // We have the similarity in Distance, and a num_of_neighbors
     // dimensional array with best similarities.
@@ -152,8 +148,8 @@ namespace Timbl {
 	  //
 	  best->bestDistance = Distance;
 	  if ( _storeInstances ){
-	    for ( unsigned int j = 0; j < best->bestInstances.size(); ++j ){
-	      delete best->bestDistributions[j];
+	    for ( const auto& it : best->bestDistributions ){
+	      delete it;
 	    }
 	    best->bestInstances.clear();
 	    best->bestDistributions.clear();
@@ -176,8 +172,8 @@ namespace Timbl {
 	  //
 	  keep->bestDistance = Distance;
 	  if ( _storeInstances ){
-	    for ( unsigned int j = 0; j < keep->bestInstances.size(); ++j ){
-	      delete keep->bestDistributions[j];
+	    for ( const auto& it :keep->bestDistributions ){
+	      delete it;
 	    }
 	    keep->bestInstances.clear();
 	    keep->bestDistributions.clear();

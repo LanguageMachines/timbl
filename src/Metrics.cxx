@@ -27,17 +27,14 @@
 #include <vector>
 #include <set>
 #include <string>
-#include <iostream>
+#include <iosfwd>
 #include <stdexcept>
-#include <sstream>
-#include <cstdlib>
-#include <climits>
 
 #include "timbl/Common.h"
-#include "timbl/MsgClass.h"
 #include "timbl/Types.h"
 #include "timbl/Instance.h"
 #include "timbl/Metrics.h"
+#include "unicode/schriter.h"
 
 using namespace std;
 using Common::Epsilon;
@@ -47,7 +44,8 @@ using Common::Log2;
 
 namespace Timbl{
 
-  double lv_distance( const string& source, const string& target ){
+  double lv_distance( const icu::UnicodeString& source,
+		      const icu::UnicodeString& target ){
     // code taken from: http://www.merriampark.com/ldcpp.htm
     //    Levenshtein Distance Algorithm: C++ Implementation
     //                  by Anders Sewerin Johansen
@@ -113,7 +111,8 @@ namespace Timbl{
     return (double)matrix[n][m];
   }
 
-  double dc_distance( const string& string1, const string& string2 ){
+  double dc_distance( const icu::UnicodeString& string1,
+		      const icu::UnicodeString& string2 ){
     // code taken from:
     // http://en.wikibooks.org/wiki/Algorithm_implementation/Strings/Dice's_coefficient
     unsigned int ls1 = string1.length();
@@ -123,14 +122,18 @@ namespace Timbl{
     int total = 0;
     if ( ls1 <= 1 || ls2 <= 1 ){
       // back-off naar unigrammen
-      set<char> string1_unigrams;
-      set<char> string2_unigrams;
+      set<UChar32> string1_unigrams;
+      set<UChar32> string2_unigrams;
 
-      for ( const auto& c : string1 ){
-	string1_unigrams.insert(c);
+      icu::StringCharacterIterator it1(string1);
+      while ( it1.hasNext() ){
+	string1_unigrams.insert(it1.current32());
+	it1.next32();
       }
-      for ( const auto& c : string2 ){
-	string2_unigrams.insert(c);
+      icu::StringCharacterIterator it2(string2);
+      while ( it2.hasNext() ){
+	string2_unigrams.insert(it2.current32());
+	it2.next32();
       }
 
       for ( const auto& ug : string2_unigrams ){
@@ -141,16 +144,16 @@ namespace Timbl{
       total = string1_unigrams.size() + string2_unigrams.size();
     }
     else {
-      set<string> string1_bigrams;
-      set<string> string2_bigrams;
+      set<icu::UnicodeString> string1_bigrams;
+      set<icu::UnicodeString> string2_bigrams;
 
       for ( unsigned int i = 0; i < (ls1 - 1); ++i ) {
 	// extract character bigrams from string1
-	string1_bigrams.insert(string1.substr(i, 2));
+	string1_bigrams.insert( icu::UnicodeString( string1, i, 2 ) );
       }
       for ( unsigned int i = 0; i < (ls2 - 1); ++i ) {
 	// extract character bigrams from string2
-	string2_bigrams.insert(string2.substr(i, 2));
+	string2_bigrams.insert( icu::UnicodeString( string2, i, 2 ) );
       }
 
       for ( const auto& bg : string2_bigrams ){
@@ -340,7 +343,7 @@ namespace Timbl{
 
   inline bool FV_to_real( FeatureValue *FV, double &result ){
     if ( FV ){
-      if ( TiCC::stringTo<double>( FV->name_u(), result ) ){
+      if ( TiCC::stringTo<double>( FV->name(), result ) ){
 	return true;
       }
     }
@@ -393,7 +396,7 @@ namespace Timbl{
 				      size_t, double) const {
     double result = 0.0;
     if ( G != F ){
-      result = lv_distance( F->Name(), G->Name() );
+      result = lv_distance( F->name(), G->name() );
     }
     return result;
   }
@@ -402,7 +405,7 @@ namespace Timbl{
 			       size_t, double ) const {
     double result = 0.0;
     if ( G != F ){
-      result = dc_distance( F->Name(), G->Name() );
+      result = dc_distance( F->name(), G->name() );
     }
     return result;
   }

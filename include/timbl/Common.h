@@ -29,12 +29,13 @@
 #define TIMBL_COMMON_H
 
 #include <iostream>
+#include <limits>
 #include <cmath>
-#include <cfloat>
 #include <cassert>
 
 namespace Common {
-  const double Epsilon = DBL_EPSILON;   // smallest x so that 1+x != 1
+  const double Epsilon = std::numeric_limits<double>::epsilon();
+  // smallest x so that 1+x != 1
   const int DEFAULT_MAX_FEATS = 2500;   // default maximun number of Features
 
   std::string Version();

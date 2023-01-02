@@ -26,7 +26,7 @@
 */
 
 #include <string>
-#include <map>
+#include <iosfwd>
 #include <fstream>
 #include <cassert>
 
@@ -36,6 +36,7 @@
 #include "timbl/Common.h"
 #include "timbl/Types.h"
 #include "timbl/IBtree.h"
+#include "timbl/Instance.h"
 #include "timbl/MBLClass.h"
 #include "timbl/TimblExperiment.h"
 
@@ -113,7 +114,7 @@ namespace Timbl {
       delete confusionInfo;
       confusionInfo = 0;
       if ( Verbosity(ADVANCED_STATS) ){
-	confusionInfo = new ConfusionMatrix( Targets->num_of_values() );
+	confusionInfo = new ConfusionMatrix( targets.num_of_values() );
       }
       showTestingInfo( *mylog );
       // Start time.

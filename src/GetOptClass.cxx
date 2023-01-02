@@ -25,20 +25,17 @@
       lamasoftware (at ) science.ru.nl
 */
 #include <string>
+#include <iosfwd>
 #include <fstream>
-#include <cstdio>
-#include <cstdlib>
-#include <cstdarg>
-#include <cstring>
-#include <ctime>
-#include <cctype>
-#include <algorithm>
+
+#include "ticcutils/CommandLine.h"
+
 #include "timbl/Common.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
 #include "timbl/MsgClass.h"
 #include "timbl/Metrics.h"
-#include "ticcutils/CommandLine.h"
+#include "timbl/Instance.h"
 #include "timbl/GetOptClass.h"
 #include "timbl/TimblExperiment.h"
 
@@ -127,6 +124,7 @@ namespace Timbl {
     local_normalisation( in.local_normalisation ),
     local_norm_factor( in.local_norm_factor ),
     MaxFeats( in.MaxFeats ),
+    target_pos( in.target_pos ),
     no_neigh( in.no_neigh ),
     mvd_limit( in.mvd_limit ),
     estimate( in.estimate ),
@@ -293,7 +291,7 @@ namespace Timbl {
 	if ( !outPath.empty() ){
 	  Exp->setOutPath( outPath );
 	}
-      }
+      } //first
       if ( clones > 0 ){
 	Exp->Clones( clones );
       }
@@ -485,7 +483,7 @@ namespace Timbl {
 	  return false;
 	}
 	else {
-	  for ( size_t j=k+1; j <= m && j <= metricsArray.size(); ++j ){
+	  for ( size_t j=k+1; j <= m && j < metricsArray.size(); ++j ){
 	    if ( metricsArray[j] != UnknownMetric
 		 && metricsArray[j] != Value ){
 	      Error( "metric of feature " + TiCC::toString<int>(j) +

@@ -397,7 +397,7 @@ namespace Timbl {
   }
 
   const TargetValue *TimblAPI::Classify( const string& s,
-					 const ValueDistribution *& db,
+					 const ClassDistribution *& db,
 					 double& di ){
     if ( Valid() ){
       return pimpl->Classify( TiCC::UnicodeFromUTF8(s), db, di );
@@ -410,7 +410,7 @@ namespace Timbl {
   }
 
   const TargetValue *TimblAPI::Classify( const icu::UnicodeString& s,
-					 const ValueDistribution *& db,
+					 const ClassDistribution *& db,
 					 double& di ){
     if ( Valid() ){
       return pimpl->Classify( s, db, di );
@@ -437,7 +437,7 @@ namespace Timbl {
   }
 
   const TargetValue *TimblAPI::Classify( const string& s,
-					 const ValueDistribution *& db ){
+					 const ClassDistribution *& db ){
     if ( Valid() ){
       return pimpl->Classify( TiCC::UnicodeFromUTF8(s), db  );
     }
@@ -448,7 +448,7 @@ namespace Timbl {
   }
 
   const TargetValue *TimblAPI::Classify( const icu::UnicodeString& s,
-					 const ValueDistribution *& db ){
+					 const ClassDistribution *& db ){
     if ( Valid() ){
       return pimpl->Classify( s, db  );
     }
@@ -505,11 +505,11 @@ namespace Timbl {
     return 0;
   }
 
-  const Target *TimblAPI::myTargets() const{
+  const Targets& TimblAPI::myTargets() const{
     if ( Valid() ){
-      return pimpl->Targets;
+      return pimpl->targets;
     }
-    return 0;
+    abort();
   }
 
   bool TimblAPI::Classify( const string& s, string& cls ){

@@ -2,7 +2,7 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [master]
+    branches: [master, valueclass]
     paths:
       - 'src/**'
       - 'include/**'
@@ -32,6 +32,7 @@ jobs:
             ${{ github.actor }} started a build of
             ${{ github.event.repository.name }}
             [${{ steps.extract_branch.outputs.branch }}]
+
   build:
     runs-on: ${{ matrix.os }}
     needs: notification

@@ -48,10 +48,11 @@ namespace Timbl {
   class Feature;
   class FeatureValue;
   class Instance;
-  class Target;
+  class Feature_List;
+  class Targets;
   class TargetValue;
-  class ValueDistribution;
-  class WValueDistribution;
+  class ClassDistribution;
+  class WClassDistribution;
 
   class IBtree {
     friend class InstanceBase_base;
@@ -68,12 +69,14 @@ namespace Timbl {
   private:
     FeatureValue *FValue;
     const TargetValue *TValue;
-    ValueDistribution *TDistribution;
+    ClassDistribution *TDistribution;
     IBtree *link;
     IBtree *next;
 
     IBtree();
     explicit IBtree( FeatureValue * );
+    IBtree( const IBtree& ) = delete; // forbid copies
+    IBtree& operator=( const IBtree& ) = delete; // forbid copies
     ~IBtree();
     IBtree *Reduce( const TargetValue *, unsigned long&, long );
 #ifdef IBSTATS
@@ -81,7 +84,7 @@ namespace Timbl {
 #else
     static inline IBtree *add_feat_val( FeatureValue *, IBtree **, unsigned long& );
 #endif
-    inline ValueDistribution *sum_distributions( bool );
+    inline ClassDistribution *sum_distributions( bool );
     inline IBtree *make_unique( const TargetValue *, unsigned long& );
     void cleanDistributions();
     void re_assign_defaults( bool, bool );
@@ -90,11 +93,9 @@ namespace Timbl {
     void countBranches( unsigned int,
 			std::vector<unsigned int>&,
 			std::vector<unsigned int>& );
-    const ValueDistribution *exact_match( const Instance&  ) const;
+    const ClassDistribution *exact_match( const Instance&  ) const;
   protected:
     const IBtree *search_node( FeatureValue * ) const;
-    IBtree( const IBtree& );
-    IBtree& operator=( const IBtree& );
   };
 
   typedef std::unordered_map<size_t, const IBtree*> FI_map;
@@ -103,8 +104,8 @@ namespace Timbl {
     friend class IG_InstanceBase;
     friend class TRIBL_InstanceBase;
     friend class TRIBL2_InstanceBase;
-    InstanceBase_base( const InstanceBase_base& );
-    InstanceBase_base& operator=( const InstanceBase_base& );
+    InstanceBase_base( const InstanceBase_base& ) = delete; // forbid copies
+    InstanceBase_base& operator=( const InstanceBase_base& ) = delete; // forbid copies
     friend std::ostream& operator<<( std::ostream &os,
 				     const InstanceBase_base& );
     friend std::ostream& operator<<( std::ostream &os,
@@ -119,23 +120,23 @@ namespace Timbl {
     void summarizeNodes( std::vector<unsigned int>&,
 			 std::vector<unsigned int>& );
     virtual bool MergeSub( InstanceBase_base * );
-    const ValueDistribution *ExactMatch( const Instance& I ) const {
+    const ClassDistribution *ExactMatch( const Instance& I ) const {
       return InstBase->exact_match( I ); };
-    virtual const ValueDistribution *InitGraphTest( std::vector<FeatureValue *>&,
+    virtual const ClassDistribution *InitGraphTest( std::vector<FeatureValue *>&,
 						    const std::vector<FeatureValue *> *,
-						    size_t,
-						    size_t );
-    virtual const ValueDistribution *NextGraphTest( std::vector<FeatureValue *>&,
+						    const size_t,
+						    const size_t );
+    virtual const ClassDistribution *NextGraphTest( std::vector<FeatureValue *>&,
 					      size_t& );
     unsigned long int GetDistSize( ) const { return NumOfTails; };
-    virtual const ValueDistribution *IG_test( const Instance& , size_t&, bool&,
+    virtual const ClassDistribution *IG_test( const Instance& , size_t&, bool&,
 					      const TargetValue *& );
     virtual IB_InstanceBase *TRIBL_test( const Instance& , size_t,
 					 const TargetValue *&,
-					 const ValueDistribution *&,
+					 const ClassDistribution *&,
 					 size_t& );
     virtual IB_InstanceBase *TRIBL2_test( const Instance& ,
-					  const ValueDistribution *&,
+					  const ClassDistribution *&,
 					  size_t& );
     bool read_hash( std::istream&,
 		    Hash::UnicodeHash&,
@@ -151,20 +152,18 @@ namespace Timbl {
     void toXML( std::ostream& );
     void printStatsTree( std::ostream&, unsigned int startLevel );
     virtual bool ReadIB( std::istream&,
-			 std::vector<Feature *>&,
-			 Target&,
+			 Feature_List&,
+			 Targets&,
 			 int );
-    virtual bool ReadIB( std::istream&,
-			 std::vector<Feature *>&,
-			 Target&,
-			 Hash::UnicodeHash&,
-			 Hash::UnicodeHash&,
-			 int );
+    virtual bool ReadIB_hashed( std::istream&,
+				Feature_List&,
+				Targets&,
+				int );
     virtual void Prune( const TargetValue *, long = 0 );
     virtual bool IsPruned() const { return false; };
     void CleanPartition(  bool );
     unsigned long int GetSizeInfo( unsigned long int&, double & ) const;
-    const ValueDistribution *TopDist() const { return TopDistribution; };
+    const ClassDistribution *TopDist() const { return TopDistribution; };
     bool HasDistributions() const;
     const TargetValue *TopTarget( bool & );
     bool PersistentD() const { return PersistentDistributions; };
@@ -181,47 +180,46 @@ namespace Timbl {
     bool Random;
     bool PersistentDistributions;
     int Version;
-    ValueDistribution *TopDistribution;
-    WValueDistribution *WTop;
+    ClassDistribution *TopDistribution;
+    WClassDistribution *WTop;
     const TargetValue *TopT;
     FI_map fast_index;
     bool tiedTop;
     IBtree *InstBase;
     IBtree *LastInstBasePos;
-    const IBtree **RestartSearch;
-    const IBtree **SkipSearch;
-    const IBtree **InstPath;
+    std::vector<const IBtree *> RestartSearch;
+    std::vector<const IBtree *> SkipSearch;
+    std::vector<const IBtree *> InstPath;
     unsigned long int& ibCount;
 
     size_t Depth;
     unsigned long int NumOfTails;
-    IBtree *read_list( std::istream &,
-		       std::vector<Feature*>&,
-		       Target&,
+    IBtree *read_list( std::istream&,
+		       Feature_List&,
+		       Targets&,
 		       int );
-    IBtree *read_local( std::istream &,
-			std::vector<Feature*>&,
-			Target&,
+    IBtree *read_local( std::istream&,
+			Feature_List&,
+			Targets&,
 			int );
-    IBtree *read_list_hashed( std::istream &,
-			      std::vector<Feature*>&,
-			      Target&,
+    IBtree *read_list_hashed( std::istream&,
+			      Feature_List&,
+			      Targets&,
 			      int );
-    IBtree *read_local_hashed( std::istream &,
-			       std::vector<Feature*>&,
-			       Target&,
+    IBtree *read_local_hashed( std::istream&,
+			       Feature_List&,
+			       Targets&,
 			       int );
     void write_tree( std::ostream &os, const IBtree * ) const;
     void write_tree_hashed( std::ostream &os, const IBtree * ) const;
     bool read_IB( std::istream&,
-		  std::vector<Feature *>&,
-		  Target&,
+		  Feature_List& ,
+		  Targets&,
 		  int );
-    bool read_IB( std::istream&,
-		  std::vector<Feature *>&,
-		  Target&,
-		  Hash::UnicodeHash&,
-		  Hash::UnicodeHash&, int );
+    bool read_IB_hashed( std::istream&,
+			 Feature_List& ,
+			 Targets&,
+			 int );
     void fill_index();
     const IBtree *fast_search_node( FeatureValue * );
   };
@@ -234,17 +232,15 @@ namespace Timbl {
       effFeat(0),
       testInst(0)
 	{};
-    IB_InstanceBase *Copy() const;
-    IB_InstanceBase *clone() const;
-    const ValueDistribution *InitGraphTest( std::vector<FeatureValue *>&,
+    IB_InstanceBase *Copy() const override;
+    IB_InstanceBase *clone() const override;
+    const ClassDistribution *InitGraphTest( std::vector<FeatureValue *>&,
 					    const std::vector<FeatureValue *> *,
-					    size_t,
-					    size_t );
-    const ValueDistribution *NextGraphTest( std::vector<FeatureValue *>&,
-				      size_t& );
+					    const size_t,
+					    const size_t ) override;
+    const ClassDistribution *NextGraphTest( std::vector<FeatureValue *>&,
+					    size_t& ) override;
   private:
-    IB_InstanceBase( const IB_InstanceBase& ); // inhibit copy
-    IB_InstanceBase& operator=( const IB_InstanceBase& ); // inhibit copy
     size_t offSet;
     size_t effFeat;
     const std::vector<FeatureValue *> *testInst;
@@ -255,24 +251,24 @@ namespace Timbl {
     IG_InstanceBase( size_t size, unsigned long& cnt,
 		     bool rand, bool pruned, bool keep_dists ):
       InstanceBase_base( size, cnt, rand, keep_dists ), Pruned( pruned ) {};
-    IG_InstanceBase *clone() const;
-    IG_InstanceBase *Copy() const;
-    void Prune( const TargetValue *, long = 0 );
+    IG_InstanceBase *clone() const override;
+    IG_InstanceBase *Copy() const override;
+    void Prune( const TargetValue *, long = 0 ) override;
     void specialPrune( const TargetValue * );
-    bool IsPruned() const { return Pruned; };
-    const ValueDistribution *IG_test( const Instance& , size_t&, bool&,
-				      const TargetValue *& );
+    bool IsPruned() const override { return Pruned; };
+    const ClassDistribution *IG_test( const Instance& ,
+				      size_t&,
+				      bool&,
+				      const TargetValue *& ) override;
     bool ReadIB( std::istream&,
-		 std::vector<Feature *>&,
-		 Target&,
-		 int );
-    bool ReadIB( std::istream&,
-		 std::vector<Feature *>&,
-		 Target&,
-		 Hash::UnicodeHash&,
-		 Hash::UnicodeHash&,
-		 int );
-    bool MergeSub( InstanceBase_base * );
+		 Feature_List&,
+		 Targets&,
+		 int ) override;
+    bool ReadIB_hashed( std::istream&,
+			Feature_List&,
+			Targets&,
+			int ) override;
+    bool MergeSub( InstanceBase_base * ) override;
   protected:
     bool Pruned;
   };
@@ -282,13 +278,13 @@ namespace Timbl {
     TRIBL_InstanceBase( size_t size, unsigned long& cnt,
 			bool rand, bool keep_dists ):
       InstanceBase_base( size, cnt, rand, keep_dists ), Threshold(0) {};
-    TRIBL_InstanceBase *clone() const;
-    TRIBL_InstanceBase *Copy() const;
+    TRIBL_InstanceBase *clone() const override;
+    TRIBL_InstanceBase *Copy() const override;
     IB_InstanceBase *TRIBL_test( const Instance&,
 				 size_t,
 				 const TargetValue *&,
-				 const ValueDistribution *&,
-				 size_t& );
+				 const ClassDistribution *&,
+				 size_t& ) override;
   private:
     IB_InstanceBase *IBPartition( IBtree * ) const;
     void AssignDefaults( size_t );
@@ -301,11 +297,11 @@ namespace Timbl {
 			 bool rand, bool keep_dists ):
       InstanceBase_base( size, cnt, rand, keep_dists ) {
     };
-    TRIBL2_InstanceBase *clone() const;
-    TRIBL2_InstanceBase *Copy() const;
+    TRIBL2_InstanceBase *clone() const override;
+    TRIBL2_InstanceBase *Copy() const override;
     IB_InstanceBase *TRIBL2_test( const Instance& ,
-				  const ValueDistribution *&,
-				  size_t& );
+				  const ClassDistribution *&,
+				  size_t& ) override;
   private:
     IB_InstanceBase *IBPartition( IBtree * ) const;
   };

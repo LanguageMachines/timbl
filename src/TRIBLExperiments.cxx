@@ -28,27 +28,21 @@
 
 #include <string>
 #include <map>
+#include <iosfwd>
 #include <fstream>
-#include <sstream>
-#include <iomanip>
+#include <cstdlib> // for srand()
 #include <cassert>
-#include <cstdlib>
 
-#include "timbl/MsgClass.h"
 #include "timbl/Common.h"
 #include "timbl/Types.h"
 #include "timbl/Options.h"
 #include "timbl/Instance.h"
-#include "timbl/Statistics.h"
-#include "timbl/neighborSet.h"
-#include "timbl/BestArray.h"
 #include "timbl/IBtree.h"
 #include "timbl/MBLClass.h"
 #include "timbl/TimblExperiment.h"
 
 namespace Timbl {
   using namespace std;
-  using namespace icu;
 
   void TRIBL_Experiment::InitInstanceBase(){
     srand( RandomSeed() );
@@ -107,11 +101,11 @@ namespace Timbl {
     const TargetValue *Res = NULL;
     bool Tie = false;
     exact = false;
-    if ( !bestResult.reset( beamSize, normalisation, norm_factor, Targets ) ){
+    if ( !bestResult.reset( beamSize, normalisation, norm_factor, targets ) ){
       Warning( "no normalisation possible because a BeamSize is specified\n"
 	       "output is NOT normalized!" );
     }
-    const ValueDistribution *ExResultDist = ExactMatch( Inst );
+    const ClassDistribution *ExResultDist = ExactMatch( Inst );
     if ( ExResultDist ){
       Distance = 0.0;
       Res = ExResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
@@ -120,7 +114,7 @@ namespace Timbl {
     }
     else {
       size_t level = 0;
-      const ValueDistribution *TrResultDist = 0;
+      const ClassDistribution *TrResultDist = 0;
       initExperiment();
       IB_InstanceBase *SubTree
 	= InstanceBase->TRIBL_test( Inst, TRIBL_offset(),
@@ -142,13 +136,13 @@ namespace Timbl {
       else {
 	testInstance( Inst, SubTree, TRIBL_offset() );
 	bestArray.initNeighborSet( nSet );
-	WValueDistribution *ResultDist = getBestDistribution();
+	WClassDistribution *ResultDist = getBestDistribution();
 	Res = ResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
 	if ( Tie ){
 	  ++num_of_neighbors;
 	  testInstance( Inst, SubTree, TRIBL_offset() );
 	  bestArray.addToNeighborSet( nSet, num_of_neighbors );
-	  WValueDistribution *ResultDist2 = getBestDistribution();
+	  WClassDistribution *ResultDist2 = getBestDistribution();
 	  bool Tie2 = false;
 	  const TargetValue *Res2 = ResultDist2->BestTarget( Tie2, (RandomSeed() >= 0) );
 	  --num_of_neighbors;
@@ -189,7 +183,7 @@ namespace Timbl {
     return Res;
   }
 
-  bool TRIBL_Experiment::checkLine( const UnicodeString& line ){
+  bool TRIBL_Experiment::checkLine( const icu::UnicodeString& line ){
     if ( !TimblExperiment::checkLine( line ) ){
       return false;
     }
@@ -201,7 +195,7 @@ namespace Timbl {
     return true;
   }
 
-  bool TRIBL2_Experiment::checkLine( const UnicodeString& line ){
+  bool TRIBL2_Experiment::checkLine( const icu::UnicodeString& line ){
     if ( !TimblExperiment::checkLine( line ) ){
       return false;
     }
@@ -218,12 +212,12 @@ namespace Timbl {
 						       bool& exact ){
     const TargetValue *Res = NULL;
     exact = false;
-    if ( !bestResult.reset( beamSize, normalisation, norm_factor, Targets ) ){
+    if ( !bestResult.reset( beamSize, normalisation, norm_factor, targets ) ){
       Warning( "no normalisation possible because a BeamSize is specified\n"
 	       "output is NOT normalized!" );
     }
     bool Tie = false;
-    const ValueDistribution *ExResultDist = ExactMatch( Inst );
+    const ClassDistribution *ExResultDist = ExactMatch( Inst );
     if ( ExResultDist ){
       Distance = 0.0;
       Res = ExResultDist->BestTarget( Tie, (RandomSeed() >= 0) );
@@ -232,21 +226,22 @@ namespace Timbl {
     }
     else {
       size_t level = 0;
-      const ValueDistribution *TrResultDist = 0;
+      const ClassDistribution *TrResultDist = 0;
       IB_InstanceBase *SubTree
 	= InstanceBase->TRIBL2_test( Inst, TrResultDist, level );
       if ( SubTree ){
 	testInstance( Inst, SubTree, level );
 	bestArray.initNeighborSet( nSet );
-	WValueDistribution *ResultDist1 = getBestDistribution();
+	WClassDistribution *ResultDist1 = getBestDistribution();
 	Res = ResultDist1->BestTarget( Tie, (RandomSeed() >= 0) );
 	if ( Tie ){
 	  ++num_of_neighbors;
 	  testInstance( Inst, SubTree, level );
 	  bestArray.addToNeighborSet( nSet, num_of_neighbors );
-	  WValueDistribution *ResultDist2 = getBestDistribution();
+	  WClassDistribution *ResultDist2 = getBestDistribution();
 	  bool Tie2 = false;
-	  const TargetValue *Res2 = ResultDist2->BestTarget( Tie2, (RandomSeed() >= 0) );
+	  const TargetValue *Res2 = ResultDist2->BestTarget( Tie2,
+							     (RandomSeed() >= 0) );
 	  --num_of_neighbors;
 	  if ( !Tie2 ){
 	    delete ResultDist1;
@@ -317,7 +312,8 @@ namespace Timbl {
     bool Hashed;
     int Version;
     string range_buf;
-    if ( !get_IB_Info( is, Pruned, Version, Hashed, range_buf ) ){
+    size_t numF = get_IB_Info( is, Pruned, Version, Hashed, range_buf );
+    if ( numF == 0 ){
       return false;
     }
     else if ( Pruned ){
@@ -326,7 +322,7 @@ namespace Timbl {
     }
     else {
       TreeOrder = DataFile;
-      Initialize();
+      Initialize( numF );
       if ( !get_ranges( range_buf ) ){
 	Warning( "couldn't retrieve ranges..." );
       }
@@ -338,24 +334,24 @@ namespace Timbl {
 					       KeepDistributions() );
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
-	  Features[i]->SetWeight( 1.0 );
-	  if ( Features[permutation[i]]->Ignore() ){
-	    PermFeatures[i] = NULL;
+	  features[i]->SetWeight( 1.0 );
+	  if ( features[features.permutation[i]]->Ignore() ){
+	    features.perm_feats[i] = NULL;
 	  }
 	  else {
-	    PermFeatures[pos++] = Features[permutation[i]];
+	    features.perm_feats[pos++] = features[features.permutation[i]];
 	  }
 	}
 	if ( Hashed ){
-	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
-					 *Targets->hash(),
-					 *Features[0]->hash(),
-					 Version );
+	  result = InstanceBase->ReadIB_hashed( is,
+						features,
+						targets,
+						Version );
 	}
 	else {
-	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
+	  result = InstanceBase->ReadIB( is,
+					 features,
+					 targets,
 					 Version );
 	}
       }
@@ -369,7 +365,8 @@ namespace Timbl {
     bool Hashed;
     int Version;
     string range_buf;
-    if ( !get_IB_Info( is, Pruned, Version, Hashed, range_buf ) ){
+    size_t numF = get_IB_Info( is, Pruned, Version, Hashed, range_buf );
+    if ( numF == 0 ){
       return false;
     }
     else if ( Pruned ){
@@ -378,7 +375,7 @@ namespace Timbl {
     }
     else {
       TreeOrder = DataFile;
-      Initialize();
+      Initialize( numF );
       if ( !get_ranges( range_buf ) ){
 	Warning( "couldn't retrieve ranges..." );
       }
@@ -390,24 +387,24 @@ namespace Timbl {
 						KeepDistributions() );
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
-	  Features[i]->SetWeight( 1.0 );
-	  if ( Features[permutation[i]]->Ignore() ){
-	    PermFeatures[i] = NULL;
+	  features[i]->SetWeight( 1.0 );
+	  if ( features[features.permutation[i]]->Ignore() ){
+	    features.perm_feats[i] = NULL;
 	  }
 	  else {
-	    PermFeatures[pos++] = Features[permutation[i]];
+	    features.perm_feats[pos++] = features[features.permutation[i]];
 	  }
 	}
 	if ( Hashed ){
-	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
-					 *Targets->hash(),
-					 *Features[0]->hash(),
-					 Version );
+	  result = InstanceBase->ReadIB_hashed( is,
+						features,
+						targets,
+						Version );
 	}
 	else {
-	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
+	  result = InstanceBase->ReadIB( is,
+					 features,
+					 targets,
 					 Version );
 	}
       }

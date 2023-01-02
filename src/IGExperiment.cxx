@@ -26,21 +26,22 @@
 */
 
 #include <string>
-#include <map>
-#include <iostream>
+#include <iosfwd>
 #include <fstream>
 #include <cassert>
 
-#include "timbl/MsgClass.h"
 #include "timbl/Common.h"
 #include "timbl/Types.h"
 #include "timbl/IBtree.h"
+#include "timbl/Instance.h"
 #include "timbl/TimblExperiment.h"
 #include "ticcutils/Timer.h"
+#include "ticcutils/PrettyPrint.h"
 
 namespace Timbl {
   using namespace std;
   using namespace icu;
+  using TiCC::operator<<;
 
   void IG_Experiment::InitInstanceBase(){
     srand( RandomSeed() );
@@ -60,7 +61,7 @@ namespace Timbl {
 	delete confusionInfo;
 	confusionInfo = 0;
 	if ( Verbosity(ADVANCED_STATS) ){
-	  confusionInfo = new ConfusionMatrix( Targets->num_of_values() );
+	  confusionInfo = new ConfusionMatrix( targets.num_of_values() );
 	}
 	if ( !is_copy ){
 	  InitWeights();
@@ -135,7 +136,7 @@ namespace Timbl {
 	  }
 	  UnicodeString Buffer;
 	  IG_InstanceBase *outInstanceBase = 0;
-	  TargetValue *TopTarget = Targets->MajorityClass();
+	  TargetValue *TopTarget = targets.MajorityClass();
 	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
 	  // Open the file.
 	  //
@@ -193,7 +194,7 @@ namespace Timbl {
 	  UnicodeString Buffer;
 	  IG_InstanceBase *PartInstanceBase = 0;
 	  IG_InstanceBase *outInstanceBase = 0;
-	  TargetValue *TopTarget = Targets->MajorityClass();
+	  TargetValue *TopTarget = targets.MajorityClass();
 	  //	cerr << "MAJORITY CLASS = " << TopTarget << endl;
 	  // Open the file.
 	  //
@@ -368,12 +369,12 @@ namespace Timbl {
     exact = false;
     bool Tie = false;
     initExperiment();
-    if ( !bestResult.reset( beamSize, normalisation, norm_factor, Targets ) ){
+    if ( !bestResult.reset( beamSize, normalisation, norm_factor, targets ) ){
       Warning( "no normalisation possible because a BeamSize is specified\n"
 	       "output is NOT normalized!" );
     }
     const TargetValue *TV = NULL;
-    const ValueDistribution *ResultDist;
+    const ClassDistribution *ResultDist;
     ResultDist = InstanceBase->IG_test( Inst, match_depth, last_leaf, TV );
     if ( match_depth == 0 ){
       // when level 0, ResultDist == TopDistribution
@@ -456,7 +457,8 @@ namespace Timbl {
     bool Hashed;
     int Version;
     string range_buf;
-    if ( !get_IB_Info( is, Pruned, Version, Hashed, range_buf ) ){
+    size_t numF = get_IB_Info( is, Pruned, Version, Hashed, range_buf );
+    if ( numF == 0 ){
       return false;
     }
     else if ( !Pruned ){
@@ -465,7 +467,7 @@ namespace Timbl {
     }
     else {
       TreeOrder = DataFile;
-      Initialize();
+      Initialize( numF );
       if ( !get_ranges( range_buf ) ){
 	Warning( "couldn't retrieve ranges..." );
       }
@@ -478,24 +480,24 @@ namespace Timbl {
 					    KeepDistributions() );
 	int pos=0;
 	for ( size_t i=0; i < NumOfFeatures(); ++i ){
-	  Features[i]->SetWeight( 1.0 );
-	  if ( Features[permutation[i]]->Ignore() ){
-	    PermFeatures[i] = NULL;
+	  features[i]->SetWeight( 1.0 );
+	  if ( features[features.permutation[i]]->Ignore() ){
+	    features.perm_feats[i] = NULL;
 	  }
 	  else {
-	    PermFeatures[pos++] = Features[permutation[i]];
+	    features.perm_feats[pos++] = features[features.permutation[i]];
 	  }
 	}
 	if ( Hashed ){
-	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
-					 *Targets->hash(),
-					 *Features[0]->hash(),
-					 Version );
+	  result = InstanceBase->ReadIB_hashed( is,
+						features,
+						targets,
+						Version );
 	}
 	else {
-	  result = InstanceBase->ReadIB( is, PermFeatures,
-					 *Targets,
+	  result = InstanceBase->ReadIB( is,
+					 features,
+					 targets,
 					 Version );
 	}
 	if ( result ){

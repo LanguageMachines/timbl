@@ -42,7 +42,7 @@ namespace Timbl{
   public:
     double test( FeatureValue *FV,
 		 FeatureValue *G,
-		 Feature *Feat ) const;
+		 Feature *Feat ) const override;
   };
 
   class valueDiffTestFunction: public metricTestFunction {
@@ -53,15 +53,16 @@ namespace Timbl{
       {};
     double test( FeatureValue *,
 		 FeatureValue *,
-		 Feature * ) const;
+		 Feature * ) const override;
   protected:
     int threshold;
   };
 
   class TesterClass {
   public:
-    TesterClass( const std::vector<Feature*>&,
-		 const std::vector<size_t> & );
+    TesterClass( const Feature_List& );
+    TesterClass( const TesterClass& ) = delete; // inhibit copies
+    TesterClass& operator=( const TesterClass& ) = delete; // inhibit copies
     virtual ~TesterClass(){};
     void init( const Instance&, size_t, size_t );
     virtual size_t test( std::vector<FeatureValue *>&,
@@ -74,78 +75,61 @@ namespace Timbl{
     size_t offSet;
     const std::vector<FeatureValue *> *FV;
     const std::vector<Feature *> &features;
-    std::vector<Feature *> permFeatures;
     const std::vector<size_t> &permutation;
+    std::vector<Feature *> permFeatures;
     std::vector<double> distances;
   private:
-    TesterClass( const TesterClass& ); // inhibit copies
-    TesterClass& operator=( const TesterClass& ); // inhibit copies
   };
 
   class DistanceTester: public TesterClass {
   public:
-    DistanceTester( const std::vector<Feature*>&,
-		    const std::vector<size_t>&,
+    DistanceTester( const Feature_List&,
 		    int );
     ~DistanceTester();
-    double getDistance( size_t ) const;
+    double getDistance( size_t ) const override;
     size_t test( std::vector<FeatureValue *>&,
 		 size_t,
-		 double );
+		 double ) override;
   private:
-    DistanceTester( const DistanceTester& ); // inhibit copies
-    DistanceTester& operator=( const DistanceTester& ); // inhibit copies
-    metricTestFunction **metricTest;
-
+    std::vector<metricTestFunction*> metricTest;
   };
 
   class SimilarityTester: public TesterClass {
   public:
-  SimilarityTester( const std::vector<Feature*>& pf,
-		    const std::vector<size_t>& p ):
-    TesterClass( pf, p ){};
+    SimilarityTester( const Feature_List& pf ):
+      TesterClass( pf ){};
     ~SimilarityTester() {};
     virtual size_t test( std::vector<FeatureValue *>&,
 			 size_t,
-			 double ) = 0;
+			 double ) override = 0;
   protected:
   private:
-    SimilarityTester( const SimilarityTester & ); // inhibit copies
-    SimilarityTester& operator=( const SimilarityTester & ); // inhibit copies
   };
 
   class CosineTester: public SimilarityTester {
   public:
-  CosineTester( const std::vector<Feature*>& pf,
-		const std::vector<size_t>& p ):
-    SimilarityTester( pf, p ){};
-    double getDistance( size_t ) const;
+    CosineTester( const Feature_List& pf ):
+      SimilarityTester( pf ){};
+    double getDistance( size_t ) const override;
     size_t test( std::vector<FeatureValue *>&,
 		 size_t,
-		 double );
+		 double ) override;
   private:
-    CosineTester( const CosineTester & ); // inhibit copies
-    CosineTester& operator=( const CosineTester & ); // inhibit copies
   };
 
   class DotProductTester: public SimilarityTester {
   public:
-  DotProductTester( const std::vector<Feature*>& pf,
-		    const std::vector<size_t>& p ):
-    SimilarityTester( pf, p ){};
-    double getDistance( size_t ) const;
+    DotProductTester( const Feature_List& pf ):
+      SimilarityTester( pf ){};
+    double getDistance( size_t ) const override;
     size_t test( std::vector<FeatureValue *>&,
 		 size_t,
-		 double );
+		 double ) override;
   private:
-    DotProductTester( const DotProductTester & ); // inhibit copies
-    DotProductTester& operator=( const DotProductTester & ); // inhibit copies
-
   };
 
   TesterClass* getTester( MetricType,
-			  const std::vector<Feature*>&,
-			  const std::vector<size_t>&,
+			  const Feature_List&,
 			  int );
 
 }
