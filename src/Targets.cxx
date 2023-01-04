@@ -198,7 +198,7 @@ namespace Timbl {
     double entropy = 0.0;
     size_t TotalVals = total_items;
     if ( TotalVals > 0 ){
-      // Loop over the classes in the distibution
+      // Loop over the classes in the distribution
       for ( const auto& it : distribution ){
 	size_t Freq = it.second->Freq();
 	if ( Freq > 0 ){
