@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([timbl],[6.8.1],[lamasoftware@science.ru.nl]) #also adapt in codemeta.json!
+AC_INIT([timbl],[6.9],[lamasoftware@science.ru.nl]) #also adapt in codemeta.json!
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_MACRO_DIR([m4])
