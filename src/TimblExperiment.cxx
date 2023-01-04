@@ -2118,7 +2118,7 @@ namespace Timbl {
     return result;
   }
 
-  bool TimblExperiment::SetOptions( int argc, const char **argv ){
+  bool TimblExperiment::SetOptions( int argc, const char *argv[] ){
     if ( IsClone() ){
       TiCC::CL_Options Opts( timbl_serv_short_opts, "" );
       try {

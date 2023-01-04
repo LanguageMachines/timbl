@@ -162,7 +162,7 @@ namespace Timbl {
     void setOutPath( const std::string& s ){ outPath = s; };
     TimblExperiment *CreateClient( int  ) const;
     TimblExperiment *splitChild() const;
-    bool SetOptions( int, const char ** );
+    bool SetOptions( int, const char *[] );
     bool SetOptions( const std::string& );
     bool SetOptions( const TiCC::CL_Options&  );
     bool IndirectOptions( const TiCC::CL_Options&  );
