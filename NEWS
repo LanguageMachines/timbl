@@ -1,3 +1,8 @@
+6.8.1 2023-01-04
+[Ko van der Sloot]
+* fix for some odd distro issues
+* for now re-added 2 backward compatability functions
+
 6.8 2023-01-02
 [Ko van der Sloot]
 * major code refactoring
