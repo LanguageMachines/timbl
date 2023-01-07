@@ -132,7 +132,7 @@ namespace Timbl {
 						    const size_t,
 						    const size_t );
     virtual const ClassDistribution *NextGraphTest( std::vector<FeatureValue *>&,
-					      size_t& );
+						    size_t& );
     unsigned long int GetDistSize( ) const { return NumOfTails; };
     virtual const ClassDistribution *IG_test( const Instance& , size_t&, bool&,
 					      const TargetValue *& );
