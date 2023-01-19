@@ -63,12 +63,11 @@ jobs:
         run: |
              if [ "$RUNNER_OS" == "Linux" ]; then
                 sudo apt-get install libicu-dev libxml2-dev libbz2-dev
-                sudo apt-get install zlib1g-dev libtar-dev cppcheck
+                sudo apt-get install zlib1g-dev cppcheck
              else
                 brew install libxml2;
                 brew install bzip2;
                 brew install zlib;
-                brew install libtar
                 brew install cppcheck
              fi
       - name: install TiccUtils
