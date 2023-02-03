@@ -360,10 +360,9 @@ namespace Timbl {
 			       const Targets& Targs,
 			       int BinSize,
 			       bool full ){
-    char dumname[80];
     vector<FeatureValue *> FVBin(BinSize);
     for ( int i=0; i < BinSize; ++i ){
-      sprintf( dumname, "dum%d", i );
+      UnicodeString dumname = "dum" + TiCC::toUnicodeString( i );
       FVBin[i] = new FeatureValue( dumname );
     }
     NumStatistics( FVBin, DBentropy );
