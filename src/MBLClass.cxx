@@ -314,15 +314,19 @@ namespace Timbl {
   }
 
   MBLClass::~MBLClass(){
+    //    cerr << "MBLClass delete " << endl;
     CurrInst.clear();
     if ( !is_copy ){
+      //      cerr << "NO copy: also delete instancebase" << endl;
       delete InstanceBase;
     }
     else {
       if ( is_synced ){
+	//	cerr << "is synced: also delete instancebase" << endl;
 	delete InstanceBase;
       }
       else {
+	//	cerr << "only clean partition" << endl;
 	InstanceBase->CleanPartition( false );
       }
     }

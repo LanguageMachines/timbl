@@ -437,9 +437,11 @@ namespace Timbl {
       size_t key = it.first;
       Vfield *vd = it.second;
       if ( distribution.find(key) != distribution.end() ){
+	// the key is already present, increment the frequency
 	distribution[key]->AddFreq( vd->Freq() );
       }
       else {
+	// add a key
 	// VD might be weighted. But we don't need/want that info here
 	// Weight == Freq is more convenient
 	distribution[key] = new Vfield( vd->Value(), vd->Freq(),

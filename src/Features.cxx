@@ -589,6 +589,10 @@ namespace Timbl {
     if ( !_is_reference ){
       delete _feature_hash;
     }
+    for ( const auto& it : feats ){
+      delete it;
+    }
+    feats.clear();
   }
 
   void Feature_List::init( size_t size,
