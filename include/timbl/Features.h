@@ -168,8 +168,6 @@ namespace Timbl {
     std::vector<long int> n_i_dot;
     double n_min;
     double n_max;
-    size_t SaveSize;
-    size_t SaveNum;
     double weight;
     void Statistics( double );
     void NumStatistics( std::vector<FeatureValue *>&, double );

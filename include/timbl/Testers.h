@@ -96,7 +96,7 @@ namespace Timbl{
 
   class SimilarityTester: public TesterClass {
   public:
-    SimilarityTester( const Feature_List& pf ):
+    explicit SimilarityTester( const Feature_List& pf ):
       TesterClass( pf ){};
     ~SimilarityTester() {};
     virtual size_t test( std::vector<FeatureValue *>&,
@@ -108,7 +108,7 @@ namespace Timbl{
 
   class CosineTester: public SimilarityTester {
   public:
-    CosineTester( const Feature_List& pf ):
+    explicit CosineTester( const Feature_List& pf ):
       SimilarityTester( pf ){};
     double getDistance( size_t ) const override;
     size_t test( std::vector<FeatureValue *>&,
@@ -119,7 +119,7 @@ namespace Timbl{
 
   class DotProductTester: public SimilarityTester {
   public:
-    DotProductTester( const Feature_List& pf ):
+    explicit DotProductTester( const Feature_List& pf ):
       SimilarityTester( pf ){};
     double getDistance( size_t ) const override;
     size_t test( std::vector<FeatureValue *>&,

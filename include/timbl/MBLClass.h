@@ -132,10 +132,10 @@ namespace Timbl {
     void IBInfo( std::ostream& os ) const;
     void MatrixInfo( std::ostream& ) const;
     int RandomSeed() const { return random_seed; };
-    void Info( const std::string& ) const;
-    void Warning( const std::string& ) const;
-    void Error( const std::string& ) const;
-    void FatalError( const std::string& ) const;
+    void Info( const std::string& ) const override;
+    void Warning( const std::string& ) const override;
+    void Error( const std::string& ) const override;
+    void FatalError( const std::string& ) const override;
     size_t MaxFeats() const { return MaxFeatures; };
     int Progress() const { return progress; };
     void Progress( int p ){ progress =  p; };

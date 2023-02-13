@@ -813,6 +813,7 @@ namespace Timbl {
   }
 
   void Targets::init(){
+    assert( target_hash == 0 ); // Safeguard init() may only called once
     target_hash = new Hash::UnicodeHash();
   }
 
