@@ -1,3 +1,9 @@
+6.8.2 2023-02-22
+* plugged a memory leak
+* C++ code quality improved
+* removed dependency on deprecated sprintf function
+* removed dependency on libtar
+
 6.8.1 2023-01-04
 [Ko van der Sloot]
 * fix for some odd distro issues
