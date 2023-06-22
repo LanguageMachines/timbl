@@ -28,11 +28,18 @@
 #ifndef TIMBL_BESTARRAY_H
 #define TIMBL_BESTARRAY_H
 
-#include "ticcutils/XMLtools.h"
+#include <vector>
+#include <iosfwd>
+#include <cstddef>
+
+#include "unicode/unistr.h"
+#include "libxml/parser.h"
 #include "ticcutils/json.hpp"
-#include "timbl/neighborSet.h"
+#include "timbl/Targets.h"
 
 namespace Timbl {
+
+  class neighborSet;
 
   class BestRec {
     friend std::ostream& operator<< ( std::ostream&, const BestRec * );

@@ -28,7 +28,13 @@
 
 #ifndef TIMBL_NEIGHBORSET_H
 #define TIMBL_NEIGHBORSET_H
-namespace Timbl{
+
+#include "timbl/Types.h"
+
+namespace Timbl {
+
+  class ClassDistribution;
+  class WClassDistribution;
 
   class decayStruct {
     friend std::ostream& operator<<( std::ostream&, const decayStruct& );

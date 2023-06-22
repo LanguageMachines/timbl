@@ -24,15 +24,23 @@
   or send mail to:
       lamasoftware (at ) science.ru.nl
 */
-#include <string>
 
+#include "timbl/BestArray.h"
+
+#include <ostream>
+#include <string>
+#include <cfloat>                 // for DBL_DIG, DBL_MAX
+#include <algorithm>              // for max
+#include <cmath>                  // for fabs
+#include <unicode/unistr.h>       // for UnicodeString
+#include <unicode/ustream.h>      // for operator<<
+#include <unicode/uversion.h>     // for icu
 #include "timbl/Common.h"
-#include "timbl/Types.h"
-#include "timbl/Instance.h"
 #include "timbl/neighborSet.h"
 #include "ticcutils/XMLtools.h"
+#include "ticcutils/StringOps.h"
+#include "ticcutils/Unicode.h"
 #include "ticcutils/json.hpp"
-#include "timbl/BestArray.h"
 
 namespace Timbl {
   using namespace std;

@@ -28,6 +28,15 @@
 
 */
 
+#include <memory>
+#include <cstddef>
+
+#include <iosfwd>              // for ostream
+#include <vector>              // for vector
+#include "unicode/unistr.h"
+#include "unicode/ustream.h"
+#include "timbl/Types.h"
+
 namespace Timbl{
 
   static const icu::UnicodeString DefaultSparseString = "0.0000E-17";

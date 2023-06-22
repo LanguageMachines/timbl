@@ -24,8 +24,9 @@
   or send mail to:
       lamasoftware (at ) science.ru.nl
 */
-#include <ostream>
-#include <iostream>
+#include "timbl/Choppers.h"
+
+#include <cctype>        // for isspace
 #include <stdexcept>
 #include <vector>
 #include <string>
@@ -34,7 +35,7 @@
 #include "ticcutils/Unicode.h"
 #include "ticcutils/PrettyPrint.h"
 #include "timbl/Types.h"
-#include "timbl/Choppers.h"
+
 
 using namespace std;
 using namespace icu;
