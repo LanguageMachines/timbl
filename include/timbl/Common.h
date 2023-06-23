@@ -32,6 +32,8 @@
 #include <limits>
 #include <cmath>
 #include <cassert>
+#include <ctype.h>   // for isspace
+#include <string>    // for string
 
 namespace Common {
   const double Epsilon = std::numeric_limits<double>::epsilon();

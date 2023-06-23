@@ -27,17 +27,12 @@
 
 
 #include <string>
-#include <map>
-#include <fstream>
-#include <sstream>
-#include <iomanip>
+#include <iostream>
 #include <cassert>
-
-#include <sys/time.h>
 
 #include "timbl/Common.h"
 #include "timbl/Types.h"
-#include "timbl/Instance.h"
+#include "timbl/StringOps.h"
 #include "timbl/TimblExperiment.h"
 
 namespace Timbl {
