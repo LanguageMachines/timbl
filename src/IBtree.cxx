@@ -401,8 +401,8 @@ namespace Timbl {
   }
 
   void save_hash( ostream& os,
-		  Hash::UnicodeHash& cats,
-		  Hash::UnicodeHash& feats ){
+		  const Hash::UnicodeHash& cats,
+		  const Hash::UnicodeHash& feats ){
     int Size = cats.num_of_entries();
     os << "Classes" << endl;
     for ( int i=1; i <= Size; ++i ){
