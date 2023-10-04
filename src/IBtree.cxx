@@ -417,8 +417,8 @@ namespace Timbl {
   }
 
   void InstanceBase_base::Save( ostream& os,
-				Hash::UnicodeHash& cats,
-				Hash::UnicodeHash& feats,
+				const Hash::UnicodeHash& cats,
+				const Hash::UnicodeHash& feats,
 				bool persist ) {
     // save an IBtree for later use.
     bool temp_persist =  PersistentDistributions;

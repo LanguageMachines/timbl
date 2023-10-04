@@ -151,8 +151,8 @@ namespace Timbl {
     void Save( std::ostream&,
 	       bool=false );
     void Save( std::ostream&,
-	       Hash::UnicodeHash&,
-	       Hash::UnicodeHash&,
+	       const Hash::UnicodeHash&,
+	       const Hash::UnicodeHash&,
 	       bool=false );
     void toXML( std::ostream& );
     void printStatsTree( std::ostream&, unsigned int startLevel );
