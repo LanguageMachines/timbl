@@ -100,7 +100,7 @@ namespace Timbl {
 			std::vector<unsigned int>& );
     const ClassDistribution *exact_match( const Instance&  ) const;
   protected:
-    const IBtree *search_node( FeatureValue * ) const;
+    const IBtree *search_node( const FeatureValue * ) const;
   };
 
   typedef std::unordered_map<size_t, const IBtree*> FI_map;
@@ -226,7 +226,7 @@ namespace Timbl {
 			 Targets&,
 			 int );
     void fill_index();
-    const IBtree *fast_search_node( FeatureValue * );
+    const IBtree *fast_search_node( const FeatureValue * );
   };
 
   class IB_InstanceBase: public InstanceBase_base {

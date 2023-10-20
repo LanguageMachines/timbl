@@ -202,16 +202,16 @@ namespace Timbl {
       else {
 	FPR = FP / double(FP + TN);
       }
-      double FScore;
+      double f_score;
       if ( precision < 0 || TPR < 0 ||
 	   fabs(precision + TPR) < Epsilon ){
-	FScore = -1;
+	f_score = -1;
       }
       else {
-	FScore = ( 2 * precision * TPR ) / (precision + TPR );
+	f_score = ( 2 * precision * TPR ) / (precision + TPR );
 	++effF;
-	maf += FScore;
-	mif += (FScore * testCount);
+	maf += f_score;
+	mif += (f_score * testCount);
       }
       double AUC;
       if ( TPR < 0 || FPR < 0 ){
@@ -235,7 +235,7 @@ namespace Timbl {
 	pf(os,precision);
 	pf(os,TPR);
 	pf(os,FPR);
-	pf(os,FScore);
+	pf(os,f_score);
 	pf(os,AUC);
 	os << endl;
       }

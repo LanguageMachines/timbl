@@ -33,16 +33,16 @@ namespace Timbl{
   class metricTestFunction {
   public:
     virtual ~metricTestFunction(){};
-    virtual double test( FeatureValue *,
-			 FeatureValue *,
-			 Feature * ) const = 0;
+    virtual double test( const FeatureValue *,
+			 const FeatureValue *,
+			 const Feature * ) const = 0;
   };
 
   class overlapTestFunction: public metricTestFunction {
   public:
-    double test( FeatureValue *FV,
-		 FeatureValue *G,
-		 Feature *Feat ) const override;
+    double test( const FeatureValue *FV,
+		 const FeatureValue *G,
+		 const Feature *Feat ) const override;
   };
 
   class valueDiffTestFunction: public metricTestFunction {
@@ -51,9 +51,9 @@ namespace Timbl{
     metricTestFunction(),
       threshold( t )
       {};
-    double test( FeatureValue *,
-		 FeatureValue *,
-		 Feature * ) const override;
+    double test( const FeatureValue *,
+		 const FeatureValue *,
+		 const Feature * ) const override;
   protected:
     int threshold;
   };
@@ -65,7 +65,7 @@ namespace Timbl{
     TesterClass& operator=( const TesterClass& ) = delete; // inhibit copies
     virtual ~TesterClass(){};
     void init( const Instance&, size_t, size_t );
-    virtual size_t test( std::vector<FeatureValue *>&,
+    virtual size_t test( const std::vector<FeatureValue *>&,
 			 size_t,
 			 double ) = 0;
     virtual double getDistance( size_t ) const = 0;
@@ -87,7 +87,7 @@ namespace Timbl{
 		    int );
     ~DistanceTester();
     double getDistance( size_t ) const override;
-    size_t test( std::vector<FeatureValue *>&,
+    size_t test( const std::vector<FeatureValue *>&,
 		 size_t,
 		 double ) override;
   private:
@@ -99,7 +99,7 @@ namespace Timbl{
     explicit SimilarityTester( const Feature_List& pf ):
       TesterClass( pf ){};
     ~SimilarityTester() {};
-    virtual size_t test( std::vector<FeatureValue *>&,
+    virtual size_t test( const std::vector<FeatureValue *>&,
 			 size_t,
 			 double ) override = 0;
   protected:
@@ -111,7 +111,7 @@ namespace Timbl{
     explicit CosineTester( const Feature_List& pf ):
       SimilarityTester( pf ){};
     double getDistance( size_t ) const override;
-    size_t test( std::vector<FeatureValue *>&,
+    size_t test( const std::vector<FeatureValue *>&,
 		 size_t,
 		 double ) override;
   private:
@@ -122,7 +122,7 @@ namespace Timbl{
     explicit DotProductTester( const Feature_List& pf ):
       SimilarityTester( pf ){};
     double getDistance( size_t ) const override;
-    size_t test( std::vector<FeatureValue *>&,
+    size_t test( const std::vector<FeatureValue *>&,
 		 size_t,
 		 double ) override;
   private:

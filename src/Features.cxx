@@ -196,7 +196,7 @@ namespace Timbl {
   }
 
   bool Feature::increment_value( FeatureValue *FV,
-				 TargetValue *tv ){
+				 const TargetValue *tv ){
     bool result = false;
     if ( FV ){
       FV->incr_val_freq();
@@ -208,7 +208,8 @@ namespace Timbl {
     return result;
   }
 
-  bool Feature::decrement_value( FeatureValue *FV, TargetValue *tv ){
+  bool Feature::decrement_value( FeatureValue *FV,
+				 const TargetValue *tv ){
     bool result = false;
     if ( FV ){
       FV->decr_val_freq();
@@ -538,8 +539,8 @@ namespace Timbl {
     }
   }
 
-  double Feature::fvDistance( FeatureValue *F,
-			      FeatureValue *G,
+  double Feature::fvDistance( const FeatureValue *F,
+			      const FeatureValue *G,
 			      size_t limit ) const {
     double result = 0.0;
     if ( F != G ){
@@ -757,7 +758,7 @@ namespace Timbl {
     double sum = 0.0;
     vector<double> store( values_array.size() );
     for ( unsigned int i=0; i < values_array.size(); ++i ){
-      FeatureValue *FV = values_array[i];
+      const FeatureValue *FV = values_array[i];
       double val = TiCC::stringTo<double>( FV->name() );
       store[i] = val;
       sum += val;
@@ -809,7 +810,7 @@ namespace Timbl {
       return true;
     }
     if ( !metric_matrix ){
-      metric_matrix = new SparseSymetricMatrix<ValueClass*>();
+      metric_matrix = new SparseSymetricMatrix<const ValueClass*>();
     }
     if ( PrestoreStatus != ps_failed && metric->isStorable( ) ) {
       try {
@@ -925,7 +926,7 @@ namespace Timbl {
 
   bool Feature::fill_matrix( istream &is ) {
     if ( !metric_matrix ){
-      metric_matrix = new SparseSymetricMatrix<ValueClass*>();
+      metric_matrix = new SparseSymetricMatrix<const ValueClass*>();
     }
     else {
       metric_matrix->Clear();

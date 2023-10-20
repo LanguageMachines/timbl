@@ -44,7 +44,8 @@ namespace Timbl{
     virtual bool isSimilarityMetric() const = 0;
     virtual bool isNumerical() const = 0;
     virtual bool isStorable() const = 0;
-    virtual double distance( FeatureValue *, FeatureValue *,
+    virtual double distance( const FeatureValue *,
+			     const FeatureValue *,
 			     size_t=1, double = 1.0 ) const = 0;
     virtual double get_max_similarity() const {
       throw std::logic_error( "get_max_similarity not implemented for " +
@@ -68,8 +69,8 @@ namespace Timbl{
   OverlapMetric(): distanceMetricClass( Overlap ){};
     bool isNumerical() const override { return false; };
     bool isStorable() const override { return false; };
-    double distance( FeatureValue *,
-		     FeatureValue *,
+    double distance( const FeatureValue *,
+		     const FeatureValue *,
 		     size_t,
 		     double ) const override;
   };
@@ -85,8 +86,8 @@ namespace Timbl{
   class NumericMetric: public NumericMetricClass {
   public:
   NumericMetric(): NumericMetricClass( Numeric ){};
-    double distance( FeatureValue *,
-		     FeatureValue *,
+    double distance( const FeatureValue *,
+		     const FeatureValue *,
 		     size_t,
 		     double ) const override;
   };
@@ -94,8 +95,8 @@ namespace Timbl{
   class EuclideanMetric: public NumericMetricClass {
   public:
   EuclideanMetric(): NumericMetricClass( Euclidean ){};
-    double distance( FeatureValue *,
-		     FeatureValue *,
+    double distance( const FeatureValue *,
+		     const FeatureValue *,
 		     size_t,
 		     double ) const override;
   };
@@ -105,8 +106,8 @@ namespace Timbl{
   ValueDiffMetric(): distanceMetricClass( ValueDiff ){};
     bool isNumerical() const override { return false; };
     bool isStorable() const override { return true; };
-    double distance( FeatureValue *,
-		     FeatureValue *,
+    double distance( const FeatureValue *,
+		     const FeatureValue *,
 		     size_t,
 		     double ) const override;
   };
@@ -116,8 +117,8 @@ namespace Timbl{
   DiceMetric(): distanceMetricClass( Dice ){};
     bool isNumerical() const override { return false; };
     bool isStorable() const override { return true; };
-    double distance( FeatureValue *,
-		     FeatureValue *,
+    double distance( const FeatureValue *,
+		     const FeatureValue *,
 		     size_t,
 		     double ) const override;
   };
@@ -127,8 +128,8 @@ namespace Timbl{
   JeffreyMetric(): distanceMetricClass( JeffreyDiv ){};
     bool isNumerical() const override{ return false; };
     bool isStorable() const override { return true; };
-    double distance( FeatureValue *,
-		     FeatureValue *,
+    double distance( const FeatureValue *,
+		     const FeatureValue *,
 		     size_t,
 		     double ) const override;
   };
@@ -138,8 +139,8 @@ namespace Timbl{
   JSMetric(): distanceMetricClass( JSDiv ){};
     bool isNumerical() const override { return false; };
     bool isStorable() const override { return true; };
-    double distance( FeatureValue *,
-		     FeatureValue *,
+    double distance( const FeatureValue *,
+		     const FeatureValue *,
 		     size_t,
 		     double ) const override;
   };
@@ -149,8 +150,8 @@ namespace Timbl{
   LevenshteinMetric(): distanceMetricClass( Levenshtein ){};
     bool isNumerical() const override { return false; };
     bool isStorable() const override { return true; };
-    double distance( FeatureValue *,
-		     FeatureValue *,
+    double distance( const FeatureValue *,
+		     const FeatureValue *,
 		     size_t,
 		     double ) const override;
   };
@@ -167,8 +168,8 @@ namespace Timbl{
   class CosineMetric: public similarityMetricClass {
   public:
   CosineMetric(): similarityMetricClass( Cosine ){};
-    double distance( FeatureValue *,
-		     FeatureValue *,
+    double distance( const FeatureValue *,
+		     const FeatureValue *,
 		     size_t,
 		     double ) const override;
     double get_max_similarity() const override { return 1.0; };
@@ -177,8 +178,8 @@ namespace Timbl{
   class DotProductMetric: public similarityMetricClass {
   public:
   DotProductMetric(): similarityMetricClass( DotProduct ){};
-    double distance( FeatureValue *,
-		     FeatureValue *,
+    double distance( const FeatureValue *,
+		     const FeatureValue *,
 		     size_t,
 		     double ) const override;
     double get_max_similarity() const override {

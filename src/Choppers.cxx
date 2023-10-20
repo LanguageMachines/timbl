@@ -345,8 +345,8 @@ namespace Timbl{
 
   UnicodeString C45_Chopper::getString() const{
     UnicodeString res;
-    for ( const auto& chop : choppedInput ) {
-      res += CodeToStr( chop ) + ",";
+    for ( const auto& part : choppedInput ) {
+      res += CodeToStr( part ) + ",";
     }
     return res;
   }
@@ -390,11 +390,11 @@ namespace Timbl{
   UnicodeString Bin_Chopper::getString() const {
     UnicodeString res;
     int i = 1;
-    for ( const auto& chop : choppedInput ){
-      if ( &chop == &choppedInput.back() ){
+    for ( const auto& part : choppedInput ){
+      if ( &part == &choppedInput.back() ){
 	break;
       }
-      if ( chop[0] == '1' ){
+      if ( part[0] == '1' ){
 	res += TiCC::toUnicodeString(i) + ",";
       }
       ++i;
@@ -415,13 +415,13 @@ namespace Timbl{
       return false;
     }
     size_t i = 0;
-    for ( auto& chop : choppedInput ){
+    for ( auto& part : choppedInput ){
       size_t index = i * fLen;
       // Scan the value.
       //
-      chop.remove();
+      part.remove();
       for ( int j = 0; j < fLen; ++j ) {
-	chop += strippedInput[index++];
+	part += strippedInput[index++];
       }
       ++i;
     }
@@ -430,8 +430,8 @@ namespace Timbl{
 
   UnicodeString Compact_Chopper::getString() const {
     UnicodeString res;
-    for ( const auto& chop : choppedInput ){
-      res += CodeToStr( chop );
+    for ( const auto& part : choppedInput ){
+      res += CodeToStr( part );
     }
     return res;
   }
@@ -475,8 +475,8 @@ namespace Timbl{
 
   UnicodeString Tabbed_Chopper::getString() const {
     UnicodeString res;
-    for ( const auto& chop : choppedInput ){
-      res += CodeToStr( chop ) + "\t";
+    for ( const auto& part : choppedInput ){
+      res += CodeToStr( part ) + "\t";
     }
     return res;
   }
@@ -528,13 +528,13 @@ namespace Timbl{
   UnicodeString Sparse_Chopper::getString() const {
     UnicodeString res;
     int i = 1;
-    for ( const auto& chop : choppedInput ){
-      if ( &chop == &choppedInput.back() ){
+    for ( const auto& part : choppedInput ){
+      if ( &part == &choppedInput.back() ){
 	break;
       }
-      if ( chop != DefaultSparseString ){
+      if ( part != DefaultSparseString ){
 	res += "(" + TiCC::toUnicodeString( i ) + ",";
-	res += CodeToStr(chop);
+	res += CodeToStr(part);
 	res += ")";
       }
       ++i;

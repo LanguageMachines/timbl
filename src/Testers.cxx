@@ -43,9 +43,9 @@ namespace Timbl{
   //#define DBGTEST
   //#define DBGTEST_DOT
 
-  double overlapTestFunction::test( FeatureValue *F,
-				    FeatureValue *G,
-				    Feature *Feat ) const {
+  double overlapTestFunction::test( const FeatureValue *F,
+				    const FeatureValue *G,
+				    const Feature *Feat ) const {
 #ifdef DBGTEST
     cerr << "overlap_distance(" << F << "," << G << ") = ";
 #endif
@@ -60,9 +60,9 @@ namespace Timbl{
     return result;
   }
 
-  double valueDiffTestFunction::test( FeatureValue *F,
-				      FeatureValue *G,
-				      Feature *Feat ) const {
+  double valueDiffTestFunction::test( const FeatureValue *F,
+				      const FeatureValue *G,
+				      const Feature *Feat ) const {
 #ifdef DBGTEST
     cerr << TiCC::toString(Feat->getMetricType()) << "_distance(" << F << "," << G << ") = ";
 #endif
@@ -154,7 +154,7 @@ namespace Timbl{
     }
   }
 
-  size_t DistanceTester::test( vector<FeatureValue *>& G,
+  size_t DistanceTester::test( const vector<FeatureValue *>& G,
 			       size_t CurPos,
 			       double Threshold ) {
     size_t i;
@@ -186,7 +186,8 @@ namespace Timbl{
     return distances[pos];
   }
 
-  inline bool FV_to_real( FeatureValue *FV, double &result ){
+  inline bool FV_to_real( const FeatureValue *FV,
+			  double &result ){
     if ( FV ){
       if ( TiCC::stringTo<double>( FV->name(), result ) ){
 	return true;
@@ -195,8 +196,8 @@ namespace Timbl{
     return false;
   }
 
-  double innerProduct( FeatureValue *FV,
-		       FeatureValue *G ) {
+  double innerProduct( const FeatureValue *FV,
+		       const FeatureValue *G ) {
     double r1=0, r2=0, result;
 #ifdef DBGTEST_DOT
     cerr << "innerproduct " << FV << " x " << G << endl;
@@ -217,7 +218,7 @@ namespace Timbl{
     return result;
   }
 
-  size_t CosineTester::test( vector<FeatureValue *>& G,
+  size_t CosineTester::test( const vector<FeatureValue *>& G,
 			     size_t,
 			     double ){
     double denom1 = 0.0;
@@ -243,7 +244,7 @@ namespace Timbl{
     return effSize;
   }
 
-  size_t DotProductTester::test( vector<FeatureValue *>& G,
+  size_t DotProductTester::test( const vector<FeatureValue *>& G,
 				 size_t,
 				 double ) {
     size_t TrueF;

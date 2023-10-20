@@ -100,7 +100,7 @@ namespace Timbl {
     bool first = true;
     oss << "{ ";
     for ( const auto& it : distribution ){
-      Vfield *f = it.second;
+      const Vfield *f = it.second;
       if ( f->frequency >= minf ){
 	if ( !first ){
 	  oss << ", ";
@@ -119,7 +119,7 @@ namespace Timbl {
     bool first = true;
     oss << "{ ";
     for( const auto& it : distribution ){
-      Vfield *f = it.second;
+      const Vfield *f = it.second;
       if ( abs(f->weight) < minw ){
 	continue;
       }
@@ -148,7 +148,7 @@ namespace Timbl {
     if ( beam > 0 ){
       set<double, dblCmp> freqs;
       for ( const auto& it : distribution ){
-	Vfield *f = it.second;
+	const Vfield *f = it.second;
 	freqs.insert( f->frequency );
       }
       int cnt=0;
@@ -168,7 +168,7 @@ namespace Timbl {
     if ( beam > 0 ){
       set<double, dblCmp> wgths;
       for ( const auto& it : distribution ){
-	Vfield *f = it.second;
+	const Vfield *f = it.second;
 	wgths.insert( f->weight );
       }
       int cnt=0;
@@ -249,7 +249,7 @@ namespace Timbl {
     ClassDistribution *res = new ClassDistribution();
     for ( const auto& d : distribution ){
       size_t key = d.first;
-      Vfield *vdf = d.second;
+      const Vfield *vdf = d.second;
       res->distribution[key] = new Vfield( vdf->Value(),
 					   vdf->Freq(),
 					   vdf->Freq() );
@@ -262,7 +262,7 @@ namespace Timbl {
     WClassDistribution *res = new WClassDistribution();
     for ( const auto& d : distribution ){
       size_t key = d.first;
-      Vfield *vdf = d.second;
+      const Vfield *vdf = d.second;
       res->distribution[key] = new Vfield( vdf->Value(),
 					   vdf->Freq(),
 					   vdf->Freq() );
@@ -275,7 +275,7 @@ namespace Timbl {
     WClassDistribution *result = new WClassDistribution();
     for ( const auto& d : distribution ){
       size_t key = d.first;
-      Vfield *vdf = d.second;
+      const Vfield *vdf = d.second;
       result->distribution[key] = new Vfield( vdf->Value(),
 					      vdf->Freq(),
 					      vdf->Weight() );
@@ -297,7 +297,7 @@ namespace Timbl {
     oss << "{ ";
     bool first = true;
     for ( const auto& it : distribution ){
-      Vfield *f = it.second;
+      const Vfield *f = it.second;
       if ( f->frequency > 0 ){
 	if ( !first ){
 	  oss << ", ";
@@ -315,7 +315,7 @@ namespace Timbl {
     bool first = true;
     oss << "{ ";
     for ( const auto& it : distribution ){
-      Vfield *f = it.second;
+      const Vfield *f = it.second;
       if ( f->frequency > 0 ){
 	if ( !first ){
 	  oss << ", ";
@@ -338,7 +338,7 @@ namespace Timbl {
     oss << "{ ";
     bool first = true;
     for ( const auto& it : distribution ){
-      Vfield *f = it.second;
+      const Vfield *f = it.second;
       if ( f->frequency > 0 ){
 	if ( !first ){
 	  oss << ", ";
@@ -356,7 +356,7 @@ namespace Timbl {
     oss << "{ ";
     bool first = true;
     for ( const auto& it : distribution ){
-      Vfield *f = it.second;
+      const Vfield *f = it.second;
       if ( f->frequency > 0 ){
 	if ( !first ){
 	  oss << ", ";

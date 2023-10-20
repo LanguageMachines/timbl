@@ -117,12 +117,14 @@ namespace Timbl {
     void Min( const double val ){ n_min = val; };
     double Max() const { return n_max; };
     void Max( const double val ){ n_max = val; };
-    double fvDistance( FeatureValue *, FeatureValue *, size_t=1 ) const;
+    double fvDistance( const FeatureValue *,
+		       const FeatureValue *,
+		       size_t=1 ) const;
     FeatureValue *add_value( const icu::UnicodeString&, TargetValue *, int=1 );
     FeatureValue *add_value( size_t, TargetValue *, int=1 );
     FeatureValue *Lookup( const icu::UnicodeString& ) const;
-    bool decrement_value( FeatureValue *, TargetValue * );
-    bool increment_value( FeatureValue *, TargetValue * );
+    bool decrement_value( FeatureValue *, const TargetValue * );
+    bool increment_value( FeatureValue *, const TargetValue * );
     size_t EffectiveValues() const;
     size_t TotalValues() const;
     bool isNumerical() const;
@@ -143,7 +145,7 @@ namespace Timbl {
     void NumStatistics( double, const Targets&, int, bool );
     void ClipFreq( size_t f ){ matrix_clip_freq = f; };
     size_t ClipFreq() const { return matrix_clip_freq; };
-    SparseSymetricMatrix<ValueClass *> *metric_matrix;
+    SparseSymetricMatrix<const ValueClass *> *metric_matrix;
   private:
     Feature( const Feature& );
     Feature& operator=( const Feature& );

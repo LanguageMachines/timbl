@@ -168,7 +168,8 @@ namespace Timbl{
     return 1.0 - dice;
   }
 
-  double vd_distance( SparseValueProbClass *r, SparseValueProbClass *s ){
+  double vd_distance( const SparseValueProbClass *r,
+		      const SparseValueProbClass *s ){
     double result = 0.0;
     if ( ! ( r && s ) ){
       return 1.0;
@@ -210,7 +211,8 @@ namespace Timbl{
     return p * Log2( p/q );
   }
 
-  double jd_distance( SparseValueProbClass *r, SparseValueProbClass *s ){
+  double jd_distance( const SparseValueProbClass *r,
+		      const SparseValueProbClass *s ){
     double part1 = 0.0;
     double part2 = 0.0;
     auto p1 = r->begin();
@@ -252,7 +254,8 @@ namespace Timbl{
     return k * Log2( (2.0 * k)/( k + l ) );
   }
 
-  double js_distance( SparseValueProbClass *r, SparseValueProbClass *s ){
+  double js_distance( const SparseValueProbClass *r,
+		      const SparseValueProbClass *s ){
     double part1 = 0.0;
     double part2 = 0.0;
     auto p1 = r->begin();
@@ -328,8 +331,8 @@ namespace Timbl{
     }
   }
 
-  double OverlapMetric::distance( FeatureValue *F,
-				  FeatureValue *G,
+  double OverlapMetric::distance( const FeatureValue *F,
+				  const FeatureValue *G,
 				  size_t,
 				  double ) const {
     if ( F == G ){
@@ -341,7 +344,8 @@ namespace Timbl{
   }
 
 
-  inline bool FV_to_real( FeatureValue *FV, double &result ){
+  inline bool FV_to_real( const FeatureValue *FV,
+			  double &result ){
     if ( FV ){
       if ( TiCC::stringTo<double>( FV->name(), result ) ){
 	return true;
@@ -350,7 +354,8 @@ namespace Timbl{
     return false;
   }
 
-  double JeffreyMetric::distance( FeatureValue *F, FeatureValue *G,
+  double JeffreyMetric::distance( const FeatureValue *F,
+				  const FeatureValue *G,
 				  size_t limit,
 				  double ) const {
     double result = 0.0;
@@ -371,7 +376,8 @@ namespace Timbl{
     return result;
   }
 
-  double JSMetric::distance( FeatureValue *F, FeatureValue *G,
+  double JSMetric::distance( const FeatureValue *F,
+			     const FeatureValue *G,
 			     size_t limit,
 			     double ) const {
     double result = 0.0;
@@ -392,7 +398,8 @@ namespace Timbl{
     return result;
   }
 
-  double LevenshteinMetric::distance( FeatureValue *F, FeatureValue *G,
+  double LevenshteinMetric::distance( const FeatureValue *F,
+				      const FeatureValue *G,
 				      size_t, double) const {
     double result = 0.0;
     if ( G != F ){
@@ -401,7 +408,8 @@ namespace Timbl{
     return result;
   }
 
-  double DiceMetric::distance( FeatureValue *F, FeatureValue *G,
+  double DiceMetric::distance( const FeatureValue *F,
+			       const FeatureValue *G,
 			       size_t, double ) const {
     double result = 0.0;
     if ( G != F ){
@@ -410,7 +418,8 @@ namespace Timbl{
     return result;
   }
 
-  double ValueDiffMetric::distance( FeatureValue *F, FeatureValue *G,
+  double ValueDiffMetric::distance( const FeatureValue *F,
+				    const FeatureValue *G,
 				    size_t limit,
 				    double ) const {
     double result = 0.0;
@@ -431,7 +440,8 @@ namespace Timbl{
     return result;
   }
 
-  double NumericMetric::distance( FeatureValue *F, FeatureValue *G,
+  double NumericMetric::distance( const FeatureValue *F,
+				  const FeatureValue *G,
 				  size_t,
 				  double scale ) const {
     double r1=0, r2=0, result;
@@ -445,7 +455,8 @@ namespace Timbl{
     return result;
   }
 
-  double EuclideanMetric::distance( FeatureValue *F, FeatureValue *G,
+  double EuclideanMetric::distance( const FeatureValue *F,
+				    const FeatureValue *G,
 				    size_t,
 				    double scale ) const {
     double r1=0, r2=0, result;
@@ -459,12 +470,14 @@ namespace Timbl{
     return result;
   }
 
-  double DotProductMetric::distance( FeatureValue *, FeatureValue *,
+  double DotProductMetric::distance( const FeatureValue *,
+				     const FeatureValue *,
 				     size_t, double ) const {
     throw( logic_error( "unimplemented distance() for Dotproduct metric!" ) );
   }
 
-  double CosineMetric::distance( FeatureValue *, FeatureValue *,
+  double CosineMetric::distance( const FeatureValue *,
+				 const FeatureValue *,
 				 size_t, double ) const {
     throw( logic_error( "unimplemented distance() for Cosine metric!" ) );
   }

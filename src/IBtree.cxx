@@ -1411,7 +1411,7 @@ namespace Timbl {
 	while( ibPnt ){
 	  IBtree *ibPntNext = ibPnt->next;
 	  ibPnt->next = 0;
-	  FeatureValue *fv = ibPnt->FValue;
+	  const FeatureValue *fv = ibPnt->FValue;
 	  IBtree **pnt = &InstBase;
 	  if ( (*pnt)->FValue->Index() < fv->Index() ){
 	    Error( "MergeSub assumes sorted additions!" );
@@ -1509,7 +1509,7 @@ namespace Timbl {
     return 0;
   }
 
-  const IBtree *IBtree::search_node( FeatureValue *fv ) const {
+  const IBtree *IBtree::search_node( const FeatureValue *fv ) const {
     const IBtree *pnt = 0;
     if ( fv ){
       if ( fv->isUnknown() ){
@@ -1526,7 +1526,7 @@ namespace Timbl {
     return pnt;
   }
 
-  const IBtree *InstanceBase_base::fast_search_node( FeatureValue *fv ) {
+  const IBtree *InstanceBase_base::fast_search_node( const FeatureValue *fv ) {
     const IBtree *result = 0;
     if ( fast_index.empty() ){
       fill_index();
