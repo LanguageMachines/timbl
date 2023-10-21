@@ -435,7 +435,7 @@ namespace Timbl {
   void ClassDistribution::Merge( const ClassDistribution& VD ){
     for ( const auto& it : VD.distribution ){
       size_t key = it.first;
-      Vfield *vd = it.second;
+      const Vfield *vd = it.second;
       if ( distribution.find(key) != distribution.end() ){
 	// the key is already present, increment the frequency
 	distribution[key]->AddFreq( vd->Freq() );
@@ -454,8 +454,8 @@ namespace Timbl {
   void WClassDistribution::MergeW( const ClassDistribution& VD,
 				   double Weight ){
     for ( const auto& it : VD.distribution ){
-      Vfield *vd = it.second;
       size_t key = it.first;
+      const Vfield *vd = it.second;
       if ( distribution.find(key) != distribution.end() ){
 	distribution[key]->SetWeight( distribution[key]->Weight() + vd->Weight() *Weight );
       }
