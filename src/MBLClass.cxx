@@ -1591,7 +1591,7 @@ namespace Timbl {
 	    str1 += to_string(n+1) + "-" + to_string(ff+1);
 	  }
 	  else {
-	    str1 + to_string(ff+1);
+	    str1 += to_string(ff+1);
 	  }
 	}
       }
