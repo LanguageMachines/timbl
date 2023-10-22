@@ -440,7 +440,7 @@ namespace Timbl {
     }
     for ( size_t i = 0; i < Num_Vals; ++i ){
       n_i_dot[i] = 0;      // ALL values should be zeroed
-      FeatureValue *fv = FVA[i];
+      const FeatureValue *fv = FVA[i];
       for ( const auto& tit : fv->TargetDist ){
 	n_dot_j[tit.second->Index()-1] += tit.second->Freq();
 	n_i_dot[i] += tit.second->Freq();
@@ -449,7 +449,7 @@ namespace Timbl {
     }
     if ( n_dot_dot != 0 ){
       for ( size_t m = 0; m < Num_Vals; ++m ){
-	FeatureValue *fv = FVA[m];
+	const FeatureValue *fv = FVA[m];
 	size_t n = 0;
 	for ( const auto& it : fv->TargetDist ){
 	  if ( n >= Size ){
