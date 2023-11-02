@@ -70,6 +70,16 @@ jobs:
                 brew install zlib;
                 brew install cppcheck
              fi
+      - name: Configure CppCheck
+        run: |
+             if [ "$RUNNER_OS" == "Linux" ]; then
+               cpc_opts="--enable=all --inline-suppr --force -I include -I /usr/local/include --quiet --error-exitcode=0"
+                echo "cpc_opts=$cpc_opts" >> $GITHUB_ENV
+             else
+               cpc_opts="--enable=all --inline-suppr --force -I include -I /usr/local/include -I /usr/local/opt/icu4c/include --suppress=missingIncludeSystem --quiet --error-exitcode=0"
+                echo "cpc_opts=$cpc_opts" >> $GITHUB_ENV
+             fi
+
       - name: install TiccUtils
         env:
           CXX: ${{ matrix.compiler }}
@@ -94,7 +104,7 @@ jobs:
           id=$(echo ${{matrix.compiler}} | cut -d\+ -f1)
           echo "id=$id" >> $GITHUB_ENV
       - name: Static Code-check
-        run: cppcheck --enable=all --inline-suppr --force -I include -I /usr/local/include --suppress=missingIncludeSystem --quiet --error-exitcode=0 .
+        run: cppcheck {{ env.cpc_opts }} .
       - name: make
         run: make
       - name: install
