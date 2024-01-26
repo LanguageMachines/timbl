@@ -6,7 +6,7 @@
 TiMBL: Tilburg Memory Based Learner
 ===========================================
 
-    TiMBL 6.4 (c) CLS/ILK/CLiPS 1998 - 2023
+    TiMBL 6.4 (c) CLS/ILK/CLiPS 1998 - 2024
     Centre for Language Studies, Radboud University Nijmegen
     Induction of Linguistic Knowledge Research Group, Tilburg University and
     Centre for Dutch Language and Speech, University of Antwerp
