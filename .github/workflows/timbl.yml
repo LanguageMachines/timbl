@@ -73,9 +73,9 @@ jobs:
       - name: Configure CppCheck
         run: |
              if [ "$RUNNER_OS" == "Linux" ]; then
-                cpc_opts="--enable=all --inline-suppr --force -I include -I /usr/local/include --suppress=dupInheritedMember --quiet --error-exitcode=0"
+                cpc_opts="--enable=all --inline-suppr --force -I include -I /usr/local/include --suppress=duplInheritedMember --quiet --error-exitcode=0"
              else
-                cpc_opts="--enable=all --inline-suppr --force -I include -I /usr/local/include -I /usr/local/opt/icu4c/include --suppress=missingIncludeSystem --suppress=dupInheritedMember --quiet --error-exitcode=0"
+                cpc_opts="--enable=all --inline-suppr --force -I include -I /usr/local/include -I /usr/local/opt/icu4c/include --suppress=missingIncludeSystem --suppress=duplInheritedMember --quiet --error-exitcode=0"
              fi
              echo "cpc_opts=$cpc_opts" >> $GITHUB_ENV
 
