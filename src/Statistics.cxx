@@ -83,7 +83,7 @@ namespace Timbl {
 			       const Targets& targets ) const {
     os << "Confusion Matrix:" << endl;
     os << "        ";
-    for ( const auto& val : targets.values_array ){
+    for ( const auto* val : targets.values_array ){
       // Print the class names.
       os.width(6);
       os.setf(ios::right, ios::adjustfield);
@@ -155,7 +155,7 @@ namespace Timbl {
       size_t FP = 0;
       size_t FN = 0;
       size_t TN = 0;
-      ValueClass *tv = targets.values_array[i];
+      const ValueClass *tv = targets.values_array[i];
       size_t testCount = 0;
       for ( unsigned int j=0; j < size; ++j ){
 	testCount += mat[i][j];

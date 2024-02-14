@@ -173,7 +173,8 @@ namespace Timbl {
     double weight;
     void Statistics( double );
     void NumStatistics( std::vector<FeatureValue *>&, double );
-    void ChiSquareStatistics( std::vector<FeatureValue *>&, const Targets& );
+    void ChiSquareStatistics( const std::vector<FeatureValue *>&,
+			      const Targets& );
     void ChiSquareStatistics( const Targets& );
     void SharedVarianceStatistics( const Targets&, int );
     void StandardDeviationStatistics();

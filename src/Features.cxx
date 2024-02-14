@@ -409,7 +409,7 @@ namespace Timbl {
     // And the split. info.
     //
     split_info = 0.0;
-    for ( const auto& fv : values_array ){
+    for ( const auto* fv : values_array ){
       double Prob = fv->ValFreq() / (double)TotalVals;
       if ( Prob > 0 ) {
 	split_info += Prob * Log2(Prob);
@@ -426,7 +426,7 @@ namespace Timbl {
     }
   }
 
-  void Feature::ChiSquareStatistics( vector<FeatureValue *>& FVA,
+  void Feature::ChiSquareStatistics( const vector<FeatureValue *>& FVA,
 				     const Targets& Targs ){
     size_t Num_Vals = FVA.size();
     chi_square = 0.0;

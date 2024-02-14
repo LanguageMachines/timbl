@@ -74,7 +74,7 @@ namespace Timbl {
   }
 
   ostream& operator<<( ostream& os, const Instance& I ){
-    for ( const auto& it : I.FV ){
+    for ( const auto* it : I.FV ){
       os << it << ", ";
     }
     os << I.TV << " " << I.sample_weight;

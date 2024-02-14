@@ -477,7 +477,7 @@ namespace Timbl {
     tie = false;
     auto It = distribution.begin();
     if ( It != distribution.end() ){
-      Vfield *pnt = It->second;
+      const Vfield *pnt = It->second;
       size_t Max = pnt->Freq();
       if ( do_rand ){
 	int nof_best=1, pick=1;
