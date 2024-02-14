@@ -356,7 +356,7 @@ namespace Timbl {
 
   UnicodeString VectoString( const vector<FeatureValue*>& vec ){
     UnicodeString result;
-    for ( auto const& fv : vec ){
+    for ( auto const* fv : vec ){
       result += " " + fv->name();
     }
     return result;

@@ -291,7 +291,7 @@ namespace Timbl {
     }
     int jj = 0;
     int cnt = 0;
-    for ( const auto& it: ddv ){
+    for ( const auto* it: ddv ){
       FVBin[jj]->TargetDist.Merge( *it->dist );
       if ( ++cnt >= num_per_bin ){
 	++jj;
@@ -386,7 +386,7 @@ namespace Timbl {
     size_t TotalVals = TotalValues();
     entropy = 0.0;
     // Loop over the values.
-    for ( const auto& fv : values_array ){
+    for ( const auto* fv : values_array ){
       // Entropy for this FV pair.
       size_t Freq = fv->ValFreq();
       if ( Freq > 0 ){
@@ -493,7 +493,7 @@ namespace Timbl {
       n_dot_j[j] = 0;
     }
     int i = 0;
-    for ( const auto& fv : values_array ){
+    for ( const auto* fv : values_array ){
       n_i_dot[i] = 0;       // ALL values should be zeroed
       for ( const auto& t_it : fv->TargetDist ){
 	long int fr = t_it.second->Freq();
@@ -505,7 +505,7 @@ namespace Timbl {
     }
     if ( n_dot_dot != 0 ){
       int m = 0;
-      for ( const auto& fv : values_array ){
+      for ( const auto* fv : values_array ){
 	size_t n = 0;
 	for ( const auto& t_it : fv->TargetDist ){
 	  if ( n >= Size ){
@@ -676,7 +676,7 @@ namespace Timbl {
     if ( !is_reference ){
       delete_matrix();
       delete metric;
-      for ( const auto& it : values_array ){
+      for ( const auto* it : values_array ){
 	delete it;
       }
     }
@@ -708,7 +708,7 @@ namespace Timbl {
 
   FeatVal_Stat Feature::prepare_numeric_stats(){
     bool first = true;
-    for ( const auto& fv : values_array ){
+    for ( const auto* fv : values_array ){
       size_t freq = fv->ValFreq();
       if ( freq > 0 ){
 	double tmp = -1;
@@ -814,8 +814,8 @@ namespace Timbl {
     }
     if ( PrestoreStatus != ps_failed && metric->isStorable( ) ) {
       try {
-	for ( const auto& FV_i : values_array ){
-	  for ( const auto& FV_j : values_array ){
+	for ( const auto* FV_i : values_array ){
+	  for ( const auto* FV_j : values_array ){
 	    if ( FV_i->ValFreq() >= matrix_clip_freq &&
 		 FV_j->ValFreq() >= matrix_clip_freq &&
 		 ( Prestored_metric != metric->type() ||
@@ -865,7 +865,7 @@ namespace Timbl {
   }
 
   void Feature::print_vc_pb_array( ostream &os ) const {
-    for ( const auto& FV : values_array ){
+    for ( const auto* FV : values_array ){
       if ( FV->ValueClassProb ){
 	os << FV << FV->ValueClassProb << endl;
       }
@@ -876,7 +876,7 @@ namespace Timbl {
     unsigned int Num = 0;
     bool first = true;
     // clear all existing arrays
-    for ( const auto& FV : values_array ){
+    for ( auto* FV : values_array ){
       if ( FV->ValueClassProb ){
 	delete FV->ValueClassProb;
 	FV->ValueClassProb = NULL;
@@ -915,7 +915,7 @@ namespace Timbl {
       }
     }
     // check if we've got all the values, assign a default if not so
-    for ( const auto& FV : values_array ){
+    for ( auto* FV : values_array ){
       if ( FV->ValueClassProb == NULL ){
 	FV->ValueClassProb = new SparseValueProbClass( Num );
       }
@@ -977,14 +977,14 @@ namespace Timbl {
     ios::fmtflags old_flags = os.flags();
     os.unsetf(std::ios_base::floatfield);
     if ( full ){
-      for ( const auto& FV_i : values_array ){
+      for ( const auto* FV_i : values_array ){
 	os.width(6);
 	os.setf(ios::left, ios::adjustfield);
 	os << FV_i << ":";
 	os.width(12);
 	os.precision(3);
 	os.setf(ios::right, ios::adjustfield);
-	for ( const auto& FV_j : values_array ){
+	for ( const auto* FV_j : values_array ){
 	  os.width(12);
 	  os.precision(3);
 	  os.setf(ios::right,ios::adjustfield );
