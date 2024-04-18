@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # bootstrap - script to bootstrap the distribution rolling engine
 
 # usage:
@@ -35,32 +37,48 @@ aclocal=aclocal
 #   svn log --verbose > ChangeLog
 #}
 
-if $automake --version|head -1 |grep ' 1\.[4-9]'; then
-    echo "automake 1.4-1.9 is active. You should use automake 1.10 or later"
+# inspired by hack as used in mcl (from http://micans.org/)
+
+# autoconf-archive Debian package, aclocal-archive RPM, obsolete/badly supported OS, installed in home dir
+acdirs="/usr/share/autoconf-archive/ /usr/share/aclocal/ /usr/local/share/aclocal/ $HOME/local/share/autoconf-archive/ /opt/homebrew/share/aclocal/"
+
+   found=false
+   for d in $acdirs
+   do
+      if test -f ${d}pkg.m4
+      then
+         found=true
+         break
+      fi
+   done
+
+   if ! $found
+   then
+      cat <<EOT
+You need the autoconf-archive Debian package, or the aclocal-archive
+RPM package.  Alternatively, you could install the GNU Autoconf Macro
+Archive's http://autoconf-archive.cryp.to/ac_path_lib.html
+as `pwd`/acinclude.m4.
+EOT
+   fi
+
+
+if $automake --version|head -1 |grep ' 1\.[4-8]'; then
+    echo "automake 1.4-1.8 is active. You should use automake 1.9 or later"
     if test -f /etc/debian_version; then
-        echo " sudo apt-get install automake"
+        echo " sudo apt-get install automake1.9"
         echo " sudo update-alternatives --config automake"
     fi
     exit 1
 fi
-# autoconf-archive Debian package, aclocal-archive RPM, obsolete/badly supported OS, installed in home dir
-acdirs="/usr/share/autoconf-archive/ /usr/share/aclocal/ /usr/local/share/aclocal/ $HOME/local/share/autoconf-archive/"
 
-found=false
-for d in $acdirs
-do
-    if test -f ${d}libtool.m4
-    then
-        found=true
-        break
+if $aclocal --version|head -1 |grep ' 1\.[4-8]'; then
+    echo "aclocal 1.4-1.8 is active. You should use aclocal 1.9 or later"
+    if test -f /etc/debian_version; then
+        echo " sudo apt-get install aclocal1.9"
+        echo " sudo update-alternatives --config aclocal"
     fi
-done
-
-if ! $found
-then
-    cat <<EOT
-You need the autoconf-archive package, or the aclocal-archive package.
-EOT
+    exit 1
 fi
 
 # Debian automake package installs as automake-version.  Use this

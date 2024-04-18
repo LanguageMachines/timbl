@@ -38,7 +38,7 @@ jobs:
     needs: notification
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-14]
         compiler: [g++, clang++]
 
     steps:
@@ -53,9 +53,10 @@ jobs:
              if [ "$RUNNER_OS" == "Linux" ]; then
                 sudo apt-get install pkg-config autoconf-archive
              else
-                brew upgrade;
+                brew upgrade
                 brew install pkg-config
                 brew install autoconf-archive
+                brew install libtool
                 brew install autoconf
                 brew install automake
              fi
@@ -65,9 +66,9 @@ jobs:
                 sudo apt-get install libicu-dev libxml2-dev libbz2-dev
                 sudo apt-get install zlib1g-dev cppcheck
              else
-                brew install libxml2;
-                brew install bzip2;
-                brew install zlib;
+                brew install libxml2
+                brew install bzip2
+                brew install zlib
                 brew install cppcheck
              fi
       - name: Configure CppCheck
