@@ -81,7 +81,7 @@ namespace Timbl {
       target_hash( T ),
       is_reference(false)
     {};
-    ~Targets();
+    ~Targets() override;
     Targets& operator=( const Targets& );
     void init();
     TargetValue *add_value( const icu::UnicodeString&, int freq = 1 );

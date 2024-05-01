@@ -339,7 +339,7 @@ namespace Timbl {
     else {
       result = json::array();
       size_t k = 0;
-      for ( auto const& best : bestArray ){
+      for ( auto const *best : bestArray ){
 	result.push_back( record_to_json( best, ++k) );
       }
     }

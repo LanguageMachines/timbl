@@ -646,12 +646,12 @@ namespace Timbl {
 
   void MBLClass::diverseWeights(void){
     double minW = DBL_MAX;
-    for ( auto const &feat : features.feats ){
+    for ( auto const *feat : features.feats ){
       if ( feat->Ignore() ){
 	continue;
       }
       if ( feat->Weight() < minW ){
-	minW =  feat->Weight();
+	minW = feat->Weight();
       }
     }
     for ( auto *feat : features.feats ){
@@ -1021,7 +1021,7 @@ namespace Timbl {
       }
       if ( Verbosity(VD_MATRIX) ){
 	size_t pos = 0;
-	for ( auto const& feat : features.feats ){
+	for ( auto const *feat : features.feats ){
 	  ++pos;
 	  if ( !feat->Ignore() ){
 	    bool dummy;
