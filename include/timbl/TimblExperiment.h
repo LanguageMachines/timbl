@@ -178,8 +178,8 @@ namespace Timbl {
     bool GetCurrentWeights( std::vector<double>& );
     xmlNode *weightsToXML();
     nlohmann::json weights_to_JSON();
-    bool ShowOptions( std::ostream& );
-    bool ShowSettings( std::ostream& );
+    bool ShowOptions( std::ostream& ) override;
+    bool ShowSettings( std::ostream& ) override;
     xmlNode *settingsToXML();
     nlohmann::json settings_to_JSON() override;
     bool showBestNeighbors( std::ostream& ) const;
@@ -306,6 +306,7 @@ namespace Timbl {
 
   class IB1_Experiment: public TimblExperiment {
   public:
+    // cppcheck-suppress noExplicitConstructor
     IB1_Experiment( const size_t N = DEFAULT_MAX_FEATS,
 		    const std::string& s= "",
 		    const bool init = true );
@@ -330,7 +331,8 @@ namespace Timbl {
 
   class IB2_Experiment: public IB1_Experiment {
   public:
-  IB2_Experiment( size_t N, const std::string& s="" ):
+    // cppcheck-suppress noExplicitConstructor
+    IB2_Experiment( size_t N, const std::string& s="" ):
     IB1_Experiment( N, s ) {
       IB2_offset( 0 );
     };
@@ -351,6 +353,7 @@ namespace Timbl {
 
   class LOO_Experiment: public IB1_Experiment {
   public:
+    // cppcheck-suppress noExplicitConstructor
     LOO_Experiment( int N, const std::string& s = "" ):
       IB1_Experiment( N, s ) {
     };
@@ -366,6 +369,7 @@ namespace Timbl {
 
   class CV_Experiment: public IB1_Experiment {
   public:
+    // cppcheck-suppress noExplicitConstructor
     CV_Experiment( int N = DEFAULT_MAX_FEATS, const std::string& s = "" ):
       IB1_Experiment( N, s ), CV_fileW(Unknown_w) { };
     CV_Experiment( const CV_Experiment& ) = delete; // forbid copies
@@ -392,9 +396,10 @@ namespace Timbl {
 
   class TRIBL_Experiment: public TimblExperiment {
   public:
-  TRIBL_Experiment( const size_t N = DEFAULT_MAX_FEATS,
-		    const std::string& s = "",
-		    const bool init = true ):
+    // cppcheck-suppress noExplicitConstructor
+    TRIBL_Experiment( const size_t N = DEFAULT_MAX_FEATS,
+		      const std::string& s = "",
+		      const bool init = true ):
     TimblExperiment( TRIBL_a, s ) {
       if ( init ) init_options_table( N );
     };
@@ -415,9 +420,10 @@ namespace Timbl {
 
   class TRIBL2_Experiment: public TimblExperiment {
   public:
-  TRIBL2_Experiment( const size_t N = DEFAULT_MAX_FEATS,
-		     const std::string& s = "",
-		     const bool init = true ):
+    // cppcheck-suppress noExplicitConstructor
+    TRIBL2_Experiment( const size_t N = DEFAULT_MAX_FEATS,
+		       const std::string& s = "",
+		       const bool init = true ):
     TimblExperiment( TRIBL2_a, s ) {
       if ( init ) init_options_table( N );
     };
@@ -437,9 +443,10 @@ namespace Timbl {
 
   class IG_Experiment: public TimblExperiment {
   public:
-  IG_Experiment( const size_t N = DEFAULT_MAX_FEATS,
-		 const std::string& s = "",
-		 const bool init = true ):
+    // cppcheck-suppress noExplicitConstructor
+    IG_Experiment( const size_t N = DEFAULT_MAX_FEATS,
+		   const std::string& s = "",
+		   const bool init = true ):
     TimblExperiment( IGTREE_a, s ) {
       if ( init ) init_options_table( N );
     };

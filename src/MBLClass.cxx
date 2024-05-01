@@ -412,14 +412,14 @@ namespace Timbl {
     }
   }
 
-  bool MBLClass::ShowOptions( ostream& os ) const {
+  bool MBLClass::ShowOptions( ostream& os ) {
     os << "Possible Experiment Settings (current value between []):" << endl;
     Options.Show_Options( os );
     os << endl;
     return true;
   }
 
-  bool MBLClass::ShowSettings( ostream& os ) const{
+  bool MBLClass::ShowSettings( ostream& os ) {
     os << "Current Experiment Settings :" << endl;
     Options.Show_Settings( os );
     os << endl;
@@ -975,7 +975,7 @@ namespace Timbl {
 
   bool MBLClass::allocate_arrays(){
     size_t Dim = targets.values_array.size();
-    for ( const auto& feat : features.feats ){
+    for ( auto *feat : features.feats ){
       if ( !feat->Ignore() &&
 	   !feat->isNumerical() ) {
 	if ( !feat->AllocSparseArrays( Dim ) ){
@@ -1541,7 +1541,7 @@ namespace Timbl {
       double Entropy = 0.0;
       // first get the Database Entropy
       size_t totval = targets.TotalValues();
-      for ( const auto& it : targets.values_array ){
+      for ( const auto *it : targets.values_array ){
 	double Ratio = it->ValFreq() / (double)totval;
 	if ( Ratio > 0 ){
 	  Entropy += Ratio * Log2(Ratio);

@@ -91,8 +91,8 @@ namespace Timbl {
     bool writeWeights( std::ostream& ) const;
     bool readWeights( std::istream&, WeightType );
     bool writeNamesFile( std::ostream& ) const;
-    bool ShowOptions( std::ostream& ) const;
-    bool ShowSettings( std::ostream& ) const;
+    virtual bool ShowOptions( std::ostream& );
+    virtual bool ShowSettings( std::ostream& );
     void writePermutation( std::ostream& ) const;
     void LearningInfo( std::ostream& );
     virtual ~MBLClass() override;
