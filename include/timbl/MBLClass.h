@@ -51,7 +51,7 @@ namespace Timbl {
   public:
     bool SetOption( const std::string& );
     xmlNode *settingsToXml() const;
-    nlohmann::json settings_to_JSON() const;
+    virtual nlohmann::json settings_to_JSON();
     bool ShowWeights( std::ostream& ) const;
     bool Verbosity( VerbosityFlags v ) const {
       return verbosity & v; };
@@ -95,7 +95,7 @@ namespace Timbl {
     bool ShowSettings( std::ostream& ) const;
     void writePermutation( std::ostream& ) const;
     void LearningInfo( std::ostream& );
-    virtual ~MBLClass();
+    virtual ~MBLClass() override;
     void Initialize( size_t );
     bool PutInstanceBase( std::ostream& ) const;
     VerbosityFlags get_verbosity() const { return verbosity; };

@@ -85,7 +85,7 @@ namespace Timbl{
   public:
     DistanceTester( const Feature_List&,
 		    int );
-    ~DistanceTester();
+    ~DistanceTester() override;
     double getDistance( size_t ) const override;
     size_t test( const std::vector<FeatureValue *>&,
 		 size_t,
@@ -98,7 +98,7 @@ namespace Timbl{
   public:
     explicit SimilarityTester( const Feature_List& pf ):
       TesterClass( pf ){};
-    ~SimilarityTester() {};
+    ~SimilarityTester() override {};
     virtual size_t test( const std::vector<FeatureValue *>&,
 			 size_t,
 			 double ) override = 0;

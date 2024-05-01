@@ -71,91 +71,82 @@ namespace Timbl {
     MaxFeatures = Size;
     UserOptions.resize(MaxFeatures+1);
     //cerr << "fill table() for " << (void*)this << endl;
-    bool stat =
-      Options.Add( new IntegerOption( "FLENGTH",
-				      &F_length, 0, 1, 32 ) )
-      && Options.Add( new SizeOption( "MAXBESTS",
-				      &MaxBests, 500, 10, 100000 ) )
-      && Options.Add( new SizeOption( "TRIBL_OFFSET",
-				      &tribl_offset, 0, 0, MaxFeatures ) )
-      && Options.Add( new UnsignedOption( "IG_THRESHOLD",
-					  &igThreshold,
-					  1000, 0,
-					  std::numeric_limits<unsigned>::max() ) )
-      && Options.Add( new InputFormatOption( "INPUTFORMAT",
-					     &input_format,
-					     UnknownInputFormat ) )
-      && Options.Add( new OrdeningOption( "TREE_ORDER",
-					  &TreeOrder, UnknownOrdening ) )
-      && Options.Add( new BoolOption( "ALL_WEIGHTS",
-				      &need_all_weights, false ) )
-      && Options.Add( new WeightOption( "WEIGHTING",
-					&Weighting, GR_w ) )
-      && Options.Add( new IntegerOption( "BIN_SIZE",
-					 &Bin_Size, 20, 2, 10000 ) )
-      && Options.Add( new UnsignedOption( "IB2_OFFSET",
-					  &ib2_offset, 0, 1, 10000000 ) )
-      && Options.Add( new BoolOption( "KEEP_DISTRIBUTIONS",
-				      &keep_distributions, false ) )
-      && Options.Add( new BoolOption( "DO_SLOPPY_LOO",
-				      &do_sloppy_loo, false ) )
-      && Options.Add( new SizeOption( "TARGET_POS",
-				      &target_pos,
-				      std::numeric_limits<size_t>::max(),
-				      0, MaxFeatures ) );
-    //    cerr << "STAT 1=" << (stat?"true":"false") << endl;
-    if ( stat ){
-      stat =
-	Options.Add( new BoolOption( "DO_SILLY",
-				     &do_silly_testing, false ) )
-	&& Options.Add( new BoolOption( "DO_DIVERSIFY",
-					&do_diversify, false ) )
-	&& Options.Add( new DecayOption( "DECAY",
-					 &decay_flag, Zero ) )
-	&& Options.Add( new IntegerOption( "SEED",
-					   &random_seed, -1, -1, RAND_MAX ) )
-	&& Options.Add( new IntegerOption( "BEAM_SIZE",
-					   &beamSize, 0, 1, INT_MAX ) )
-	&& Options.Add( new RealOption( "DECAYPARAM_A",
-					&decay_alfa, 1.0, 0.0, DBL_MAX ) )
-	&& Options.Add( new RealOption( "DECAYPARAM_B",
-					&decay_beta, 1.0, 0.0, DBL_MAX ) )
-	&& Options.Add( new NormalisationOption( "NORMALISATION",
-						 &normalisation, noNorm ) )
-	&& Options.Add( new RealOption( "NORM_FACTOR",
-					&norm_factor, 1.0, Epsilon, DBL_MAX ) )
-	&& Options.Add( new BoolOption( "EXEMPLAR_WEIGHTS",
-					&do_sample_weighting, false ) )
-	&& Options.Add( new BoolOption( "IGNORE_EXEMPLAR_WEIGHTS",
-					&do_ignore_samples, true ) )
-	&& Options.Add( new BoolOption( "NO_EXEMPLAR_WEIGHTS_TEST",
-					&no_samples_test, true ) )
-	&& Options.Add( new VerbosityOption( "VERBOSITY",
-					     &verbosity, NO_VERB ) )
-	&& Options.Add( new BoolOption( "EXACT_MATCH",
-					&do_exact_match, false ) )
-	&& Options.Add( new BoolOption( "HASHED_TREE",
-					&hashed_trees, true ) )
-	&& Options.Add( new MetricOption( "GLOBAL_METRIC",
-					  &globalMetricOption, Overlap ) )
-	&& Options.Add( new MetricArrayOption( "METRICS",
-					       UserOptions, globalMetricOption,
-					       MaxFeatures+1 ) )
-	&& Options.Add( new IntegerOption( "MVD_LIMIT",
-					   &mvd_threshold, 1, 1, 100000 ) )
-	&& Options.Add( new SizeOption( "NEIGHBORS",
-					&num_of_neighbors, 1, 1, 100000 ) )
-	&& Options.Add( new IntegerOption( "PROGRESS",
-					   &progress, 10000, 1, INT_MAX ) )
-	&& Options.Add( new IntegerOption( "HANDLE_OCCURRENCES",
-					   &doOcc, 0, 0, 3 ) )
-	&& Options.Add( new IntegerOption( "CLIP_FACTOR",
-					   &clip_factor, 10, 0, 1000000 ) );
-    }
-    //    cerr << "STAT 2=" << (stat?"true":"false") << endl;
-    if ( !stat ){
-      FatalError( "Too many options for OptionTable" );
-    }
+    Options.Add( new IntegerOption( "FLENGTH",
+				    &F_length, 0, 1, 32 ) );
+    Options.Add( new SizeOption( "MAXBESTS",
+				 &MaxBests, 500, 10, 100000 ) );
+    Options.Add( new SizeOption( "TRIBL_OFFSET",
+				 &tribl_offset, 0, 0, MaxFeatures ) );
+    Options.Add( new UnsignedOption( "IG_THRESHOLD",
+				     &igThreshold,
+				     1000, 0,
+				     std::numeric_limits<unsigned>::max() ) );
+    Options.Add( new InputFormatOption( "INPUTFORMAT",
+					&input_format,
+					UnknownInputFormat ) );
+    Options.Add( new OrdeningOption( "TREE_ORDER",
+				     &TreeOrder, UnknownOrdening ) );
+    Options.Add( new BoolOption( "ALL_WEIGHTS",
+				 &need_all_weights, false ) );
+    Options.Add( new WeightOption( "WEIGHTING",
+				   &Weighting, GR_w ) );
+    Options.Add( new IntegerOption( "BIN_SIZE",
+				    &Bin_Size, 20, 2, 10000 ) );
+    Options.Add( new UnsignedOption( "IB2_OFFSET",
+				     &ib2_offset, 0, 1, 10000000 ) );
+    Options.Add( new BoolOption( "KEEP_DISTRIBUTIONS",
+				 &keep_distributions, false ) );
+    Options.Add( new BoolOption( "DO_SLOPPY_LOO",
+				 &do_sloppy_loo, false ) );
+    Options.Add( new SizeOption( "TARGET_POS",
+				 &target_pos,
+				 std::numeric_limits<size_t>::max(),
+				 0, MaxFeatures ) );;
+    Options.Add( new BoolOption( "DO_SILLY",
+				 &do_silly_testing, false ) );
+    Options.Add( new BoolOption( "DO_DIVERSIFY",
+				 &do_diversify, false ) );
+    Options.Add( new DecayOption( "DECAY",
+				  &decay_flag, Zero ) );
+    Options.Add( new IntegerOption( "SEED",
+				    &random_seed, -1, -1, RAND_MAX ) );
+    Options.Add( new IntegerOption( "BEAM_SIZE",
+				    &beamSize, 0, 1, INT_MAX ) );
+    Options.Add( new RealOption( "DECAYPARAM_A",
+				 &decay_alfa, 1.0, 0.0, DBL_MAX ) );
+    Options.Add( new RealOption( "DECAYPARAM_B",
+				 &decay_beta, 1.0, 0.0, DBL_MAX ) );
+    Options.Add( new NormalisationOption( "NORMALISATION",
+					  &normalisation, noNorm ) );
+    Options.Add( new RealOption( "NORM_FACTOR",
+				 &norm_factor, 1.0, Epsilon, DBL_MAX ) );
+    Options.Add( new BoolOption( "EXEMPLAR_WEIGHTS",
+				 &do_sample_weighting, false ) );
+    Options.Add( new BoolOption( "IGNORE_EXEMPLAR_WEIGHTS",
+				 &do_ignore_samples, true ) );
+    Options.Add( new BoolOption( "NO_EXEMPLAR_WEIGHTS_TEST",
+				 &no_samples_test, true ) );
+    Options.Add( new VerbosityOption( "VERBOSITY",
+				      &verbosity, NO_VERB ) );
+    Options.Add( new BoolOption( "EXACT_MATCH",
+				 &do_exact_match, false ) );
+    Options.Add( new BoolOption( "HASHED_TREE",
+				 &hashed_trees, true ) );
+    Options.Add( new MetricOption( "GLOBAL_METRIC",
+				   &globalMetricOption, Overlap ) );
+    Options.Add( new MetricArrayOption( "METRICS",
+					UserOptions, globalMetricOption,
+					MaxFeatures+1 ) );
+    Options.Add( new IntegerOption( "MVD_LIMIT",
+				    &mvd_threshold, 1, 1, 100000 ) );
+    Options.Add( new SizeOption( "NEIGHBORS",
+				 &num_of_neighbors, 1, 1, 100000 ) );
+    Options.Add( new IntegerOption( "PROGRESS",
+				    &progress, 10000, 1, INT_MAX ) );
+    Options.Add( new IntegerOption( "HANDLE_OCCURRENCES",
+				    &doOcc, 0, 0, 3 ) );
+    Options.Add( new IntegerOption( "CLIP_FACTOR",
+				    &clip_factor, 10, 0, 1000000 ) );
   }
 
   void MBLClass::InvalidMessage(void) const{
@@ -468,7 +459,7 @@ namespace Timbl {
     return result;
   }
 
-  json MBLClass::settings_to_JSON() const{
+  json MBLClass::settings_to_JSON() {
     ostringstream tmp;
     Options.Show_Settings( tmp );
     vector<string> lines = TiCC::split_at( tmp.str(), "\n" );
@@ -655,7 +646,7 @@ namespace Timbl {
 
   void MBLClass::diverseWeights(void){
     double minW = DBL_MAX;
-    for ( auto const& feat : features.feats ){
+    for ( auto const &feat : features.feats ){
       if ( feat->Ignore() ){
 	continue;
       }
@@ -663,7 +654,7 @@ namespace Timbl {
 	minW =  feat->Weight();
       }
     }
-    for ( auto const& feat : features.feats ){
+    for ( auto *feat : features.feats ){
       if ( feat->Ignore() ){
 	continue;
       }

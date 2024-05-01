@@ -2205,7 +2205,7 @@ namespace Timbl {
     }
   }
 
-  json TimblExperiment::settings_to_JSON(){
+  json TimblExperiment::settings_to_JSON() {
     if ( ConfirmOptions() ){
       return MBLClass::settings_to_JSON( );
     }

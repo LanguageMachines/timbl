@@ -76,7 +76,7 @@ namespace Timbl {
   public:
     explicit FeatureValue( const icu::UnicodeString& );
     FeatureValue( const icu::UnicodeString&, size_t );
-    ~FeatureValue();
+    ~FeatureValue() override;
     void ReconstructDistribution( const ClassDistribution& vd ) {
       TargetDist.Merge( vd );
       _frequency = TargetDist.totalSize();
@@ -94,7 +94,7 @@ namespace Timbl {
     friend class Feature_List;
   public:
     explicit Feature( Hash::UnicodeHash *T );
-    ~Feature();
+    ~Feature() override;
     bool Ignore() const { return ignore; };
     void Ignore( const bool val ){ ignore = val; };
     bool setMetricType( const MetricType );
@@ -200,7 +200,7 @@ namespace Timbl {
       _feature_hash = hash;
     }
     Feature_List &operator=( const Feature_List& );
-    ~Feature_List();
+    ~Feature_List() override;
     void init( size_t, const std::vector<MetricType>& );
     Hash::UnicodeHash *hash() const { return _feature_hash; };
     size_t effective_feats(){ return _eff_feats; };

@@ -39,7 +39,7 @@ namespace Timbl {
     std::vector<std::vector<size_t> > mat;
   public:
     explicit ConfusionMatrix( size_t );
-    virtual ~ConfusionMatrix();
+    virtual ~ConfusionMatrix() override;
     void Increment( const TargetValue*, const TargetValue* );
     void Print( std::ostream&, const Targets& ) const;
     void FScore( std::ostream&, const Targets&, bool ) const;

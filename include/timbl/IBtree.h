@@ -117,7 +117,7 @@ namespace Timbl {
 				     const InstanceBase_base * );
   public:
     InstanceBase_base( size_t, unsigned long&, bool, bool );
-    virtual ~InstanceBase_base( void );
+    virtual ~InstanceBase_base( void ) override;
     void AssignDefaults( void );
     void RedoDistributions();
     bool AddInstance( const Instance&  );

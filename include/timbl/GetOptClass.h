@@ -40,7 +40,7 @@ namespace Timbl {
   public:
     explicit GetOptClass( const TiCC::CL_Options&  );
     GetOptClass& operator=( const GetOptClass& ) = delete; // forbid copies
-    virtual ~GetOptClass();
+    virtual ~GetOptClass() override;
     GetOptClass *Clone( std::ostream * = 0 ) const;
     bool parse_options( const TiCC::CL_Options&, const int=0 );
     void set_default_options( const int=0 );

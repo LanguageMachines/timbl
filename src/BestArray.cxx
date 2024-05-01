@@ -200,7 +200,7 @@ namespace Timbl {
 
   void BestArray::initNeighborSet( neighborSet& ns ) const {
     ns.clear();
-    for ( auto const& best : bestArray ){
+    for ( auto const *best : bestArray ){
       ns.push_back( best->bestDistance,
 		    best->aggregateDist );
     }
@@ -214,7 +214,7 @@ namespace Timbl {
   xmlNode *BestArray::toXML() const {
     xmlNode *top = TiCC::XmlNewNode( "neighborset" );
     size_t k = 0;
-    for ( auto const& best : bestArray ){
+    for ( auto const *best : bestArray ){
       ++k;
       if ( _storeInstances ){
 	size_t totalBests = best->totalBests();

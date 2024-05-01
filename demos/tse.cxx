@@ -432,7 +432,7 @@ void one_command( istream &in_file, int &line_count ) {
   }
 }
 
-int main(int argc, char *argv[] ){
+int main(int argc, char const *argv[] ){
   // the following trick makes it possible to parse lines from cin
   // as well from a user supplied file.
   istream *script_file;

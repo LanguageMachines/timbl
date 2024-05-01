@@ -70,7 +70,7 @@ namespace Timbl {
 	{};
     resultStore( const resultStore& ) = delete; // inhibit copies
     resultStore& operator=( const resultStore& ) = delete; // inhibit copies
-    ~resultStore();
+    ~resultStore() override;
     bool reset( int, normType, double, const Targets&  );
     void clear();
     void addConstant( const ClassDistribution *, const TargetValue * );
@@ -129,7 +129,7 @@ namespace Timbl {
     friend class threadData;
     friend class threadBlock;
   public:
-    virtual ~TimblExperiment();
+    virtual ~TimblExperiment() override;
     virtual TimblExperiment *clone() const = 0;
     TimblExperiment& operator=( const TimblExperiment& );
     virtual bool Prepare( const std::string& = "", bool = true, bool = false );
@@ -181,7 +181,7 @@ namespace Timbl {
     bool ShowOptions( std::ostream& );
     bool ShowSettings( std::ostream& );
     xmlNode *settingsToXML();
-    nlohmann::json settings_to_JSON();
+    nlohmann::json settings_to_JSON() override;
     bool showBestNeighbors( std::ostream& ) const;
     xmlNode *bestNeighborsToXML() const;
     nlohmann::json best_neighbors_to_JSON() const;

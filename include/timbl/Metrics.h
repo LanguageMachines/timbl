@@ -60,7 +60,7 @@ namespace Timbl{
   class distanceMetricClass: public metricClass {
   public:
     explicit distanceMetricClass( MetricType m ): metricClass(m){};
-    virtual ~distanceMetricClass() {};
+    virtual ~distanceMetricClass() override {};
     bool isSimilarityMetric() const override { return false; };
   };
 
@@ -78,7 +78,7 @@ namespace Timbl{
   class NumericMetricClass: public distanceMetricClass {
   public:
     explicit NumericMetricClass( MetricType m ): distanceMetricClass( m ){};
-    virtual ~NumericMetricClass() {};
+    virtual ~NumericMetricClass() override {};
     bool isNumerical() const override { return true; };
     bool isStorable() const override { return false; };
   };
@@ -159,7 +159,7 @@ namespace Timbl{
   class similarityMetricClass: public metricClass {
   public:
     explicit similarityMetricClass( MetricType m ): metricClass( m ){};
-    virtual ~similarityMetricClass() {};
+    virtual ~similarityMetricClass() override {};
     bool isSimilarityMetric() const override { return true; };
     bool isNumerical() const override { return true; };
     bool isStorable() const override { return false; };
