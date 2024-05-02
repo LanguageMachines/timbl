@@ -225,12 +225,12 @@ namespace Timbl {
       Initialized = false;
       OptParams = NULL;
       algorithm = in.algorithm;
+      ibCount = in.ibCount;
+      confusionInfo = 0;
       CurrentDataFile = in.CurrentDataFile;
       WFileName = in.WFileName;
-      estimate = in.estimate;
       Weighting = in.Weighting;
-      confusionInfo = 0;
-      match_depth = 0;
+      match_depth = -1;
       estimate = in.estimate;
       numOfThreads = in.numOfThreads;
     }
