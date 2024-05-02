@@ -230,6 +230,8 @@ namespace Timbl {
       estimate = in.estimate;
       Weighting = in.Weighting;
       confusionInfo = 0;
+      match_depth = 0;
+      estimate = in.estimate;
       numOfThreads = in.numOfThreads;
     }
     return *this;
@@ -906,8 +908,8 @@ namespace Timbl {
       if ( Estimate() > 0 &&  (unsigned int)Estimate() > line ) {
 	time_t SecsUsed = Time - start;
 	if ( SecsUsed > 0 ) {
-	  double Estimated = (SecsUsed / (float)line) *
-	    (float)Estimate();
+	  double Estimated = ( SecsUsed / double(line) )
+	    * double(Estimate());
 	  time_t EstimatedTime = (long)Estimated + start;
 	  string time_string = ctime(&EstimatedTime);
 	  time_string.pop_back(); // the newline from ctime
@@ -961,8 +963,8 @@ namespace Timbl {
       if ( Estimate() > 0 && (unsigned int)Estimate() > lines ) {
 	time_t SecsUsed = Time - start;
 	if ( SecsUsed > 0 ) {
-	  double Estimated = (SecsUsed / (float)line) *
-	    ( (float)Estimate() - IB2_offset() );
+	  double Estimated = ( SecsUsed / double(line) )
+	    * ( double(Estimate() - IB2_offset()) );
 	  time_t EstimatedTime = (long)Estimated + start;
 	  string time_string = ctime(&EstimatedTime);
 	  time_string.pop_back(); // the newline from ctime
