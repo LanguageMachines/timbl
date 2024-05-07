@@ -44,7 +44,7 @@ using Common::Log2;
 
 namespace Timbl{
 
-  double lv_distance( const icu::UnicodeString& source,
+  size_t lv_distance( const icu::UnicodeString& source,
 		      const icu::UnicodeString& target ){
     // code taken from: http://www.merriampark.com/ldcpp.htm
     //    Levenshtein Distance Algorithm: C++ Implementation
@@ -52,13 +52,12 @@ namespace Timbl{
     // Step 1
     const size_t n = source.length();
     const size_t m = target.length();
-    if (n == 0) {
-      return (double)m;
+    if ( n == 0 ) {
+      return m;
     }
-    if (m == 0) {
-      return (double)n;
+    if ( m == 0 ) {
+      return n;
     }
-
 
     // Step 1 declare a matrix
     std::vector<std::vector<size_t>> matrix(n+1,vector<size_t>(m+1));
@@ -103,7 +102,7 @@ namespace Timbl{
 	matrix[i][j]=cell;
       }
     }
-    return (double)matrix[n][m];
+    return matrix[n][m];
   }
 
   double dc_distance( const icu::UnicodeString& string1,
@@ -398,7 +397,7 @@ namespace Timbl{
 				      size_t, double) const {
     double result = 0.0;
     if ( G != F ){
-      result = lv_distance( F->name(), G->name() );
+      result = (double)lv_distance( F->name(), G->name() );
     }
     return result;
   }
