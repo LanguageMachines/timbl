@@ -58,17 +58,12 @@ namespace Timbl{
     if (m == 0) {
       return (double)n;
     }
-    // Good form to declare a TYPEDEF
-    typedef std::vector< std::vector<size_t> > Tmatrix;
-    Tmatrix matrix(n+1);
 
-    // Size the vectors in the 2.nd dimension. Unfortunately C++ doesn't
-    // allow for allocation on declaration of 2.nd dimension of vec of vec
 
-    for ( size_t i = 0; i <= n; ++i ) {
-      matrix[i].resize(m+1);
-    }
-    // Step 2
+    // Step 1 declare a matrix
+    std::vector<std::vector<size_t>> matrix(n+1,vector<size_t>(m+1));
+
+    // Step 2 fill all values
     for ( size_t i = 0; i <= n; ++i ) {
       matrix[i][0]=i;
     }
