@@ -105,6 +105,7 @@ jobs:
       - name: Static Code-check
         run: cppcheck ${{ env.cpc_opts }} .
       - name: make
+        id: make
         run: make
         continue-on-error: true
       - name: install
