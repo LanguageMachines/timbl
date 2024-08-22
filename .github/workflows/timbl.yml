@@ -115,13 +115,13 @@ jobs:
         continue-on-error: true
       - name: make check
         id: check
-        if: ${{ steps.install.outcome == 'success' }}
+        if: ${{ steps.make.outcome == 'success' }}
         env:
           CXX: ${{ matrix.compiler }}
         run: LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib make check
         continue-on-error: true
       - name: show log
-        if: ${{ steps.check.outcome != 'success' }}
+        if: ${{ steps.make.outcome == 'success' && steps.check.outcome != 'success' }}
         run: cat src/test-suite.log
       - name: Notify IRC of failure
         if: ${{ failure() }}
