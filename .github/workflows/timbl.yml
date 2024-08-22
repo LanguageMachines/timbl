@@ -112,7 +112,7 @@ jobs:
         if: ${{ steps.make.outcome == 'success' }}
         run: sudo make install
         continue-on-error: true
-      - name: make check
+      - name: check
         if: ${{ steps.install.outcome == 'success' }}
         env:
           CXX: ${{ matrix.compiler }}
