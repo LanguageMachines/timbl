@@ -8,18 +8,12 @@ AC_CONFIG_SRCDIR([.])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 
-if test x"${CXXFLAGS+set}" = xset; then
-  # the user set CXXFLAGS; don't override it.
-  cxx_flags_were_set=true
-else
-  cxx_flags_were_set=false
-fi
-if $cxx_flags_were_set; then
-  CXXFLAGS=$CXXFLAGS
-fi
+AX_REQUIRE_DEFINED([AX_CXX_COMPILE_STDCXX_17])
 
 # Checks for programs.
 AC_PROG_CXX( [g++ c++] )
+AX_CXX_COMPILE_STDCXX_17
+
 # libtool stuff
 LT_INIT
 
