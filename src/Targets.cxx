@@ -247,9 +247,7 @@ namespace Timbl {
 
   ClassDistribution *ClassDistribution::to_VD_Copy( ) const {
     ClassDistribution *res = new ClassDistribution();
-    for ( const auto& d : distribution ){
-      size_t key = d.first;
-      const Vfield *vdf = d.second;
+    for ( const auto& [key,vdf] : distribution ){
       res->distribution[key] = new Vfield( vdf->Value(),
 					   vdf->Freq(),
 					   vdf->Freq() );
@@ -260,9 +258,7 @@ namespace Timbl {
 
   WClassDistribution *ClassDistribution::to_WVD_Copy() const {
     WClassDistribution *res = new WClassDistribution();
-    for ( const auto& d : distribution ){
-      size_t key = d.first;
-      const Vfield *vdf = d.second;
+    for ( const auto& [key,vdf] : distribution ){
       res->distribution[key] = new Vfield( vdf->Value(),
 					   vdf->Freq(),
 					   vdf->Freq() );
@@ -273,9 +269,7 @@ namespace Timbl {
 
   WClassDistribution *WClassDistribution::to_WVD_Copy( ) const {
     WClassDistribution *result = new WClassDistribution();
-    for ( const auto& d : distribution ){
-      size_t key = d.first;
-      const Vfield *vdf = d.second;
+    for ( const auto& [key,vdf] : distribution ){
       result->distribution[key] = new Vfield( vdf->Value(),
 					      vdf->Freq(),
 					      vdf->Weight() );
@@ -433,9 +427,7 @@ namespace Timbl {
   }
 
   void ClassDistribution::Merge( const ClassDistribution& VD ){
-    for ( const auto& it : VD.distribution ){
-      size_t key = it.first;
-      const Vfield *vd = it.second;
+    for ( const auto& [key,vd] : VD.distribution ){
       if ( distribution.find(key) != distribution.end() ){
 	// the key is already present, increment the frequency
 	distribution[key]->AddFreq( vd->Freq() );
@@ -453,9 +445,7 @@ namespace Timbl {
 
   void WClassDistribution::MergeW( const ClassDistribution& VD,
 				   double Weight ){
-    for ( const auto& it : VD.distribution ){
-      size_t key = it.first;
-      const Vfield *vd = it.second;
+    for ( const auto& [key,vd] : VD.distribution ){
       if ( distribution.find(key) != distribution.end() ){
 	distribution[key]->SetWeight( distribution[key]->Weight() + vd->Weight() *Weight );
       }

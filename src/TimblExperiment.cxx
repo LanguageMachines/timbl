@@ -485,9 +485,9 @@ namespace Timbl {
   }
 
   ostream& operator<< ( ostream& os, const fileIndex& fi ){
-    for ( const auto& it : fi ){
+    for ( const auto& [fv,index] : fi ){
       os << "<";
-      os << it.first << "," << it.second;
+      os << fv << "," << index;
       os << ">";
     }
     return os;

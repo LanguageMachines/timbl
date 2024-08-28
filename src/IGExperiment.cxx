@@ -87,8 +87,8 @@ namespace Timbl {
   ostream& operator<< ( ostream& os,
 			const fileDoubleIndex& fmi ){
     os << "[";
-    for ( const auto& it : fmi ){
-      os << it.first << " " << it.second << endl;
+    for ( const auto& [fv,index] : fmi ){
+      os << fv << " " << index << endl;
     }
     os << "]";
     return os;
