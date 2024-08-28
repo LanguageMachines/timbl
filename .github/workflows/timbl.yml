@@ -80,6 +80,7 @@ jobs:
              echo "cpc_opts=$cpc_opts" >> $GITHUB_ENV
 
       - name: install TiccUtils
+        id: ticcutils
         env:
           CXX: ${{ matrix.compiler }}
         run: |
@@ -90,49 +91,68 @@ jobs:
           make;
           sudo make install;
           cd ..;
+        continue-on-error: true
+      - name: get status ticcutils
+        if: ${{ steps.ticcutils.outcome != 'success' }}
+        run: echo "action_status=ticcutils" >> $GITHUB_ENV
+
+      - name: Static Code-check
+        run: cppcheck ${{ env.cpc_opts }} .
 
       - name: bootstrap
         run: sh bootstrap.sh
       - name: configure
+        id: configure
         env:
           CXX: ${{ matrix.compiler }}
         run: ./configure
+      - name: get status configure
+        if: ${{ steps.configure.outcome != 'success' }}
+        run: |
+           echo "action_status=configure" >> $GITHUB_ENV
+           cat config.log
       - name: compiler-id
         id: compiler
         run: |
           id=$(echo ${{matrix.compiler}} | cut -d\+ -f1)
           echo "id=$id" >> $GITHUB_ENV
-      - name: Static Code-check
-        run: cppcheck ${{ env.cpc_opts }} .
       - name: make
         id: make
+        if: ${{ env.action_status == '' }}
         run: make
         continue-on-error: true
+      - name: get status make
+        if: ${{ steps.make.outcome != 'success' }}
+        run: echo "action_status=make" >> $GITHUB_ENV
       - name: install
         id: install
-        if: ${{ steps.make.outcome == 'success' }}
+        if: ${{ env.action_status == '' }}
         run: sudo make install
         continue-on-error: true
+      - name: get status install
+        if: ${{ steps.install.outcome != 'success' }}
+        run: echo "action_status=install" >> $GITHUB_ENV
       - name: make check
         id: check
-        if: ${{ steps.make.outcome == 'success' }}
+        if: ${{ env.action_status == '' }}
         env:
           CXX: ${{ matrix.compiler }}
         run: LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib make check
         continue-on-error: true
       - name: show log
         if: ${{ steps.make.outcome == 'success' && steps.check.outcome != 'success' }}
-        run: cat src/test-suite.log
+        run: |
+          cat src/test-suite.log
       - name: Notify IRC of failure
-        if: ${{ failure() }}
+        if: ${{ env.action_status != '' }}
         uses: Gottox/irc-message-action@v2
         with:
           server: irc.uvt.nl
           channel: '#gitlama'
           nickname: GH-${{ runner.os }}-${{ env.id }}
-          message: "timbl [${{ needs.notification.outputs.branch }}] build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: \u00034FAIL\u0003"
+          message: "timbl [${{ needs.notification.outputs.branch }}] build with ${{ matrix.compiler }} by ${{ github.actor }} on ${{ matrix.os }}: \u00034FAIL\u0003 in step ${{ env.action_status }}"
       - name: Notify IRC of succes
-        if: ${{ success() }}
+        if: ${{ env.action_status == '' }}
         uses: Gottox/irc-message-action@v2
         with:
           server: irc.uvt.nl
