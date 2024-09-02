@@ -130,7 +130,7 @@ jobs:
         run: sudo make install
         continue-on-error: true
       - name: get status install
-        if: ${{ steps.install.outcome != 'success' }}
+        if: ${{ env.action_status == ''  && steps.install.outcome != 'success' }}
         run: echo "action_status=install" >> $GITHUB_ENV
       - name: make check
         id: check
