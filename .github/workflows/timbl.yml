@@ -55,6 +55,7 @@ jobs:
           module: ticcutils
 
       - name: Static Code-check
+        uses: LanguageMachines/ticcactions/setup-cppcheck@v1
         if: ${{ env.action_status == '' }}
         run: cppcheck ${{ env.cpc_opts }} .
 
