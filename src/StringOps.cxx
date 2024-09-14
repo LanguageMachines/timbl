@@ -46,9 +46,6 @@ namespace Timbl {
     if ( trim ){
       In.trim();
     }
-    else {
-      In = par;
-    }
     UnicodeString Out;
     for ( int i=0; i < In.length(); ++i ){
       switch ( In[i] ){
