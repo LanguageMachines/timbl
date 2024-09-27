@@ -28,6 +28,7 @@
 #include <set>
 #include <string>
 #include <iosfwd>
+#include <algorithm>
 #include <stdexcept>
 
 #include "timbl/Common.h"
@@ -129,12 +130,10 @@ namespace Timbl{
 	string2_unigrams.insert(it2.current32());
 	it2.next32();
       }
-
-      for ( const auto& ug : string2_unigrams ){
-	if ( string1_unigrams.find( ug ) != string1_unigrams.end() ){
-	  ++overlap;
-	}
-      }
+      overlap = std::count_if( string2_unigrams.begin(),
+			       string2_unigrams.end(),
+			       [string1_unigrams](auto bg ){
+				 return string1_unigrams.find( bg ) != string1_unigrams.end(); } );
       total = string1_unigrams.size() + string2_unigrams.size();
     }
     else {
@@ -149,12 +148,10 @@ namespace Timbl{
 	// extract character bigrams from string2
 	string2_bigrams.insert( icu::UnicodeString( string2, i, 2 ) );
       }
-
-      for ( const auto& bg : string2_bigrams ){
-	if ( string1_bigrams.find( bg ) != string1_bigrams.end() ){
-	  ++overlap;
-	}
-      }
+      overlap = std::count_if( string2_bigrams.begin(),
+			       string2_bigrams.end(),
+			       [string1_bigrams](auto bg ){
+				 return string1_bigrams.find( bg ) != string1_bigrams.end(); } );
       total = string1_bigrams.size() + string2_bigrams.size();
     }
     dice = (double)(overlap * 2) / (double)total;
