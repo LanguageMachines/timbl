@@ -339,12 +339,8 @@ namespace Timbl {
 
   void InstanceBase_base::toXML( ostream &os )  {
     // save an IBtree for later use.
-    xmlDoc *doc =  xmlNewDoc( TiCC::to_xmlChar("1.0") );
-    xmlNode *root = xmlNewDocNode( doc,
-				   0,
-				   TiCC::to_xmlChar("root" ),
-				   0 );
-    xmlDocSetRootElement( doc, root );
+    xmlDoc *doc = TiCC::create_xmlDocument( "root" );
+    xmlNode *root = TiCC::getRoot( doc );
     xmlAddChild( root,
 		 TiCC::XmlNewComment( "Version " + TiCC::toString(Version) ) );
     bool dummy;
