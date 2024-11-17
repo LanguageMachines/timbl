@@ -5,7 +5,9 @@ on:
   schedule:
     - cron: "0 20 3 * 5"  # run test once a month
   push:
-    branches: [master]
+    branches:
+      - master
+      - develop
     paths:
       - configure.ac
       - 'src/**'
