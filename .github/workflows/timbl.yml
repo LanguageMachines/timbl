@@ -48,6 +48,7 @@ jobs:
 
       - uses: LanguageMachines/ticcactions/cpp-submodule-build@v1
         with:
+          branch: ${{ github.ref_name }}
           module: ticcutils
 
       - uses: LanguageMachines/ticcactions/setup-cppcheck@v1
