@@ -103,7 +103,7 @@ namespace Timbl {
     const IBtree *search_node( const FeatureValue * ) const;
   };
 
-  typedef std::unordered_map<size_t, const IBtree*> FI_map;
+  using FI_map = std::unordered_map<size_t, const IBtree*>;
 
   class InstanceBase_base: public MsgClass {
     friend class IG_InstanceBase;

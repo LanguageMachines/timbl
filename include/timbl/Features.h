@@ -49,8 +49,8 @@ namespace Timbl {
   class SparseValueProbClass {
     friend std::ostream& operator<< ( std::ostream&, SparseValueProbClass * );
   public:
-    typedef std::map< size_t, double > IDmaptype;
-    typedef IDmaptype::const_iterator IDiterator;
+    using IDmaptype = std::map< size_t, double >;
+    using IDiterator = IDmaptype::const_iterator;
     explicit SparseValueProbClass( size_t d ): dimension(d) {};
     void Assign( const size_t i, const double d ) { vc_map[i] = d; };
     void Clear() { vc_map.clear(); };

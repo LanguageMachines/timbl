@@ -33,7 +33,7 @@
 #include "timbl/neighborSet.h"
 #include "timbl/Options.h"
 
-typedef struct _xmlNode xmlNode;
+using xmlNode = struct _xmlNode;
 
 namespace Hash {
   class UnicodeHash;

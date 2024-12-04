@@ -117,8 +117,8 @@ namespace Timbl {
     }
   };
 
-  typedef std::map<FeatureValue*,std::set<std::streamsize>, fCmp> fileIndex;
-  typedef std::map<FeatureValue*, fileIndex, fCmp > fileDoubleIndex;
+  using fileIndex = std::map<FeatureValue*,std::set<std::streamsize>, fCmp>;
+  using fileDoubleIndex = std::map<FeatureValue*, fileIndex, fCmp >;
   std::ostream& operator<< ( std::ostream&, const fileIndex& );
   std::ostream& operator<< ( std::ostream&, const fileDoubleIndex& );
 

@@ -138,8 +138,8 @@ namespace Timbl {
     friend std::ostream& operator<<( std::ostream&, const ClassDistribution * );
     friend class WClassDistribution;
   public:
-    typedef std::map<size_t, Vfield *> VDlist;
-    typedef VDlist::const_iterator dist_iterator;
+    using VDlist = std::map<size_t, Vfield *>;
+    using dist_iterator = VDlist::const_iterator;
     ClassDistribution( ): total_items(0) {};
     ClassDistribution( const ClassDistribution& );
     virtual ~ClassDistribution(){ clear(); };
