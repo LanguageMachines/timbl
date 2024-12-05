@@ -79,7 +79,7 @@ namespace Timbl {
     OptionClassT& operator = (const OptionClassT&);
   };
 
-  typedef OptionClassT<bool> BoolOption;
+  using BoolOption= OptionClassT<bool>;
 
   template <>
     inline std::ostream& OptionClassT<bool>::show_opt( std::ostream &os ) const {
@@ -99,7 +99,7 @@ namespace Timbl {
     return os;
   }
 
-  typedef OptionClassT<VerbosityFlags> VerbosityOption;
+  using  VerbosityOption = OptionClassT<VerbosityFlags>;
 
   template <>
     inline std::ostream& OptionClassT<VerbosityFlags>::show_full( std::ostream &os ) const {
@@ -109,7 +109,7 @@ namespace Timbl {
     return os;
   }
 
-  typedef OptionClassT<InputFormatType> InputFormatOption;
+  using InputFormatOption = OptionClassT<InputFormatType>;
 
   template <>
     inline std::ostream& InputFormatOption::show_full( std::ostream &os ) const {
@@ -126,7 +126,7 @@ namespace Timbl {
   }
 
 
-  typedef OptionClassT<MetricType> MetricOption;
+  using MetricOption = OptionClassT<MetricType>;
 
   template <>
     inline std::ostream& OptionClassT<MetricType>::show_full( std::ostream &os )const {
@@ -142,7 +142,7 @@ namespace Timbl {
     return os;
   }
 
-  typedef OptionClassT<AlgorithmType> AlgorithmOption;
+  using  AlgorithmOption = OptionClassT<AlgorithmType>;
 
   template <>
     inline std::ostream& OptionClassT<AlgorithmType>::show_full( std::ostream &os ) const {
@@ -158,7 +158,7 @@ namespace Timbl {
     return os;
   }
 
-  typedef OptionClassT<DecayType> DecayOption;
+  using DecayOption = OptionClassT<DecayType>;
 
   template <>
     inline std::ostream& DecayOption::show_full( std::ostream &os ) const {
@@ -174,7 +174,7 @@ namespace Timbl {
     return os;
   }
 
-  typedef OptionClassT<SmoothingType> SmoothOption;
+  using SmoothOption = OptionClassT<SmoothingType>;
 
   template <>
     inline std::ostream& SmoothOption::show_full( std::ostream &os ) const {
@@ -190,7 +190,7 @@ namespace Timbl {
     return os;
   }
 
-  typedef OptionClassT<WeightType> WeightOption;
+  using WeightOption = OptionClassT<WeightType>;
 
   template <>
     inline std::ostream& OptionClassT<WeightType>::show_full( std::ostream &os ) const {
@@ -206,7 +206,7 @@ namespace Timbl {
     return os;
   }
 
-  typedef OptionClassT<OrdeningType> OrdeningOption;
+  using OrdeningOption = OptionClassT<OrdeningType>;
 
   template <>
     inline std::ostream& OptionClassT<OrdeningType>::show_full( std::ostream &os ) const {
@@ -222,7 +222,7 @@ namespace Timbl {
     return os;
   }
 
-  typedef OptionClassT<normType> NormalisationOption;
+  using  NormalisationOption = OptionClassT<normType>;
 
   template <>
     inline std::ostream& NormalisationOption::show_full( std::ostream &os ) const {
@@ -360,10 +360,10 @@ namespace Timbl {
     OptionClassLT& operator = (const OptionClassLT&);
   };
 
-  typedef OptionClassLT<int> IntegerOption;
-  typedef OptionClassLT<unsigned int> UnsignedOption;
-  typedef OptionClassLT<size_t> SizeOption;
-  typedef OptionClassLT<double> RealOption;
+  using IntegerOption = OptionClassLT<int>;
+  using UnsignedOption = OptionClassLT<unsigned int>;
+  using SizeOption = OptionClassLT<size_t>;
+  using RealOption = OptionClassLT<double>;
 
   enum SetOptRes { Opt_OK, Opt_Frozen, Opt_Unknown, Opt_Ill_Val};
 

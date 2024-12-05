@@ -43,7 +43,7 @@ using namespace icu;
 
 namespace Timbl {
   using namespace Common;
-
+  using TiCC::operator<<;
   IBtree::IBtree():
     FValue(0), TValue(0), TDistribution(0),
     link(0), next(0)
@@ -339,8 +339,8 @@ namespace Timbl {
 
   void InstanceBase_base::toXML( ostream &os )  {
     // save an IBtree for later use.
-    TiCC::XmlDoc doc( "root" );
-    xmlNode *root = doc.getRoot();
+    xmlDoc *doc = TiCC::create_xmlDocument( "root" );
+    xmlNode *root = TiCC::getRoot( doc );
     xmlAddChild( root,
 		 TiCC::XmlNewComment( "Version " + TiCC::toString(Version) ) );
     bool dummy;

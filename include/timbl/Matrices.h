@@ -35,8 +35,8 @@ template <class T> std::ostream& operator << (std::ostream&,
 
 template <class Class>
 class SparseSymetricMatrix {
-  typedef std::map< Class, double > CDmap;
-  typedef std::map< Class, CDmap > CCDmap;
+  using CDmap = std::map< Class, double >;
+  using CCDmap = std::map< Class, CDmap >;
   friend std::ostream& operator << <> ( std::ostream&,
 					const SparseSymetricMatrix<Class>& );
 

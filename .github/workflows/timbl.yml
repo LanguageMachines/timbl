@@ -5,7 +5,9 @@ on:
   schedule:
     - cron: "0 20 3 * 5"  # run test once a month
   push:
-    branches: [master]
+    branches:
+      - master
+      - develop
     paths:
       - configure.ac
       - 'src/**'
@@ -46,6 +48,7 @@ jobs:
 
       - uses: LanguageMachines/ticcactions/cpp-submodule-build@v1
         with:
+          branch: ${{ github.ref_name }}
           module: ticcutils
 
       - uses: LanguageMachines/ticcactions/setup-cppcheck@v1
