@@ -1,3 +1,10 @@
+6.10 2024-12-16
+[Ko van der Sloot]
+* C++17 is required
+* updated to latest ticcutils
+* improved GitHub CI
+* code quality
+
 6.9 2023-10-21
 [Ko van der Sloot]
 * better code: const correctness etc.
