@@ -50,6 +50,7 @@ bool Do_NS = false;
 bool Do_Indirect = false;
 bool Do_Save_Perc = false;
 bool Do_Limit = false;
+bool Do_Prune = false;
 size_t limit_val = 0;
 
 string I_Path = "";
@@ -350,6 +351,7 @@ void Preset_Values( TiCC::CL_Options& opts ){
   opts.is_present( 'q', Q_value );
   opts.insert( 'v', "F", true );
   opts.insert( 'v', "S", false );
+  Do_Prune = opts.extract("prune");
   Weighting W = GR;
   // default Weighting = GainRatio
   if ( opts.is_present( 'w', value ) ){
@@ -770,7 +772,14 @@ int main(int argc, char *argv[]){
 	delete Run;
 	return 3;
       }
-
+      if ( Do_Prune ){
+	if ( TreeOutFile.empty() ){
+	  cerr << "'--prune' option needs a tree output filename" << endl;
+	  delete Run;
+	  return 666;
+	}
+	cout << "\n\nPRUNING!!!!\n\n" << endl;
+      }
       // normal cases....
       if ( TreeInFile == "" ){
 	// normal case
@@ -823,12 +832,19 @@ int main(int argc, char *argv[]){
 	      }
 	    }
 	    if ( ok && Run->Learn( dataFile ) ){
-	      if ( TreeOutFile != "" ){
+	      if ( Do_Prune ){
+		Run->Prune();
 		Run->WriteInstanceBase( TreeOutFile );
+		do_test = false; // no testing when pruning
 	      }
-	      if ( levelTreeOutFile != "" ){
-		Run->WriteInstanceBaseLevels( levelTreeOutFile,
-					      levelTreeLevel );
+	      else {
+		if ( TreeOutFile != "" ){
+		  Run->WriteInstanceBase( TreeOutFile );
+		}
+		if ( levelTreeOutFile != "" ){
+		  Run->WriteInstanceBaseLevels( levelTreeOutFile,
+						levelTreeLevel );
+		}
 	      }
 	    }
 	    else {
@@ -838,7 +854,9 @@ int main(int argc, char *argv[]){
 	}
       }
       else if ( !dataFile.empty() &&
-		!( TestFile.empty() && TreeOutFile.empty() && levelTreeOutFile.empty() ) ){
+		!( TestFile.empty()
+		   && TreeOutFile.empty()
+		   && levelTreeOutFile.empty() ) ){
 	// it seems we want to expand our tree
 	do_test = false;
 	if ( Run->GetInstanceBase( TreeInFile ) ) {
@@ -856,10 +874,17 @@ int main(int argc, char *argv[]){
       }
       else {
 	// normal case
-	//   running a testing phase from recovered tree
-	if ( TestFile.empty()
-	     && XOutFile == ""
-	     && !Do_Indirect ){
+	if ( Do_Prune ){
+	  Run->GetInstanceBase( TreeInFile );
+	  Run->Prune();
+	  Run->WriteInstanceBase( TreeOutFile );
+	  do_test = false;
+	}
+	else if ( TestFile.empty()
+		  && XOutFile == ""
+		  && !Do_Indirect ){
+	  //   running a testing phase from recovered tree
+
 	  cerr << "reading an instancebase(-i option) without a testfile (-t option) is useless" << endl;
 	  do_test = false;
 	}

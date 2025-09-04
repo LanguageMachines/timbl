@@ -184,6 +184,7 @@ namespace Timbl {
     bool DefaultsValid;
     bool Random;
     bool PersistentDistributions;
+    bool Pruned;
     int Version;
     ClassDistribution *TopDistribution;
     WClassDistribution *WTop;
@@ -255,10 +256,10 @@ namespace Timbl {
   public:
     IG_InstanceBase( size_t size, unsigned long& cnt,
 		     bool rand, bool pruned, bool keep_dists ):
-      InstanceBase_base( size, cnt, rand, keep_dists ), Pruned( pruned ) {};
+      InstanceBase_base( size, cnt, rand, keep_dists ) { Pruned = pruned; };
     IG_InstanceBase *clone() const override;
     IG_InstanceBase *Copy() const override;
-    void Prune( const TargetValue *, long = 0 ) override;
+    //    void Prune( const TargetValue *, long = 0 ) override;
     void specialPrune( const TargetValue * );
     bool IsPruned() const override { return Pruned; };
     const ClassDistribution *IG_test( const Instance& ,
@@ -274,8 +275,6 @@ namespace Timbl {
 			Targets&,
 			int ) override;
     bool MergeSub( InstanceBase_base * ) override;
-  protected:
-    bool Pruned;
   };
 
   class TRIBL_InstanceBase: public InstanceBase_base {

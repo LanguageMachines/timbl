@@ -341,7 +341,7 @@ namespace Timbl {
 
   bool IG_Experiment::sanityCheck() const {
     bool status = true;
-    if ( IBStatus() != Pruned ){
+    if ( IBStatus() != IB_Stat::Pruned ){
       Warning( "you tried to apply the IGTree algorithm on a complete,"
 	       "(non-pruned) Instance Base" );
       status = false;

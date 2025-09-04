@@ -67,7 +67,9 @@ namespace Timbl {
   using TiCC::operator<<;
 
   const string timbl_short_opts = "a:b:B:c:C:d:De:f:F:G::hHi:I:k:l:L:m:M:n:N:o:O:p:P:q:QR:s::t:T:u:U:v:Vw:W:xX:Z%";
-  const string timbl_long_opts = ",Beam:,clones:,Diversify,occurrences:,sloppy::,silly::,Threshold:,Treeorder:,matrixin:,matrixout:,version,help,limit:";
+  const string timbl_long_opts = ",Beam:,clones:,Diversify,occurrences:,"
+    "sloppy::,silly::,Threshold:,Treeorder:,matrixin:,matrixout:,"
+    "version,help,limit:,prune";
   const string timbl_serv_short_opts = "C:d:G::k:l:L:p:Qv:x";
   const string timbl_indirect_opts = "d:e:G:k:L:m:o:p:QR:t:v:w:x%";
 
@@ -647,7 +649,7 @@ namespace Timbl {
     if ( ExpInvalid() ){
       result = false;
     }
-    else if ( IBStatus() == Invalid ){
+    else if ( IBStatus() == IB_Stat::Invalid ){
       Warning( "unable to Increment, No InstanceBase available" );
       result = false;
     }
@@ -677,7 +679,7 @@ namespace Timbl {
     if ( ExpInvalid() ){
       result = false;
     }
-    else if ( IBStatus() == Invalid ){
+    else if ( IBStatus() == IB_Stat::Invalid ){
       Warning( "unable to Decrement, No InstanceBase available" );
       result = false;
     }
@@ -703,7 +705,7 @@ namespace Timbl {
     if ( ExpInvalid() ){
       result = false;
     }
-    else if ( IBStatus() == Invalid ){
+    else if ( IBStatus() == IB_Stat::Invalid ){
       Warning( "unable to expand the InstanceBase: Not there" );
       result = false;
     }
@@ -784,7 +786,7 @@ namespace Timbl {
     if ( ExpInvalid() ){
       result = false;
     }
-    else if ( IBStatus() == Invalid ){
+    else if ( IBStatus() == IB_Stat::Invalid ){
       Warning( "unable to remove from InstanceBase: Not there" );
       result = false;
     }
@@ -1269,7 +1271,7 @@ namespace Timbl {
       Warning( "IB2, cannot Append data: No datafile bootstrapped yet" );
       result = false;
     }
-    else if ( IBStatus() == Invalid ){
+    else if ( IBStatus() == IB_Stat::Invalid ){
       Warning( "unable to expand the InstanceBase: Not there" );
       result = false;
     }
@@ -1412,7 +1414,7 @@ namespace Timbl {
   }
 
   bool TimblExperiment::checkTestFile(){
-    if ( IBStatus() == Invalid ){
+    if ( IBStatus() == IB_Stat::Invalid ){
       Warning( "you tried to apply the " + TiCC::toString( algorithm ) +
 	       " algorithm, but no Instance Base is available yet" );
     }
@@ -1447,7 +1449,7 @@ namespace Timbl {
     if ( !TimblExperiment::checkTestFile() ){
       return false;
     }
-    else if ( IBStatus() == Pruned ){
+    else if ( IBStatus() == IB_Stat::Pruned ){
       Warning( "you tried to apply the " + TiCC::toString( algorithm) +
 	       " algorithm on a pruned Instance Base" );
       return false;
@@ -1487,7 +1489,7 @@ namespace Timbl {
       else if ( Initialized ){
 	result = true;
       }
-      else if ( IBStatus() == Invalid ){
+      else if ( IBStatus() == IB_Stat::Invalid ){
 	Warning( "no Instance Base is available yet" );
       }
       else if ( !setInputFormat( IF ) ){
@@ -1510,7 +1512,7 @@ namespace Timbl {
     if ( !TimblExperiment::checkLine( line ) ){
       return false;
     }
-    else if ( IBStatus() == Pruned ){
+    else if ( IBStatus() == IB_Stat::Pruned ){
       Warning( "you tried to apply the IB1 algorithm on a pruned"
 	       " Instance Base" );
       return false;

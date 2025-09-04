@@ -31,6 +31,7 @@
 #include "timbl/Types.h"
 #include "timbl/Options.h"
 #include "timbl/Instance.h"
+#include "timbl/IBtree.h"
 #include "timbl/neighborSet.h"
 #include "timbl/BestArray.h"
 #include "timbl/Statistics.h"
@@ -302,6 +303,19 @@ namespace Timbl {
   bool TimblAPI::Prepare( const string& s ){
     if ( Valid() ){
       return pimpl->Prepare( s );
+    }
+    else {
+      return false;
+    }
+  }
+
+  bool TimblAPI::Prune(){
+    if ( Valid() ){
+      TargetValue *TopTarget = pimpl->targets.MajorityClass();
+      cout << "TopTarget=" << TopTarget << endl;
+      cout << "instancebase=" << (void*)pimpl->InstanceBase << endl;
+      pimpl->InstanceBase->Prune( TopTarget );
+      return true;
     }
     else {
       return false;

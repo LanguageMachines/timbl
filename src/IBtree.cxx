@@ -677,6 +677,7 @@ namespace Timbl {
     NumOfTails = 0;
     DefAss = true;  // always for a restored tree
     DefaultsValid = true; // always for a restored tree
+    Pruned = false;
     Version = expected_version;
     char delim;
     is >> delim;
@@ -1261,13 +1262,16 @@ namespace Timbl {
     DefaultsValid = true;
   }
 
-  void InstanceBase_base::Prune( const TargetValue *, long ){
-    FatalError( "You Cannot Prune this kind of tree! " );
-  }
+  // void InstanceBase_base::Prune( const TargetValue *, long ){
+  //   FatalError( "You Cannot Prune this kind of tree! " );
+  // }
 
-  void IG_InstanceBase::Prune( const TargetValue *top, long depth ){
-    AssignDefaults( );
-    if ( !Pruned ) {
+  void InstanceBase_base::Prune( const TargetValue *top, long depth ){
+    if ( Pruned ) {
+      throw runtime_error( "cannot prune a pruned instancebase" );
+    }
+    else {
+      AssignDefaults( );
       InstBase = InstBase->Reduce( top, ibCount, depth );
       Pruned = true;
     }
