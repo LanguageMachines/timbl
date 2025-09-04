@@ -165,7 +165,7 @@ namespace Timbl {
 				Targets&,
 				int );
     virtual void Prune( const TargetValue *, long = 0 );
-    virtual bool IsPruned() const { return false; };
+    bool IsPruned() const { return Pruned; };
     void CleanPartition(  bool );
     unsigned long int GetSizeInfo( unsigned long int&, double & ) const;
     const ClassDistribution *TopDist() const { return TopDistribution; };
@@ -261,7 +261,6 @@ namespace Timbl {
     IG_InstanceBase *Copy() const override;
     //    void Prune( const TargetValue *, long = 0 ) override;
     void specialPrune( const TargetValue * );
-    bool IsPruned() const override { return Pruned; };
     const ClassDistribution *IG_test( const Instance& ,
 				      size_t&,
 				      bool&,

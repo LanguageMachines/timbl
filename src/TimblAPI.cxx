@@ -311,9 +311,7 @@ namespace Timbl {
 
   bool TimblAPI::Prune(){
     if ( Valid() ){
-      TargetValue *TopTarget = pimpl->targets.MajorityClass();
-      cout << "TopTarget=" << TopTarget << endl;
-      cout << "instancebase=" << (void*)pimpl->InstanceBase << endl;
+      const TargetValue *TopTarget = pimpl->targets.MajorityClass();
       pimpl->InstanceBase->Prune( TopTarget );
       return true;
     }

@@ -778,7 +778,6 @@ int main(int argc, char *argv[]){
 	  delete Run;
 	  return 666;
 	}
-	cout << "\n\nPRUNING!!!!\n\n" << endl;
       }
       // normal cases....
       if ( TreeInFile == "" ){

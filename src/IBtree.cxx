@@ -1040,6 +1040,7 @@ namespace Timbl {
     DefaultsValid( false ),
     Random( Rand ),
     PersistentDistributions( persist ),
+    Pruned( false ),
     Version( 4 ),
     TopDistribution( new ClassDistribution ),
     WTop( 0 ),
