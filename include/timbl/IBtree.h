@@ -240,6 +240,7 @@ namespace Timbl {
 	{};
     IB_InstanceBase *Copy() const override;
     IB_InstanceBase *clone() const override;
+    void Prune( const TargetValue *, long = 0 ) override;
     const ClassDistribution *InitGraphTest( std::vector<FeatureValue *>&,
 					    const std::vector<FeatureValue *> *,
 					    const size_t,
@@ -259,7 +260,7 @@ namespace Timbl {
       InstanceBase_base( size, cnt, rand, keep_dists ) { Pruned = pruned; };
     IG_InstanceBase *clone() const override;
     IG_InstanceBase *Copy() const override;
-    //    void Prune( const TargetValue *, long = 0 ) override;
+    void Prune( const TargetValue *, long = 0 ) override;
     void specialPrune( const TargetValue * );
     const ClassDistribution *IG_test( const Instance& ,
 				      size_t&,

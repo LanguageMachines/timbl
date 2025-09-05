@@ -1263,11 +1263,22 @@ namespace Timbl {
     DefaultsValid = true;
   }
 
-  // void InstanceBase_base::Prune( const TargetValue *, long ){
-  //   FatalError( "You Cannot Prune this kind of tree! " );
-  // }
+  void InstanceBase_base::Prune( const TargetValue *, long ){
+    FatalError( "You can only Prune when using IB1 or IG !" );
+  }
 
-  void InstanceBase_base::Prune( const TargetValue *top, long depth ){
+  void IB_InstanceBase::Prune( const TargetValue *top, long depth ){
+    if ( Pruned ) {
+      throw runtime_error( "cannot prune a pruned instancebase" );
+    }
+    else {
+      AssignDefaults( );
+      InstBase = InstBase->Reduce( top, ibCount, depth );
+      Pruned = true;
+    }
+  }
+
+  void IG_InstanceBase::Prune( const TargetValue *top, long depth ){
     if ( Pruned ) {
       throw runtime_error( "cannot prune a pruned instancebase" );
     }
