@@ -143,6 +143,7 @@ namespace Timbl{
     bool ShowOptions( std::ostream& ) const;
     bool ShowSettings( std::ostream& ) const;
     bool ShowIBInfo( std::ostream& ) const;
+    bool LearningInfo( std::ostream& ) const;
     bool ShowStatistics( std::ostream& ) const;
     bool SetOptions( const std::string& );
     bool SetIndirectOptions( const TiCC::CL_Options&  );

@@ -768,6 +768,16 @@ namespace Timbl {
     }
   }
 
+  bool TimblAPI::LearningInfo( ostream& os ) const{
+    if ( Valid() ){
+      pimpl->LearningInfo( os );
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
   bool TimblAPI::ShowStatistics( ostream& os ) const{
     return Valid() && pimpl->showStatistics( os );
   }

@@ -457,6 +457,12 @@ bool get_file_names( TiCC::CL_Options& opts ){
   if ( opts.extract( 'I', value ) ){
     TreeOutFile = correct_path( value, O_Path );
   }
+  if ( Do_Prune ){
+    if ( WgtOutFile.empty() ){
+      WgtOutFile = TreeOutFile + ".wgt";
+    }
+  }
+
   if ( opts.extract( 'X', value ) ){
     XOutFile = correct_path( value, O_Path );
   }
@@ -832,8 +838,14 @@ int main(int argc, char *argv[]){
 	    }
 	    if ( ok && Run->Learn( dataFile ) ){
 	      if ( Do_Prune ){
+		if ( WgtOutFile != "" ) {
+		  Run->SetOptions( "ALL_WEIGHTS: true" );
+		}
 		Run->Prune();
 		Run->WriteInstanceBase( TreeOutFile );
+		if ( WgtOutFile != "" ) {
+		  Run->SaveWeights( WgtOutFile );
+		}
 		do_test = false; // no testing when pruning
 	      }
 	      else {
@@ -875,6 +887,10 @@ int main(int argc, char *argv[]){
 	// normal case
 	if ( Do_Prune ){
 	  Run->GetInstanceBase( TreeInFile );
+	  Run->LearningInfo( cout ); // force weights calculation. HACK
+	  if ( WgtOutFile != "" ) {
+	    Run->SaveWeights( WgtOutFile );
+	  }
 	  Run->Prune();
 	  Run->WriteInstanceBase( TreeOutFile );
 	  do_test = false;
