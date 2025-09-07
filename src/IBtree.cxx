@@ -211,7 +211,8 @@ namespace Timbl {
     os << ")\n";
   }
 
-  void InstanceBase_base::write_tree_hashed( ostream &os, const IBtree *pnt ) const {
+  void InstanceBase_base::write_tree_hashed( ostream &os,
+					     const IBtree *pnt ) const {
     // part of saving a tree in a recoverable manner
     os << "(" << pnt->TValue->Index();
     if ( pnt->link ){

@@ -232,8 +232,10 @@ namespace Timbl {
 
   class IB_InstanceBase: public InstanceBase_base {
   public:
-  IB_InstanceBase( size_t size, unsigned long& cnt, bool rand ):
-    InstanceBase_base( size, cnt, rand , false ),
+    IB_InstanceBase( size_t size,
+		     unsigned long& cnt,
+		     bool rand ):
+      InstanceBase_base( size, cnt, rand , false ),
       offSet(0),
       effFeat(0),
       testInst(0)

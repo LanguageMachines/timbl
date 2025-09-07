@@ -838,9 +838,6 @@ int main(int argc, char *argv[]){
 	    }
 	    if ( ok && Run->Learn( dataFile ) ){
 	      if ( Do_Prune ){
-		if ( WgtOutFile != "" ) {
-		  Run->SetOptions( "ALL_WEIGHTS: true" );
-		}
 		Run->Prune();
 		Run->WriteInstanceBase( TreeOutFile );
 		if ( WgtOutFile != "" ) {
