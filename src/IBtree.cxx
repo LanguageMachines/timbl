@@ -917,6 +917,7 @@ namespace Timbl {
 							     && persist );
 	}
       }
+      //      cerr << "HMM: \n" << pnt->TDistribution << endl;
       pnt->TValue = pnt->TDistribution->BestTarget( dummy, Random );
       pnt = pnt->next;
     }
@@ -1234,6 +1235,19 @@ namespace Timbl {
     delete this;
   }
 
+  void InstanceBase_base::RedoDistributions( bool pruning ){
+    if ( pruning ){
+      cerr << "not implemented yet" << endl;
+    }
+    else {
+      InstBase->redo_distributions( );
+      ClassDistribution *Top
+	= InstBase->sum_distributions( true );
+      delete Top; // still a bit silly but the Top Distribution is known
+      DefAss = true;
+    }
+  }
+
   void InstanceBase_base::AssignDefaults(){
     if ( !DefaultsValid ){
       if ( !DefAss ){
@@ -1276,6 +1290,7 @@ namespace Timbl {
       AssignDefaults( );
       InstBase = InstBase->Reduce( top, ibCount, depth );
       Pruned = true;
+      cerr << "THIS! " << std::to_string(PersistentDistributions) << endl;
     }
   }
 

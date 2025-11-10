@@ -51,6 +51,7 @@ bool Do_Indirect = false;
 bool Do_Save_Perc = false;
 bool Do_Limit = false;
 bool Do_Prune = false;
+bool restore_distributions = false;
 size_t limit_val = 0;
 
 string I_Path = "";
@@ -352,6 +353,14 @@ void Preset_Values( TiCC::CL_Options& opts ){
   opts.insert( 'v', "F", true );
   opts.insert( 'v', "S", false );
   Do_Prune = opts.extract("prune");
+  if ( Do_Prune ){
+    string dummy;
+    bool mood = false;
+    opts.is_present( 'D', dummy, mood );
+    if ( mood ){
+      restore_distributions = true;
+    }
+  }
   Weighting W = GR;
   // default Weighting = GainRatio
   if ( opts.is_present( 'w', value ) ){
@@ -838,7 +847,7 @@ int main(int argc, char *argv[]){
 	    }
 	    if ( ok && Run->Learn( dataFile ) ){
 	      if ( Do_Prune ){
-		Run->Prune();
+		Run->Prune(restore_distributions);
 		Run->WriteInstanceBase( TreeOutFile );
 		if ( WgtOutFile != "" ) {
 		  Run->SaveWeights( WgtOutFile );
@@ -888,7 +897,7 @@ int main(int argc, char *argv[]){
 	  if ( WgtOutFile != "" ) {
 	    Run->SaveWeights( WgtOutFile );
 	  }
-	  Run->Prune();
+	  Run->Prune( restore_distributions );
 	  Run->WriteInstanceBase( TreeOutFile );
 	  do_test = false;
 	}

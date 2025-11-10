@@ -77,7 +77,7 @@ namespace Timbl{
     bool Decrement( const std::string& );
     bool Expand( const std::string& );
     bool Remove( const std::string& );
-    bool Prune();
+    bool Prune( bool = false );
     bool Test( const std::string& = "",
 	       const std::string& = "",
 	       const std::string& = "" );

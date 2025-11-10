@@ -119,7 +119,7 @@ namespace Timbl {
     InstanceBase_base( size_t, unsigned long&, bool, bool );
     virtual ~InstanceBase_base( void ) override;
     void AssignDefaults( void );
-    void RedoDistributions();
+    void RedoDistributions( bool = false );
     bool AddInstance( const Instance&  );
     void RemoveInstance( const Instance&  );
     void summarizeNodes( std::vector<unsigned int>&,
