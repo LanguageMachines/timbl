@@ -95,6 +95,7 @@ namespace Timbl {
     void re_assign_defaults( bool, bool );
     void assign_defaults( bool, bool, size_t );
     void redo_distributions();
+    void redo_distributions_2();
     void countBranches( unsigned int,
 			std::vector<unsigned int>&,
 			std::vector<unsigned int>& );

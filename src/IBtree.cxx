@@ -917,7 +917,6 @@ namespace Timbl {
 							     && persist );
 	}
       }
-      //      cerr << "HMM: \n" << pnt->TDistribution << endl;
       pnt->TValue = pnt->TDistribution->BestTarget( dummy, Random );
       pnt = pnt->next;
     }
@@ -954,6 +953,29 @@ namespace Timbl {
 	if ( pnt->FValue->ValFreq() > 0 ){
 	  pnt->FValue->ReconstructDistribution( *(pnt->TDistribution) );
 	}
+      }
+      pnt = pnt->next;
+    }
+  }
+
+  void IBtree::redo_distributions_2(){
+    // recursively gather Distribution information up to the top.
+    // removing old info...
+    // at each node we also Reconstruct Feature distributions
+    // we keep the Target value that was given!
+    IBtree *pnt = this;
+    while ( pnt ){
+      if ( pnt->link ){
+	pnt->link->redo_distributions();
+	delete pnt->TDistribution;
+	pnt->TDistribution = pnt->link->sum_distributions( false );
+	if ( pnt->FValue->ValFreq() > 0 ){
+	  pnt->FValue->ReconstructDistribution( *(pnt->TDistribution) );
+	}
+      }
+      else if ( !pnt->TDistribution ){
+	pnt->TDistribution = new ClassDistribution;
+	pnt->TDistribution->IncFreq(pnt->TValue, pnt->TValue->ValFreq() );
       }
       pnt = pnt->next;
     }
@@ -1237,7 +1259,7 @@ namespace Timbl {
 
   void InstanceBase_base::RedoDistributions( bool pruning ){
     if ( pruning ){
-      cerr << "not implemented yet" << endl;
+      InstBase->redo_distributions_2( );
     }
     else {
       InstBase->redo_distributions( );
@@ -1290,7 +1312,6 @@ namespace Timbl {
       AssignDefaults( );
       InstBase = InstBase->Reduce( top, ibCount, depth );
       Pruned = true;
-      cerr << "THIS! " << std::to_string(PersistentDistributions) << endl;
     }
   }
 

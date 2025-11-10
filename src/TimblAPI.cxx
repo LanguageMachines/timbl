@@ -312,11 +312,9 @@ namespace Timbl {
   bool TimblAPI::Prune( bool restore_distributions ){
     if ( Valid() ){
       const TargetValue *TopTarget = pimpl->targets.MajorityClass();
-      cout << "Restore= " << TiCC::toString(restore_distributions) << endl;
-      //      cerr << "Restore= " << TiCC::toString(restore_distributions) << endl;
       pimpl->InstanceBase->Prune( TopTarget );
       if ( restore_distributions ){
-	pimpl->InstanceBase->RedoDistributions();
+	pimpl->InstanceBase->RedoDistributions(true);
       }
       return true;
     }
