@@ -980,6 +980,7 @@ namespace Timbl {
     return result;
   }
 
+#undef RED
   inline IBtree *IBtree::Reduce( const TargetValue *Top,
 				 unsigned long& cnt,
 				 long depth,
@@ -989,14 +990,18 @@ namespace Timbl {
     // leaves of the Tree and moving back to the top.
     // when keep_dists is true, gather the distributions upward.
     IBtree *pnt = this;
+#ifdef RED
     if ( keep_dists ){
       cerr << "reduceer " << this << endl;
       cerr << " input dist " << dist << endl;
     }
+#endif
     while ( pnt ){
       if ( keep_dists ){
 	if ( pnt->link != NULL ){
+#ifdef RED
 	  cerr << "reduceer => " << pnt->link << endl;
+#endif
 	  ClassDistribution *extra = 0;
 	  pnt->link = pnt->link->Reduce( pnt->TValue,
 					 cnt,
@@ -1004,7 +1009,9 @@ namespace Timbl {
 					 keep_dists,
 					 extra );
 	  if ( pnt->link == 0 ){
+#ifdef RED
 	    cerr << "AHA!" << endl;
+#endif
 	    if ( pnt->TDistribution ){
 	      pnt->TDistribution->Merge( *extra );
 	    }
@@ -1013,8 +1020,10 @@ namespace Timbl {
 	    }
 	  }
 	  if ( extra ){
+#ifdef RED
 	    cerr << "this: " << this << endl;
 	    cerr << "extra na reduce hier: " << extra << endl;
+#endif
 	    if ( dist ){
 	      dist->Merge( *extra );
 	    }
@@ -1022,10 +1031,11 @@ namespace Timbl {
 	      dist = extra->to_VD_Copy();
 	    }
 	  }
+#ifdef RED
 	  cerr << "merged dist: " << dist << endl;
+#endif
 	}
 	else if ( pnt->TDistribution ){
-	  cerr << "OK?" << endl;
 	  if ( dist ){
 	    dist->Merge( *pnt->TDistribution );
 	  }
@@ -1033,7 +1043,9 @@ namespace Timbl {
 	    dist = pnt->TDistribution->to_VD_Copy();
 	  }
 	}
+#ifdef RED
 	cerr << "OKE hier: " << dist << endl;
+#endif
       }
       else {
 	if ( pnt->link != NULL ){
@@ -1046,22 +1058,30 @@ namespace Timbl {
 	}
       }
       pnt = pnt->next;
+#ifdef RED
       if ( pnt ){
 	cerr << "looping" << endl;
       }
       else {
 	cerr << "FINAL dist " << dist << endl;
       }
+#endif
     }
     if ( dist && keep_dists ){
+#ifdef RED
       cerr << "output dist = " << dist << endl;
+#endif
       this->TDistribution = dist->to_VD_Copy();
+#ifdef RED
       cerr << "result " << this << endl;
+#endif
     }
     if ( depth <= 0 ){
       IBtree *out = make_unique( Top, cnt );
+#ifdef RED
       cerr << "definitive result " << out << endl;
       cerr << "final dist " << dist << endl;
+#endif
       return out;
     }
     else {

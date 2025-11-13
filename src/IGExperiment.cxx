@@ -240,7 +240,7 @@ namespace Timbl {
 		if ( PartInstanceBase ){
 		  //		time_stamp( "Start Pruning:    " );
 		  //		cerr << PartInstanceBase << endl;
-		  PartInstanceBase->Prune( TopTarget, 2 );
+		  PartInstanceBase->Prune( TopTarget, false, 2 );
 		  //		time_stamp( "Finished Pruning: " );
 		  //		cerr << PartInstanceBase << endl;
 		  if ( !TmpInstanceBase->MergeSub( PartInstanceBase ) ){
