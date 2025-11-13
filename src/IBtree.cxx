@@ -958,29 +958,6 @@ namespace Timbl {
     }
   }
 
-  void IBtree::redo_distributions_2(){
-    // recursively gather Distribution information up to the top.
-    // removing old info...
-    // at each node we also Reconstruct Feature distributions
-    // we keep the Target value that was given!
-    IBtree *pnt = this;
-    while ( pnt ){
-      if ( pnt->link ){
-	pnt->link->redo_distributions();
-	delete pnt->TDistribution;
-	pnt->TDistribution = pnt->link->sum_distributions( false );
-	if ( pnt->FValue->ValFreq() > 0 ){
-	  pnt->FValue->ReconstructDistribution( *(pnt->TDistribution) );
-	}
-      }
-      else if ( !pnt->TDistribution ){
-	pnt->TDistribution = new ClassDistribution;
-	pnt->TDistribution->IncFreq(pnt->TValue, pnt->TValue->ValFreq() );
-      }
-      pnt = pnt->next;
-    }
-  }
-
   inline IBtree *IBtree::make_unique( const TargetValue *Top,
 				      unsigned long& cnt ){
     // remove branches with the same target as the Top, except when they
@@ -1005,18 +982,87 @@ namespace Timbl {
 
   inline IBtree *IBtree::Reduce( const TargetValue *Top,
 				 unsigned long& cnt,
-				 long depth ){
+				 long depth,
+				 bool keep_dists,
+				 ClassDistribution*& dist ){
     // recursively cut default nodes, (with make unique,) starting at the
     // leaves of the Tree and moving back to the top.
+    // when keep_dists is true, gather the distributions upward.
     IBtree *pnt = this;
+    if ( keep_dists ){
+      cerr << "reduceer " << this << endl;
+      cerr << " input dist " << dist << endl;
+    }
     while ( pnt ){
-      if ( pnt->link != NULL ){
-	pnt->link = pnt->link->Reduce( pnt->TValue, cnt, depth-1 );
+      if ( keep_dists ){
+	if ( pnt->link != NULL ){
+	  cerr << "reduceer => " << pnt->link << endl;
+	  ClassDistribution *extra = 0;
+	  pnt->link = pnt->link->Reduce( pnt->TValue,
+					 cnt,
+					 depth-1,
+					 keep_dists,
+					 extra );
+	  if ( pnt->link == 0 ){
+	    cerr << "AHA!" << endl;
+	    if ( pnt->TDistribution ){
+	      pnt->TDistribution->Merge( *extra );
+	    }
+	    else {
+	      pnt->TDistribution = extra->to_VD_Copy();
+	    }
+	  }
+	  if ( extra ){
+	    cerr << "this: " << this << endl;
+	    cerr << "extra na reduce hier: " << extra << endl;
+	    if ( dist ){
+	      dist->Merge( *extra );
+	    }
+	    else {
+	      dist = extra->to_VD_Copy();
+	    }
+	  }
+	  cerr << "merged dist: " << dist << endl;
+	}
+	else if ( pnt->TDistribution ){
+	  cerr << "OK?" << endl;
+	  if ( dist ){
+	    dist->Merge( *pnt->TDistribution );
+	  }
+	  else {
+	    dist = pnt->TDistribution->to_VD_Copy();
+	  }
+	}
+	cerr << "OKE hier: " << dist << endl;
+      }
+      else {
+	if ( pnt->link != NULL ){
+	  ClassDistribution *dummy = 0;
+	    pnt->link = pnt->link->Reduce( pnt->TValue,
+					   cnt,
+					   depth-1,
+					   false,
+					   dummy );
+	}
       }
       pnt = pnt->next;
+      if ( pnt ){
+	cerr << "looping" << endl;
+      }
+      else {
+	cerr << "FINAL dist " << dist << endl;
+      }
+    }
+    if ( dist && keep_dists ){
+      cerr << "output dist = " << dist << endl;
+      this->TDistribution = dist->to_VD_Copy();
+      cerr << "result " << this << endl;
     }
     if ( depth <= 0 ){
-      return make_unique( Top, cnt );
+      IBtree *out = make_unique( Top, cnt );
+      cerr << "definitive result " << out << endl;
+      cerr << "final dist " << dist << endl;
+      return out;
     }
     else {
       return this;
@@ -1257,19 +1303,6 @@ namespace Timbl {
     delete this;
   }
 
-  void InstanceBase_base::RedoDistributions( bool pruning ){
-    if ( pruning ){
-      InstBase->redo_distributions_2( );
-    }
-    else {
-      InstBase->redo_distributions( );
-      ClassDistribution *Top
-	= InstBase->sum_distributions( true );
-      delete Top; // still a bit silly but the Top Distribution is known
-      DefAss = true;
-    }
-  }
-
   void InstanceBase_base::AssignDefaults(){
     if ( !DefaultsValid ){
       if ( !DefAss ){
@@ -1300,28 +1333,34 @@ namespace Timbl {
     DefaultsValid = true;
   }
 
-  void InstanceBase_base::Prune( const TargetValue *, long ){
+  void InstanceBase_base::Prune( const TargetValue *, bool, long ){
     FatalError( "You can only Prune when using IB1 or IG !" );
   }
 
-  void IB_InstanceBase::Prune( const TargetValue *top, long depth ){
+  void IB_InstanceBase::Prune( const TargetValue *top,
+			       bool keep_dists,
+			       long depth ){
     if ( Pruned ) {
       throw runtime_error( "cannot prune a pruned instancebase" );
     }
     else {
       AssignDefaults( );
-      InstBase = InstBase->Reduce( top, ibCount, depth );
+      ClassDistribution *cd = NULL;
+      InstBase = InstBase->Reduce( top, ibCount, depth, keep_dists, cd );
       Pruned = true;
     }
   }
 
-  void IG_InstanceBase::Prune( const TargetValue *top, long depth ){
+  void IG_InstanceBase::Prune( const TargetValue *top,
+			       bool keep_dists,
+			       long depth ){
     if ( Pruned ) {
       throw runtime_error( "cannot prune a pruned instancebase" );
     }
     else {
       AssignDefaults( );
-      InstBase = InstBase->Reduce( top, ibCount, depth );
+      ClassDistribution *cd = NULL;
+      InstBase = InstBase->Reduce( top, ibCount, depth, keep_dists, cd );
       Pruned = true;
     }
   }
@@ -1339,7 +1378,8 @@ namespace Timbl {
     }
     bool dummy;
     InstBase->TValue = dist.BestTarget( dummy, Random );
-    InstBase = InstBase->Reduce( top, ibCount, 0 );
+    ClassDistribution *cd = NULL;
+    InstBase = InstBase->Reduce( top, ibCount, 0, false, cd );
     Pruned = true;
   }
 

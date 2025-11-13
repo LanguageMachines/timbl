@@ -78,7 +78,11 @@ namespace Timbl {
     IBtree( const IBtree& ) = delete; // forbid copies
     IBtree& operator=( const IBtree& ) = delete; // forbid copies
     ~IBtree();
-    IBtree *Reduce( const TargetValue *, unsigned long&, long );
+    IBtree *Reduce( const TargetValue *,
+		    unsigned long&,
+		    long,
+		    bool,
+		    ClassDistribution*&  );
 #ifdef IBSTATS
     static inline IBtree *add_feat_val( FeatureValue *,
 					unsigned int&,
@@ -95,7 +99,6 @@ namespace Timbl {
     void re_assign_defaults( bool, bool );
     void assign_defaults( bool, bool, size_t );
     void redo_distributions();
-    void redo_distributions_2();
     void countBranches( unsigned int,
 			std::vector<unsigned int>&,
 			std::vector<unsigned int>& );
@@ -120,7 +123,6 @@ namespace Timbl {
     InstanceBase_base( size_t, unsigned long&, bool, bool );
     virtual ~InstanceBase_base( void ) override;
     void AssignDefaults( void );
-    void RedoDistributions( bool = false );
     bool AddInstance( const Instance&  );
     void RemoveInstance( const Instance&  );
     void summarizeNodes( std::vector<unsigned int>&,
@@ -165,7 +167,7 @@ namespace Timbl {
 				Feature_List&,
 				Targets&,
 				int );
-    virtual void Prune( const TargetValue *, long = 0 );
+    virtual void Prune( const TargetValue *, bool=false, long = 0 );
     bool IsPruned() const { return Pruned; };
     void CleanPartition(  bool );
     unsigned long int GetSizeInfo( unsigned long int&, double & ) const;
@@ -243,7 +245,7 @@ namespace Timbl {
 	{};
     IB_InstanceBase *Copy() const override;
     IB_InstanceBase *clone() const override;
-    void Prune( const TargetValue *, long = 0 ) override;
+    void Prune( const TargetValue *, bool=false, long = 0 ) override;
     const ClassDistribution *InitGraphTest( std::vector<FeatureValue *>&,
 					    const std::vector<FeatureValue *> *,
 					    const size_t,
@@ -263,7 +265,7 @@ namespace Timbl {
       InstanceBase_base( size, cnt, rand, keep_dists ) { Pruned = pruned; };
     IG_InstanceBase *clone() const override;
     IG_InstanceBase *Copy() const override;
-    void Prune( const TargetValue *, long = 0 ) override;
+    void Prune( const TargetValue *, bool = false, long = 0 ) override;
     void specialPrune( const TargetValue * );
     const ClassDistribution *IG_test( const Instance& ,
 				      size_t&,
