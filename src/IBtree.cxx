@@ -1070,8 +1070,11 @@ namespace Timbl {
     if ( dist && keep_dists ){
 #ifdef RED
       cerr << "output dist = " << dist << endl;
+      cerr << "vervang: " << TDistribution << endl;
 #endif
-      this->TDistribution = dist->to_VD_Copy();
+      if ( !TDistribution ){
+	this->TDistribution = dist->to_VD_Copy();
+      }
 #ifdef RED
       cerr << "result " << this << endl;
 #endif
