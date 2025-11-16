@@ -998,15 +998,13 @@ namespace Timbl {
 					 depth-1,
 					 keep_dists,
 					 extra );
-	  if ( pnt->link == 0 ){
+	  if ( extra ){
 	    if ( pnt->TDistribution ){
 	      pnt->TDistribution->Merge( *extra );
 	    }
 	    else {
 	      pnt->TDistribution = extra->to_VD_Copy();
 	    }
-	  }
-	  if ( extra ){
 	    if ( dist ){
 	      dist->Merge( *extra );
 	    }
