@@ -1036,17 +1036,16 @@ namespace Timbl {
       }
       pnt = pnt->next;
     }
-    if ( dist && keep_dists ){
-      if ( !TDistribution ){
-	this->TDistribution = dist;
-	dist = 0;
-      }
-    }
     if ( depth <= 0 ){
       IBtree *out = make_unique( Top, cnt );
       return out;
     }
     else {
+      if ( keep_dists &&
+	   !TDistribution ){
+	TDistribution = dist;
+	dist = 0;
+      }
       return this;
     }
   }
