@@ -70,7 +70,7 @@ namespace Timbl {
     if ( !TimblExperiment::checkTestFile() ){
       return false;
     }
-    else if ( IBStatus() == Pruned ){
+    else if ( IBStatus() == IB_Stat::Pruned ){
       Warning( "you tried to apply the " + TiCC::toString( algorithm) +
 	       " algorithm on a pruned Instance Base" );
       return false;
@@ -86,7 +86,7 @@ namespace Timbl {
     if ( !TimblExperiment::checkTestFile() ){
       return false;
     }
-    else if ( IBStatus() == Pruned ){
+    else if ( IBStatus() == IB_Stat::Pruned ){
       Warning( "you tried to apply the " + TiCC::toString( algorithm) +
 	       " algorithm on a pruned Instance Base" );
       return false;
@@ -187,7 +187,7 @@ namespace Timbl {
     if ( !TimblExperiment::checkLine( line ) ){
       return false;
     }
-    else if ( IBStatus() == Pruned ){
+    else if ( IBStatus() == IB_Stat::Pruned ){
       Warning( "you tried to apply the TRIBL algorithm on a pruned "
 	       " Instance Base" );
       return false;
@@ -199,7 +199,7 @@ namespace Timbl {
     if ( !TimblExperiment::checkLine( line ) ){
       return false;
     }
-    else if ( IBStatus() == Pruned ){
+    else if ( IBStatus() == IB_Stat::Pruned ){
       Warning( "you tried to apply the TRIBL2 algorithm on a pruned "
 	       " Instance Base" );
       return false;

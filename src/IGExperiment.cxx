@@ -240,7 +240,7 @@ namespace Timbl {
 		if ( PartInstanceBase ){
 		  //		time_stamp( "Start Pruning:    " );
 		  //		cerr << PartInstanceBase << endl;
-		  PartInstanceBase->Prune( TopTarget, 2 );
+		  PartInstanceBase->Prune( TopTarget, false, 2 );
 		  //		time_stamp( "Finished Pruning: " );
 		  //		cerr << PartInstanceBase << endl;
 		  if ( !TmpInstanceBase->MergeSub( PartInstanceBase ) ){
@@ -341,7 +341,7 @@ namespace Timbl {
 
   bool IG_Experiment::sanityCheck() const {
     bool status = true;
-    if ( IBStatus() != Pruned ){
+    if ( IBStatus() != IB_Stat::Pruned ){
       Warning( "you tried to apply the IGTree algorithm on a complete,"
 	       "(non-pruned) Instance Base" );
       status = false;

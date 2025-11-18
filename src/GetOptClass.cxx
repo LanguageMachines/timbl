@@ -76,6 +76,7 @@ namespace Timbl {
     do_sloppy_loo = false;
     do_silly = false;
     do_diversify = false;
+    do_prune = false;
     if ( MaxFeats == -1 ){
       MaxFeats = Max;
       LocalInputFormat = UnknownInputFormat; // InputFormat and verbosity
@@ -155,6 +156,7 @@ namespace Timbl {
     do_sloppy_loo( false ),
     do_silly( in.do_silly ),
     do_diversify( in.do_diversify ),
+    do_prune( in.do_prune ),
     metricsArray( in.metricsArray ),
     parent_socket_os( in.parent_socket_os ),
     outPath( in.outPath ),
@@ -236,6 +238,12 @@ namespace Timbl {
 	}
 	if ( do_diversify ){
 	  optline = "DO_DIVERSIFY: true";
+	  if ( !Exp->SetOption( optline ) ){
+	    return false;
+	  }
+	}
+	if ( do_prune ){
+	  optline = "DO_PRUNE: true";
 	  if ( !Exp->SetOption( optline ) ){
 	    return false;
 	  }
@@ -943,7 +951,18 @@ namespace Timbl {
 	  break;
 
 	case 'p':
-	  local_progress = TiCC::stringTo<int>( value );
+	  if ( longOpt ){
+	    if ( option == "prune" ){
+	      do_prune = true;
+	    }
+	    else {
+	      Error( "invalid option: Did you mean '--prune' ?" );
+	      return false;
+	    }
+	  }
+	  else {
+	    local_progress = TiCC::stringTo<int>( value );
+	  }
 	  break;
 
 	case 'q':

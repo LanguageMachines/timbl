@@ -106,6 +106,8 @@ namespace Timbl {
 				 &do_silly_testing, false ) );
     Options.Add( new BoolOption( "DO_DIVERSIFY",
 				 &do_diversify, false ) );
+    Options.Add( new BoolOption( "DO_PRUNE",
+				 &do_prune, false ) );
     Options.Add( new DecayOption( "DECAY",
 				  &decay_flag, Zero ) );
     Options.Add( new IntegerOption( "SEED",
@@ -217,6 +219,7 @@ namespace Timbl {
     tableFilled(false),
     globalMetricOption(Overlap),
     do_diversify(false),
+    do_prune(false),
     ChopInput(0),
     F_length(0),
     MaxFeatures(0),
@@ -287,6 +290,7 @@ namespace Timbl {
       do_sloppy_loo      = m.do_sloppy_loo;
       do_silly_testing   = m.do_silly_testing;
       do_diversify       = m.do_diversify;
+      do_prune           = m.do_prune;
       tester = 0;
       decay = 0;
       targets  = m.targets;

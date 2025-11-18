@@ -78,7 +78,11 @@ namespace Timbl {
     IBtree( const IBtree& ) = delete; // forbid copies
     IBtree& operator=( const IBtree& ) = delete; // forbid copies
     ~IBtree();
-    IBtree *Reduce( const TargetValue *, unsigned long&, long );
+    IBtree *Reduce( const TargetValue *,
+		    unsigned long&,
+		    long,
+		    bool,
+		    ClassDistribution*&  );
 #ifdef IBSTATS
     static inline IBtree *add_feat_val( FeatureValue *,
 					unsigned int&,
@@ -119,7 +123,6 @@ namespace Timbl {
     InstanceBase_base( size_t, unsigned long&, bool, bool );
     virtual ~InstanceBase_base( void ) override;
     void AssignDefaults( void );
-    void RedoDistributions();
     bool AddInstance( const Instance&  );
     void RemoveInstance( const Instance&  );
     void summarizeNodes( std::vector<unsigned int>&,
@@ -164,8 +167,8 @@ namespace Timbl {
 				Feature_List&,
 				Targets&,
 				int );
-    virtual void Prune( const TargetValue *, long = 0 );
-    virtual bool IsPruned() const { return false; };
+    virtual void Prune( const TargetValue *, bool=false, long = 0 );
+    bool IsPruned() const { return Pruned; };
     void CleanPartition(  bool );
     unsigned long int GetSizeInfo( unsigned long int&, double & ) const;
     const ClassDistribution *TopDist() const { return TopDistribution; };
@@ -184,6 +187,7 @@ namespace Timbl {
     bool DefaultsValid;
     bool Random;
     bool PersistentDistributions;
+    bool Pruned;
     int Version;
     ClassDistribution *TopDistribution;
     WClassDistribution *WTop;
@@ -231,14 +235,17 @@ namespace Timbl {
 
   class IB_InstanceBase: public InstanceBase_base {
   public:
-  IB_InstanceBase( size_t size, unsigned long& cnt, bool rand ):
-    InstanceBase_base( size, cnt, rand , false ),
+    IB_InstanceBase( size_t size,
+		     unsigned long& cnt,
+		     bool rand ):
+      InstanceBase_base( size, cnt, rand , false ),
       offSet(0),
       effFeat(0),
       testInst(0)
 	{};
     IB_InstanceBase *Copy() const override;
     IB_InstanceBase *clone() const override;
+    void Prune( const TargetValue *, bool=false, long = 0 ) override;
     const ClassDistribution *InitGraphTest( std::vector<FeatureValue *>&,
 					    const std::vector<FeatureValue *> *,
 					    const size_t,
@@ -255,12 +262,11 @@ namespace Timbl {
   public:
     IG_InstanceBase( size_t size, unsigned long& cnt,
 		     bool rand, bool pruned, bool keep_dists ):
-      InstanceBase_base( size, cnt, rand, keep_dists ), Pruned( pruned ) {};
+      InstanceBase_base( size, cnt, rand, keep_dists ) { Pruned = pruned; };
     IG_InstanceBase *clone() const override;
     IG_InstanceBase *Copy() const override;
-    void Prune( const TargetValue *, long = 0 ) override;
+    void Prune( const TargetValue *, bool = false, long = 0 ) override;
     void specialPrune( const TargetValue * );
-    bool IsPruned() const override { return Pruned; };
     const ClassDistribution *IG_test( const Instance& ,
 				      size_t&,
 				      bool&,
@@ -274,8 +280,6 @@ namespace Timbl {
 			Targets&,
 			int ) override;
     bool MergeSub( InstanceBase_base * ) override;
-  protected:
-    bool Pruned;
   };
 
   class TRIBL_InstanceBase: public InstanceBase_base {
