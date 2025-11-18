@@ -1009,7 +1009,8 @@ namespace Timbl {
 	      dist->Merge( *extra );
 	    }
 	    else {
-	      dist = extra->to_VD_Copy();
+	      dist = extra;
+	      extra = 0;
 	    }
 	    delete extra;
 	  }
@@ -1037,7 +1038,8 @@ namespace Timbl {
     }
     if ( dist && keep_dists ){
       if ( !TDistribution ){
-	this->TDistribution = dist->to_VD_Copy();
+	this->TDistribution = dist;
+	dist = 0;
       }
     }
     if ( depth <= 0 ){
