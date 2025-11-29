@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2024
+  Copyright (c) 1998 - 2025
   ILK   - Tilburg University
   CLST  - Radboud University
   CLiPS - University of Antwerp
@@ -31,6 +31,7 @@
 #include "timbl/Types.h"
 #include "timbl/Options.h"
 #include "timbl/Instance.h"
+#include "timbl/IBtree.h"
 #include "timbl/neighborSet.h"
 #include "timbl/BestArray.h"
 #include "timbl/Statistics.h"
@@ -302,6 +303,17 @@ namespace Timbl {
   bool TimblAPI::Prepare( const string& s ){
     if ( Valid() ){
       return pimpl->Prepare( s );
+    }
+    else {
+      return false;
+    }
+  }
+
+  bool TimblAPI::Prune( bool restore_distributions ){
+    if ( Valid() ){
+      const TargetValue *TopTarget = pimpl->targets.MajorityClass();
+      pimpl->InstanceBase->Prune( TopTarget, restore_distributions );
+      return true;
     }
     else {
       return false;
@@ -749,6 +761,16 @@ namespace Timbl {
   bool TimblAPI::ShowIBInfo( ostream& os ) const{
     if ( Valid() ){
       pimpl->IBInfo( os );
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  bool TimblAPI::LearningInfo( ostream& os ) const{
+    if ( Valid() ){
+      pimpl->LearningInfo( os );
       return true;
     }
     else {

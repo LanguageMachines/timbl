@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2024
+  Copyright (c) 1998 - 2025
   ILK   - Tilburg University
   CLST  - Radboud University
   CLiPS - University of Antwerp
@@ -80,13 +80,13 @@ namespace Timbl {
 
   MBLClass::IB_Stat MBLClass::IBStatus() const {
     if ( !InstanceBase ){
-      return Invalid;
+      return IB_Stat::Invalid;
     }
     else if (InstanceBase->IsPruned() ){
-      return Pruned;
+      return IB_Stat::Pruned;
     }
     else {
-      return Normal;
+      return IB_Stat::Normal;
     }
   }
 

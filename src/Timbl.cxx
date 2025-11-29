@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2024
+  Copyright (c) 1998 - 2025
   ILK   - Tilburg University
   CLST  - Radboud University
   CLiPS - University of Antwerp
@@ -50,6 +50,8 @@ bool Do_NS = false;
 bool Do_Indirect = false;
 bool Do_Save_Perc = false;
 bool Do_Limit = false;
+bool Do_Prune = false;
+bool restore_distributions = false;
 size_t limit_val = 0;
 
 string I_Path = "";
@@ -350,6 +352,15 @@ void Preset_Values( TiCC::CL_Options& opts ){
   opts.is_present( 'q', Q_value );
   opts.insert( 'v', "F", true );
   opts.insert( 'v', "S", false );
+  Do_Prune = opts.extract("prune");
+  if ( Do_Prune ){
+    string dummy;
+    bool mood = false;
+    opts.is_present( 'D', dummy, mood );
+    if ( mood ){
+      restore_distributions = true;
+    }
+  }
   Weighting W = GR;
   // default Weighting = GainRatio
   if ( opts.is_present( 'w', value ) ){
@@ -455,6 +466,12 @@ bool get_file_names( TiCC::CL_Options& opts ){
   if ( opts.extract( 'I', value ) ){
     TreeOutFile = correct_path( value, O_Path );
   }
+  if ( Do_Prune ){
+    if ( WgtOutFile.empty() ){
+      WgtOutFile = TreeOutFile + ".wgt";
+    }
+  }
+
   if ( opts.extract( 'X', value ) ){
     XOutFile = correct_path( value, O_Path );
   }
@@ -708,7 +725,7 @@ int main(int argc, char *argv[]){
     // Start.
     //
     cerr << "TiMBL " << TimblAPI::VersionInfo()
-	 << " (c) CLST/ILK/CLIPS 1998 - 2024.\n"
+	 << " (c) CLST/ILK/CLIPS 1998 - 2025.\n"
 	 << "Tilburg Memory Based Learner\n"
 	 << "Centre for Language and Speech Technology, Radboud University\n"
 	 << "Induction of Linguistic Knowledge Research Group, Tilburg University\n"
@@ -770,7 +787,13 @@ int main(int argc, char *argv[]){
 	delete Run;
 	return 3;
       }
-
+      if ( Do_Prune ){
+	if ( TreeOutFile.empty() ){
+	  cerr << "'--prune' option needs a tree output filename" << endl;
+	  delete Run;
+	  return 666;
+	}
+      }
       // normal cases....
       if ( TreeInFile == "" ){
 	// normal case
@@ -823,12 +846,22 @@ int main(int argc, char *argv[]){
 	      }
 	    }
 	    if ( ok && Run->Learn( dataFile ) ){
-	      if ( TreeOutFile != "" ){
+	      if ( Do_Prune ){
+		Run->Prune(restore_distributions);
 		Run->WriteInstanceBase( TreeOutFile );
+		if ( WgtOutFile != "" ) {
+		  Run->SaveWeights( WgtOutFile );
+		}
+		do_test = false; // no testing when pruning
 	      }
-	      if ( levelTreeOutFile != "" ){
-		Run->WriteInstanceBaseLevels( levelTreeOutFile,
-					      levelTreeLevel );
+	      else {
+		if ( TreeOutFile != "" ){
+		  Run->WriteInstanceBase( TreeOutFile );
+		}
+		if ( levelTreeOutFile != "" ){
+		  Run->WriteInstanceBaseLevels( levelTreeOutFile,
+						levelTreeLevel );
+		}
 	      }
 	    }
 	    else {
@@ -838,7 +871,9 @@ int main(int argc, char *argv[]){
 	}
       }
       else if ( !dataFile.empty() &&
-		!( TestFile.empty() && TreeOutFile.empty() && levelTreeOutFile.empty() ) ){
+		!( TestFile.empty()
+		   && TreeOutFile.empty()
+		   && levelTreeOutFile.empty() ) ){
 	// it seems we want to expand our tree
 	do_test = false;
 	if ( Run->GetInstanceBase( TreeInFile ) ) {
@@ -856,10 +891,21 @@ int main(int argc, char *argv[]){
       }
       else {
 	// normal case
-	//   running a testing phase from recovered tree
-	if ( TestFile.empty()
-	     && XOutFile == ""
-	     && !Do_Indirect ){
+	if ( Do_Prune ){
+	  Run->GetInstanceBase( TreeInFile );
+	  Run->LearningInfo( cout ); // force weights calculation. HACK
+	  if ( WgtOutFile != "" ) {
+	    Run->SaveWeights( WgtOutFile );
+	  }
+	  Run->Prune( restore_distributions );
+	  Run->WriteInstanceBase( TreeOutFile );
+	  do_test = false;
+	}
+	else if ( TestFile.empty()
+		  && XOutFile == ""
+		  && !Do_Indirect ){
+	  //   running a testing phase from recovered tree
+
 	  cerr << "reading an instancebase(-i option) without a testfile (-t option) is useless" << endl;
 	  do_test = false;
 	}

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2024
+  Copyright (c) 1998 - 2025
   ILK   - Tilburg University
   CLST  - Radboud University
   CLiPS - University of Antwerp
@@ -211,7 +211,8 @@ namespace Timbl {
     os << ")\n";
   }
 
-  void InstanceBase_base::write_tree_hashed( ostream &os, const IBtree *pnt ) const {
+  void InstanceBase_base::write_tree_hashed( ostream &os,
+					     const IBtree *pnt ) const {
     // part of saving a tree in a recoverable manner
     os << "(" << pnt->TValue->Index();
     if ( pnt->link ){
@@ -677,6 +678,7 @@ namespace Timbl {
     NumOfTails = 0;
     DefAss = true;  // always for a restored tree
     DefaultsValid = true; // always for a restored tree
+    Pruned = false;
     Version = expected_version;
     char delim;
     is >> delim;
@@ -980,20 +982,70 @@ namespace Timbl {
 
   inline IBtree *IBtree::Reduce( const TargetValue *Top,
 				 unsigned long& cnt,
-				 long depth ){
+				 long depth,
+				 bool keep_dists,
+				 ClassDistribution*& dist ){
     // recursively cut default nodes, (with make unique,) starting at the
     // leaves of the Tree and moving back to the top.
+    // when keep_dists is true, gather the distributions upward.
     IBtree *pnt = this;
     while ( pnt ){
-      if ( pnt->link != NULL ){
-	pnt->link = pnt->link->Reduce( pnt->TValue, cnt, depth-1 );
+      if ( keep_dists ){
+	if ( pnt->link != NULL ){
+	  ClassDistribution *extra = 0;
+	  pnt->link = pnt->link->Reduce( pnt->TValue,
+					 cnt,
+					 depth-1,
+					 keep_dists,
+					 extra );
+	  if ( extra ){
+	    if ( pnt->TDistribution ){
+	      pnt->TDistribution->Merge( *extra );
+	    }
+	    else {
+	      pnt->TDistribution = extra->to_VD_Copy();
+	    }
+	    if ( dist ){
+	      dist->Merge( *extra );
+	    }
+	    else {
+	      dist = extra;
+	      extra = 0;
+	    }
+	    delete extra;
+	  }
+	}
+	else if ( pnt->TDistribution ){
+	  if ( dist ){
+	    dist->Merge( *pnt->TDistribution );
+	  }
+	  else {
+	    dist = pnt->TDistribution->to_VD_Copy();
+	  }
+	}
+      }
+      else {
+	if ( pnt->link != NULL ){
+	  ClassDistribution *dummy = 0;
+	  pnt->link = pnt->link->Reduce( pnt->TValue,
+					 cnt,
+					 depth-1,
+					 false,
+					 dummy );
+	}
       }
       pnt = pnt->next;
     }
     if ( depth <= 0 ){
-      return make_unique( Top, cnt );
+      IBtree *out = make_unique( Top, cnt );
+      return out;
     }
     else {
+      if ( keep_dists &&
+	   !TDistribution ){
+	TDistribution = dist;
+	dist = 0;
+      }
       return this;
     }
   }
@@ -1039,6 +1091,7 @@ namespace Timbl {
     DefaultsValid( false ),
     Random( Rand ),
     PersistentDistributions( persist ),
+    Pruned( false ),
     Version( 4 ),
     TopDistribution( new ClassDistribution ),
     WTop( 0 ),
@@ -1261,14 +1314,37 @@ namespace Timbl {
     DefaultsValid = true;
   }
 
-  void InstanceBase_base::Prune( const TargetValue *, long ){
-    FatalError( "You Cannot Prune this kind of tree! " );
+  void InstanceBase_base::Prune( const TargetValue *, bool, long ){
+    FatalError( "You can only Prune when using IB1 or IG !" );
   }
 
-  void IG_InstanceBase::Prune( const TargetValue *top, long depth ){
-    AssignDefaults( );
-    if ( !Pruned ) {
-      InstBase = InstBase->Reduce( top, ibCount, depth );
+  void IB_InstanceBase::Prune( const TargetValue *top,
+			       bool keep_dists,
+			       long depth ){
+    if ( Pruned ) {
+      throw runtime_error( "cannot prune a pruned instancebase" );
+    }
+    else {
+      AssignDefaults( );
+      ClassDistribution *cd = NULL;
+      InstBase = InstBase->Reduce( top, ibCount, depth, keep_dists, cd );
+      if ( cd ){
+	delete cd;
+      }
+      Pruned = true;
+    }
+  }
+
+  void IG_InstanceBase::Prune( const TargetValue *top,
+			       bool keep_dists,
+			       long depth ){
+    if ( Pruned ) {
+      throw runtime_error( "cannot prune a pruned instancebase" );
+    }
+    else {
+      AssignDefaults( );
+      ClassDistribution *cd = NULL;
+      InstBase = InstBase->Reduce( top, ibCount, depth, keep_dists, cd );
       Pruned = true;
     }
   }
@@ -1286,7 +1362,8 @@ namespace Timbl {
     }
     bool dummy;
     InstBase->TValue = dist.BestTarget( dummy, Random );
-    InstBase = InstBase->Reduce( top, ibCount, 0 );
+    ClassDistribution *cd = NULL;
+    InstBase = InstBase->Reduce( top, ibCount, 0, false, cd );
     Pruned = true;
   }
 

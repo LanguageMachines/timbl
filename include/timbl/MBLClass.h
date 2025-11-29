@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2024
+  Copyright (c) 1998 - 2025
   ILK   - Tilburg University
   CLST  - Radboud University
   CLiPS - University of Antwerp
@@ -82,7 +82,7 @@ namespace Timbl {
     MBLClass& operator=( const MBLClass& );
     enum PhaseValue { TrainWords, LearnWords, TestWords, TrainLearnWords };
     friend std::ostream& operator<< ( std::ostream&, const PhaseValue& );
-    enum IB_Stat { Invalid, Normal, Pruned };
+    enum class IB_Stat { Invalid, Normal, Pruned };
 
     bool writeArrays( std::ostream& );
     bool readArrays( std::istream& );
@@ -194,6 +194,7 @@ namespace Timbl {
     bool tableFilled;
     MetricType globalMetricOption;
     bool do_diversify;
+    bool do_prune;
     bool initProbabilityArrays( bool );
     void calculatePrestored();
     void initDecay();

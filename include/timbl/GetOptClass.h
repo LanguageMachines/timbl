@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2024
+  Copyright (c) 1998 - 2025
   ILK   - Tilburg University
   CLST  - Radboud University
   CLiPS - University of Antwerp
@@ -92,6 +92,7 @@ namespace Timbl {
     bool do_sloppy_loo;
     bool do_silly;
     bool do_diversify;
+    bool do_prune;
     std::vector<MetricType>metricsArray;
     std::ostream *parent_socket_os;
     std::string inPath;
