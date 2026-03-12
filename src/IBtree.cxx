@@ -962,12 +962,11 @@ namespace Timbl {
 				      unsigned long& cnt ){
     // remove branches with the same target as the Top, except when they
     // still have a subbranch, which means that they are an exception.
-    IBtree **tmp, *dead, *result;
-    result = this;
-    tmp = &result;
+    IBtree *result = this;
+    IBtree **tmp = &result;
     while ( *tmp ){
       if ( (*tmp)->TValue == Top && (*tmp)->link == NULL ){
-	dead = *tmp;
+	IBtree *dead = *tmp;
 	*tmp = (*tmp)->next;
 	dead->next=NULL;
 	--cnt;

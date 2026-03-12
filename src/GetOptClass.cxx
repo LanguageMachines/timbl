@@ -446,7 +446,6 @@ namespace Timbl {
   inline bool GetOptClass::parse_range( string& line,
 					string::iterator& it,
 					MetricType Value ){
-    size_t m;
     while( it != line.end() && *it != ':' ){
       auto eit = it;
       while( eit != line.end() && isdigit( *eit ) ) ++eit;
@@ -476,7 +475,7 @@ namespace Timbl {
 	eit = it;
 	while( eit != line.end() && isdigit( *eit ) ) ++eit;
 	tmp = string( it, eit );
-	m = TiCC::stringTo<int>(tmp);
+	size_t m = TiCC::stringTo<int>(tmp);
 	if ( m == 0 || m > metricsArray.size() ){
 	  Error( "illegal value in metric description: -m " + line );
 	  return false;
