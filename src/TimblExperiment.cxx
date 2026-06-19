@@ -1106,7 +1106,12 @@ namespace Timbl {
     if ( Verbosity(MATCH_DEPTH) ){
       outfile << " " << matchDepth() << ":" << (matchedAtLeaf()?"L":"N");
     }
-    outfile << endl;
+    // Use '\n' rather than std::endl: endl flushes the output stream on every
+    // classified line. Combined with the larger output buffer set in
+    // initTestFiles(), letting lines accumulate turns ~one write() per line
+    // into a handful of large writes, which dominates testing time on large
+    // files. The stream is flushed when it is closed at the end of testing.
+    outfile << '\n';
     showBestNeighbors( outfile );
   }
 
@@ -1404,6 +1409,15 @@ namespace Timbl {
 	  if ( checkTestFile() ){
 	    outStream.close();
 	    outStream.clear(); // just to be shure. old G++ libraries are in error here
+	    // Give the output stream a large buffer before opening it. The
+	    // default buffer is tiny, so writing one result per test instance
+	    // turns into a great many small write() syscalls that dominate
+	    // testing time on large files; a 1 MB buffer batches them into a
+	    // handful of large writes. (pubsetbuf must precede open() to apply.)
+	    if ( outStreamBuf.empty() ){
+	      outStreamBuf.resize( 1u << 20 );
+	    }
+	    outStream.rdbuf()->pubsetbuf( outStreamBuf.data(), outStreamBuf.size() );
 	    outStream.open( OutFileName, ios::out | ios::trunc );
 	    return true;
 	  }
