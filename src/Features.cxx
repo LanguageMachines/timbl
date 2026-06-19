@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1998 - 2025
+  Copyright (c) 1998 - 2026
   ILK   - Tilburg University
   CLST  - Radboud University
   CLiPS - University of Antwerp
@@ -272,7 +272,6 @@ namespace Timbl {
   void Feature::NumStatistics( vector<FeatureValue *>& FVBin,
 			       double DBentropy ){
     size_t BinSize = FVBin.size();
-    double Prob, FVEntropy;
     size_t TotalVals = TotalValues();
     entropy = 0.0;
     vector<D_D*> ddv;
@@ -311,9 +310,9 @@ namespace Timbl {
       if ( Freq > 0 ){
 	// Entropy for this FV pair.
 	//
-	FVEntropy = 0.0;
+	auto FVEntropy = 0.0;
 	for ( const auto& it : pnt->TargetDist ){
-	  Prob = it.second->Freq()/(double)Freq;
+	  auto Prob = it.second->Freq()/(double)Freq;
 	  FVEntropy += Prob * Log2(Prob);
 	}
 	entropy += -FVEntropy * Freq / (double)TotalVals;
@@ -330,7 +329,7 @@ namespace Timbl {
     for ( size_t l=0; l < BinSize; ++l ){
       size_t Freq = FVBin[l]->ValFreq();
       if ( Freq > 0 ){
-	Prob = Freq / (double)TotalVals;
+	auto Prob = Freq / (double)TotalVals;
 	split_info += Prob * Log2(Prob);
       }
     }
