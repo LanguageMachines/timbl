@@ -41,8 +41,8 @@ int main(){
   cout << "resulting Distribution: " << vd << endl;
   ClassDistribution::dist_iterator it=vd->begin();
   while ( it != vd->end() ){
-    cout << it->second << " OR ";
-    cout << it->second->Value() << " " << it->second->Weight() << endl;
+    cout << *it << " OR ";
+    cout << it->Value() << " " << it->Weight() << endl;
     ++it;
   }
 

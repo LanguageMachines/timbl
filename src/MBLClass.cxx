@@ -1848,7 +1848,7 @@ namespace Timbl {
     }
     tester->init( Inst, EffectiveFeatures(), ib_offset );
     auto lastpos = best_distrib->begin();
-    Vfield *Bpnt = lastpos->second;
+    const Vfield *Bpnt = ( lastpos != best_distrib->end() ) ? &*lastpos : nullptr;
     size_t EffFeat = EffectiveFeatures() - ib_offset;
     size_t CurPos = 0;
     while ( Bpnt ) {
@@ -1873,7 +1873,7 @@ namespace Timbl {
       CurPos = EndPos-1;
       ++lastpos;
       if ( lastpos != best_distrib->end() ){
-	Bpnt = lastpos->second;
+	Bpnt = &*lastpos;
       }
       else {
 	best_distrib = IB->NextGraphTest( CurrentFV,
@@ -1882,7 +1882,7 @@ namespace Timbl {
 	if ( best_distrib ){
 	  lastpos = best_distrib->begin();
 	  if ( lastpos != best_distrib->end() ){
-	    Bpnt = lastpos->second;
+	    Bpnt = &*lastpos;
 	  }
 	}
       }

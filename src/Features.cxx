@@ -130,8 +130,8 @@ namespace Timbl {
 	  // Loop over all present classes.
 	  //
 	  for ( const auto& tit : FV->TargetDist ){
-	    FV->ValueClassProb->Assign( tit.second->Index(),
-					tit.second->Freq()/(double)freq );
+	    FV->ValueClassProb->Assign( tit.Index(),
+					tit.Freq()/(double)freq );
 	  }
 	}
       }
@@ -312,7 +312,7 @@ namespace Timbl {
 	//
 	auto FVEntropy = 0.0;
 	for ( const auto& it : pnt->TargetDist ){
-	  auto Prob = it.second->Freq()/(double)Freq;
+	  auto Prob = it.Freq()/(double)Freq;
 	  FVEntropy += Prob * Log2(Prob);
 	}
 	entropy += -FVEntropy * Freq / (double)TotalVals;
@@ -391,7 +391,7 @@ namespace Timbl {
       if ( Freq > 0 ){
 	double FVEntropy = 0.0;
 	for ( const auto& tit : fv->TargetDist ){
-	  double Prob = tit.second->Freq() / (double)Freq;
+	  double Prob = tit.Freq() / (double)Freq;
 	  FVEntropy += Prob * Log2(Prob);
 	}
 	entropy += -FVEntropy * Freq / (double)TotalVals;
@@ -441,8 +441,8 @@ namespace Timbl {
       n_i_dot[i] = 0;      // ALL values should be zeroed
       const FeatureValue *fv = FVA[i];
       for ( const auto& tit : fv->TargetDist ){
-	n_dot_j[tit.second->Index()-1] += tit.second->Freq();
-	n_i_dot[i] += tit.second->Freq();
+	n_dot_j[tit.Index()-1] += tit.Freq();
+	n_i_dot[i] += tit.Freq();
       }
       n_dot_dot += n_i_dot[i];
     }
@@ -454,17 +454,17 @@ namespace Timbl {
 	  if ( n >= Size ){
 	    break;
 	  }
-	  while ( n < it.second->Index()-1 ){
+	  while ( n < it.Index()-1 ){
 	    double tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
 	      (double)n_dot_dot;
 	    chi_square += tmp;
 	  }
-	  if ( n == it.second->Index()-1 ){
+	  if ( n == it.Index()-1 ){
 	    double tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
 	      (double)n_dot_dot;
 	    if ( fabs(tmp) > Epsilon){
-	      chi_square += ( (tmp - it.second->Freq()) *
-			      (tmp - it.second->Freq()) ) / tmp;
+	      chi_square += ( (tmp - it.Freq()) *
+			      (tmp - it.Freq()) ) / tmp;
 	    }
 	  }
 	  else {
@@ -495,8 +495,8 @@ namespace Timbl {
     for ( const auto* fv : values_array ){
       n_i_dot[i] = 0;       // ALL values should be zeroed
       for ( const auto& t_it : fv->TargetDist ){
-	long int fr = t_it.second->Freq();
-	n_dot_j[t_it.second->Index()-1] += fr;
+	long int fr = t_it.Freq();
+	n_dot_j[t_it.Index()-1] += fr;
 	n_i_dot[i] += fr;
       }
       n_dot_dot += n_i_dot[i];
@@ -510,8 +510,8 @@ namespace Timbl {
 	  if ( n >= Size ){
 	    break;
 	  }
-	  size_t id = t_it.second->Index()-1;
-	  long int fr = t_it.second->Freq();
+	  size_t id = t_it.Index()-1;
+	  long int fr = t_it.Freq();
 	  while ( n < id ){
 	    double tmp = ((double)n_dot_j[n++] * (double)n_i_dot[m]) /
 	      (double)n_dot_dot;

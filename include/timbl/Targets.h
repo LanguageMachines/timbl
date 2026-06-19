@@ -110,10 +110,15 @@ namespace Timbl {
   public:
     Vfield( const TargetValue *val, int freq, double w ):
       value(val), frequency(freq), weight(w) {};
-    Vfield( const Vfield& in ):
-      value(in.value), frequency(in.frequency), weight(in.weight) {};
-    Vfield& operator=( const Vfield& ) = delete; // forbid copies
-    ~Vfield(){};
+    // Vfield is a plain value type: it is stored BY VALUE in
+    // ClassDistribution's vector and owns nothing (value is a non-owning
+    // pointer into the Targets table). Full value semantics are therefore
+    // required (vector needs move-assignment to keep itself sorted) and safe.
+    Vfield( const Vfield& ) = default;
+    Vfield( Vfield&& ) = default;
+    Vfield& operator=( const Vfield& ) = default;
+    Vfield& operator=( Vfield&& ) = default;
+    ~Vfield() = default;
     std::ostream& put( std::ostream& ) const;
     const TargetValue *Value() const { return value; };
     void Value( const TargetValue *t ){  value = t; };
@@ -123,7 +128,7 @@ namespace Timbl {
     void DecFreq() {  frequency -= 1; };
     double Weight() const { return weight; };
     void SetWeight( double w ){ weight = w; };
-    size_t Index();
+    size_t Index() const;
   protected:
     const TargetValue *value;
     size_t frequency;
@@ -138,7 +143,14 @@ namespace Timbl {
     friend std::ostream& operator<<( std::ostream&, const ClassDistribution * );
     friend class WClassDistribution;
   public:
-    using VDlist = std::map<size_t, Vfield *>;
+    // The distribution is stored as a flat vector of Vfield values, kept
+    // sorted by value->Index(). Compared to the former
+    // std::map<size_t,Vfield*> this removes, per target class, one heap
+    // allocation and the red-black-tree node overhead -- a large memory win
+    // since there is (potentially) one distribution per instance-base node.
+    // Lookups are a binary search; the sorted invariant also keeps
+    // (de)serialisation order stable.
+    using VDlist = std::vector<Vfield>;
     using dist_iterator = VDlist::const_iterator;
     ClassDistribution( ): total_items(0) {};
     ClassDistribution( const ClassDistribution& );
@@ -176,6 +188,11 @@ namespace Timbl {
     const TargetValue* BestTargetW( bool &, bool = false ) const;
     virtual ClassDistribution *clone( ) const {
       return new ClassDistribution(); };
+    // find the entry for target index 'id'; returns nullptr if absent.
+    Vfield *find_index( size_t id );
+    const Vfield *find_index( size_t id ) const;
+    // return the sorted insert position (lower_bound) for target index 'id'.
+    VDlist::iterator lower_index( size_t id );
     size_t total_items;
     VDlist distribution;
   };
