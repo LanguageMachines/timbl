@@ -168,6 +168,8 @@ namespace Timbl {
 	showStatistics( *mylog );
       }
       result = true;
+      outStream.flush();
+      outStream.close();
     }
     return result;
   }

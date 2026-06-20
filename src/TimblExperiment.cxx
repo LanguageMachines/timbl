@@ -2023,6 +2023,8 @@ namespace Timbl {
 	show_speed_summary( *mylog, startTime );
 	showStatistics( *mylog );
       }
+      outStream.flush();
+      outStream.close();
       result = true;
     }
     return result;
