@@ -92,6 +92,13 @@ namespace Timbl{
 		 double ) override;
   private:
     std::vector<metricTestFunction*> metricTest;
+    // Per-feature test info precomputed once, in permuted order, so the inner
+    // test loop avoids the permutation indirection and, for plain Overlap
+    // features (the common case), the virtual metricTestFunction / fvDistance
+    // / metric->distance() chain -- which for Overlap only computes
+    // (F==G ? 0 : weight).
+    std::vector<metricTestFunction*> permTest; // metricTest in permuted order
+    std::vector<char> isOverlap;               // 1 if feature uses Overlap
   };
 
   class SimilarityTester: public TesterClass {
