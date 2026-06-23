@@ -1,4 +1,4 @@
-.TH timbl 1 "2017 November 9"
+.TH timbl 1 "2026 June 23"
 
 .SH NAME
 timbl \- Tilburg Memory Based Learner
@@ -229,6 +229,13 @@ n
 number of features (default 2500)
 .RE
 
+.BR \-\-limit =<l>
+.RS
+limit the number of features used to the 'l' with the highest weights.
+
+(will restart Timbl with an adapted -m option)
+.RE
+
 .B \-o
 s
 .RS
@@ -309,6 +316,13 @@ you may add \-\-sloppy to speed up leave\(hyone\(hyout testing (but see docs)
 cross_validate
 .RS
 perform cross\(hyvalidation test (IB1 only)
+.RE
+
+.B \-\-prune
+.RS
+Convert an IB1 tree into an IGTree
+
+usage: 'timbl \-i IB1tree \-I IGtree'
 .RE
 
 .B \-t
@@ -434,9 +448,11 @@ dump the InstanceBase as XML in 'file'
 possibly
 
 .SH AUTHORS
-Ko van der Sloot Timbl@uvt.nl
+Ko van der Sloot
 
-Antal van den Bosch Timbl@uvt.nl
+Antal van den Bosch
+
+e\-mail: lamasoftware@science.ru.nl
 
 .SH SEE ALSO
 .BR timblserver (1)

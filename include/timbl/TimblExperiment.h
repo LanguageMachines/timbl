@@ -288,6 +288,7 @@ namespace Timbl {
     std::string outStreamName;
     std::ifstream testStream;
     std::ofstream outStream;
+    std::vector<char> outStreamBuf; // large write buffer for outStream
     unsigned long ibCount;
     ConfusionMatrix *confusionInfo;
     std::vector<Instance> instances;

@@ -50,7 +50,7 @@ namespace Timbl {
   using namespace Common;
   using TiCC::operator<<;
 
-  size_t Vfield::Index() { return value->Index(); }
+  size_t Vfield::Index() const { return value->Index(); }
 
   ostream& operator<<(ostream& os, const Vfield *vd ) {
     return vd->put( os );
@@ -76,20 +76,49 @@ namespace Timbl {
     return (int)floor(randnum+0.5);
   }
 
-  void ClassDistribution::clear(){
-    for ( const auto& d : distribution ){
-      delete d.second;
+  // distribution is kept sorted by value->Index(); these helpers locate or
+  // position entries with a binary search.
+  ClassDistribution::VDlist::iterator
+  ClassDistribution::lower_index( size_t id ){
+    // Fast path for the common append case: when building a distribution
+    // from sorted input (read_distribution) or merging a disjoint tail, the
+    // new index is larger than everything present, so the insert position is
+    // simply end() -- no binary search needed.
+    if ( distribution.empty() || distribution.back().value->Index() < id ){
+      return distribution.end();
     }
+    return lower_bound( distribution.begin(), distribution.end(), id,
+			[]( const Vfield& v, size_t i ){
+			  return v.value->Index() < i; } );
+  }
+
+  Vfield *ClassDistribution::find_index( size_t id ){
+    auto it = lower_index( id );
+    if ( it != distribution.end() && it->value->Index() == id ){
+      return &*it;
+    }
+    return nullptr;
+  }
+
+  const Vfield *ClassDistribution::find_index( size_t id ) const {
+    auto it = lower_bound( distribution.begin(), distribution.end(), id,
+			   []( const Vfield& v, size_t i ){
+			     return v.value->Index() < i; } );
+    if ( it != distribution.end() && it->value->Index() == id ){
+      return &*it;
+    }
+    return nullptr;
+  }
+
+  void ClassDistribution::clear(){
     distribution.clear();
     total_items = 0;
   }
 
   double ClassDistribution::Confidence( const TargetValue *tv ) const {
-    auto it = find_if( distribution.begin(), distribution.end(),
-		       [tv]( const std::pair<const long unsigned int, Timbl::Vfield*>& v ){
-			 return v.second->Value() == tv ; } );
-    if ( it != distribution.end() ){
-      return it->second->Weight();
+    const Vfield *f = find_index( tv->Index() );
+    if ( f ){
+      return f->Weight();
     }
     return 0.0;
   }
@@ -99,13 +128,12 @@ namespace Timbl {
     oss.setf(ios::showpoint);
     bool first = true;
     oss << "{ ";
-    for ( const auto& it : distribution ){
-      const Vfield *f = it.second;
-      if ( f->frequency >= minf ){
+    for ( const auto& f : distribution ){
+      if ( f.frequency >= minf ){
 	if ( !first ){
 	  oss << ", ";
 	}
-	oss << f->value << " " << double(f->frequency);
+	oss << f.value << " " << double(f.frequency);
 	first = false;
       }
     }
@@ -118,18 +146,17 @@ namespace Timbl {
     oss.setf(ios::showpoint);
     bool first = true;
     oss << "{ ";
-    for( const auto& it : distribution ){
-      const Vfield *f = it.second;
-      if ( abs(f->weight) < minw ){
+    for( const auto& f : distribution ){
+      if ( abs(f.weight) < minw ){
 	continue;
       }
-      if ( abs(f->weight) < Epsilon ){
+      if ( abs(f.weight) < Epsilon ){
 	continue;
       }
       if ( !first ){
 	oss << ", ";
       }
-      oss << f->value << " " << f->weight;
+      oss << f.value << " " << f.weight;
       first = false;
     }
     oss << " }";
@@ -147,9 +174,8 @@ namespace Timbl {
     double minw = 0.0;
     if ( beam > 0 ){
       set<double, dblCmp> freqs;
-      for ( const auto& it : distribution ){
-	const Vfield *f = it.second;
-	freqs.insert( f->frequency );
+      for ( const auto& f : distribution ){
+	freqs.insert( f.frequency );
       }
       int cnt=0;
       for ( const auto& rit : freqs ){
@@ -167,9 +193,8 @@ namespace Timbl {
     double minw = 0.0;
     if ( beam > 0 ){
       set<double, dblCmp> wgths;
-      for ( const auto& it : distribution ){
-	const Vfield *f = it.second;
-	wgths.insert( f->weight );
+      for ( const auto& f : distribution ){
+	wgths.insert( f.weight );
       }
       int cnt=0;
       for ( const auto& rit : wgths ){
@@ -200,7 +225,7 @@ namespace Timbl {
     if ( TotalVals > 0 ){
       // Loop over the classes in the distribution
       for ( const auto& it : distribution ){
-	size_t Freq = it.second->Freq();
+	size_t Freq = it.Freq();
 	if ( Freq > 0 ){
 	  double Prob = Freq / (double)TotalVals;
 	  entropy += Prob * Log2(Prob);
@@ -213,10 +238,10 @@ namespace Timbl {
   void WClassDistribution::Normalize() {
     double sum = accumulate( distribution.begin(), distribution.end(),
 			     0.0,
-			     []( double r, const std::pair<const long unsigned int, Timbl::Vfield*>& v ){
-			       return r + v.second->Weight(); } );
+			     []( double r, const Vfield& v ){
+			       return r + v.Weight(); } );
     for ( auto& it : distribution ){
-      it.second->SetWeight( it.second->Weight() / sum );
+      it.SetWeight( it.Weight() / sum );
     }
   }
 
@@ -226,12 +251,12 @@ namespace Timbl {
       // search for val, if not there: add entry with frequency factor;
       // otherwise increment the ExamplarWeight
       size_t id = val->Index();
-      auto const& it = distribution.find( id );
-      if ( it != distribution.end() ){
-	it->second->SetWeight( it->second->Weight() + factor );
+      auto it = lower_index( id );
+      if ( it != distribution.end() && it->value->Index() == id ){
+	it->SetWeight( it->Weight() + factor );
       }
       else {
-	distribution[id] = new Vfield( val, 1, factor );
+	distribution.insert( it, Vfield( val, 1, factor ) );
       }
     }
     total_items += targ.num_of_values();
@@ -239,18 +264,17 @@ namespace Timbl {
   }
 
   void WClassDistribution::Normalize_2( ) {
-    for ( const auto& d : distribution ){
-      d.second->SetWeight( log1p( d.second->Weight() ) );
+    for ( auto& d : distribution ){
+      d.SetWeight( log1p( d.Weight() ) );
     }
     Normalize();
   }
 
   ClassDistribution *ClassDistribution::to_VD_Copy( ) const {
     ClassDistribution *res = new ClassDistribution();
-    for ( const auto& [key,vdf] : distribution ){
-      res->distribution[key] = new Vfield( vdf->Value(),
-					   vdf->Freq(),
-					   vdf->Freq() );
+    res->distribution.reserve( distribution.size() );
+    for ( const auto& vdf : distribution ){
+      res->distribution.emplace_back( vdf.Value(), vdf.Freq(), vdf.Freq() );
     }
     res->total_items = total_items;
     return res;
@@ -258,10 +282,9 @@ namespace Timbl {
 
   WClassDistribution *ClassDistribution::to_WVD_Copy() const {
     WClassDistribution *res = new WClassDistribution();
-    for ( const auto& [key,vdf] : distribution ){
-      res->distribution[key] = new Vfield( vdf->Value(),
-					   vdf->Freq(),
-					   vdf->Freq() );
+    res->distribution.reserve( distribution.size() );
+    for ( const auto& vdf : distribution ){
+      res->distribution.emplace_back( vdf.Value(), vdf.Freq(), vdf.Freq() );
     }
     res->total_items = total_items;
     return res;
@@ -269,10 +292,9 @@ namespace Timbl {
 
   WClassDistribution *WClassDistribution::to_WVD_Copy( ) const {
     WClassDistribution *result = new WClassDistribution();
-    for ( const auto& [key,vdf] : distribution ){
-      result->distribution[key] = new Vfield( vdf->Value(),
-					      vdf->Freq(),
-					      vdf->Weight() );
+    result->distribution.reserve( distribution.size() );
+    for ( const auto& vdf : distribution ){
+      result->distribution.emplace_back( vdf.Value(), vdf.Freq(), vdf.Weight() );
     }
     result->total_items = total_items;
     return result;
@@ -290,13 +312,12 @@ namespace Timbl {
     ostringstream oss;
     oss << "{ ";
     bool first = true;
-    for ( const auto& it : distribution ){
-      const Vfield *f = it.second;
-      if ( f->frequency > 0 ){
+    for ( const auto& f : distribution ){
+      if ( f.frequency > 0 ){
 	if ( !first ){
 	  oss << ", ";
 	}
-	oss << f->value->Index() << " " << f->frequency;
+	oss << f.value->Index() << " " << f.frequency;
 	first = false;
       }
     }
@@ -308,14 +329,13 @@ namespace Timbl {
     ostringstream oss;
     bool first = true;
     oss << "{ ";
-    for ( const auto& it : distribution ){
-      const Vfield *f = it.second;
-      if ( f->frequency > 0 ){
+    for ( const auto& f : distribution ){
+      if ( f.frequency > 0 ){
 	if ( !first ){
 	  oss << ", ";
 	}
-	oss << f->Value()->Index() << " "
-	    << f->frequency << " " << f->weight;
+	oss << f.Value()->Index() << " "
+	    << f.frequency << " " << f.weight;
 	first = false;
       }
     }
@@ -331,13 +351,12 @@ namespace Timbl {
     ostringstream oss;
     oss << "{ ";
     bool first = true;
-    for ( const auto& it : distribution ){
-      const Vfield *f = it.second;
-      if ( f->frequency > 0 ){
+    for ( const auto& f : distribution ){
+      if ( f.frequency > 0 ){
 	if ( !first ){
 	  oss << ", ";
 	}
-	oss << f->value << " " << f->frequency;
+	oss << f.value << " " << f.frequency;
 	first = false;
       }
     }
@@ -349,14 +368,13 @@ namespace Timbl {
     ostringstream oss;
     oss << "{ ";
     bool first = true;
-    for ( const auto& it : distribution ){
-      const Vfield *f = it.second;
-      if ( f->frequency > 0 ){
+    for ( const auto& f : distribution ){
+      if ( f.frequency > 0 ){
 	if ( !first ){
 	  oss << ", ";
 	}
 	oss.setf(ios::showpoint);
-	oss << f->value << " " << f->frequency << " " << f->weight;
+	oss << f.value << " " << f.frequency << " " << f.weight;
 	first = false;
       }
     }
@@ -366,18 +384,30 @@ namespace Timbl {
 
   void ClassDistribution::SetFreq( const TargetValue *val, const int freq,
 				   double ){
-    // add entry with frequency freq;
-    Vfield *temp = new Vfield( val, freq, freq );
-    distribution[val->Index()] = temp;
+    // add entry with frequency freq (replacing any existing entry for val);
+    size_t id = val->Index();
+    auto it = lower_index( id );
+    if ( it != distribution.end() && it->value->Index() == id ){
+      *it = Vfield( val, freq, freq );
+    }
+    else {
+      distribution.insert( it, Vfield( val, freq, freq ) );
+    }
     total_items += freq;
   }
 
   void WClassDistribution::SetFreq( const TargetValue *val, const int freq,
 				    double sw ){
-    // add entry with frequency freq;
+    // add entry with frequency freq (replacing any existing entry for val);
     // also sets the sample_weight
-    Vfield *temp = new Vfield( val, freq, sw );
-    distribution[val->Index()] = temp;
+    size_t id = val->Index();
+    auto it = lower_index( id );
+    if ( it != distribution.end() && it->value->Index() == id ){
+      *it = Vfield( val, freq, sw );
+    }
+    else {
+      distribution.insert( it, Vfield( val, freq, sw ) );
+    }
     total_items += freq;
   }
 
@@ -387,12 +417,12 @@ namespace Timbl {
     // search for val, if not there: add entry with frequency 'occ';
     // otherwise increment the freqency
     size_t id = val->Index();
-    auto const& it = distribution.find( id );
-    if ( it != distribution.end() ){
-      it->second->IncFreq( occ );
+    auto it = lower_index( id );
+    if ( it != distribution.end() && it->value->Index() == id ){
+      it->IncFreq( occ );
     }
     else {
-      distribution[id] = new Vfield( val, occ, 1.0 );
+      distribution.insert( it, Vfield( val, occ, 1.0 ) );
     }
     total_items += occ;
     return true;
@@ -405,39 +435,40 @@ namespace Timbl {
     // otherwise increment the freqency
     // also set sample weight
     size_t id = val->Index();
-    auto const& it = distribution.find( id );
-    if ( it != distribution.end() ){
-      it->second->IncFreq( occ );
+    auto it = lower_index( id );
+    if ( it != distribution.end() && it->value->Index() == id ){
+      it->IncFreq( occ );
     }
     else {
-      distribution[id] = new Vfield( val, occ, sw );
+      it = distribution.insert( it, Vfield( val, occ, sw ) );
     }
     total_items += occ;
-    return fabs( distribution[id]->Weight() - sw ) > Epsilon;
+    return fabs( it->Weight() - sw ) > Epsilon;
   }
 
   void ClassDistribution::DecFreq( const TargetValue *val ){
     // search for val, if not there, just forget
     // otherwise decrement the freqency
-    auto const& it = distribution.find( val->Index() );
-    if ( it != distribution.end() ){
-      it->second->DecFreq();
+    Vfield *f = find_index( val->Index() );
+    if ( f ){
+      f->DecFreq();
       total_items -= 1;
     }
   }
 
   void ClassDistribution::Merge( const ClassDistribution& VD ){
-    for ( const auto& [key,vd] : VD.distribution ){
-      if ( distribution.find(key) != distribution.end() ){
+    for ( const auto& vd : VD.distribution ){
+      size_t key = vd.value->Index();
+      auto it = lower_index( key );
+      if ( it != distribution.end() && it->value->Index() == key ){
 	// the key is already present, increment the frequency
-	distribution[key]->AddFreq( vd->Freq() );
+	it->AddFreq( vd.Freq() );
       }
       else {
 	// add a key
 	// VD might be weighted. But we don't need/want that info here
 	// Weight == Freq is more convenient
-	distribution[key] = new Vfield( vd->Value(), vd->Freq(),
-					vd->Freq() );
+	distribution.insert( it, Vfield( vd.Value(), vd.Freq(), vd.Freq() ) );
       }
     }
     total_items += VD.total_items;
@@ -445,13 +476,15 @@ namespace Timbl {
 
   void WClassDistribution::MergeW( const ClassDistribution& VD,
 				   double Weight ){
-    for ( const auto& [key,vd] : VD.distribution ){
-      if ( distribution.find(key) != distribution.end() ){
-	distribution[key]->SetWeight( distribution[key]->Weight() + vd->Weight() *Weight );
+    for ( const auto& vd : VD.distribution ){
+      size_t key = vd.value->Index();
+      auto it = lower_index( key );
+      if ( it != distribution.end() && it->value->Index() == key ){
+	it->SetWeight( it->Weight() + vd.Weight() * Weight );
       }
       else {
-	distribution[key] = new Vfield( vd->Value(), 1,
-					vd->Weight() * Weight);
+	distribution.insert( it, Vfield( vd.Value(), 1,
+					 vd.Weight() * Weight ) );
       }
     }
     total_items += VD.total_items;
@@ -467,13 +500,13 @@ namespace Timbl {
     tie = false;
     auto It = distribution.begin();
     if ( It != distribution.end() ){
-      const Vfield *pnt = It->second;
+      const Vfield *pnt = &*It;
       size_t Max = pnt->Freq();
       if ( do_rand ){
 	int nof_best=1, pick=1;
 	++It;
 	while ( It != distribution.end() ){
-	  pnt = It->second;
+	  pnt = &*It;
 	  if ( pnt->Freq() > Max ){
 	    Max = pnt->Freq();
 	    nof_best = 1;
@@ -490,7 +523,7 @@ namespace Timbl {
 	It = distribution.begin();
 	nof_best = 0;
 	while ( It != distribution.end() ){
-	  pnt = It->second;
+	  pnt = &*It;
 	  if ( pnt->Freq() == Max ){
 	    if ( ++nof_best == pick ){
 	      return pnt->Value();
@@ -504,7 +537,7 @@ namespace Timbl {
 	best = pnt->Value();
 	++It;
 	while ( It != distribution.end() ){
-	  pnt = It->second;
+	  pnt = &*It;
 	  if ( pnt->Freq() > Max ){
 	    tie = false;
 	    best = pnt->Value();
@@ -536,17 +569,17 @@ namespace Timbl {
     auto It = distribution.begin();
     tie = false;
     if ( It != distribution.end() ){
-      double Max = It->second->Weight();
+      double Max = It->Weight();
       if ( do_rand ){
 	int nof_best=1, pick=1;
 	++It;
 	while ( It != distribution.end() ){
-	  if ( It->second->Weight() > Max ){
-	    Max = It->second->Weight();
+	  if ( It->Weight() > Max ){
+	    Max = It->Weight();
 	    nof_best = 1;
 	  }
 	  else {
-	    if ( abs(It->second->Weight()- Max) < Epsilon ){
+	    if ( abs(It->Weight()- Max) < Epsilon ){
 	      nof_best++;
 	    }
 	  }
@@ -557,9 +590,9 @@ namespace Timbl {
 	It = distribution.begin();
 	nof_best = 0;
 	while ( It != distribution.end() ){
-	  if ( abs(It->second->Weight() - Max) < Epsilon ){
+	  if ( abs(It->Weight() - Max) < Epsilon ){
 	    if ( ++nof_best == pick ){
-	      return It->second->Value();
+	      return It->Value();
 	    }
 	  }
 	  ++It;
@@ -567,19 +600,19 @@ namespace Timbl {
 	return NULL;
       }
       else {
-	best = It->second->Value();
+	best = It->Value();
 	++It;
 	while ( It != distribution.end() ){
-	  if ( It->second->Weight() > Max ){
+	  if ( It->Weight() > Max ){
 	    tie = false;
-	    best = It->second->Value();
-	    Max = It->second->Weight();
+	    best = It->Value();
+	    Max = It->Weight();
 	  }
 	  else {
-	    if ( abs(It->second->Weight() - Max) < Epsilon ) {
+	    if ( abs(It->Weight() - Max) < Epsilon ) {
 	      tie = true;
-	      if ( It->second->Value()->ValFreq() > best->ValFreq() ){
-		best = It->second->Value();
+	      if ( It->Value()->ValFreq() > best->ValFreq() ){
+		best = It->Value();
 	      }
 	    }
 	  }

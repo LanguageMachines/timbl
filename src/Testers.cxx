@@ -152,6 +152,17 @@ namespace Timbl{
 	metricTest[i] = new overlapTestFunction();
       }
     }
+    // Precompute, in permuted order, the metric test function and an Overlap
+    // flag for each feature, so test() can use a flat index and take a direct
+    // path for Overlap features.
+    permTest.resize(_size,0);
+    isOverlap.resize(_size,0);
+    for ( size_t j=0; j < _size; ++j ){
+      Feature *feat = permFeatures[j];
+      permTest[j] = metricTest[permutation[j]];
+      isOverlap[j] = ( feat && !feat->Ignore()
+		       && feat->getMetricType() == Overlap ) ? 1 : 0;
+    }
   }
 
   size_t DistanceTester::test( const vector<FeatureValue *>& G,
@@ -164,9 +175,15 @@ namespace Timbl{
       cerr << "feature " << TrueF << " (perm=" << permutation[TrueF]
 	   << ")" << endl;
 #endif
-      double result = metricTest[permutation[TrueF]]->test( (*FV)[TrueF],
-							    G[i],
-							    permFeatures[TrueF] );
+      double result;
+      if ( isOverlap[TrueF] ){
+	// plain Overlap: distance is 0 for an exact value match, otherwise
+	// the feature weight -- no virtual metric dispatch needed.
+	result = ( (*FV)[TrueF] == G[i] ) ? 0.0 : permFeatures[TrueF]->Weight();
+      }
+      else {
+	result = permTest[TrueF]->test( (*FV)[TrueF], G[i], permFeatures[TrueF] );
+      }
       distances[i+1] = distances[i] + result;
       if ( distances[i+1] > Threshold ){
 #ifdef DBGTEST

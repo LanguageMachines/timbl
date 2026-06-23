@@ -142,6 +142,9 @@ inline void usage_full(void){
   cerr << "            Supported options: d e F k m o p q R t u v w x % -"
        << endl;
   cerr << "            -t <file> is mandatory" << endl;
+  cerr << "--prune   : convert an IB1 tree into an IGtree." << endl
+       << "            using -i to read an IB1 file and -I to output an IGtree"
+       << endl;
   cerr << "Input options:" << endl;
   cerr << "-f f      : read from Datafile 'f'" << endl;
   cerr << "-f f      : OR: use filenames from 'f' for CV test" << endl;
