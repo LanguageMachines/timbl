@@ -1,3 +1,10 @@
+6.12 2026-06-25
+[Ko van der Sloot]
+* Merged 3 pull request suggested by Claude
+  smaller memory footprint and > 40% speedup
+* some small code improvements
+* updated man page
+
 6.11 2025-12-11
 [Ko van der Sloot]
 * added a --prune option: https://github.com/LanguageMachines/timbl/issues/13
