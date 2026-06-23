@@ -2,6 +2,7 @@
 [Ko van der Sloot]
 * Merged 3 pull request suggested by Claude
   smaller memory footprint and > 40% speedup
+* bumped .so version, due to an ABI/API breach
 * some small code improvements
 * updated man page
 
