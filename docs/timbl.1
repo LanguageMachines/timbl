@@ -1,4 +1,4 @@
-.TH timbl 1 "2017 November 9"
+.TH timbl 1 "2026 June 23"
 
 .SH NAME
 timbl \- Tilburg Memory Based Learner
@@ -311,6 +311,13 @@ cross_validate
 perform cross\(hyvalidation test (IB1 only)
 .RE
 
+.B \-\-prune
+.RS
+Convert an IB1 tree into an IGTree
+
+usage: 'timbl \-i IB1tree \-I IGtree'
+.RE
+
 .B \-t
 @file
 .RS
@@ -434,9 +441,11 @@ dump the InstanceBase as XML in 'file'
 possibly
 
 .SH AUTHORS
-Ko van der Sloot Timbl@uvt.nl
+Ko van der Sloot
 
-Antal van den Bosch Timbl@uvt.nl
+Antal van den Bosch
+
+e\-mail: lamasoftware@science.ru.nl
 
 .SH SEE ALSO
 .BR timblserver (1)
