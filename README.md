@@ -96,5 +96,6 @@ dependencies through your distribution's package manager, as they are not
 provided by our script:
 
 * ``icu`` - A C++ library for Unicode and Globalization support. On Debian/Ubuntu systems, install the package libicu-dev.
-* A sane build environment with a C++ compiler (e.g. gcc 4.9 or above or clang), make, autotools, libtool, pkg-config
+* ``libxml2`` - A C library to manipulate XML. On Debian/Ubuntu systems, install the package libxml2-dev.
+* A sane build environment with a C++ compiler supporting C++17 (e.g. gcc 7 or above or clang), make, autotools, libtool, pkg-config
 
