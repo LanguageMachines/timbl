@@ -1,7 +1,7 @@
 6.12 2026-06-25
 [Ko van der Sloot]
 * Merged 3 pull request suggested by Claude
-  smaller memory footprint and > 40% speedup
+  smaller memory footprint and upto 40% speedup
 * bumped .so version, due to an ABI/API breach
 * some small code improvements
 * updated man page
