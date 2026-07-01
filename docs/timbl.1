@@ -1,4 +1,4 @@
-.TH timbl 1 "2026 June 23"
+.TH timbl 1 "2026 June 23" "TiMBL 6.12"
 
 .SH NAME
 timbl \- Tilburg Memory Based Learner
@@ -113,7 +113,7 @@ read from data file 'file' OR use filenames from 'file' for cross validation tes
 format
 .RS
 assume the specified input format
-(Compact, C4.5, ARFF, Columns, Binary, Sparse )
+(Compact, C4.5, ARFF, Columns, Tabbed, Binary, Sparse )
 .RE
 
 .B \-G
@@ -229,11 +229,19 @@ n
 number of features (default 2500)
 .RE
 
-.BR \-\-limit =<l>
+.BR \-\-limit =l
 .RS
-limit the number of features used to the 'l' with the highest weights.
+limit the number of features used to the 'l' features with the highest
+weights (restarts timbl with an adapted \-m option). Cannot be combined
+with cross\-validation.
+.RE
 
-(will restart Timbl with an adapted -m option)
+.B \-\-prune
+.RS
+prune an IGTree instance base directly from an IB1/TRIBL2 instance
+base, instead of after a full training run: read an existing instance
+base (\-i), optionally add training material (\-f), prune the tree, and
+write the result to the file given with \-I (which is required).
 .RE
 
 .B \-o
@@ -318,13 +326,6 @@ cross_validate
 perform cross\(hyvalidation test (IB1 only)
 .RE
 
-.B \-\-prune
-.RS
-Convert an IB1 tree into an IGTree
-
-usage: 'timbl \-i IB1tree \-I IGtree'
-.RE
-
 .B \-t
 @file
 .RS
@@ -364,8 +365,17 @@ save value\(hyclass probabilities in 'file'
 .RE
 
 .B \-V
+or
+.B \-\-version
 .RS
-Show VERSION
+show version number
+.RE
+
+.B \-h
+or
+.B \-\-help
+.RS
+show usage information
 .RE
 
 .B +v
@@ -445,14 +455,27 @@ dump the InstanceBase as XML in 'file'
 .RE
 
 .SH BUGS
-possibly
+possibly. Please report bugs and issues at the issue tracker:
+https://github.com/LanguageMachines/timbl/issues
 
 .SH AUTHORS
 Ko van der Sloot
 
 Antal van den Bosch
 
-e\-mail: lamasoftware@science.ru.nl
+Walter Daelemans
+
+Maarten van Gompel
+
+Contact: lamasoftware@science.ru.nl
 
 .SH SEE ALSO
-.BR timblserver (1)
+.BR timblserver (1),
+.BR mbt (1),
+.BR frog (1)
+.PP
+More documentation, including the reference guide, is available at
+https://languagemachines.github.io/timbl/ and in the source
+distribution's
+.B docs
+directory.
