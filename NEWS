@@ -1,5 +1,6 @@
-6.12 2026-06-25
+7.0 2026-07-01
 [Ko van der Sloot]
+* first release in the 7 series
 * Merged 3 pull request suggested by Claude
   smaller memory footprint and upto 40% speedup
 * bumped .so version, due to an ABI/API breach
