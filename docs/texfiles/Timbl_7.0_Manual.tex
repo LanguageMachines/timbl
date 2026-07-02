@@ -1,4 +1,4 @@
-% TiMBL 6.4 manual
+% TiMBL 7.0 manual
 
 \documentclass{book}
 
@@ -9,28 +9,26 @@
 \usepackage{fullname}
 \usepackage{url}
 
+% allow long URLs to break across lines
+\urldef{\timblmanualurl}\url{https://github.com/LanguageMachines/timbl/blob/master/docs/Timbl_7.0_Manual.pdf}
+
 \newcommand{\chisq}{{$ \chi^2 $}}
 
 \author{Walter Daelemans$*$ \and Jakub Zavrel$\dagger$ \and Ko van der Sloot$\dagger\dagger$\\ \and
-	Antal van den Bosch$\dagger\dagger$\\ \ \\
+	Antal van den Bosch$\ddagger$\\ \ \\
 	(*) CLiPS - Computational Linguistics Group\\
         Department of Linguistics \\
 	University of Antwerp\\ \\
-	($\dagger$) Textkernel B.V.\\ \\
-%	(**) Induction of Linguistic Knowledge Research Group\\
-%	Tilburg center for Cognition and Communication \\
-%        Tilburg University \\ \\
+	($\dagger$) Zeta Alpha\\ \\
         ($\dagger\dagger$) Centre for Language Studies \\
         Radboud University Nijmegen \\ \\
-        URL: http://ilk.uvt.nl\thanks{This document is available from
-	http://ilk.uvt.nl/downloads/pub/papers/ilk.XXXX.pdf. All rights reserved
-	Centre for Language Studies, Nijmegen \
-        Induction of Linguistic Knowledge, Tilburg University and
-        CLiPS, University of Antwerp.}}
+        ($\ddagger$) Faculty of Humanities \\
+        Utrecht University \\ \\
+        URL: https://languagemachines.github.io/timbl\thanks{This document is available from
+	\timblmanualurl.}}
 
 \title{{\huge TiMBL: Tilburg Memory-Based Learner} \\ \vspace*{0.5cm}
-{\bf version 6.4} \\ \vspace*{0.5cm}{\huge Reference Guide}\\
-\vspace*{1cm} {\it ILK Technical Report -- ILK 11-01}}
+{\bf version 7.0} \\ \vspace*{0.5cm}{\huge Reference Guide}}
 
 %better paragraph indentation
 \parindent 0pt
@@ -101,7 +99,7 @@ Our sincere thanks go to the many users of TiMBL who have contributed
 to it immensely by giving us feedback and reporting bugs, and to the
 two organisations that have supported and enabled its development:
 NWO, the Netherlands Organization for Scientific Research, and the
-School of Humanities of Tilburg University. NWO funding has spanned
+Tilburg School for Humanities and Digital Sciences. NWO funding has spanned
 three subsequent periods totalling fourteen years. From 1997 until 2001
 development was part of the ``Induction of Linguistic Knowledge''
 research project funded by NWO's {\em Pionier}\/ programme. Between
@@ -110,17 +108,19 @@ Language'' research project under the NWO {\em Vernieuwingsimpuls}\/
 programme, and between 2006 and 2011 as part of the ``Implicit
 Linguistics'' research project under the NWO Vici programme.
 
-The current release (version 6.4) coincides with a release of a Debian
-Science package for TiMBL. Its most significant change is a
-multiprocessor option that ``clones'' TiMBL internally so that it can
-classify a test set on $n$ available processors. An elaborate
-description of the changes from version 1.0 up to 6.4 can be found in
-Chapter~\ref{changes}.  Although all new features have been tested for
+The current release (version 7.0) is the result of a long series of
+incremental releases since version 6.4, which together brought, among
+other things, a multiprocessor option that ``clones'' TiMBL internally
+so that it can classify a test set on $n$ available processors,
+improved Unicode/UTF-8 handling, and a number of new options. An
+elaborate description of the changes from version 1.0 up to 7.0 can be
+found in Chapter~\ref{changes}.  Although all new features have been
+tested for
 some time in our research groups, the software may still contain bugs
 and inconsistencies in some places. We would appreciate it if you
 would send bug reports, ideas about enhancements of the software and
-the manual, and any other comments you might have, to {\tt
-  Timbl@uvt.nl}.
+the manual, and any other comments you might have, to our issue
+tracker at \url{https://github.com/LanguageMachines/timbl/issues}.
 
 This reference guide is structured as follows. In
 Chapter~\ref{license} you can find the terms of the open source
@@ -156,56 +156,72 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with TiMBL.  If not, see $<$http://www.gnu.org/licenses/$>$.
 
-In publication of research that makes use of TiMBL 6.4, a citation
+In publication of research that makes use of TiMBL 7.0, a citation
 should be given of: {\em ``Walter Daelemans, Jakub Zavrel, Ko van der
-  Sloot, and Antal van den Bosch (2012). TiMBL: Tilburg Memory Based
-  Learner, version 6.4, Reference Guide. ILK Technical Report XX-XX
+  Sloot, and Antal van den Bosch (2026). TiMBL: Tilburg Memory Based
+  Learner, version 7.0, Reference Guide.
   Available from \\ {\tt
-    http://ilk.uvt.nl/downloads/pub/papers/ilkXXXX.pdf}''}
+    https://languagemachines.github.io/timbl}''}
 
-For information about commercial licenses for TiMBL 6.4,
-contact {\tt Timbl@uvt.nl}, or send your request in writing to:
+For information about commercial licenses for TiMBL 7.0,
+contact {\tt lamasoftware@science.ru.nl}, or send your request in writing to:
 
-Prof. dr.~Walter Daelemans\\
-CLiPS - Language Technology Group\\
-Dept. of Linguistics \\
-University of Antwerp\\
-Prinsstraat 13, L-203, B-2000 Antwerp \\
-Belgium
+Prof. dr.~Antal van den Bosch\\
+Utrecht University\\
+Faculty of Humanities\\
+P.O. Box 80125\\
+3508 TC Utrecht\\
+the Netherlands
 
 \pagestyle{headings}
 
 \chapter{Installation}
 \vspace{-1cm}
-You can get the TiMBL package as a gzipped tar archive from:
+Before installing TiMBL from source, you should first check whether
+your operating system's package manager already offers an up-to-date
+package for it (TiMBL is available in, among others, Debian, Ubuntu and
+Homebrew). If so, that is by far the easiest route.
 
-{\tt http://ilk.uvt.nl/timbl}
+The home of the TiMBL project is on GitHub:
 
-Following the links from that page, you can download the file {\tt
-  timbl-latest.tar.gz}. This file contains the complete source code (C++)
-for the TiMBL program, a few sample data sets, the license, and
-documentation. The installation should be relatively straightforward
-on most UNIX systems.
+{\tt https://github.com/LanguageMachines/timbl}
 
-To install the package on your computer, unzip the downloaded file ({\tt >} is the command line prompt):
+and its documentation and further information can be found at:
 
-{\tt > tar xfz timbl-latest.tar.gz}
+{\tt https://languagemachines.github.io/timbl}
 
-This will make a directory {\tt timbl-6.4} under your current
+To build TiMBL from source, download the latest release tarball from
+the releases page
+(\url{https://github.com/LanguageMachines/timbl/releases}), or clone the
+repository directly with {\tt git}. The source distribution contains the
+complete source code (C++), a few sample data sets, the license, and
+documentation. Building should be relatively straightforward on most
+UNIX-like systems (Linux and macOS).
+
+To install from a release tarball, unzip the downloaded file ({\tt >} is the command line prompt):
+
+{\tt > tar xfz timbl-7.0.tar.gz}
+
+This will make a directory {\tt timbl-7.0} under your current
 directory. (The numbering may be higher; the current guide refers to
-version 6.4).
+version 7.0).
 
-Alternatively you can do:
+Alternatively, to build the latest development version, clone the
+repository:
 
-{\tt > gunzip timbl-6.4.tar.gz}
+{\tt > git clone https://github.com/LanguageMachines/timbl.git} \\
+{\tt > cd timbl} \\
+{\tt > bash bootstrap.sh}
 
-and unpack the tar archive:
+TiMBL depends on a few other packages, most notably {\tt ticcutils}
+(also available from the LanguageMachines GitHub organisation),
+{\tt pkg-config}, {\tt libicu} and {\tt libxml2}. Install these through
+your distribution's package manager before configuring; alternatively,
+running {\tt ./build-deps.sh} will fetch and build the
+LanguageMachines dependencies for you.
 
-{\tt > tar xf timbl-6.4.tar}
+Go to the source directory, and configure the package by typing
 
-Go to the timbl-6.4 directory, and configure the package by typing
-
-{\tt > cd timbl-6.4} \\
 {\tt > ./configure --prefix=<location\_to\_install>}
 
 If you do not use the {\tt --prefix} option, TiMBL will try to install
@@ -215,9 +231,9 @@ as {\tt \$HOME/install}.
 
 It is not obligatory to install TiMBL, but if you plan to install
 TiMBL-based extensions such as
-TimblServer\footnote{\url{http://ilk.uvt.nl/timbl}},
-Mbt\footnote{\url{http://ilk.uvt.nl/mbt}}, or
-Frog\footnote{\url{http://ilk.uvt.nl/frog}}, or you want to
+TimblServer\footnote{\url{https://github.com/LanguageMachines/timblserver}},
+Mbt\footnote{\url{https://languagemachines.github.io/mbt}}, or
+Frog\footnote{\url{https://languagemachines.github.io/frog}}, or you want to
 build your own extensions using the TiMBL API, installing is the best
 choice.
 
@@ -237,7 +253,7 @@ several demo programs named {\tt api\_test*}, {\tt classify} and {\tt
   tse} are created in the {\tt ./demos} subdirectory.
 
 Within the {\tt <location\_to\_install>} directory a subdirectory is
-also created: {\tt share/doc/timbl} where the TiMBL 6.4 documentation
+also created: {\tt share/doc/timbl} where the TiMBL 7.0 documentation
 can be found, and which in turn contains a subdirectory {\tt examples}
 with example data files. Some of these data sets are used in the Quick
 Start Section~\ref{tutorial} of this document; other data and source
@@ -269,15 +285,61 @@ If you did not install TiMBL, the executable can be found in the {\tt
   src} directory of the build. The demo files can be found in the {\tt
   demo} directory.
 
-The email address for problems with the installation, bug reports,
-comments and questions is {\tt Timbl@uvt.nl}.
+Problems with the installation, bug reports, comments and questions
+are welcome at our issue tracker,
+\url{https://github.com/LanguageMachines/timbl/issues}.
 
 \chapter{Changes}
 \label{changes}
 
 This chapter gives a brief overview of the changes from all previously
-released versions (1.0 up to 6.4) for users already familiar with the
+released versions (1.0 up to 7.0) for users already familiar with the
 program.
+
+\section{From version 6.4 to 7.0}
+
+Between version 6.4 and 7.0, TiMBL saw a long series of incremental
+releases. Most of these focused on internal code quality, build-system
+modernisation, and bug fixes; the changes most relevant to users are
+summarised below. The {\tt NEWS} and {\tt ChangeLog} files in the
+source repository give the complete per-release history.
+
+\begin{itemize}
+\item With {\tt --prune}, an IGTree instance base can now be pruned
+  directly from an IB1/TRIBL2 instance base, instead of after a full
+  training: TiMBL reads an existing instance base ({\tt -i}),
+  optionally adds new training material ({\tt -f}), prunes the tree,
+  and writes the result to a new file ({\tt -I}).
+\item With {\tt --limit <l>}, classification can be restricted to the
+  {\tt <l>} features with the highest weights; TiMBL automatically
+  restarts with an adapted {\tt -m} option that ignores the remaining
+  features.
+\item The options {\tt -f} (training file) and {\tt -i} (instance
+  base) may now be used without {\tt -t}, that is, to build and store
+  an instance base without immediately testing.
+\item A new {\tt Tabbed} input format was added to the {\tt -F}
+  option, in which fields are separated by tab characters, so that
+  spaces within field values are significant.
+\item TiMBL now handles Unicode (UTF-8) input robustly: strings are
+  internally normalised to NFC, which makes the program reliable on
+  text in a wide range of scripts, including non-Latin ones.
+\item Experimental JSON support for input and output was added. The
+  JSON syntax should still be considered unstable and may change in
+  future releases.
+\item The long options {\tt --version} and {\tt --help} are now
+  accepted alongside {\tt -V} and {\tt -h}.
+\end{itemize}
+
+For developers using the TiMBL API, version 6.8 introduced a major
+refactoring that modernises the code (Unicode strings are now the
+default, and C-style arrays and casts were removed) and that breaks
+both the API and the ABI; code written against earlier versions may
+need to be adapted and recompiled. Building TiMBL now requires a
+C++17 compiler. The dependencies on Boost and libtar have been
+removed; TiMBL relies on {\tt ticcutils}, {\tt libicu} and {\tt
+  libxml2}. Since version 6.4.7 the source repository is hosted on
+GitHub, and a {\tt Dockerfile} and a {\tt build-deps.sh} helper script
+are provided.
 
 \section{From version 6.3 to 6.4}
 
@@ -314,14 +376,15 @@ program.
 
 \begin{itemize}
 \item All server-related functionality is removed from TiMBL. A new
-  TimblServer package is available wich provides the same interface as
-  Timbl up to version 6.3, but also adds some extra features, such as
+  TimblServer package is available which provides the same interface as
+  TiMBL up to version 6.3, but also adds some extra features, such as
   running multiple but separate experiments on one TCP port. See
   the TimblServer package for more details.
 
-\item Starting with Timbl 6.3 we support installable packages for
-  Debian and Ubuntu (.deb), RedHat (.rpm) and MacOSX
-  (Fink)\footnote{\url{http://ilk.uvt.nl/timbl-packages}}.
+\item Starting with TiMBL 6.3 we support installable packages for
+  Debian and Ubuntu (.deb), RedHat (.rpm) and
+  macOS\footnote{Up-to-date packaging information is available from
+    \url{https://languagemachines.github.io/timbl}}.
 
 \item Some bugs and inconsistencies have been fixed.
 
@@ -927,11 +990,11 @@ output.
 
 {\footnotesize
 \begin{verbatim}
-TiMBL 6.4.2 (c) ILK 1998 - 2011.
+TiMBL 7.0 (c) CLS/ILK/CLiPS 1998 - 2026.
 Tilburg Memory Based Learner
-Induction of Linguistic Knowledge Research Group, Tilburg University
+Centre for Language Studies, Radboud University Nijmegen
 CLiPS Computational Linguistics Group, University of Antwerp
-Mon Apr 23 15:43:26 2012
+Tue Jun 23 12:00:00 2026
 
 Examine datafile 'dimin.train' gave the following results:
 Number of Features: 12
@@ -2592,7 +2655,13 @@ and English compounds \cite{Plag+07}, reading aloud
 \cite{VandenBosch+00b}, phonological bootstrapping \cite{Durieux+00},
 the prediction of linking morphemes in Dutch \cite{Krott+01},
 morphology \cite{Eddington00,Eddington03}, and the Dutch plural
-inflection \cite{Keuleers+07}. \namecite{Vandekerckhove+13} use
+inflection \cite{Keuleers+07}, including more recent work modelling the
+production of variable plural forms in Dutch \cite{Zee+21}.
+\namecite{VanCraenenbroeck+19} use $k$-nearest neighbor classification
+in TiMBL to analyse syntactic microvariation in the word order of Dutch
+verb clusters, and \namecite{VanCraenenbroeck+23} apply leave-one-out
+$k$-nearest neighbor classification in TiMBL to study morphosyntactic
+variation across some 260 Dutch dialects. \namecite{Vandekerckhove+13} use
 TiMBL to develop a language bigram model and use this to explain
 behavior of patients with a specific impairment that prohibits them to
 assess adjective orderings as normal or less felicitous.
@@ -2606,9 +2675,10 @@ to episodic memory and fast memory access with global matching models
 \subsubsection{Applications in syntax and semantics}
 
 At the {\bf syntactic} sentence level TiMBL has been applied to
-Part-of-Speech tagging \cite{Daelemans+96b,Zavrel+99,Halteren+01};
+Part-of-Speech tagging \cite{Daelemans+96b,Zavrel+99,Halteren+01,Griebenouw+19};
 PP-attachment \cite{Zavrel+97b}; subcategorization \cite{Buchholz98};
-phrase chunking \cite{Veenstra98,Sang+99}; shallow parsing of English
+phrase chunking \cite{Veenstra98,Sang+99}; multi-level sequence
+labeling \cite{Chen+19}; shallow parsing of English
 \cite{Daelemans+99a,Buchholz+99,Yeh00} and Arabic \cite{Azmi+10};
 clause identification \cite{Orasan00,Sang01}; detecting the scope of
 negation markers and hedge cues \cite{Morante+08c,Morante+09c};
@@ -2644,6 +2714,8 @@ recognition
 \cite{Buchholz+00,Hendrickx+03,DeMeulder+03,Sporleder+06b,Leveling+06,VandenBosch+13c},
 information extraction \cite{Zavrel+00b,Zavrel+03,Ahn06}, event
 extraction \cite{Morante+09d}, text classification \cite{Spitters00},
+stance detection \cite{Shenoy+17}, the automatic classification of the
+mood of songs from their lyrics \cite{VanZaanen+10},
 question classification \cite{Garcia+06,Dridan+07}, spam filtering
 \cite{Androutsopoulos+00}, and authorship attribution
 \cite{Luyckx+08,Kestemont+09}.
@@ -2664,7 +2736,12 @@ probabilistic classifiers, are discussed in
 prediction and statistical language modeling are identified in
 \cite{VandenBosch05,VandenBosch06,Stehouwer+09b}. Next-word prediction
 with TiMBL has been specifically applied to {\bf word completion}
-\cite{VandenBosch+08,VandenBosch11,Verberne+12,Stoop+14}.
+\cite{VandenBosch+08,VandenBosch11,Verberne+12,Stoop+14}. More
+recently, this memory-based approach to next-token prediction has been
+scaled up with TiMBL into a transparent, CPU-only, and eco-friendly
+alternative to neural {\bf large language models}, with next-token
+prediction accuracy that scales log-linearly with the amount of
+training data \cite{VandenBosch+25}.
 
 TiMBL has been shown to be a useful {\bf error detector} and
 corrector, such as in the context of error detection in textual
@@ -2679,14 +2756,22 @@ offers a conceptual bridge between example-based machine translation
 in \cite{VandenBosch+07,Canisius+09,VandenBosch+09,VanGompel+09};
 hybrids with statistical machine translation are presented in
 \cite{Stroppa+07,Haque+09,Haque+10}; sub-sentential paraphrasing using
-pivot translations is described in \cite{Max09}.
+pivot translations is described in \cite{Max09}. In related translation
+tasks, \namecite{Tezcan+16} include TiMBL among the learners in their
+machine-translation quality-estimation system for the WMT16 shared
+task, and \namecite{Daems+17} train a TiMBL classifier to distinguish
+human translations from post-edited machine translations
+(``translationese'' versus ``post-editese'').
 
 Although most of the applications of TiMBL are in the natural language
 processing and computational linguistics areas, it is occasionally
-used in other related domains as well. Examples are the classification
-of newborns' cries \cite{Feier+14}, scaffolded learning by robots
-\cite{Saunders+06}, or the detection of clinically important
-micro-organisms through an electronic nose \cite{Moens+06}.
+used in other domains as well. Examples are the classification of
+newborns' cries \cite{Feier+14}, scaffolded learning by robots
+\cite{Saunders+06}, the detection of clinically important
+micro-organisms through an electronic nose \cite{Moens+06}, the
+identification of cattle breeds from microsatellite {\sc dna} markers
+\cite{Jaiswal+16}, and, through the TiMBL-based memory-based shallow
+parser MBSP, the generation of visual art \cite{DeSmedt+11}.
 
 \subsubsection{Dissertations and special issue}
 
@@ -2697,7 +2782,8 @@ learning methods for NLP tasks related to English word pronunciation
 alignment, grapheme-to-phoneme conversion). TiMBL is also central in
 the Ph.D. theses of \namecite{Buchholz02}, \namecite{Lendvai04},
 \namecite{Hendrickx05}, \namecite{Hoste05}, \namecite{Keuleers08},
-\namecite{Canisius09}, and \namecite{Vandekerckhove13}.
+\namecite{Canisius09}, \namecite{Vandekerckhove13}, and
+\namecite{Pijpops19}.
 
 In 1999 a special issue of the {\em Journal for Experimental and
   Theoretical Artificial Intelligence} (Vol.~11(3), edited by Walter
@@ -2708,10 +2794,9 @@ taken in TiMBL \cite{Daelemans99b}.
 
 \ \\
 
-{\it All Tilburg/Antwerp papers referred to in this section, as well
-as more recent papers, are available in electronic form from the {\sc
-ILK} home page: {\tt http://ilk.uvt.nl} and the {\sc CLiPS} home page: \\
-{\tt http://www.clips.ua.ac.be/}.}
+{\it Many of the papers referred to in this section are available in
+electronic form from the {\sc CLiPS} home page:
+\url{https://www.uantwerpen.be/en/research-groups/clips/}.}
 
 \chapter{Software usage and options}
 \label{reference}
@@ -2726,11 +2811,11 @@ of the most basic command line options.
 
 {\footnotesize
 \begin{verbatim}
-TiMBL 6.4.2 (c) ILK 1998 - 2012.
+TiMBL 7.0 (c) CLS/ILK/CLiPS 1998 - 2026.
 Tilburg Memory Based Learner
-Induction of Linguistic Knowledge Research Group, Tilburg University
+Centre for Language Studies, Radboud University Nijmegen
 CLiPS Computational Linguistics Group, University of Antwerp
-Mon Apr 23 15:43:26 2012
+Tue Jun 23 12:00:00 2026
 
 usage:  timbl -f data-file {-t test-file}
 or see: timbl -h
@@ -2953,12 +3038,20 @@ cross-validation files.
 
 \item {\tt -F <format>} : Force TiMBL to interpret the training and
 test file as a specific data format. Possible values for this
-parameter are: {\tt Compact, C4.5, ARFF, Columns, Sparse, Binary}
-(case-insensitive). The default is that TiMBL guesses the format from
-the contents of the first line of the data file. ARFF is not
-automatically detected. See section~\ref{dataformats} for description
-of the data formats and the guessing rules. The {\tt Compact} format
-cannot be used with numeric features.
+parameter are: {\tt Compact, C4.5, ARFF, Columns, Tabbed, Sparse,
+  Binary} (case-insensitive). The default is that TiMBL guesses the
+format from the contents of the first line of the data file. ARFF is
+not automatically detected. In the {\tt Tabbed} format, fields are
+separated by single tab characters, so that spaces inside a
+feature-value or category symbol are significant. See
+section~\ref{dataformats} for description of the data formats and the
+guessing rules. The {\tt Compact} format cannot be used with numeric
+features.
+
+\item {\tt --limit <l>} : Restrict classification to the {\tt <l>}
+  features that have the highest weights. TiMBL automatically restarts
+  with an adapted {\tt -m} option that ignores the remaining
+  features. This option cannot be combined with cross-validation.
 
 \item {\tt -l <n>} : Feature length. Only applicable with the Compact
   data format; {\tt <n>} is the number of characters used for each
@@ -2968,7 +3061,9 @@ cannot be used with numeric features.
   instead of processing a training file, read a previously saved (see
   {\tt -I} option) instance-base or {\sc IGTree} from the file {\tt
     treefile}. See section~\ref{treeformat} for the format of this
-  file.
+  file. Both {\tt -i} and {\tt -f} may be used without {\tt -t}, for
+  instance to build and save an instance base without classifying a
+  test set in the same run.
 
 \item {\tt --matrixin=<filename>} : Read value distance metrics (such
   as {\sc mvdm} or Jeffrey divergence matrices written to file with
@@ -3012,6 +3107,12 @@ cannot be used with numeric features.
   saves the current weights into {\tt treefile.wgt} unless this is
   overridden by {\tt -W}.
   See section~\ref{treeformat} for a description of the resulting file's format.
+
+\item {\tt --prune} : Prune an {\sc IGTree} instance base directly from
+  an IB1/TRIBL2 instance base, instead of after a full training run.
+  TiMBL reads an existing instance base ({\tt -i}), optionally adds new
+  training material ({\tt -f}), prunes the resulting tree, and writes
+  it to the file given with {\tt -I} (which is therefore required).
 
 \item {\tt --matrixout=<filename>} : Store calculated {\sc mvdm} or
   Jeffrey divergence distance metrics in file {\tt filename}.
@@ -3200,7 +3301,7 @@ list of disclosed hidden options follows.
   weight thus becomes $\epsilon$. This modification ``diversifies''
   the feature weights, and was introduced to enhance the effect of
   {\sc Dimbl}, the multi-CPU variant of TiMBL\footnote{For {\sc
-      Dimbl}, see \url{http://ilk.uvt.nl/dimbl}}.
+      Dimbl}, see \url{https://github.com/LanguageMachines/dimbl}}.
 \end{description}
 
 \section{File formats}
