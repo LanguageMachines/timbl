@@ -1,11 +1,15 @@
 7.0 2026-07-01
 [Ko van der Sloot]
 * first release in the 7 series
-* Merged 3 pull request suggested by Claude
+* Merged 3 pull request suggested by Claude Code
   smaller memory footprint and upto 40% speedup
 * bumped .so version, due to an ABI/API breach
 * some small code improvements
 * updated man page
+[Antal vd Bosch]
+* updated Timbl manual
+[Maarten van Gompel]
+* updated README.md
 
 6.11 2025-12-11
 [Ko van der Sloot]
