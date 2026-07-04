@@ -131,11 +131,11 @@ inline void usage_full(void){
   cerr << "-L n      : MVDM threshold at level n" << endl;
   cerr << "-R n      : solve ties at random with seed n" << endl;
   cerr << "-t  f     : test using file 'f'" << endl;
-  cerr << "-t leave_one_out:"
+  cerr << "-t leave_one_out"
        << " test with Leave One Out,using IB1" << endl;
   cerr << " you may add -sloppy to speed up Leave One Out testing (see docs)"
        << endl;
-  cerr << "-t cross_validate:"
+  cerr << "-t cross_validate"
        << " Cross Validate Test,using IB1" << endl;
   cerr << "   @f     : test using files and options described in file 'f'"
        << endl;
