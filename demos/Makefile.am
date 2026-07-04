@@ -1,6 +1,3 @@
-# $Id$
-# $URL: $
-
 AM_CPPFLAGS = -I@top_srcdir@/include
 AM_CXXFLAGS = -std=c++17
 
