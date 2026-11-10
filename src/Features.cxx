@@ -164,7 +164,7 @@ namespace Timbl {
   }
 
   FeatureValue *Feature::add_value( const UnicodeString& valstr,
-				    TargetValue *tv,
+				    const TargetValue *tv,
 				    int freq ){
     unsigned int hash_val = TokenTree->hash( valstr );
     //    cerr << "hash(" << valstr << ") geeft: " << hash_val << endl;
@@ -172,7 +172,7 @@ namespace Timbl {
   }
 
   FeatureValue *Feature::add_value( size_t hash_val,
-				    TargetValue *tv,
+				    const TargetValue *tv,
 				    int freq ){
     auto const& it = reverse_values.find( hash_val );
     if (  it == reverse_values.end() ){

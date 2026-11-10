@@ -88,8 +88,8 @@ namespace Timbl {
     TargetValue *add_value( size_t, int freq = 1 );
     TargetValue *Lookup( const icu::UnicodeString& ) const;
     TargetValue *ReverseLookup( size_t ) const;
-    bool decrement_value( TargetValue * );
-    bool increment_value( TargetValue * );
+    static bool decrement_value( TargetValue * );
+    static bool increment_value( TargetValue * );
     TargetValue *MajorityClass() const;
     size_t EffectiveValues() const;
     size_t TotalValues() const;

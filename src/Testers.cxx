@@ -158,7 +158,7 @@ namespace Timbl{
     permTest.resize(_size,0);
     isOverlap.resize(_size,0);
     for ( size_t j=0; j < _size; ++j ){
-      Feature *feat = permFeatures[j];
+      const Feature *feat = permFeatures[j];
       permTest[j] = metricTest[permutation[j]];
       isOverlap[j] = ( feat && !feat->Ignore()
 		       && feat->getMetricType() == Overlap ) ? 1 : 0;

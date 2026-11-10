@@ -151,7 +151,7 @@ namespace Timbl {
     isTop = true;
   }
 
-  void resultStore::addDisposable( ClassDistribution *vd,
+  void resultStore::addDisposable( const ClassDistribution *vd,
 				   const TargetValue *best_result ) {
     rawDist = vd;
     best_target = best_result;

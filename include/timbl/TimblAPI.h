@@ -50,8 +50,7 @@ namespace Timbl{
   class TimblAPI {
     friend class TimblExperiment;
   public:
-    // cppcheck-suppress noExplicitConstructor
-    TimblAPI( const TiCC::CL_Options&, const std::string& = "" );
+    explicit TimblAPI( const TiCC::CL_Options&, const std::string& = "" );
     // cppcheck-suppress noExplicitConstructor
     TimblAPI( const std::string&,  const std::string& = "" );
     TimblAPI( const TimblAPI& );

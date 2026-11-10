@@ -117,8 +117,6 @@ namespace Timbl{
   };
 
   class ARFF_Chopper : public C45_Chopper {
-  public:
-    bool chop( const icu::UnicodeString&, size_t ) override;
   };
 
   class ARFF_ExChopper : public C45_ExChopper {

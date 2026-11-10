@@ -351,14 +351,6 @@ namespace Timbl{
     return res;
   }
 
-  bool ARFF_Chopper::chop( const UnicodeString& InBuf, size_t len ){
-    // Lines look like this:
-    // one, two,   three , bla.
-    // the termination dot is optional
-    // WhiteSpace is skipped!
-    return C45_Chopper::chop( InBuf, len );
-  }
-
   bool Bin_Chopper::chop( const UnicodeString& InBuf, size_t len ) {
     // Lines look like this:
     // 12, 25, 333, bla.

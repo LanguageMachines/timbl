@@ -247,7 +247,7 @@ namespace Timbl {
 
   void WClassDistribution::Normalize_1( double factor,
 					const Targets& targ ) {
-    for ( const auto& val : targ.values_array ){
+    for ( const auto *val : targ.values_array ){
       // search for val, if not there: add entry with frequency factor;
       // otherwise increment the ExamplarWeight
       size_t id = val->Index();

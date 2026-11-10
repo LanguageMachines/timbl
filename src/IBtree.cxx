@@ -892,7 +892,7 @@ namespace Timbl {
       else {
 	result = new ClassDistribution();
       }
-      IBtree *pnt = this->next;
+      const IBtree *pnt = this->next;
       while ( pnt ){
 	if ( pnt->TDistribution ){
 	  result->Merge( *(pnt->TDistribution) );
@@ -1235,7 +1235,7 @@ namespace Timbl {
 
   IB_InstanceBase* TRIBL_InstanceBase::IBPartition( IBtree *sub ) const {
     int i=0;
-    IBtree *tmp = sub;
+    const IBtree *tmp = sub;
     while ( tmp && tmp->link ){
       i++;
       tmp = tmp->link;
@@ -1256,7 +1256,7 @@ namespace Timbl {
 
   IB_InstanceBase* TRIBL2_InstanceBase::IBPartition( IBtree *sub ) const {
     int i=0;
-    IBtree *tmp = sub;
+    const IBtree *tmp = sub;
     while ( tmp && tmp->link ){
       i++;
       tmp = tmp->link;
@@ -1349,7 +1349,7 @@ namespace Timbl {
   }
 
   void IG_InstanceBase::specialPrune( const TargetValue *top ){
-    IBtree *pnt = InstBase->link;
+    const IBtree *pnt = InstBase->link;
     // we have to fix the toptarget here, because the node
     // is build incremental
     ClassDistribution dist;

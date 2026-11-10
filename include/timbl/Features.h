@@ -120,11 +120,15 @@ namespace Timbl {
     double fvDistance( const FeatureValue *,
 		       const FeatureValue *,
 		       size_t=1 ) const;
-    FeatureValue *add_value( const icu::UnicodeString&, TargetValue *, int=1 );
-    FeatureValue *add_value( size_t, TargetValue *, int=1 );
+    FeatureValue *add_value( const icu::UnicodeString&,
+			     const TargetValue *,
+			     int=1 );
+    FeatureValue *add_value( size_t,
+			     const TargetValue *,
+			     int=1 );
     FeatureValue *Lookup( const icu::UnicodeString& ) const;
-    bool decrement_value( FeatureValue *, const TargetValue * );
-    bool increment_value( FeatureValue *, const TargetValue * );
+    static bool decrement_value( FeatureValue *, const TargetValue * );
+    static bool increment_value( FeatureValue *, const TargetValue * );
     size_t EffectiveValues() const;
     size_t TotalValues() const;
     bool isNumerical() const;
